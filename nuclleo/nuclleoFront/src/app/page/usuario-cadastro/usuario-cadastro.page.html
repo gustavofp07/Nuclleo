@@ -1,0 +1,38 @@
+<ion-content [fullscreen]="true" class="cadastro-content">
+
+  <div class="container">
+
+    <h2>Cadastrar</h2>
+
+    <form (ngSubmit)="salvar()">
+
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="E-mail" [(ngModel)]="usuario.email" name="email" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-item">
+        <ion-input type="password" placeholder="Senha" [(ngModel)]="usuario.senha" name="senha" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="input-item">
+        <ion-input type="password" placeholder="Confirmar a senha" [(ngModel)]="confirmarSenha" name="confirmarSenha" required></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" type="submit" class="btn-cadastrar">
+        Cadastrar
+      </ion-button>
+
+    </form>
+
+    <p class="termos">
+      Ao clicar em continuar, você concorda com os nossos
+      <span>Termos de Serviço</span> e com a <span>Política de Privacidade</span>
+    </p>
+
+  </div>
+
+</ion-content>
