@@ -2,22 +2,17 @@ GET http://localhost:8080/api/v1/usuarios HTTP/1.1
 
 ###
 
-GET http://example.com/topics/1 HTTP/1.1
-
-###
-
 POST http://localhost:8080/api/v1/usuarios HTTP/1.1
 content-type: application/json
 
 {
-    "cdUsuario": "3",
     "nmUsuario": "Cadu",
-    "email": "cadu@gmail"
+    "email": "cadu@gmail.com"
 }
 
 ###
 
-DELETE http://localhost:8080/api/v1/usuarios/1 HTTP/1.1
+DELETE http://localhost:8080/api/v1/usuarios/3 HTTP/1.1
 
 ###
 
@@ -25,7 +20,13 @@ PUT http://localhost:8080/api/v1/usuarios HTTP/1.1
 content-type: application/json
 
 {
-    "cdUsuario": "3",
+    "cdUsuario": 6,
     "nmUsuario": "Carlos Eduardo araujo",
-    "email": "carlos@gmail"
+    "ftUsuario": "foto.png",
+    "email": "carlos@gmail",
+    "senha": "123",
+    "dtEntrada": null,
+    "cpf": "111",
+    "cep": null,
+    "telefone": null
 }
