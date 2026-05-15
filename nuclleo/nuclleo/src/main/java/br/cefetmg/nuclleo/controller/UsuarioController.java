@@ -73,7 +73,7 @@ public class UsuarioController {
     public Usuario inserir(@RequestBody Usuario usuario) {
         //usuario.setCdUsuario(nextId++);
         //usuarioList.add(usuario);
-        usuario.setCdUsuario(null); // opcional
+        //usuario.setCdUsuario(null); // opcional
         repository.save(usuario);
         return usuario;
     }

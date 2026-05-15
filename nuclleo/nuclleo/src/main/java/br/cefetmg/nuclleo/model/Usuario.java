@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 //import jakarta.persistence.Version;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+//import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,14 +19,22 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Data
+//@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tbUsuario")// é aqui que se define o nome da tabela no banco de dados
+@Entity(name = "tb_Usuario")// é aqui que se define o nome da tabela no banco de dados
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cdUsuario;
+
+    /*
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "cdUsuario", updatable = false)
+    private UUID cdUsuario; // existe o tipo UUID
+    */
 
 
     @Column(length = 60, nullable = false)
