@@ -1,93 +1,91 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="login-content">
 
-  <div class="login-screen">
+  <div class="container">
 
-    <!-- Brand -->
+    <!-- Logo / Nome -->
     <div class="brand">
-      <h2 class="">Nuclleo</h2>
+      <h2>Nuclleo</h2>
     </div>
 
-    <!-- Content -->
-    <div class="content">
+    <!-- Títulos -->
+    <div class="copy">
+      <h1>Login</h1>
+      <p>Insira seu e-mail e senha</p>
+    </div>
 
-      <!-- Copy -->
-      <div class="copy">
-        <h1 class="login-title">Login</h1>
-        <p class="login-subtitle">Insira seu e-mail e senha</p>
-      </div>
+    <!-- Formulário -->
+    <form (ngSubmit)="onSubmit()">
 
       <!-- Email -->
-      <ion-item class="field" lines="none">
+      <ion-item lines="none" class="input-item">
         <ion-input
           type="email"
           placeholder="E-mail"
-          [value]="email()"
-          (ionInput)="email.set($any($event.target).value)"
-          autocomplete="email">
+          [(ngModel)]="email"
+          name="email"
+          required>
         </ion-input>
       </ion-item>
 
       <!-- Senha -->
-      <ion-item class="field" lines="none">
+      <ion-item lines="none" class="input-item">
 
         <ion-input
-          [type]="showPassword() ? 'text' : 'password'"
+          [type]="showPassword ? 'text' : 'password'"
           placeholder="Senha"
-          [value]="password()"
-          (ionInput)="password.set($any($event.target).value)"
-          autocomplete="current-password">
+          [(ngModel)]="password"
+          name="password"
+          required>
         </ion-input>
 
-        <button
+        <ion-button
+          fill="clear"
+          slot="end"
           type="button"
-          class="toggle-password"
-          (click)="showPassword.set(!showPassword())">
+          (click)="togglePassword()">
 
-          @if (showPassword()) {
-            <ion-icon name="eye-off-outline"></ion-icon>
-          } @else {
-            <ion-icon name="eye-outline"></ion-icon>
-          }
+          <ion-icon
+            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          </ion-icon>
 
-        </button>
+        </ion-button>
 
       </ion-item>
 
-      <!-- Login -->
-      <div class="actions">
-        <ion-button expand="block" class="btn-primary" (click)="onSubmit()">
-          Entrar
-        </ion-button>
-      </div>
+      <!-- Botão Login -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="btn-login">
 
-      <!-- Divider -->
-      <div class="divider">
-        <div class="divider-line"></div>
-        <span class="divider-text">ou</span>
-        <div class="divider-line"></div>
-      </div>
+        Entrar
 
-      <!-- Google -->
-      <div class="social-buttons">
+      </ion-button>
 
-        <ion-button
-          expand="block"
-          fill="clear"
-          class="btn-google"
-          (click)="onGoogleLogin()">
+    </form>
 
-          Continuar com Google
-
-        </ion-button>
-
-      </div>
-
-      <!-- Registro -->
-      <a routerLink="/register" class="register-link">
-        Não possuo uma conta
-      </a>
-
+    <!-- Divider -->
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span>ou</span>
+      <div class="divider-line"></div>
     </div>
+
+    <!-- Google -->
+    <ion-button
+      expand="block"
+      fill="solid"
+      class="btn-google"
+      (click)="onGoogleLogin()">
+
+      Continuar com Google
+
+    </ion-button>
+
+    <!-- Cadastro -->
+    <a routerLink="/register" class="register-link">
+      Não possuo uma conta
+    </a>
 
   </div>
 

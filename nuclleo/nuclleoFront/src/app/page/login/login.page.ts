@@ -12,25 +12,39 @@ import { RouterLink } from '@angular/router';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, RouterLink, IonButton, IonInput, IonItem, IonIcon, IonHeader, IonToolbar]
+  imports: [CommonModule,
+    FormsModule,
+    RouterLink,
+
+    IonContent,
+    IonItem,
+    IonInput,
+    IonButton,
+    IonIcon]
 })
 export class LoginPage implements OnInit {
 
-  email = signal('');
-  password = signal('');
-  showPassword = signal(false);
+  email: string = '';
+  password: string = '';
+
+  showPassword: boolean = false;
+
+  constructor() { }
+
+  ngOnInit() { }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   onSubmit() {
     console.log('Login');
+    console.log(this.email);
+    console.log(this.password);
   }
 
   onGoogleLogin() {
     console.log('Google Login');
-  }
-
-  constructor() { }
-
-  ngOnInit() {
   }
   
 }
