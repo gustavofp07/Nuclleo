@@ -41,6 +41,9 @@ export class LoginPage implements OnInit {
     console.log('Login');
     console.log(this.email);
     console.log(this.password);
+
+    
+
   }
 
   onGoogleLogin() {

@@ -1,0 +1,90 @@
+<ion-content [fullscreen]="true" class="perfil-content">
+
+  <div class="container">
+
+    <!-- FOTO + DADOS -->
+    <div class="perfil-topo">
+
+      <img
+        [src]="usuario.ftUsuario || 'assets/img/user.png'"
+        class="foto-usuario">
+
+      <div class="dados-usuario">
+        <h2>{{ usuario.nmUsuario }}</h2>
+        <p>@{{ usuario.email.split('@')[0] }}</p>
+      </div>
+
+    </div>
+
+    <!-- INFORMAÇÕES -->
+    <div class="info-box">
+
+      <div class="info-item">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Na Nuclleo há 6 dias</span>
+      </div>
+
+      <div class="info-item">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>Coronel Fabriciano, MG</span>
+      </div>
+
+    </div>
+
+    <!-- BOTÃO -->
+    <ion-button expand="block" class="btn-editar">
+      <ion-icon name="create-outline"></ion-icon>
+      Editar perfil
+    </ion-button>
+
+    <!-- NÍVEL -->
+    <div class="nivel-box">
+
+      <h3>Nível de cadastro</h3>
+
+      <div class="barra-nivel">
+        <div class="nivel nivel1"></div>
+        <div class="nivel nivel2"></div>
+        <div class="nivel nivel3"></div>
+      </div>
+
+      <div class="validacoes">
+
+        <div class="validacao">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>CPF: {{ usuario.cpf }}</span>
+        </div>
+
+        <div class="validacao">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Telefone: {{ usuario.telefone }}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- AVALIAÇÃO -->
+    <div class="avaliacao-box">
+
+      <h2>Sua avaliação: 4,5</h2>
+
+      <div class="estrelas">
+        ★★★★☆
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MENU INFERIOR -->
+  <div class="menu-bottom">
+
+    <ion-icon name="home"></ion-icon>
+    <ion-icon name="people-outline"></ion-icon>
+    <ion-icon name="chatbubble-outline"></ion-icon>
+    <ion-icon name="person-outline"></ion-icon>
+
+  </div>
+
+</ion-content>

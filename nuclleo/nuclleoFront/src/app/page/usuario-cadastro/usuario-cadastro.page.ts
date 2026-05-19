@@ -4,13 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { Router } from '@angular/router';
 
-import {
-  IonContent,
-  IonItem,
-  IonInput,
-  IonButton,
-  ToastController
-} from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonInput, IonButton, ToastController } from '@ionic/angular/standalone';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';

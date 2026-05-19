@@ -7,7 +7,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'usuario-cadastro',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {
@@ -21,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'tela-inicial',
     loadComponent: () => import('./page/tela-inicial/tela-inicial.page').then( m => m.TelaInicialPage)
+  },
+  {
+    path: 'usuario-perfil',
+    loadComponent: () => import('./page/usuario-perfil/usuario-perfil.page').then( m => m.UsuarioPerfilPage)
   },
 ];
