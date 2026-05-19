@@ -1,13 +1,119 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>telaInicial</ion-title>
-  </ion-toolbar>
-</ion-header>
+<!-- tela-inicial.page.html -->
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">telaInicial</ion-title>
+<ion-menu contentId="main-content">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Menu</ion-title>
     </ion-toolbar>
   </ion-header>
-</ion-content>
+
+  <ion-content>
+    <ion-list>
+      <ion-item button>
+        <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+        <ion-label>Perfil</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div class="ion-page" id="main-content">
+
+  <ion-header [translucent]="true">
+    <ion-toolbar color="primary">
+
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+
+      <ion-title>Nuclleo</ion-title>
+
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [fullscreen]="true">
+
+    <!-- Barra de pesquisa -->
+    <div class="search-area">
+      <ion-searchbar placeholder="Pesquisar produtos..."></ion-searchbar>
+    </div>
+
+    <!-- Sugestões de anúncios -->
+    <div class="section">
+      <h2>Sugestões para você</h2>
+
+      <div class="horizontal-scroll">
+        <ion-card class="product-card">
+          <img src="https://picsum.photos/300/200?1">
+
+          <ion-card-header>
+            <ion-card-title>Notebook Gamer</ion-card-title>
+            <ion-card-subtitle>R$ 3.500</ion-card-subtitle>
+          </ion-card-header>
+        </ion-card>
+
+        <ion-card class="product-card">
+          <img src="https://picsum.photos/300/200?2">
+
+          <ion-card-header>
+            <ion-card-title>Headset RGB</ion-card-title>
+            <ion-card-subtitle>R$ 220</ion-card-subtitle>
+          </ion-card-header>
+        </ion-card>
+
+        <ion-card class="product-card">
+          <img src="https://picsum.photos/300/200?3">
+
+          <ion-card-header>
+            <ion-card-title>Teclado Mecânico</ion-card-title>
+            <ion-card-subtitle>R$ 180</ion-card-subtitle>
+          </ion-card-header>
+        </ion-card>
+
+      </div>
+    </div>
+
+    <!-- Comunidades próximas -->
+    <div class="section">
+      <h2>Comunidades próximas</h2>
+
+      <ion-list>
+
+        <ion-item>
+          <ion-avatar slot="start">
+            <img src="https://picsum.photos/100?4">
+          </ion-avatar>
+
+          <ion-label>
+            <h3>Gamers Itaúna</h3>
+            <p>1,2 km de distância</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-avatar slot="start">
+            <img src="https://picsum.photos/100?5">
+          </ion-avatar>
+
+          <ion-label>
+            <h3>Tech Minas</h3>
+            <p>3 km de distância</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-avatar slot="start">
+            <img src="https://picsum.photos/100?6">
+          </ion-avatar>
+
+          <ion-label>
+            <h3>Compra & Venda</h3>
+            <p>5 km de distância</p>
+          </ion-label>
+        </ion-item>
+
+      </ion-list>
+    </div>
+
+  </ion-content>
+</div>
