@@ -1,0 +1,88 @@
+<ion-content [fullscreen]="true" class="editar-content">
+
+  <div class="container">
+
+    <!-- TOPO -->
+    <div class="topo">
+
+      <ion-button fill="clear" class="btn-voltar" (click)="cancelar()">
+
+        <ion-icon name="chevron-back-outline"></ion-icon>
+
+      </ion-button>
+
+      <h2>Editar perfil</h2>
+
+    </div>
+
+    <!-- FORM -->
+    <form (ngSubmit)="salvarAlteracoes()">
+
+      <!-- FOTO -->
+      <div class="foto-box">
+
+        <!--
+        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+
+        <input type="file" hidden #inputFile (change)="selecionarImagem($event)">
+
+        <ion-button expand="block" fill="outline" class="btn-imagem" (click)="inputFile.click()"
+          type="button">Selecionar imagem</ion-button>
+      -->
+
+        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+        <input type="file" hidden #inputFile (change)="selecionarImagem($event)">
+        <ion-button (click)="inputFile.click()">Selecionar imagem</ion-button>
+      </div>
+
+      <!-- NOME -->
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario">
+        </ion-input>
+      </ion-item>
+
+      <!-- EMAIL -->
+      <ion-item lines="none" class="input-item">
+        <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email">
+        </ion-input>
+      </ion-item>
+
+      <!-- CPF -->
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="CPF" [(ngModel)]="usuario.cpf" name="cpf">
+        </ion-input>
+      </ion-item>
+
+      <!-- CEP -->
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="CEP" [(ngModel)]="usuario.cep" name="cep">
+        </ion-input>
+      </ion-item>
+
+      <!-- TELEFONE -->
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="Telefone" [(ngModel)]="usuario.telefone" name="telefone">
+        </ion-input>
+      </ion-item>
+
+      <!-- SENHA -->
+      <ion-item lines="none" class="input-item">
+        <ion-input type="password" placeholder="Nova senha" [(ngModel)]="usuario.senha" name="senha">
+        </ion-input>
+      </ion-item>
+
+      <!-- BOTÕES -->
+      <div class="acoes">
+
+        <ion-button expand="block" class="btn-salvar" type="submit">Salvar alterações</ion-button>
+
+        <ion-button expand="block" fill="outline" class="btn-cancelar" type="button"
+          (click)="cancelar()">Cancelar</ion-button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</ion-content>

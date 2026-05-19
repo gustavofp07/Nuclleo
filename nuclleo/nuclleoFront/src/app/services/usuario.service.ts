@@ -7,12 +7,20 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class UsuarioService {
-  private api = 'http://localhost:8080/api/v1/usuarios';
+  
+  private readonly API_URL = 'http://localhost:8080/api/v1/usuarios';
 
   constructor(private http: HttpClient) {}
 
-  cadastrarUsuario(usuario: UsuarioModel): Observable<UsuarioModel> {
-    return this.http.post<UsuarioModel>(this.api, usuario);
+  cadastrarUsuario(usuario: UsuarioModel): Observable<UsuarioModel> {//body
+    return this.http.post<UsuarioModel>(this.API_URL, usuario);
   }
-  
+
+  buscarUsuario(cdUsuario: number): Observable<UsuarioModel> {//varivel
+    return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
+  }
+
+  atualizar(usuario: UsuarioModel): Observable<UsuarioModel> {//body
+    return this.http.put<UsuarioModel>(this.API_URL, usuario);
+  }
 }

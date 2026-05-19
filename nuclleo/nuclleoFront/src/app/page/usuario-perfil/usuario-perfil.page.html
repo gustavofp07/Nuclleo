@@ -6,12 +6,13 @@
     <div class="perfil-topo">
 
       <img
-        [src]="usuario.ftUsuario || 'assets/img/user.png'"
+        [src]="usuario.ftUsuario || 'assets/img/usuarioPadrao.png'"
         class="foto-usuario">
 
       <div class="dados-usuario">
         <h2>{{ usuario.nmUsuario }}</h2>
-        <p>@{{ usuario.email.split('@')[0] }}</p>
+        <!--<p>@{{ usuario.email.split('@')[0] }}</p>-->
+        <p>{{ usuario.email }}</p>
       </div>
 
     </div>
@@ -32,9 +33,9 @@
     </div>
 
     <!-- BOTÃO -->
-    <ion-button expand="block" class="btn-editar">
-      <ion-icon name="create-outline"></ion-icon>
-      Editar perfil
+    <ion-button routerLink="/usuario-alterar" expand="block" class="btn-editar">
+      <ion-icon name="create-outline" ></ion-icon>
+       Editar perfil
     </ion-button>
 
     <!-- NÍVEL -->

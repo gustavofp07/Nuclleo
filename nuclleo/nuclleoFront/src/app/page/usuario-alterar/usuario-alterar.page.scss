@@ -1,0 +1,110 @@
+.editar-content {
+  --background: #f5f5f5;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* TOPO */
+
+.topo {
+  display: flex;
+  align-items: center;
+
+  margin-top: 30px;
+  margin-bottom: 40px;
+
+  position: relative;
+}
+
+.topo h2 {
+  flex: 1;
+
+  text-align: center;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  color: #000;
+
+  margin-right: 40px;
+}
+
+.btn-voltar {
+  --color: #000;
+}
+
+/* FOTO */
+
+.foto-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.foto-usuario {
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  margin-bottom: 15px;
+
+  background: #ddd;
+}
+
+.btn-imagem {
+  --border-radius: 12px;
+  --color: #000;
+
+  width: 100%;
+}
+
+/* INPUTS */
+
+.input-item {
+  --background: #e9e9e9;
+  --color: #000;
+
+  border-radius: 12px;
+
+  margin-bottom: 15px;
+
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+ion-input {
+  --color: #000;
+}
+
+/* BOTÕES */
+
+.acoes {
+  margin-top: 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.btn-salvar {
+  --background: #000;
+  --border-radius: 12px;
+  color: #ffffff;
+
+  font-weight: 600;
+}
+
+.btn-cancelar {
+  --border-radius: 12px;
+  --color: #000;
+  --border-color: #000;
+
+  font-weight: 600;
+}

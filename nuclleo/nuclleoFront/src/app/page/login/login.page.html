@@ -14,14 +14,14 @@
     </div>
 
     <!-- Formulário -->
-    <form (ngSubmit)="onSubmit()">
+    <form (ngSubmit)="entrar()">
 
       <!-- Email -->
       <ion-item lines="none" class="input-item">
         <ion-input
           type="email"
           placeholder="E-mail"
-          [(ngModel)]="email"
+          [(ngModel)]="login.email"
           name="email"
           required>
         </ion-input>
@@ -33,7 +33,7 @@
         <ion-input
           [type]="showPassword ? 'text' : 'password'"
           placeholder="Senha"
-          [(ngModel)]="password"
+          [(ngModel)]="login.senha"
           name="password"
           required>
         </ion-input>
@@ -54,13 +54,7 @@
 
       <!-- Botão Login -->
       <ion-button
-        expand="block"
-        type="submit"
-        class="btn-login">
-
-        Entrar
-
-      </ion-button>
+        expand="block" type="submit" class="btn-login">Entrar</ion-button>
 
     </form>
 
@@ -76,11 +70,7 @@
       expand="block"
       fill="solid"
       class="btn-google"
-      (click)="onGoogleLogin()">
-
-      Continuar com Google
-
-    </ion-button>
+      (click)="onGoogleLogin()">Continuar com Google</ion-button>
 
     <!-- Cadastro -->
     <a routerLink="/usuario-cadastro" class="register-link">

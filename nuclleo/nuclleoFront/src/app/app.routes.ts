@@ -26,4 +26,8 @@ export const routes: Routes = [
     path: 'usuario-perfil',
     loadComponent: () => import('./page/usuario-perfil/usuario-perfil.page').then( m => m.UsuarioPerfilPage)
   },
+  {
+    path: 'usuario-alterar',
+    loadComponent: () => import('./page/usuario-alterar/usuario-alterar.page').then( m => m.UsuarioAlterarPage)
+  },
 ];
