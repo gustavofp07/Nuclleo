@@ -38,7 +38,6 @@ export class UsuarioPerfilPage implements OnInit {
     });
 
     this.usuario = new UsuarioModel();
-
   }
 
   ngOnInit() {
