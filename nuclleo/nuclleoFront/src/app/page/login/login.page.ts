@@ -14,7 +14,6 @@ import {
 import { Router, RouterLink } from '@angular/router';
 
 import { addIcons } from 'ionicons';
-
 import {
   eyeOutline,
   eyeOffOutline
@@ -66,6 +65,12 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
     this.usuarioService.limparSessao();
+  }
+
+  ionViewWillEnter() {
+    this.usuarioService.limparSessao();
+    this.login = new LoginModel();
+    this.showPassword = false;
   }
 
   togglePassword() {

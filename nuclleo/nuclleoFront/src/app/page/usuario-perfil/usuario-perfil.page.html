@@ -65,7 +65,7 @@
 
         <div class="info-item">
           <ion-icon name="calendar-outline"></ion-icon>
-          <span>Na Nuclleo há 6 dias</span>
+          <span>Na Nuclleo desde {{ usuario.dtEntrada }}</span>
         </div>
 
         <div class="info-item">
@@ -75,13 +75,19 @@
 
       </div>
 
-      <!-- BOTÃO -->
-      <ion-button routerLink="/usuario-alterar" expand="block" class="btn-editar">
+      <div class="acoes-perfil">
 
-        <ion-icon name="create-outline"></ion-icon>
-        Editar perfil
+        <ion-button routerLink="/usuario-alterar" class="btn-editar">
+          <ion-icon name="create-outline"></ion-icon>
+          Editar perfil
+        </ion-button>
 
-      </ion-button>
+        <ion-button (click)="excluir()" class="btn-excluir">
+          <ion-icon name="trash-outline"></ion-icon>
+          Excluir perfil
+        </ion-button>
+
+      </div>
 
       <!-- NÍVEL -->
       <div class="nivel-box">

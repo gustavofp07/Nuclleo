@@ -3,6 +3,7 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 //import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,11 +23,8 @@ import br.cefetmg.nuclleo.repository.UsuarioRepository;
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @CrossOrigin(origins = "*")
-
 public class UsuarioController {
     private UsuarioRepository repository;
-    // private List<Usuario> usuarioList; // Simulando um banco de dados em memória
-    // private Long nextId = (long) 1; // Simulando auto-incremento de ID
 
     public UsuarioController(UsuarioRepository repository) {
         this.repository = repository;
@@ -65,35 +63,38 @@ public class UsuarioController {
         }
 
         java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
-    
         usuario.setDtEntrada(data);
 
         repository.save(usuario);
         return usuario;
     }
 
+    /*
+     * @DeleteMapping("/{cdUsuario}")
+     * public Usuario excluir(@PathVariable Long cdUsuario) {
+     * Usuario usuario = this.repository.findById(cdUsuario).orElse(null); // mudar
+     * isso. Chamar o get
+     * if (usuario == null) {
+     * throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id" +
+     * cdUsuario + "não encontrado.");
+     * }
+     * 
+     * this.repository.deleteById(cdUsuario);
+     * return usuario;
+     * }
+     */
+
     @DeleteMapping("/{cdUsuario}")
-    public Usuario excluir(@PathVariable Long cdUsuario) {
-        Usuario usuario = this.repository.findById(cdUsuario).orElse(null); // mudar isso. Chamar o get
-        if (usuario == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id" + cdUsuario + "não encontrado.");
+    public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
+        Usuario usuario = this.repository.findById(cdUsuario)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        try {
+            this.repository.delete(usuario);
+            return ResponseEntity.ok(usuario);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o usuário.");
         }
-
-        this.repository.deleteById(cdUsuario);
-        return usuario;
-
-        /*
-         * Usuario retorno = null;
-         * for(int i = 0; i < usuarioList.size(); i++) {
-         * Usuario userAux = usuarioList.get(i);
-         * if (userAux != null && userAux.getCdUsuario() == cdUsuario) {
-         * retorno = userAux;
-         * usuarioList.remove(i);
-         * break;
-         * }
-         * }
-         * return retorno;
-         */
     }
 
     @PutMapping("")

@@ -23,7 +23,7 @@ export class UsuarioPerfilPage implements OnInit {
   usuario: UsuarioModel;
 
   constructor(private usuarioService: UsuarioService,
-              private router : Router
+    private router: Router
   ) {
 
     addIcons({
@@ -40,34 +40,46 @@ export class UsuarioPerfilPage implements OnInit {
     this.usuario = new UsuarioModel();
   }
 
-  ngOnInit() {
-    if (localStorage.getItem("usuarioAutenticado")) {
+  ngOnInit() { }
 
-      let usuarioLogado: UsuarioModel = JSON.parse(localStorage.getItem("usuarioAutenticado") || "");
+  ionViewWillEnter() {
+    let aux = this.usuarioService.verificarSessao();
+    if (aux == false) {
+      //this.exibirMensagem("Não há usuário logado.");
+      this.router.navigate(['/login']);
+    } else {
+      //existe alguém logado
+      let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
 
       this.usuarioService.buscarUsuario(usuarioLogado.cdUsuario).subscribe({
         next: async (usuario: UsuarioModel) => {
-          console.log("busquei ", usuario);
+          //console.log("busquei ", usuario);
           this.usuario = usuario;
         },
         error: async () => {
-          console.error('Erro ao logar');
+          //console.error('Erro ao logar');
+          console.log('Erro ao buscar usuário.');
         }
       });
-
-    } else {
-      console.log("Não tem nenhum usuário autenticado no momento.");
     }
+  }
 
+  excluir() {
+    let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
 
+    //let teste = this.usuarioService.excluirUsuario(usuarioLogado.cdUsuario);
 
-    /*
-    // EXEMPLO
-    this.usuario.nmUsuario = 'Gustavo Fusca';
-    this.usuario.email = 'gpedrosa@gmail.com';
-    this.usuario.cpf = '123.456.789-00';
-    this.usuario.telefone = '+55 (31) 94002-8922';
-*/
+    this.usuarioService.excluirUsuario(usuarioLogado.cdUsuario).subscribe({
+      next: async (usuario: UsuarioModel) => {
+        console.log("excluiu", usuario);
+        this.router.navigate(['/login']);
+      },
+      error: async () => {
+        //console.error('Erro ao logar');
+        console.log('Erro ao excluir o usuário.');
+      }
+    });
+
   }
 
 }

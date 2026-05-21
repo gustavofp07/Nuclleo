@@ -120,42 +120,73 @@
   color: #7c3aed;
 }
 
-/* BOTÃO */
+
+
+
+
+.acoes-perfil {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.acoes-perfil ion-button {
+  flex: 1;
+
+  height: 52px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  --border-radius: 16px;
+}
+
+/* EDITAR */
 
 .btn-editar {
-  margin-top: 24px;
-
   --background: linear-gradient(
     90deg,
     #7c3aed,
     #a855f7
   );
 
-  --background-hover: linear-gradient(
-    90deg,
-    #6d28d9,
-    #9333ea
-  );
+  text-transform: uppercase;
 
-  --border-radius: 16px;
+  letter-spacing: 0.5px;
+}
 
-  height: 52px;
+/* EXCLUIR */
 
-  font-size: 15px;
-  font-weight: 700;
+.btn-excluir {
+  --background: #dc2626;
+
+  --background-hover: #b91c1c;
+
+  color: white;
 
   text-transform: uppercase;
 
   letter-spacing: 0.5px;
-
-  border-radius: 16px;
-
-  overflow: hidden;
 }
 
-.btn-editar::part(native) {
-  border-radius: 16px;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* NÍVEL */
 

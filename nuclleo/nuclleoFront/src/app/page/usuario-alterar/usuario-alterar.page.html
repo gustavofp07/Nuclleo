@@ -30,9 +30,15 @@
           type="button">Selecionar imagem</ion-button>
       -->
 
+        <!--
         <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
         <input type="file" hidden #inputFile (change)="selecionarImagem($event)">
         <ion-button (click)="inputFile.click()">Selecionar imagem</ion-button>
+        -->
+
+        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+        <input type="file" hidden #inputFile (change)="teste()">
+        <ion-button (click)="teste()">Selecionar imagem</ion-button>
       </div>
 
       <!-- NOME -->
@@ -65,10 +71,24 @@
         </ion-input>
       </ion-item>
 
-      <!-- SENHA -->
       <ion-item lines="none" class="input-item">
-        <ion-input type="password" placeholder="Nova senha" [(ngModel)]="usuario.senha" name="senha">
+        <ion-input placeholder="Data de Entrada" [(ngModel)]="usuario.dtEntrada" name="dtEntrada" readonly>
         </ion-input>
+      </ion-item>
+
+      <!-- Senha -->
+      <ion-item lines="none" class="input-item">
+
+        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
+          name="senha" required>
+        </ion-input>
+
+        <!-- OLHINHO -->
+        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
+
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          </ion-icon>
+        </ion-button>
       </ion-item>
 
       <!-- BOTÕES -->

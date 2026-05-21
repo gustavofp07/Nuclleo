@@ -14,7 +14,9 @@ import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 
 import {
-  chevronBackOutline
+  chevronBackOutline,
+  eyeOffOutline,
+  eyeOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -31,6 +33,7 @@ export class UsuarioAlterarPage implements OnInit {
   usuario: UsuarioModel;
 
   previewFoto: string | ArrayBuffer | null = null;
+  showPassword: boolean = false;
 
   constructor(
     private router: Router,
@@ -38,7 +41,9 @@ export class UsuarioAlterarPage implements OnInit {
   ) {
 
     addIcons({
-      chevronBackOutline
+      chevronBackOutline,
+      eyeOutline,
+      eyeOffOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -56,22 +61,42 @@ export class UsuarioAlterarPage implements OnInit {
           this.usuario = usuario;
         },
         error: async () => {
-          console.error('Erro ao logar');
+          //console.error('Erro ao logar');
+          console.log('Erro ao logar');
         }
       });
 
     } else {
       console.log("Não tem nenhum usuário autenticado no momento.");
     }
+  }
 
-    /*
-    this.usuario.nmUsuario = 'Gustavo';
-    this.usuario.email = 'gustavo@gmail.com';
-    this.usuario.cpf = '';
-    this.usuario.cep = '';
-    this.usuario.telefone = '';
-    */
+  ionViewWillEnter() {
+    let aux = this.usuarioService.verificarSessao();
+    if (aux == false) {
+      //this.exibirMensagem("Não há usuário logado.");
+      this.router.navigate(['/login']);
+    } else {
+      //existe alguém logado
+      let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
 
+      this.usuarioService.buscarUsuario(usuarioLogado.cdUsuario).subscribe({
+        next: async (usuario: UsuarioModel) => {
+          console.log("busquei ", usuario);
+          this.usuario = usuario;
+        },
+        error: async () => {
+          //console.error('Erro ao logar');
+          console.log('Erro ao logar');
+        }
+      });
+
+    }
+    
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
   selecionarImagem(event: any) {
@@ -107,6 +132,10 @@ export class UsuarioAlterarPage implements OnInit {
 
   cancelar() {
     this.router.navigate(['/usuario-perfil']);
+  }
+
+  teste() {
+
   }
 
 }

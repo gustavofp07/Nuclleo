@@ -46,9 +46,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 export class UsuarioCadastroPage implements OnInit {
 
   usuario: UsuarioModel;
-
   confirmarSenha: string = '';
-
   showPassword: boolean = false;
 
   showConfirmPassword: boolean = false;
@@ -70,11 +68,15 @@ export class UsuarioCadastroPage implements OnInit {
 
   ngOnInit() { }
 
+  ionViewWillEnter() {
+    this.usuario = new UsuarioModel();
+    this.confirmarSenha = "";
+    this.showPassword = false;
+  }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
-
 
   toggleConfirmPassword() {
     this.showConfirmPassword =
@@ -93,19 +95,14 @@ export class UsuarioCadastroPage implements OnInit {
       this.exibirMensagem(
         'Preencha todos os campos!'
       );
-
       return;
-
     }
 
     if (this.usuario.senha !== this.confirmarSenha) {
-
       this.exibirMensagem(
         'As senhas não coincidem!'
       );
-
       return;
-
     }
 
     this.usuarioService
@@ -129,16 +126,13 @@ export class UsuarioCadastroPage implements OnInit {
           await this.exibirMensagem(
             'Erro ao cadastrar usuário!'
           );
-
         }
-
       });
 
   }
 
 
   async exibirMensagem(texto: string) {
-
     const toast =
       await this.toastController.create({
 
@@ -146,9 +140,6 @@ export class UsuarioCadastroPage implements OnInit {
         duration: 2000
 
       });
-
     toast.present();
-
   }
-
 }

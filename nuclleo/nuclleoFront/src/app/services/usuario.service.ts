@@ -10,10 +10,14 @@ export class UsuarioService {
   private readonly KEY_USUARIO = 'usuarioAutenticado';
   private readonly API_URL = 'http://localhost:8080/api/v1/usuarios';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   cadastrarUsuario(usuario: UsuarioModel): Observable<UsuarioModel> {//body
     return this.http.post<UsuarioModel>(this.API_URL, usuario);
+  }
+
+  excluirUsuario(cdUsuario: number): Observable<UsuarioModel> {
+    return this.http.delete<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
   }
 
   buscarUsuario(cdUsuario: number): Observable<UsuarioModel> {//varivel
@@ -42,13 +46,11 @@ export class UsuarioService {
     }
   }
 
-  /*
-  obterUsuarioSessao(): UsuarioModel {
+  getUsuarioSessao(): UsuarioModel {
     const usuarioJson = localStorage.getItem(this.KEY_USUARIO);
     if (usuarioJson) {
       return JSON.parse(usuarioJson) as UsuarioModel;
     }
     return new UsuarioModel();
   }
-    */
 }

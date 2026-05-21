@@ -26,6 +26,16 @@ export class TelaInicialPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    /*
+    let aux = this.usuarioService.verificarSessao();
+    if (aux == false) {
+      this.exibirMensagem("Não há usuário logado.");
+      this.router.navigate(['/login']);
+    }
+      */
+  }
+
+  ionViewWillEnter() {
     let aux = this.usuarioService.verificarSessao();
     if (aux == false) {
       this.exibirMensagem("Não há usuário logado.");
