@@ -5,6 +5,7 @@ import { IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import { home, peopleOutline, chatbubbleOutline, personOutline, createOutline, locationOutline, calendarOutline, checkmarkCircleOutline } from 'ionicons/icons';
+
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
