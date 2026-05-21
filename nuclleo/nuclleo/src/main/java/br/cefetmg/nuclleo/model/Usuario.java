@@ -1,6 +1,7 @@
 package br.cefetmg.nuclleo.model;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

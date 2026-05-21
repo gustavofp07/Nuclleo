@@ -1,6 +1,5 @@
 package br.cefetmg.nuclleo.controller;
 
-//import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -61,14 +60,14 @@ public class UsuarioController {
 
     @PostMapping("")
     public Usuario inserir(@RequestBody Usuario usuario) {
-        if (usuario.getCdUsuario() == 0) {//gambiarra. Tem q tirar isso
-            // @ts-ignore
+        if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
             usuario.setCdUsuario(null);
         }
 
-        // usuario.setCdUsuario(nextId++);
-        // usuarioList.add(usuario);
-        // usuario.setCdUsuario(null); // opcional
+        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
+    
+        usuario.setDtEntrada(data);
+
         repository.save(usuario);
         return usuario;
     }
