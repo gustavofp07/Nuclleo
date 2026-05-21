@@ -1,36 +1,124 @@
+<!-- usuario-cadastro.page.html -->
+
 <ion-content [fullscreen]="true" class="cadastro-content">
 
   <div class="container">
 
-    <h2>Cadastrar</h2>
+    <!-- LOGO -->
+    <div class="brand">
 
+      <img
+        src="assets/img/logo.png"
+        alt="Logo Nuclleo"
+        class="logo">
+
+    </div>
+
+    <!-- TÍTULOS -->
+    <div class="copy">
+      <h1>Cadastrar</h1>
+      <p>Crie sua conta na Nuclleo</p>
+    </div>
+
+    <!-- FORMULÁRIO -->
     <form (ngSubmit)="salvar()">
 
+      <!-- EMAIL -->
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="E-mail" [(ngModel)]="usuario.email" name="email" required></ion-input>
+
+        <ion-input
+          type="email"
+          placeholder="E-mail"
+          [(ngModel)]="usuario.email"
+          name="email"
+          required>
+        </ion-input>
+
       </ion-item>
 
+      <!-- NOME -->
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario" required></ion-input>
+
+        <ion-input
+          placeholder="Nome"
+          [(ngModel)]="usuario.nmUsuario"
+          name="nmUsuario"
+          required>
+        </ion-input>
+
       </ion-item>
 
+      <!-- SENHA -->
       <ion-item lines="none" class="input-item">
-        <ion-input type="password" placeholder="Senha" [(ngModel)]="usuario.senha" name="senha" required></ion-input>
+
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Senha"
+          [(ngModel)]="usuario.senha"
+          name="senha"
+          required>
+        </ion-input>
+
+        <ion-button
+          fill="clear"
+          slot="end"
+          type="button"
+          (click)="togglePassword()">
+
+          <ion-icon
+            slot="icon-only"
+            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          </ion-icon>
+
+        </ion-button>
+
       </ion-item>
 
+      <!-- CONFIRMAR SENHA -->
       <ion-item lines="none" class="input-item">
-        <ion-input type="password" placeholder="Confirmar a senha" [(ngModel)]="confirmarSenha" name="confirmarSenha" required></ion-input>
+
+        <ion-input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirmar senha"
+          [(ngModel)]="confirmarSenha"
+          name="confirmarSenha"
+          required>
+        </ion-input>
+
+        <ion-button
+          fill="clear"
+          slot="end"
+          type="button"
+          (click)="toggleConfirmPassword()">
+
+          <ion-icon
+            slot="icon-only"
+            [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'">
+          </ion-icon>
+
+        </ion-button>
+
       </ion-item>
 
-      <ion-button expand="block" type="submit" class="btn-cadastrar">
+      <!-- BOTÃO -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="btn-cadastrar">
+
         Cadastrar
+
       </ion-button>
 
     </form>
 
+    <!-- TERMOS -->
     <p class="termos">
+
       Ao clicar em continuar, você concorda com os nossos
-      <span>Termos de Serviço</span> e com a <span>Política de Privacidade</span>
+      <span>Termos de Serviço</span> e com a
+      <span>Política de Privacidade</span>
+
     </p>
 
   </div>

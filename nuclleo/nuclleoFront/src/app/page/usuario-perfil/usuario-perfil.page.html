@@ -1,89 +1,159 @@
-<ion-content [fullscreen]="true" class="perfil-content">
+<ion-menu contentId="main-content">
 
-  <div class="container">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-    <!-- FOTO + DADOS -->
-    <div class="perfil-topo">
+  <ion-content>
+    <ion-list>
 
-      <img
-        [src]="usuario.ftUsuario || 'assets/img/usuarioPadrao.png'"
-        class="foto-usuario">
+      <ion-item button routerLink="/usuario-perfil" class="register-link">
+        <ion-icon name="person-outline" slot="start">
+        </ion-icon>
+        <ion-label>Perfil</ion-label>
+      </ion-item>
 
-      <div class="dados-usuario">
-        <h2>{{ usuario.nmUsuario }}</h2>
-        <!--<p>@{{ usuario.email.split('@')[0] }}</p>-->
-        <p>{{ usuario.email }}</p>
-      </div>
+      <ion-item button routerLink="/tela-inicial" class="register-link">
+        <ion-icon name="home" slot="start">
+        </ion-icon>
+        <ion-label>Início</ion-label>
+      </ion-item>
 
-    </div>
+    </ion-list>
+  </ion-content>
 
-    <!-- INFORMAÇÕES -->
-    <div class="info-box">
+</ion-menu>
 
-      <div class="info-item">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <span>Na Nuclleo há 6 dias</span>
-      </div>
 
-      <div class="info-item">
-        <ion-icon name="location-outline"></ion-icon>
-        <span>Coronel Fabriciano, MG</span>
-      </div>
+<div class="ion-page" id="main-content">
 
-    </div>
+  <!-- HEADER -->
+  <ion-header>
+    <ion-toolbar class="toolbar">
 
-    <!-- BOTÃO -->
-    <ion-button routerLink="/usuario-alterar" expand="block" class="btn-editar">
-      <ion-icon name="create-outline" ></ion-icon>
-       Editar perfil
-    </ion-button>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
 
-    <!-- NÍVEL -->
-    <div class="nivel-box">
+      <ion-title>Perfil</ion-title>
 
-      <h3>Nível de cadastro</h3>
+    </ion-toolbar>
+  </ion-header>
 
-      <div class="barra-nivel">
-        <div class="nivel nivel1"></div>
-        <div class="nivel nivel2"></div>
-        <div class="nivel nivel3"></div>
-      </div>
 
-      <div class="validacoes">
+  <!-- CONTEÚDO -->
+  <ion-content [fullscreen]="true" class="perfil-content">
 
-        <div class="validacao">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
-          <span>CPF: {{ usuario.cpf }}</span>
-        </div>
+    <div class="container">
 
-        <div class="validacao">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
-          <span>Telefone: {{ usuario.telefone }}</span>
+      <!-- FOTO + DADOS -->
+      <div class="perfil-topo">
+
+        <img [src]="usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+
+        <div class="dados-usuario">
+          <h2>{{ usuario.nmUsuario }}</h2>
+          <p>{{ usuario.email }}</p>
         </div>
 
       </div>
 
-    </div>
+      <!-- INFORMAÇÕES -->
+      <div class="info-box">
 
-    <!-- AVALIAÇÃO -->
-    <div class="avaliacao-box">
+        <div class="info-item">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>Na Nuclleo há 6 dias</span>
+        </div>
 
-      <h2>Sua avaliação: 4,5</h2>
+        <div class="info-item">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>Coronel Fabriciano, MG</span>
+        </div>
 
-      <div class="estrelas">
-        ★★★★☆
+      </div>
+
+      <!-- BOTÃO -->
+      <ion-button routerLink="/usuario-alterar" expand="block" class="btn-editar">
+
+        <ion-icon name="create-outline"></ion-icon>
+        Editar perfil
+
+      </ion-button>
+
+      <!-- NÍVEL -->
+      <div class="nivel-box">
+
+        <h3>Nível de cadastro</h3>
+
+        <div class="barra-nivel">
+          <div class="nivel nivel1"></div>
+          <div class="nivel nivel2"></div>
+          <div class="nivel nivel3"></div>
+        </div>
+
+        <div class="validacoes">
+
+          <div class="validacao">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>CPF: {{ usuario.cpf }}</span>
+          </div>
+
+          <div class="validacao">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Telefone: {{ usuario.telefone }}</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- AVALIAÇÃO -->
+      <div class="avaliacao-box">
+
+        <h2>Sua avaliação: 4,5</h2>
+
+        <div class="estrelas">
+          ★★★★☆
+        </div>
+
       </div>
 
     </div>
 
-  </div>
+  </ion-content>
 
-  <!-- MENU INFERIOR -->
+  <!-- MENU INFERIOR 
+   
   <div class="menu-bottom">
-    <ion-icon name="home" routerLink="/tela-inicial"></ion-icon>
-    <ion-icon name="people-outline" routerLink=""></ion-icon>
-    <ion-icon name="chatbubble-outline" routerLink=""></ion-icon>
-    <ion-icon name="person-outline" routerLink="/usuario-perfil"></ion-icon>
-  </div>
 
-</ion-content>
+    <ion-icon
+      name="home"
+      routerLink="/tela-inicial"
+      style="cursor: pointer;">
+    </ion-icon>
+
+    <ion-icon
+      name="people-outline"
+      routerLink=""
+      style="cursor: pointer;">
+    </ion-icon>
+
+    <ion-icon
+      name="chatbubble-outline"
+      routerLink=""
+      style="cursor: pointer;">
+    </ion-icon>
+
+    <ion-icon
+      name="person-outline"
+      routerLink="/usuario-perfil"
+      style="cursor: pointer;">
+    </ion-icon>
+
+  </div>
+  -->
+
+</div>

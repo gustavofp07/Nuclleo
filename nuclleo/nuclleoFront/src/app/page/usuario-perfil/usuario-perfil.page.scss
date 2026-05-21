@@ -91,17 +91,18 @@
 
   padding-top: 20px;
 
-  border-top: 1px solid #dcdcdc;
+  border-top: 1px solid #000000;
 }
 
 .nivel-box h3 {
   margin-bottom: 20px;
-
+  color: black;
   font-size: 20px;
   font-weight: 700;
 }
 
 .barra-nivel {
+  
   display: flex;
   gap: 5px;
 
@@ -152,10 +153,10 @@
 
 .avaliacao-box {
   margin-top: 40px;
-
+  color: black;
   padding-top: 30px;
 
-  border-top: 1px solid #dcdcdc;
+  border-top: 1px solid #000000;
 
   text-align: center;
 }
@@ -199,4 +200,4 @@
   font-size: 32px;
 
   color: #000;
-}
+} 

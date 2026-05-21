@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import { home, peopleOutline, chatbubbleOutline, personOutline, createOutline, locationOutline, calendarOutline, checkmarkCircleOutline } from 'ionicons/icons';
@@ -16,7 +16,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './usuario-perfil.page.html',
   styleUrls: ['./usuario-perfil.page.scss'],
   standalone: true,
-  imports: [IonContent, IonButton, IonIcon, CommonModule, FormsModule, RouterLink]
+  imports: [IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon, IonMenu, IonList, IonLabel, CommonModule, FormsModule, RouterLink]
 })
 export class UsuarioPerfilPage implements OnInit {
 

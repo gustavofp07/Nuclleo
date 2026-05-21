@@ -1,25 +1,38 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonButton,
+  IonContent,
+  IonButton,
   IonInput,
   IonItem,
   IonIcon,
   ToastController
 } from '@ionic/angular/standalone';
+
 import { Router, RouterLink } from '@angular/router';
+
+import { addIcons } from 'ionicons';
+
+import {
+  eyeOutline,
+  eyeOffOutline
+} from 'ionicons/icons';
 
 import { LoginModel } from 'src/app/model/login.model';
 import { LoginService } from 'src/app/services/login.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [CommonModule,
+
+  imports: [
+    CommonModule,
     FormsModule,
     RouterLink,
 
@@ -27,49 +40,76 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
     IonItem,
     IonInput,
     IonButton,
-    IonIcon]
+    IonIcon
+  ]
 })
+
 export class LoginPage implements OnInit {
+
   login: LoginModel;
 
   showPassword: boolean = false;
 
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
     private toastController: ToastController,
-    private loginService: LoginService) {
+    private loginService: LoginService
+  ) {
+
     this.login = new LoginModel();
+
+    addIcons({
+      eyeOutline,
+      eyeOffOutline
+    });
+
   }
 
   ngOnInit() { }
+
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
+
   entrar() {
+
     console.log('Login');
     console.log(this.login.email);
     console.log(this.login.senha);
 
     this.loginService.entrar(this.login).subscribe({
+
       next: async (usuario: UsuarioModel) => {
-        await this.exibirMensagem('login realizado com sucesso!');
+
+        await this.exibirMensagem(
+          'Login realizado com sucesso!'
+        );
+
         console.log(usuario);
 
-        localStorage.setItem("usuarioAutenticado", JSON.stringify(usuario));
+        localStorage.setItem(
+          "usuarioAutenticado",
+          JSON.stringify(usuario)
+        );
 
-        //let usuarioLogado: UsuarioModel = JSON.parse(localStorage.getItem("usuarioAutenticado") || "");
-
-        //this.router.navigate(['/tela-inicial']);
         this.router.navigate(['/usuario-perfil']);
+
       },
+
       error: async () => {
-        //console.error('Erro ao logar');
-        await this.exibirMensagem('Erro ao logar!');
+
+        await this.exibirMensagem(
+          'Erro ao logar!'
+        );
+
       }
+
     });
 
   }
+
 
   onGoogleLogin() {
     console.log('Google Login');
@@ -77,10 +117,14 @@ export class LoginPage implements OnInit {
 
 
   async exibirMensagem(texto: string) {
+
     const toast = await this.toastController.create({
       message: texto,
       duration: 2000
     });
+
     toast.present();
+
   }
+
 }

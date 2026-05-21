@@ -1,10 +1,26 @@
+// usuario-cadastro.page.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Router } from '@angular/router';
 
-import { IonContent, IonItem, IonInput, IonButton, ToastController } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonItem,
+  IonInput,
+  IonButton,
+  IonIcon,
+  ToastController
+} from '@ionic/angular/standalone';
+
+import { addIcons } from 'ionicons';
+
+import {
+  eyeOutline,
+  eyeOffOutline
+} from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -15,60 +31,124 @@ import { UsuarioService } from 'src/app/services/usuario.service';
   templateUrl: './usuario-cadastro.page.html',
   styleUrls: ['./usuario-cadastro.page.scss'],
   standalone: true,
+
   imports: [
     IonContent,
     IonItem,
     IonInput,
     IonButton,
+    IonIcon,
     FormsModule,
     CommonModule
   ]
 })
+
 export class UsuarioCadastroPage implements OnInit {
+
   usuario: UsuarioModel;
+
   confirmarSenha: string = '';
+
+  showPassword: boolean = false;
+
+  showConfirmPassword: boolean = false;
 
   constructor(
     private router: Router,
     private toastController: ToastController,
     private usuarioService: UsuarioService
   ) {
+
     this.usuario = new UsuarioModel();
+
+    addIcons({
+      eyeOutline,
+      eyeOffOutline
+    });
+
   }
 
   ngOnInit() { }
 
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
+
+  toggleConfirmPassword() {
+    this.showConfirmPassword =
+      !this.showConfirmPassword;
+  }
+
+
   async salvar() {
 
-    if (!this.usuario.email || !this.usuario.nmUsuario || !this.usuario.senha) {
-      this.exibirMensagem('Preencha todos os campos!');
+    if (
+      !this.usuario.email ||
+      !this.usuario.nmUsuario ||
+      !this.usuario.senha
+    ) {
+
+      this.exibirMensagem(
+        'Preencha todos os campos!'
+      );
+
       return;
+
     }
 
     if (this.usuario.senha !== this.confirmarSenha) {
-      this.exibirMensagem('As senhas não coincidem!');
+
+      this.exibirMensagem(
+        'As senhas não coincidem!'
+      );
+
       return;
+
     }
 
-    this.usuarioService.cadastrarUsuario(this.usuario).subscribe({
-      next: async () => {
-        await this.exibirMensagem('Cadastro realizado com sucesso!');
-        this.router.navigate(['/login']);
-      },
-      error: async (err) => {
-        console.error(err);
-        await this.exibirMensagem('Erro ao cadastrar usuário!');
-      }
-    });
+    this.usuarioService
+      .cadastrarUsuario(this.usuario)
+      .subscribe({
+
+        next: async () => {
+
+          await this.exibirMensagem(
+            'Cadastro realizado com sucesso!'
+          );
+
+          this.router.navigate(['/login']);
+
+        },
+
+        error: async (err) => {
+
+          console.error(err);
+
+          await this.exibirMensagem(
+            'Erro ao cadastrar usuário!'
+          );
+
+        }
+
+      });
+
   }
+
 
   async exibirMensagem(texto: string) {
-    const toast = await this.toastController.create({
-      message: texto,
-      duration: 2000
-    });
+
+    const toast =
+      await this.toastController.create({
+
+        message: texto,
+        duration: 2000
+
+      });
+
     toast.present();
+
   }
+
 }
-
-
