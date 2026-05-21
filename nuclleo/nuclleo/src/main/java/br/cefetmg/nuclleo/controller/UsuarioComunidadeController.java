@@ -1,5 +1,7 @@
 package br.cefetmg.nuclleo.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,37 +38,61 @@ public class UsuarioComunidadeController {
         return usuarioComunidade;
     }
 
-    /*
-    @DeleteMapping("/{cdComunidade}")
-    public Comunidade excluir(@PathVariable Long cdComunidade) {
-        Comunidade comunidade = this.repository.findById(cdComunidade).orElse(null); //mudar isso. Chamar o get
-        if (comunidade == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id: " + cdComunidade + "não encontrado.");
-        }
-
-        this.repository.deleteById(cdComunidade);
-        return comunidade;
-    }
-
-    
-    @GetMapping("")
-    public List<Comunidade> getComunidades() {
+    // URL: GET api/v1/UsuarioComunidade
+    @GetMapping()
+    public List<UsuarioComunidade> getUsuarioComunidade() {
         return this.repository.findAll();
     }
 
-    @GetMapping("/{cdComunidade}") //http://localhost:8080/api/v1/comunidades/cdComunidade
-    public Comunidade getComunidadeById(@PathVariable Long cdComunidade) {
-        return this.repository.findById(cdComunidade).orElse(null);
+    // URL: GET api/v1/UsuarioComunidade/usuario?cdUsuario=1
+    @GetMapping("/usuario") 
+    public List<UsuarioComunidade> getByUsuario(@RequestParam Long cdUsuario) {
+        return this.repository.findByUsuarioCdUsuario(cdUsuario);
     }
 
-    @PutMapping("")
-    public Comunidade alterar(@RequestBody Comunidade comunidade) {
-        if (comunidade.getCdComunidade() == null) { //olhar isso aqui
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
-        }
-
-        this.repository.save(comunidade);
-        return comunidade;
+    // URL: GET api/v1/UsuarioComunidade/comunidade?cdComunidade=1
+    @GetMapping("/comunidade") 
+    public List<UsuarioComunidade> getByComunidade(@RequestParam Long cdComunidade) {
+        return this.repository.findByComunidadeCdComunidade(cdComunidade);
     }
-        */
+
+    // URL: DELETE api/v1/UsuarioComunidade/comunidade?cdComunidade=1
+    @DeleteMapping("/comunidade")
+    public List<UsuarioComunidade> excluirByCdComunidade(@RequestParam Long cdComunidade) {
+        return this.repository.deleteByComunidadeCdComunidade(cdComunidade);
+    }
+
+    // URL: DELETE api/v1/UsuarioComunidade/usuario?cdUsuario=1
+    @DeleteMapping("/usuario")
+    public List<UsuarioComunidade> excluirByCdUsuario(@RequestParam Long cdUsuario) {
+        return this.repository.deleteByUsuarioCdUsuario(cdUsuario);
+    }  
+
+    // URL: DELETE api/v1/UsuarioComunidade/relacao?cdUsuario=1&cdComunidade=2
+    @DeleteMapping("/relacao")
+    public List<UsuarioComunidade> excluirRelacaoEspecifica(
+            @RequestParam Long cdUsuario, 
+            @RequestParam Long cdComunidade) {
+        return this.repository.deleteByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade);
+    }
 }
+
+/*
+     * this.repository.deleteById(cdComunidade);
+     * return comunidade;
+     * }
+     * 
+     * 
+     * 
+     * 
+     * @PutMapping("")
+     * public Comunidade alterar(@RequestBody Comunidade comunidade) {
+     * if (comunidade.getCdComunidade() == null) { //olhar isso aqui
+     * throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+     * "Id é obrigatório");
+     * }
+     * 
+     * this.repository.save(comunidade);
+     * return comunidade;
+     * }
+     */
