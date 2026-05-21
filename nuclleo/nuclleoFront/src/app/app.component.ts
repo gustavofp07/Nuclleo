@@ -45,6 +45,7 @@ import {
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
+  styleUrls: ['app.component.scss'],
 
   imports: [
     RouterLink,

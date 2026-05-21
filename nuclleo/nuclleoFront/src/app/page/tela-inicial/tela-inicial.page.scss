@@ -1,38 +1,163 @@
-/* tela-inicial.page.scss */
+/* FUNDO */
 
-.search-area {
-  padding: 12px;
+ion-content {
+  --background: #f5f7fb;
 }
 
+/* HEADER */
+
+ion-toolbar {
+  --background: #7d17f1;
+  --color: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* PESQUISA */
+
+.search-area {
+  padding: 16px 16px 8px;
+}
+
+ion-searchbar {
+  --background: #ffffff;
+
+  --border-radius: 16px;
+
+  --box-shadow: none;
+
+  --color: #111827;
+
+  --placeholder-color: #9ca3af;
+
+  padding: 0;
+}
+
+/* SEÇÕES */
+
 .section {
-  padding: 10px 14px;
+  padding: 12px 16px;
 }
 
 .section h2 {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 700;
+
+  color: #111827;
+
+  margin-bottom: 14px;
 }
+
+/* SCROLL */
 
 .horizontal-scroll {
-  white-space: nowrap;
+  display: flex;
+
+  gap: 14px;
+
+  overflow-x: auto;
+
+  padding-bottom: 6px;
+
+  scrollbar-width: none;
 }
 
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* CARDS */
+
 .product-card {
-  display: inline-block;
-  width: 220px;
-  margin-right: 12px;
-  border-radius: 18px;
+  min-width: 220px;
+
+  border-radius: 20px;
+
   overflow: hidden;
+
+  background: #ffffff;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  border: 1px solid #e5e7eb;
 }
 
 .product-card img {
   width: 100%;
   height: 140px;
+
   object-fit: cover;
 }
 
+ion-card-header {
+  padding-top: 14px;
+}
+
+ion-card-title {
+  font-size: 18px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+ion-card-subtitle {
+  margin-top: 6px;
+
+  color: #7c3aed;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* COMUNIDADES */
+
+ion-list {
+  background: transparent;
+}
+
 ion-item {
-  --border-radius: 14px;
-  margin-bottom: 10px;
+  --background: #ffffff;
+
+  --color: #111827;
+
+  --border-color: transparent;
+
+  --border-radius: 18px;
+
+  margin-bottom: 12px;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+
+  border: 1px solid #e5e7eb;
+}
+
+ion-item::part(native) {
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+/* AVATAR */
+
+ion-avatar img {
+  object-fit: cover;
+}
+
+/* TEXTO */
+
+ion-label h3 {
+  font-size: 17px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+ion-label p {
+  margin-top: 4px;
+
+  color: #6b7280;
 }

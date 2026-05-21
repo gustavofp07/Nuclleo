@@ -1,0 +1,60 @@
+/* MENU */
+
+ion-menu {
+    --width: 260px;
+}
+
+/* FUNDO TOTAL */
+ion-menu::part(container) {
+    background: #ffffff;
+}
+
+/* HEADER */
+ion-menu ion-header,
+ion-menu ion-toolbar {
+    --background: #ffffff;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* CONTENT */
+ion-menu ion-content {
+    --background: #ffffff;
+
+    background: #ffffff;
+}
+
+/* LIST */
+ion-menu ion-list {
+    background: #ffffff;
+}
+
+/* ITEMS */
+ion-menu ion-item {
+    --background: #ffffff;
+    --color: #111827;
+
+    margin: 8px 10px;
+
+    border-radius: 14px;
+    --border-color: transparent;
+    overflow: hidden;
+}
+
+/* NATIVE */
+ion-menu ion-item::part(native) {
+    background: #ffffff;
+
+    border-radius: 14px;
+}
+
+/* ICONES */
+ion-menu ion-icon {
+    color: #7c3aed;
+
+    font-size: 22px;
+}
