@@ -5,7 +5,7 @@ import {
   IonContent, IonLabel, IonAvatar, IonItem, IonCardSubtitle, IonCardTitle, IonCard, IonCardHeader,
   IonList, IonHeader, IonTitle, IonToolbar, IonSearchbar, IonMenuButton, IonButtons, IonIcon, IonMenu
 } from '@ionic/angular/standalone';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
 import { ToastController } from '@ionic/angular';
@@ -15,8 +15,8 @@ import { ToastController } from '@ionic/angular';
   templateUrl: './tela-inicial.page.html',
   styleUrls: ['./tela-inicial.page.scss'],
   standalone: true,
-  imports: [IonContent, RouterLink, IonLabel, IonAvatar, IonItem, IonCardSubtitle, IonCardTitle, IonCard, IonCardHeader,
-    IonList, IonHeader, IonTitle, IonToolbar, IonSearchbar, IonMenuButton, IonButtons, IonIcon, IonMenu, CommonModule, FormsModule]
+  imports: [IonContent, IonLabel, IonAvatar, IonItem, IonCardSubtitle, IonCardTitle, IonCard, IonCardHeader,
+    IonList, IonHeader, IonTitle, IonToolbar, IonSearchbar, IonMenuButton, IonButtons, CommonModule, FormsModule]
 })
 export class TelaInicialPage implements OnInit {
 

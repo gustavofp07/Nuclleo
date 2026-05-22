@@ -1,0 +1,55 @@
+<ion-content [fullscreen]="true" class="criar-content">
+
+  <div class="container">
+
+    <div class="topo">
+      <h1>Criar comunidade</h1>
+      <p>Preencha as informações abaixo</p>
+    </div>
+
+    <form (ngSubmit)="criarComunidade()">
+
+      <ion-item lines="none" class="input-item">
+
+        <ion-input
+          placeholder="Nome da comunidade"
+          [(ngModel)]="comunidade.nmComunidade"
+          name="nmComunidade">
+        </ion-input>
+
+      </ion-item>
+
+      <ion-item lines="none" class="input-item">
+
+        <ion-input
+          placeholder="Descrição"
+          [(ngModel)]="comunidade.descricao"
+          name="descricao">
+        </ion-input>
+
+      </ion-item>
+
+      <ion-item lines="none" class="input-item">
+
+        <ion-input
+          placeholder="URL da foto"
+          [(ngModel)]="comunidade.foto"
+          name="foto">
+        </ion-input>
+
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        class="btn-criar">
+
+        Criar comunidade
+
+      </ion-button>
+
+    </form>
+
+  </div>
+
+</ion-content>

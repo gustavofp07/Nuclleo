@@ -16,18 +16,10 @@ import {
   IonToolbar,
   IonContent,
   IonLabel,
-  IonAvatar,
   IonItem,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCard,
-  IonCardHeader,
   IonList,
   IonHeader,
   IonTitle,
-  IonSearchbar,
-  IonMenuButton,
-  IonButtons,
   IonIcon,
   IonMenu
 } from '@ionic/angular/standalone';
@@ -37,7 +29,8 @@ import { addIcons } from 'ionicons';
 import {
   personOutline,
   homeOutline,
-  logOutOutline
+  logOutOutline,
+  peopleOutline
 } from 'ionicons/icons';
 
 
@@ -55,18 +48,10 @@ import {
     IonToolbar,
     IonContent,
     IonLabel,
-    IonAvatar,
     IonItem,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCard,
-    IonCardHeader,
     IonList,
     IonHeader,
     IonTitle,
-    IonSearchbar,
-    IonMenuButton,
-    IonButtons,
     IonIcon,
     IonMenu
   ],
@@ -81,7 +66,8 @@ export class AppComponent {
     addIcons({
       personOutline,
       homeOutline,
-      logOutOutline
+      logOutOutline,
+      peopleOutline
     });
 
     this.router.events
