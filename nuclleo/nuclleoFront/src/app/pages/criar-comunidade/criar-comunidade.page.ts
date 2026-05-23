@@ -15,6 +15,8 @@ import { Router } from '@angular/router';
 
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 
+import { HttpClient } from '@angular/common/http';
+
 @Component({
   selector: 'app-criar-comunidade',
   templateUrl: './criar-comunidade.page.html',
@@ -38,7 +40,8 @@ export class CriarComunidadePage {
 
   constructor(
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private http: HttpClient
   ) {
 
     this.comunidade = new ComunidadeModel();
@@ -47,30 +50,73 @@ export class CriarComunidadePage {
 
   async criarComunidade() {
 
-    let comunidades =
-      JSON.parse(
-        localStorage.getItem('comunidades') || '[]'
-      );
-
-    comunidades.push(this.comunidade);
-
-    localStorage.setItem(
-      'comunidades',
-      JSON.stringify(comunidades)
+  const usuarioLogado =
+    JSON.parse(
+      localStorage.getItem('usuarioAutenticado') || '{}'
     );
 
-    const toast =
-      await this.toastController.create({
+  const comunidadeEnviar = {
 
-        message: 'Comunidade criada!',
-        duration: 2000
+    nmComunidade: this.comunidade.nmComunidade,
 
-      });
+    descricao: this.comunidade.descricao,
 
-    toast.present();
+    dtCriacao: new Date(),
 
-    this.router.navigate(['/minhas-comunidades']);
+    usuarioCria: {
+      cdUsuario: Number(usuarioLogado.cdUsuario)
+    }
 
-  }
+  };
+
+  console.log(comunidadeEnviar);
+
+  this.http.post(
+    'http://localhost:8080/api/v1/comunidades',
+    comunidadeEnviar
+  ).subscribe({
+
+    next: async (resposta) => {
+
+      console.log('CRIADO:', resposta);
+
+      const toast =
+        await this.toastController.create({
+
+          message: 'Comunidade criada!',
+          duration: 2000,
+          color: 'success'
+
+        });
+
+      await toast.present();
+
+      this.router.navigate([
+        '/minhas-comunidades'
+      ]);
+
+    },
+
+    error: async (erro) => {
+
+      console.log('ERRO BACKEND:', erro.error);
+
+      const toast =
+        await this.toastController.create({
+
+          message:
+            'Erro ao criar comunidade!',
+          duration: 3000,
+          color: 'danger'
+
+        });
+
+      await toast.present();
+
+    }
+
+  });
+
+}
 
 }

@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ForeignKey;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,28 +30,29 @@ public class Comunidade {
     private Long cdComunidade; // existe o tipo UUID
 
     /*
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "cdComunidade", updatable = false)
-    private UUID cdComunidade; // existe o tipo UUID
-    */
+     * @Id
+     * 
+     * @GeneratedValue
+     * 
+     * @UuidGenerator
+     * 
+     * @Column(name = "cdComunidade", updatable = false)
+     * private UUID cdComunidade; // existe o tipo UUID
+     */
 
     @Column(name = "nmComunidade", length = 60, nullable = false)
     private String nmComunidade;
 
-    @Column(name = "dtCriacao", nullable = false)
+    @Column(name = "dtCriacao")
     private LocalDate dtCriacao;
 
     @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
-    // @Column()
-    // private Long cdUsuarioCria;
-    @ManyToOne // Indica que muitos registros da tabela atual pertencem a um Usuário
-    @JoinColumn(name = "cdUsuarioCria", // Nome da coluna física nesta tabela
-            referencedColumnName = "cdUsuario", // Nome da chave primária na tabela Usuario
-            foreignKey = @ForeignKey(name = "fk_usuario_criador") // Nome opcional da FK no banco
-    )
+    @ManyToOne
+    @JsonIgnoreProperties({
+            "senha"
+    })
+    @JoinColumn(name = "cdUsuarioCria", referencedColumnName = "cdUsuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
     private Usuario usuarioCria;
 }

@@ -2,13 +2,31 @@
 
   <div class="container">
 
-    <div class="topo">
-      <h1>Criar comunidade</h1>
-      <p>Preencha as informações abaixo</p>
+    <!-- LOGO -->
+    <div class="brand">
+
+      <img
+        src="assets/img/logo.png"
+        alt="Logo Nuclleo"
+        class="logo">
+
     </div>
 
+    <!-- TOPO -->
+    <div class="topo">
+
+      <h1>Criar comunidade</h1>
+
+      <p>
+        Preencha as informações abaixo
+      </p>
+
+    </div>
+
+    <!-- FORM -->
     <form (ngSubmit)="criarComunidade()">
 
+      <!-- NOME -->
       <ion-item lines="none" class="input-item">
 
         <ion-input
@@ -19,6 +37,7 @@
 
       </ion-item>
 
+      <!-- DESCRIÇÃO -->
       <ion-item lines="none" class="input-item">
 
         <ion-input
@@ -29,6 +48,7 @@
 
       </ion-item>
 
+      <!-- FOTO -->
       <ion-item lines="none" class="input-item">
 
         <ion-input
@@ -39,6 +59,7 @@
 
       </ion-item>
 
+      <!-- BOTÃO -->
       <ion-button
         expand="block"
         type="submit"

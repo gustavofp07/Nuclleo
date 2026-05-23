@@ -34,15 +34,18 @@
 
         <div class="comunidade-card" *ngFor="let comunidade of comunidades">
 
-          <img [src]="comunidade.foto" class="foto-comunidade">
+          <<img [src]="
+    comunidade.foto ||
+    'https://picsum.photos/200'
+  " class="foto-comunidade">
 
-          <div class="info">
+            <div class="info">
 
-            <h2>{{ comunidade.nmComunidade }}</h2>
+              <h2>{{ comunidade.nmComunidade }}</h2>
 
-            <p>{{ comunidade.descricao }}</p>
+              <p>{{ comunidade.descricao }}</p>
 
-          </div>
+            </div>
 
         </div>
 
