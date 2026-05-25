@@ -53,46 +53,36 @@
       </div>
     </div>
 
-    <!-- Comunidades próximas -->
+    <!-- Comunidades -->
     <div class="section">
-      <h2>Comunidades próximas</h2>
+
+      <h2>Comunidades</h2>
 
       <ion-list>
 
-        <ion-item>
+        <ion-item *ngFor="let comunidade of comunidades">
+
           <ion-avatar slot="start">
-            <img src="https://picsum.photos/100?4">
+
+            <img [src]="
+            comunidade.foto ||
+            'https://ionicframework.com/docs/img/demos/avatar.svg'
+          ">
+
           </ion-avatar>
 
           <ion-label>
-            <h3>Gamers Itaúna</h3>
-            <p>1,2 km de distância</p>
+
+            <h3>{{ comunidade.nmComunidade }}</h3>
+
+            <p>{{ comunidade.descricao }}</p>
+
           </ion-label>
-        </ion-item>
 
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://picsum.photos/100?5">
-          </ion-avatar>
-
-          <ion-label>
-            <h3>Tech Minas</h3>
-            <p>3 km de distância</p>
-          </ion-label>
-        </ion-item>
-
-        <ion-item>
-          <ion-avatar slot="start">
-            <img src="https://picsum.photos/100?6">
-          </ion-avatar>
-
-          <ion-label>
-            <h3>Compra & Venda</h3>
-            <p>5 km de distância</p>
-          </ion-label>
         </ion-item>
 
       </ion-list>
+
     </div>
 
   </ion-content>

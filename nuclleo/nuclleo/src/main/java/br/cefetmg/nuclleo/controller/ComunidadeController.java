@@ -28,18 +28,21 @@ public class ComunidadeController {
     }
 
     @PostMapping()
-    public Comunidade inserir(@RequestBody Comunidade comunidade) {
-        if (comunidade != null) {
-            this.repository.save(comunidade);
-        }
-        return comunidade;
+    public Comunidade inserir(
+            @RequestBody Comunidade comunidade) {
+
+        comunidade.setCdComunidade(null);
+
+        return this.repository.save(comunidade);
+
     }
 
     @DeleteMapping("/{cdComunidade}")
     public Comunidade excluir(@PathVariable Long cdComunidade) {
-        Comunidade comunidade = this.repository.findById(cdComunidade).orElse(null); //mudar isso. Chamar o get
+        Comunidade comunidade = this.repository.findById(cdComunidade).orElse(null); // mudar isso. Chamar o get
         if (comunidade == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id: " + cdComunidade + "não encontrado.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Entidade com id: " + cdComunidade + "não encontrado.");
         }
 
         this.repository.deleteById(cdComunidade);
@@ -51,19 +54,29 @@ public class ComunidadeController {
         return this.repository.findAll();
     }
 
-    @GetMapping("/{cdComunidade}") //http://localhost:8080/api/v1/comunidades/cdComunidade
+    @GetMapping("/{cdComunidade}") // http://localhost:8080/api/v1/comunidades/cdComunidade
     public Comunidade getComunidadeById(@PathVariable Long cdComunidade) {
         return this.repository.findById(cdComunidade).orElse(null);
     }
 
     @PutMapping("")
     public Comunidade alterar(@RequestBody Comunidade comunidade) {
-        if (comunidade.getCdComunidade() == null) { //olhar isso aqui
+        if (comunidade.getCdComunidade() == null) { // olhar isso aqui
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
         }
 
         this.repository.save(comunidade);
         return comunidade;
+    }
+
+    @GetMapping("/usuario/{cdUsuario}")
+    public List<Comunidade> getComunidadesUsuario(
+            @PathVariable Long cdUsuario) {
+
+        return this.repository
+                .findByUsuarioCria_CdUsuario(
+                        cdUsuario);
+
     }
 
 }

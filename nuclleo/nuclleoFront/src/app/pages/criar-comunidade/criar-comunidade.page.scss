@@ -1,0 +1,149 @@
+/* criar-comunidade.page.scss */
+/* LOGO */
+
+.brand {
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 120px;
+  height: auto;
+
+  object-fit: contain;
+}
+
+.criar-content {
+  --background: #f5f7fb;
+}
+
+.container {
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 32px 24px 50px;
+
+  width: 100%;
+  max-width: 650px;
+
+  margin: 0 auto;
+}
+
+/* TOPO */
+
+.topo {
+  text-align: center;
+
+  margin-bottom: 36px;
+}
+
+.topo h1 {
+  font-size: 32px;
+  font-weight: 700;
+
+  color: #111827;
+
+  margin-bottom: 8px;
+}
+
+.topo p {
+  color: #6b7280;
+
+  font-size: 15px;
+}
+
+/* INPUTS */
+
+.input-item {
+  --background: #ffffff;
+
+  --border-radius: 14px;
+
+  --padding-start: 14px;
+  --inner-padding-end: 8px;
+
+  margin-bottom: 18px;
+
+  min-height: 56px;
+
+  color: #111827;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.input-item::part(native) {
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+ion-input {
+  --color: #111827;
+
+  --placeholder-color: #9ca3af;
+}
+
+/* BOTÃO */
+
+.btn-criar {
+  margin-top: 10px;
+
+  --background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a855f7
+  );
+
+  --background-hover: linear-gradient(
+    90deg,
+    #6d28d9,
+    #9333ea
+  );
+
+  --color: #ffffff;
+
+  --border-radius: 16px;
+
+  height: 52px;
+
+  font-weight: 700;
+
+  font-size: 15px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  overflow: hidden;
+
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+}
+
+.btn-criar::part(native) {
+  border-radius: 16px;
+
+  overflow: hidden;
+}
+
+/* RESPONSIVIDADE */
+
+@media (min-width: 768px) {
+
+  .container {
+    padding-top: 50px;
+  }
+
+}
