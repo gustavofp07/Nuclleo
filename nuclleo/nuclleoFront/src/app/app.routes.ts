@@ -46,6 +46,10 @@ export const routes: Routes = [
     path: 'criar-comunidade',
     loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then( m => m.CriarComunidadePage)
   },
+  {
+    path: 'criar-comunidade/:cdComunidade',
+    loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then( m => m.CriarComunidadePage)
+  },
 
 
 ];

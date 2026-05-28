@@ -1,8 +1,8 @@
 package br.cefetmg.nuclleo.model;
 
-import java.time.LocalDate;
-//import java.util.UUID;
+import java.sql.Date;
 
+//import java.util.UUID;
 //import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
@@ -44,15 +44,14 @@ public class Comunidade {
     private String nmComunidade;
 
     @Column(name = "dtCriacao")
-    private LocalDate dtCriacao;
+    private Date dtCriacao;
 
     @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
     @ManyToOne
-    @JsonIgnoreProperties({
-            "senha"
-    })
+    @JsonIgnoreProperties({"senha"})
+
     @JoinColumn(name = "cdUsuarioCria", referencedColumnName = "cdUsuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
     private Usuario usuarioCria;
 }

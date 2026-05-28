@@ -67,9 +67,7 @@ export class TelaInicialPage implements OnInit {
   ) { }
 
   ngOnInit() {
-
     this.carregarComunidades();
-
   }
 
   ionViewWillEnter() {

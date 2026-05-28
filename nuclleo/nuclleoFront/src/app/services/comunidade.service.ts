@@ -20,11 +20,27 @@ export class ComunidadeService {
   ) { }
 
   cadastrarComunidade(comunidade: ComunidadeModel): Observable<ComunidadeModel> {
-    return this.http.post<ComunidadeModel>(this.API_URL,comunidade);
+    return this.http.post<ComunidadeModel>(this.API_URL, comunidade);
   }
 
-  listarComunidades():Observable<ComunidadeModel[]> {
-      return this.http.get<ComunidadeModel[]>(this.API_URL);
+  atualizarComunidade(comunidade: ComunidadeModel): Observable<ComunidadeModel> {
+    return this.http.put<ComunidadeModel>(`${this.API_URL}/${comunidade.cdComunidade}`, comunidade);
   }
 
+  //listar todas. Tirar depois
+  listarComunidades(): Observable<ComunidadeModel[]> {
+    return this.http.get<ComunidadeModel[]>(this.API_URL);
+  }
+
+  listarComunidadesDoUsuario(cdUsuario: number): Observable<ComunidadeModel[]> {
+    return this.http.get<ComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
+  }
+
+  excluir(cdComunidade: number): Observable<ComunidadeModel> {
+    return this.http.delete<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
+  }
+
+  buscarComunidade(cdComunidade: number): Observable<ComunidadeModel> {
+    return this.http.get<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
+  }
 }

@@ -194,3 +194,25 @@ ion-toolbar {
   }
 
 }
+
+
+/* AÇÕES */
+
+.acoes {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.acoes ion-button {
+  --padding-start: 0;
+  --padding-end: 0;
+
+  width: 40px;
+  height: 40px;
+}
+
+.acoes ion-button::part(native) {
+  font-size: 15px;
+}

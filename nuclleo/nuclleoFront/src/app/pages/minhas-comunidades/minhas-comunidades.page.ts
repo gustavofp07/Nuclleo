@@ -23,9 +23,25 @@ import {
   RouterLink
 } from '@angular/router';
 
+//tirar
 import {
   HttpClient
 } from '@angular/common/http';
+
+import {
+  AlertController,
+  ToastController
+} from '@ionic/angular';
+
+import {
+  addIcons
+} from 'ionicons';
+import { add, settingsOutline, trashOutline } from 'ionicons/icons';
+
+import { ComunidadeService } from 'src/app/services/comunidade.service';
+import { UsuarioModel } from 'src/app/model/usuario.model';
+import { ComunidadeModel } from 'src/app/model/comunidade.model';
+import { UsuarioService } from 'src/app/services/usuario.service';
 
 @Component({
   selector: 'app-minhas-comunidades',
@@ -49,57 +65,128 @@ import {
   ]
 })
 
-export class MinhasComunidadesPage
-implements OnInit {
-
-  comunidades: any[] = [];
+export class MinhasComunidadesPage implements OnInit {
+  usuario: UsuarioModel;
+  comunidades: ComunidadeModel[];
 
   constructor(
-    private http: HttpClient
-  ) { }
+    private comunidadeService: ComunidadeService,
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private usuarioService: UsuarioService) {
+    this.usuario = new UsuarioModel();
+    this.comunidades = [];
+    addIcons({
+      add,
+      settingsOutline,
+      trashOutline
+    });
+  }
 
   ngOnInit() {
-
-    this.carregarComunidades();
-
+    this.usuario = this.usuarioService.getUsuarioSessao();
+    if (this.usuario) {
+      this.carregarComunidades();
+    }
   }
 
   ionViewWillEnter() {
-
-    this.carregarComunidades();
-
+    if (this.usuario) {
+      this.carregarComunidades();
+    }
   }
 
   carregarComunidades() {
 
-  const usuarioLogado =
-    JSON.parse(
-      localStorage.getItem(
-        'usuarioAutenticado'
-      ) || '{}'
-    );
+    this.comunidadeService.listarComunidadesDoUsuario(this.usuario.cdUsuario).subscribe({
+      next: async (comunidades: ComunidadeModel[]) => {
+        //console.log("busquei ", comunidades);
+        this.comunidades = comunidades;
+      },
+      error: async () => {
+        //console.log('Erro ao logar');
+        this.exibirMensagem('Erro ao carregar comunidades');
+      }
+    });
 
-  this.http.get<any[]>(
+    /*
+    const usuarioLogado =
+      JSON.parse(
+        localStorage.getItem(
+          'usuarioAutenticado'
+        ) || '{}'
+      );
 
-    'http://localhost:8080/api/v1/comunidades/usuario/' +
-    usuarioLogado.cdUsuario
+    this.http.get<any[]>(
 
-  ).subscribe({
+      'http://localhost:8080/api/v1/comunidades/usuario/' +
+      usuarioLogado.cdUsuario
 
-    next: (dados) => {
+    ).subscribe({
 
-      this.comunidades = dados;
+      next: (dados) => {
 
-    },
+        this.comunidades = dados;
 
-    error: (erro) => {
+      },
 
-      console.log(erro);
+      error: (erro) => {
 
-    }
+        console.log(erro);
 
-  });
+      }
 
-}
+    });
+    */
 
+  }
+
+  async confirmarExclusao(comunidade: ComunidadeModel) {
+    const alert =
+      await this.alertController.create({
+        header: 'Excluir comunidade',
+        message:
+          'Deseja realmente excluir esta comunidade?',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Excluir',
+            role: 'destructive',
+            handler: () => {
+              this.excluirComunidade(comunidade);
+            }
+          }
+        ]
+      });
+    await alert.present();
+  }
+
+  excluirComunidade(comunidade: ComunidadeModel) {
+
+    this.comunidadeService.excluir(comunidade.cdComunidade).subscribe({
+      next: async (comunidade: ComunidadeModel) => {
+        //console.log("busquei ", comunidades);
+        this.exibirMensagem('Comunidade excluída com sucesso');
+        this.carregarComunidades();
+      },
+      error: async () => {
+        //console.log('Erro ao logar');
+        this.exibirMensagem('Erro ao excluir comunidade.');
+      }
+    });
+
+  }
+
+  async exibirMensagem(mensagem: string) {
+    const toast =
+      await this.toastController.create({
+        message: mensagem,
+        duration: 2000,
+        position: 'top'
+      });
+    await toast.present();
+  }
 }

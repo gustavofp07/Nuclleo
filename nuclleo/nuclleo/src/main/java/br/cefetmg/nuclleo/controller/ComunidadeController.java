@@ -31,7 +31,21 @@ public class ComunidadeController {
     public Comunidade inserir(@RequestBody Comunidade comunidade) {
         comunidade.setCdComunidade(null);
 
+        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
+        comunidade.setDtCriacao(data);
+
         return this.repository.save(comunidade);
+    }
+
+    @PutMapping("/{cdComunidade}")
+    public Comunidade alterar(@PathVariable Long cdComunidade, @RequestBody Comunidade comunidade) {
+
+        if (repository.existsById(cdComunidade) == false) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada.");
+        }
+
+        comunidade.setCdComunidade(cdComunidade);
+        return repository.save(comunidade);
     }
 
     @DeleteMapping("/{cdComunidade}")
@@ -46,6 +60,7 @@ public class ComunidadeController {
         return comunidade;
     }
 
+    // tirar depois
     @GetMapping("")
     public List<Comunidade> getComunidades() {
         return this.repository.findAll();
@@ -56,20 +71,8 @@ public class ComunidadeController {
         return this.repository.findById(cdComunidade).orElse(null);
     }
 
-    @PutMapping("")
-    public Comunidade alterar(@RequestBody Comunidade comunidade) {
-        if (comunidade.getCdComunidade() == null) { // olhar isso aqui
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
-        }
-
-        this.repository.save(comunidade);
-        return comunidade;
-    }
-
     @GetMapping("/usuario/{cdUsuario}")
     public List<Comunidade> getComunidadesUsuario(@PathVariable Long cdUsuario) {
-
         return this.repository.findByUsuarioCria_CdUsuario(cdUsuario);
     }
-
 }

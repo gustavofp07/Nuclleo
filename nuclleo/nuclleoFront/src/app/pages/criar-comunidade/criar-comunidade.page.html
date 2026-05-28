@@ -5,34 +5,23 @@
     <!-- LOGO -->
     <div class="brand">
 
-      <img
-        src="assets/img/logo.png"
-        alt="Logo Nuclleo"
-        class="logo">
+      <img src="assets/img/logo.png" alt="Logo Nuclleo" class="logo">
 
     </div>
 
     <!-- TOPO -->
     <div class="topo">
-
-      <h1>Criar comunidade</h1>
-
-      <p>
-        Preencha as informações abaixo
-      </p>
-
+      <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
+      <p>Preencha as informações abaixo</p>
     </div>
 
     <!-- FORM -->
-    <form (ngSubmit)="criarComunidade()">
+    <form (ngSubmit)="salvarComunidade()">>
 
       <!-- NOME -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          placeholder="Nome da comunidade"
-          [(ngModel)]="comunidade.nmComunidade"
-          name="nmComunidade">
+        <ion-input placeholder="Nome da comunidade" [(ngModel)]="comunidade.nmComunidade" name="nmComunidade">
         </ion-input>
 
       </ion-item>
@@ -40,10 +29,7 @@
       <!-- DESCRIÇÃO -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          placeholder="Descrição"
-          [(ngModel)]="comunidade.descricao"
-          name="descricao">
+        <ion-input placeholder="Descrição" [(ngModel)]="comunidade.descricao" name="descricao">
         </ion-input>
 
       </ion-item>
@@ -51,23 +37,13 @@
       <!-- FOTO -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          placeholder="URL da foto"
-          [(ngModel)]="comunidade.foto"
-          name="foto">
+        <ion-input placeholder="URL da foto" [(ngModel)]="comunidade.foto" name="foto">
         </ion-input>
 
       </ion-item>
 
       <!-- BOTÃO -->
-      <ion-button
-        expand="block"
-        type="submit"
-        class="btn-criar">
-
-        Criar comunidade
-
-      </ion-button>
+      <ion-button expand="block" type="submit" class="btn-criar">{{ modoEdicao ? 'Salvar alterações' : 'Criar comunidade' }}</ion-button>
 
     </form>
 
