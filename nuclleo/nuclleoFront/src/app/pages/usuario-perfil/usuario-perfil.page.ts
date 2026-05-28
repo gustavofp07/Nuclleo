@@ -10,6 +10,7 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
 import { Router, RouterLink } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -23,7 +24,8 @@ export class UsuarioPerfilPage implements OnInit {
   usuario: UsuarioModel;
 
   constructor(private usuarioService: UsuarioService,
-    private router: Router
+              private router: Router,
+              private toastController: ToastController
   ) {
 
     addIcons({
@@ -66,20 +68,28 @@ export class UsuarioPerfilPage implements OnInit {
 
   excluir() {
     let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
-
     //let teste = this.usuarioService.excluirUsuario(usuarioLogado.cdUsuario);
 
     this.usuarioService.excluirUsuario(usuarioLogado.cdUsuario).subscribe({
       next: async (usuario: UsuarioModel) => {
-        console.log("excluiu", usuario);
+        //console.log("excluiu", usuario);
         this.router.navigate(['/login']);
       },
       error: async () => {
         //console.error('Erro ao logar');
+        this.exibirMensagem("Erro ao excluir o usuário.");
         console.log('Erro ao excluir o usuário.');
       }
     });
 
+  }
+
+  async exibirMensagem(texto: string) {
+    const toast = await this.toastController.create({
+      message: texto,
+      duration: 2000
+    });
+    toast.present();
   }
 
 }

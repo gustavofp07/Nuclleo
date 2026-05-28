@@ -11,9 +11,6 @@ import br.cefetmg.nuclleo.model.Comunidade;
 public interface ComunidadeRepository
 extends JpaRepository<Comunidade, Long> {
 
-    List<Comunidade>
-    findByUsuarioCria_CdUsuario(
-        Long cdUsuario
-    );
+    List<Comunidade>findByUsuarioCria_CdUsuario(Long cdUsuario);
 
 }

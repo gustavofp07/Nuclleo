@@ -28,13 +28,10 @@ public class ComunidadeController {
     }
 
     @PostMapping()
-    public Comunidade inserir(
-            @RequestBody Comunidade comunidade) {
-
+    public Comunidade inserir(@RequestBody Comunidade comunidade) {
         comunidade.setCdComunidade(null);
 
         return this.repository.save(comunidade);
-
     }
 
     @DeleteMapping("/{cdComunidade}")
@@ -70,13 +67,9 @@ public class ComunidadeController {
     }
 
     @GetMapping("/usuario/{cdUsuario}")
-    public List<Comunidade> getComunidadesUsuario(
-            @PathVariable Long cdUsuario) {
+    public List<Comunidade> getComunidadesUsuario(@PathVariable Long cdUsuario) {
 
-        return this.repository
-                .findByUsuarioCria_CdUsuario(
-                        cdUsuario);
-
+        return this.repository.findByUsuarioCria_CdUsuario(cdUsuario);
     }
 
 }

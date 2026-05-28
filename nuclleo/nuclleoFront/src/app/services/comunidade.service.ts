@@ -12,31 +12,19 @@ import { ComunidadeModel } from '../model/comunidade.model';
 
 export class ComunidadeService {
 
-  private api =
-    'http://localhost:8080/api/v1/comunidades';
+  private readonly API_URL = 'http://localhost:8080/api/v1/comunidades';
+  //private api = 'http://localhost:8080/api/v1/comunidades';
 
   constructor(
     private http: HttpClient
   ) { }
 
-  cadastrarComunidade(
-    comunidade: ComunidadeModel
-  ): Observable<ComunidadeModel> {
-
-    return this.http.post<ComunidadeModel>(
-      this.api,
-      comunidade
-    );
-
+  cadastrarComunidade(comunidade: ComunidadeModel): Observable<ComunidadeModel> {
+    return this.http.post<ComunidadeModel>(this.API_URL,comunidade);
   }
 
-  listarComunidades():
-    Observable<ComunidadeModel[]> {
-
-    return this.http.get<ComunidadeModel[]>(
-      this.api
-    );
-
+  listarComunidades():Observable<ComunidadeModel[]> {
+      return this.http.get<ComunidadeModel[]>(this.API_URL);
   }
 
 }

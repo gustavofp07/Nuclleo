@@ -5,14 +5,6 @@ import {
 
 import {
   IonContent,
-  IonLabel,
-  IonAvatar,
-  IonItem,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCard,
-  IonCardHeader,
-  IonList,
   IonHeader,
   IonTitle,
   IonToolbar,
@@ -20,7 +12,6 @@ import {
   IonMenuButton,
   IonButtons,
   IonIcon,
-  IonMenu,
   IonButton
 } from '@ionic/angular/standalone';
 
@@ -48,22 +39,12 @@ import {
     RouterLink,
 
     IonContent,
-    IonLabel,
-    IonAvatar,
-    IonItem,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCard,
-    IonCardHeader,
-    IonList,
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonSearchbar,
     IonMenuButton,
     IonButtons,
     IonIcon,
-    IonMenu,
     IonButton
   ]
 })

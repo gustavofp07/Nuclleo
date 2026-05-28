@@ -17,21 +17,14 @@
   <ion-content [fullscreen]="true" class="comunidades-content">
 
     <div class="container">
-
       <!-- TOPO -->
       <div class="topo">
-
         <h1>Suas comunidades</h1>
-
-        <p>
-          Gerencie as comunidades criadas por você
-        </p>
-
+        <p>Gerencie as comunidades criadas por você</p>
       </div>
 
       <!-- LISTA -->
       <div class="lista-comunidades" *ngIf="comunidades.length > 0">
-
         <div class="comunidade-card" *ngFor="let comunidade of comunidades">
 
           <<img [src]="
@@ -40,15 +33,10 @@
   " class="foto-comunidade">
 
             <div class="info">
-
               <h2>{{ comunidade.nmComunidade }}</h2>
-
               <p>{{ comunidade.descricao }}</p>
-
             </div>
-
         </div>
-
       </div>
 
       <!-- VAZIO -->
