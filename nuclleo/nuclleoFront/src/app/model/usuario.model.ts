@@ -10,7 +10,7 @@ export class UsuarioModel {
     telefone: string;
 
     constructor() {
-        this.cdUsuario = 0;//
+        this.cdUsuario = 0;//corrigir aqui e no backend
         this.nmUsuario = '';
         this.ftUsuario = '';
         this.email = '';

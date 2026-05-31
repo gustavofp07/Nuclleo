@@ -31,11 +31,8 @@ public class Comunidade {
 
     /*
      * @Id
-     * 
      * @GeneratedValue
-     * 
      * @UuidGenerator
-     * 
      * @Column(name = "cdComunidade", updatable = false)
      * private UUID cdComunidade; // existe o tipo UUID
      */
@@ -51,7 +48,6 @@ public class Comunidade {
 
     @ManyToOne
     @JsonIgnoreProperties({"senha"})
-
     @JoinColumn(name = "cdUsuarioCria", referencedColumnName = "cdUsuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
     private Usuario usuarioCria;
 }

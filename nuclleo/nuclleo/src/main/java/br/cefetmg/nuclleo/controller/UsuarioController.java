@@ -63,8 +63,7 @@ public class UsuarioController {
         java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
         usuario.setDtEntrada(data);
 
-        repository.save(usuario);
-        return usuario;
+        return this.repository.save(usuario);
     }
 
     /*
@@ -101,8 +100,7 @@ public class UsuarioController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
         }
 
-        this.repository.save(usuario);
-        return usuario;
+        return this.repository.save(usuario);
 
         /*
          * for (int i = 0; i < usuarioList.size(); i++) {
