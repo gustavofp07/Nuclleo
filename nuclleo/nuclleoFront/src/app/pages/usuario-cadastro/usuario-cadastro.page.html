@@ -5,10 +5,7 @@
     <!-- LOGO -->
     <div class="brand">
 
-      <img
-        src="assets/img/logo.png"
-        alt="Logo Nuclleo"
-        class="logo">
+      <img src="assets/img/logo.png" alt="Logo Nuclleo" class="logo">
 
     </div>
 
@@ -18,18 +15,29 @@
       <p>Crie sua conta na Nuclleo</p>
     </div>
 
+    <!-- FOTO -->
+
+    <div class="foto-box">
+
+      <img [src]="previewFoto || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+
+      <input type="file" hidden #inputFoto accept="image/png,image/jpeg,image/jpg" (change)="selecionarImagem($event)">
+
+      <ion-button type="button" class="btn-foto" (click)="inputFoto.click()">
+
+        Selecionar foto
+
+      </ion-button>
+
+    </div>
+
     <!-- FORMULÁRIO -->
     <form (ngSubmit)="salvar()">
 
       <!-- EMAIL -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          type="email"
-          placeholder="E-mail"
-          [(ngModel)]="usuario.email"
-          name="email"
-          required>
+        <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email" required>
         </ion-input>
 
       </ion-item>
@@ -37,11 +45,7 @@
       <!-- NOME -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          placeholder="Nome"
-          [(ngModel)]="usuario.nmUsuario"
-          name="nmUsuario"
-          required>
+        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario" required>
         </ion-input>
 
       </ion-item>
@@ -49,23 +53,13 @@
       <!-- SENHA -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          [type]="showPassword ? 'text' : 'password'"
-          placeholder="Senha"
-          [(ngModel)]="usuario.senha"
-          name="senha"
-          required>
+        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
+          name="senha" required>
         </ion-input>
 
-        <ion-button
-          fill="clear"
-          slot="end"
-          type="button"
-          (click)="togglePassword()">
+        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
 
-          <ion-icon
-            slot="icon-only"
-            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
           </ion-icon>
 
         </ion-button>
@@ -75,23 +69,13 @@
       <!-- CONFIRMAR SENHA -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          [type]="showConfirmPassword ? 'text' : 'password'"
-          placeholder="Confirmar senha"
-          [(ngModel)]="confirmarSenha"
-          name="confirmarSenha"
-          required>
+        <ion-input [type]="showConfirmPassword ? 'text' : 'password'" placeholder="Confirmar senha"
+          [(ngModel)]="confirmarSenha" name="confirmarSenha" required>
         </ion-input>
 
-        <ion-button
-          fill="clear"
-          slot="end"
-          type="button"
-          (click)="toggleConfirmPassword()">
+        <ion-button fill="clear" slot="end" type="button" (click)="toggleConfirmPassword()">
 
-          <ion-icon
-            slot="icon-only"
-            [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'">
+          <ion-icon slot="icon-only" [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'">
           </ion-icon>
 
         </ion-button>
@@ -99,10 +83,7 @@
       </ion-item>
 
       <!-- BOTÃO -->
-      <ion-button
-        expand="block"
-        type="submit"
-        class="btn-cadastrar">
+      <ion-button expand="block" type="submit" class="btn-cadastrar">
 
         Cadastrar
 

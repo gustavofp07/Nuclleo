@@ -142,3 +142,43 @@ ion-item ion-button {
   color: #111827;
   font-weight: 700;
 }
+
+/* FOTO */
+
+.foto-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 28px;
+}
+
+.foto-usuario {
+  width: 130px;
+  height: 130px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  background: #e5e7eb;
+
+  border: 4px solid #ffffff;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+  margin-bottom: 14px;
+}
+
+.btn-foto {
+  --background: #7c3aed;
+  --color: #ffffff;
+
+  --border-radius: 14px;
+
+  height: 46px;
+
+  font-weight: 600;
+
+  text-transform: none;
+}

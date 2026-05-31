@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import {
   IonContent,
   IonLabel,
   IonAvatar,
   IonItem,
+  IonButton,
   IonCardSubtitle,
   IonCardTitle,
   IonCard,
@@ -51,7 +53,9 @@ import { HttpClient } from '@angular/common/http';
     IonMenuButton,
     IonButtons,
     CommonModule,
-    FormsModule
+    FormsModule,
+    IonButton,
+    RouterLink
   ]
 })
 

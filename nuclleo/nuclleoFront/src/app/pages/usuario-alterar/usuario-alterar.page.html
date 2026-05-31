@@ -1,5 +1,16 @@
 <ion-content [fullscreen]="true" class="editar-content">
 
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+
+      <ion-title>Alterar perfil</ion-title>
+
+    </ion-toolbar>
+  </ion-header>
+
   <div class="container">
 
     <!-- TOPO -->
@@ -19,87 +30,93 @@
     <form (ngSubmit)="salvarAlteracoes()">
 
       <!-- FOTO -->
-      <div class="foto-box">
 
-        <!--
-        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+        <div class="campo-label">
+          <label>Foto de perfil</label>
+        </div>
 
-        <input type="file" hidden #inputFile (change)="selecionarImagem($event)">
+        <div class="upload-box">
 
-        <ion-button expand="block" fill="outline" class="btn-imagem" (click)="inputFile.click()"
-          type="button">Selecionar imagem</ion-button>
-      -->
+          <img *ngIf="previewFoto || usuario.ftUsuario" [src]="previewFoto || usuario.ftUsuario" class="preview-imagem">
 
-        <!--
-        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
-        <input type="file" hidden #inputFile (change)="selecionarImagem($event)">
-        <ion-button (click)="inputFile.click()">Selecionar imagem</ion-button>
-        -->
+          <div *ngIf="!previewFoto && !usuario.ftUsuario" class="placeholder-upload">
 
-        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
-        <input type="file" hidden #inputFile (change)="teste()">
-        <ion-button (click)="teste()">Selecionar imagem</ion-button>
-      </div>
+            <ion-icon name="image-outline">
+            </ion-icon>
 
-      <!-- NOME -->
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario">
-        </ion-input>
-      </ion-item>
+            <span>Nenhuma imagem selecionada</span>
 
-      <!-- EMAIL -->
-      <ion-item lines="none" class="input-item">
-        <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email">
-        </ion-input>
-      </ion-item>
+          </div>
 
-      <!-- CPF -->
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="CPF" [(ngModel)]="usuario.cpf" name="cpf">
-        </ion-input>
-      </ion-item>
+          <input type="file" hidden #inputFile accept=".png,.jpg,.jpeg" (change)="selecionarImagem($event)">
 
-      <!-- CEP -->
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="CEP" [(ngModel)]="usuario.cep" name="cep">
-        </ion-input>
-      </ion-item>
+        </div>
 
-      <!-- TELEFONE -->
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Telefone" [(ngModel)]="usuario.telefone" name="telefone">
-        </ion-input>
-      </ion-item>
+        <ion-button expand="block" type="button" class="btn-upload" (click)="inputFile.click()">
 
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Data de Entrada" [(ngModel)]="usuario.dtEntrada" name="dtEntrada" readonly>
-        </ion-input>
-      </ion-item>
+          Selecionar imagem
 
-      <!-- Senha -->
-      <ion-item lines="none" class="input-item">
-
-        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
-          name="senha" required>
-        </ion-input>
-
-        <!-- OLHINHO -->
-        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
-
-          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
-          </ion-icon>
         </ion-button>
-      </ion-item>
 
-      <!-- BOTÕES -->
-      <div class="acoes">
+        <!-- NOME -->
+        <ion-item lines="none" class="input-item">
+          <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario">
+          </ion-input>
+        </ion-item>
 
-        <ion-button expand="block" class="btn-salvar" type="submit">Salvar alterações</ion-button>
+        <!-- EMAIL -->
+        <ion-item lines="none" class="input-item">
+          <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email">
+          </ion-input>
+        </ion-item>
 
-        <ion-button expand="block" fill="outline" class="btn-cancelar" type="button"
-          (click)="cancelar()">Cancelar</ion-button>
+        <!-- CPF -->
+        <ion-item lines="none" class="input-item">
+          <ion-input placeholder="CPF" [(ngModel)]="usuario.cpf" name="cpf">
+          </ion-input>
+        </ion-item>
 
-      </div>
+        <!-- CEP -->
+        <ion-item lines="none" class="input-item">
+          <ion-input placeholder="CEP" [(ngModel)]="usuario.cep" name="cep">
+          </ion-input>
+        </ion-item>
+
+        <!-- TELEFONE -->
+        <ion-item lines="none" class="input-item">
+          <ion-input placeholder="Telefone" [(ngModel)]="usuario.telefone" name="telefone">
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="input-item">
+          <ion-input placeholder="Data de Entrada" [(ngModel)]="usuario.dtEntrada" name="dtEntrada" readonly>
+          </ion-input>
+        </ion-item>
+
+        <!-- Senha -->
+        <ion-item lines="none" class="input-item">
+
+          <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
+            name="senha" required>
+          </ion-input>
+
+          <!-- OLHINHO -->
+          <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
+
+            <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+            </ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <!-- BOTÕES -->
+        <div class="acoes">
+
+          <ion-button expand="block" class="btn-salvar" type="submit">Salvar alterações</ion-button>
+
+          <ion-button expand="block" fill="outline" class="btn-cancelar" type="button"
+            (click)="cancelar()">Cancelar</ion-button>
+
+        </div>
 
     </form>
 

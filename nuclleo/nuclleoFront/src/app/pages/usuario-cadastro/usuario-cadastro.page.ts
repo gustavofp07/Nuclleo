@@ -48,7 +48,7 @@ export class UsuarioCadastroPage implements OnInit {
   usuario: UsuarioModel;
   confirmarSenha: string = '';
   showPassword: boolean = false;
-
+  previewFoto: string | ArrayBuffer | null = null;
   showConfirmPassword: boolean = false;
 
   constructor(
@@ -131,6 +131,23 @@ export class UsuarioCadastroPage implements OnInit {
 
   }
 
+  selecionarImagem(event: any) {
+
+    const arquivo = event.target.files[0];
+
+    if (!arquivo) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.previewFoto = reader.result;
+    };
+
+    reader.readAsDataURL(arquivo);
+
+  }
 
   async exibirMensagem(texto: string) {
     const toast =

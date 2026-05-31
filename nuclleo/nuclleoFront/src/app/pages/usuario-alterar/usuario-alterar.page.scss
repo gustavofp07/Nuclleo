@@ -4,6 +4,15 @@
   --background: #f5f7fb;
 }
 
+/* HEADER */
+
+ion-toolbar {
+  --background: #7d17f1;
+  --color: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
 .container {
   min-height: 100%;
 
@@ -45,54 +54,103 @@
   margin: 0;
 }
 
-/* FOTO */
+/* LABEL */
 
-.foto-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  margin-bottom: 35px;
+.campo-label {
+  text-align: center;
+  margin-bottom: 12px;
 }
 
-.foto-usuario {
-  width: 130px;
-  height: 130px;
+.campo-label label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
 
+  padding-left: 4px;
+}
+
+/* UPLOAD */
+
+.upload-box {
+  width: 220px;
+  height: 220px;
+
+  margin: 0 auto 16px auto;
+
+  border: 1px solid #d1d5db;
   border-radius: 50%;
 
-  object-fit: cover;
+  background: #ffffff;
 
-  background: #e5e7eb;
+  overflow: hidden;
 
-  border: 4px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-
-  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-/* BOTÃO FOTO */
+.preview-imagem {
+  width: 100%;
+  height: 100%;
 
-.foto-box ion-button {
-  --background: #7c3aed;
-  --background-hover: #6d28d9;
+  object-fit: cover;
+}
+
+.placeholder-upload {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  gap: 12px;
+
+  color: #9ca3af;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+}
+
+.placeholder-upload ion-icon {
+  font-size: 64px;
+  color: #9ca3af;
+}
+
+.placeholder-upload span {
+  max-width: 130px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-upload {
+  margin-bottom: 25px;
+
+  --background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a855f7
+  );
 
   --color: #ffffff;
 
-  --border-radius: 14px;
+  --border-radius: 16px;
 
-  height: 46px;
+  height: 52px;
 
-  font-weight: 600;
-
-  text-transform: none;
-
-  overflow: hidden;
+  font-weight: 700;
 }
 
-.foto-box ion-button::part(native) {
-  border-radius: 14px;
+.btn-upload::part(native) {
+  border-radius: 16px;
 }
 
 /* INPUTS */

@@ -13,24 +13,35 @@ ion-toolbar {
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* PESQUISA */
+/* AÇÕES */
 
-.search-area {
-  padding: 16px 16px 8px;
+.acoes-rapidas {
+  display: flex;
+  gap: 12px;
+
+  padding: 16px;
 }
 
-ion-searchbar {
-  --background: #ffffff;
+.acoes-rapidas ion-button {
+  flex: 1;
+  height: 42px;
 
-  --border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
 
-  --box-shadow: none;
+.btn-venda {
+  --background: #111827;
+  --color: white;
 
+  --border-radius: 12px;
+}
+
+.btn-requerimento {
   --color: #111827;
+  --border-color: #000000;
 
-  --placeholder-color: #9ca3af;
-
-  padding: 0;
+  --border-radius: 12px;
 }
 
 /* SEÇÕES */

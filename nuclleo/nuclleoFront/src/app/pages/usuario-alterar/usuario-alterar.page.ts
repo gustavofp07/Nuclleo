@@ -6,7 +6,12 @@ import {
   IonItem,
   IonInput,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  IonTitle
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -16,7 +21,8 @@ import { addIcons } from 'ionicons';
 import {
   chevronBackOutline,
   eyeOffOutline,
-  eyeOutline
+  eyeOutline,
+  imageOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -27,7 +33,11 @@ import { UsuarioService } from 'src/app/services/usuario.service';
   templateUrl: './usuario-alterar.page.html',
   styleUrls: ['./usuario-alterar.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonItem, IonInput, IonButton, IonIcon]
+  imports: [IonContent, CommonModule, FormsModule, IonItem, IonInput, IonButton, IonIcon, IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonMenuButton,
+    IonTitle]
 })
 export class UsuarioAlterarPage implements OnInit {
   usuario: UsuarioModel;
@@ -43,7 +53,8 @@ export class UsuarioAlterarPage implements OnInit {
     addIcons({
       chevronBackOutline,
       eyeOutline,
-      eyeOffOutline
+      eyeOffOutline,
+      imageOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -92,7 +103,7 @@ export class UsuarioAlterarPage implements OnInit {
       });
 
     }
-    
+
   }
 
   togglePassword() {

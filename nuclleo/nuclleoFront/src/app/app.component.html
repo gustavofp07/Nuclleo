@@ -2,9 +2,7 @@
 
 <ion-app>
 
-  <ion-menu
-    contentId="main-content"
-    [disabled]="!menuHabilitado">
+  <ion-menu contentId="main-content" [disabled]="!menuHabilitado">
 
     <ion-header>
       <ion-toolbar>
@@ -15,29 +13,9 @@
     <ion-content>
       <ion-list>
 
-        <ion-item
-          button
-          routerLink="/usuario-perfil"
-          menuClose>
+        <ion-item button routerLink="/tela-inicial" menuClose>
 
-          <ion-icon
-            name="person-outline"
-            slot="start">
-          </ion-icon>
-
-          <ion-label>Perfil</ion-label>
-
-        </ion-item>
-
-
-        <ion-item
-          button
-          routerLink="/tela-inicial"
-          menuClose>
-
-          <ion-icon
-            name="home-outline"
-            slot="start">
+          <ion-icon name="home-outline" slot="start">
           </ion-icon>
 
           <ion-label>Início</ion-label>
@@ -45,34 +23,33 @@
         </ion-item>
 
 
-        <ion-item
-          button
-          routerLink="/login"
-          menuClose>
+        <ion-item button routerLink="/usuario-perfil" menuClose>
 
-          <ion-icon
-            name="log-out-outline"
-            slot="start">
+          <ion-icon name="person-outline" slot="start">
           </ion-icon>
 
-          <ion-label>Sair</ion-label>
+          <ion-label>Perfil</ion-label>
 
         </ion-item>
 
-        <ion-item
-          button
-          routerLink="/minhas-comunidades"
-          menuClose>
+        <ion-item button routerLink="/minhas-comunidades" menuClose>
 
-          <ion-icon
-            name="people-outline"
-            slot="start">
+          <ion-icon name="people-outline" slot="start">
           </ion-icon>
 
           <ion-label>Minhas comunidades</ion-label>
 
         </ion-item>
 
+        <ion-item button routerLink="/login" menuClose>
+
+          <ion-icon name="log-out-outline" slot="start">
+          </ion-icon>
+
+          <ion-label>Sair</ion-label>
+
+        </ion-item>
+        
       </ion-list>
     </ion-content>
 
