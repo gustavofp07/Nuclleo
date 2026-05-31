@@ -13,21 +13,6 @@ ion-toolbar {
   --background: #f5f7fb;
 }
 
-/* LOGO */
-
-.brand {
-  display: flex;
-  justify-content: center;
-
-  margin-bottom: 20px;
-}
-
-.logo {
-  width: 120px;
-  height: auto;
-
-  object-fit: contain;
-}
 
 /* CONTAINER */
 
@@ -51,6 +36,7 @@ ion-toolbar {
 .topo {
   text-align: center;
 
+  margin-top: 30px;
   margin-bottom: 36px;
 }
 
