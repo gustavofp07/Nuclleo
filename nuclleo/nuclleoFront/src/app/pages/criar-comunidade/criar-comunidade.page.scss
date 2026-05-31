@@ -1,5 +1,11 @@
 /* criar-comunidade.page.scss */
 /* LOGO */
+ion-toolbar {
+  --background: #7d17f1;
+  --color: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+}
 
 .brand {
   display: flex;

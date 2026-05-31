@@ -7,7 +7,12 @@ import {
   IonInput,
   IonItem,
   IonButton,
-  ToastController
+  ToastController,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 
 import { FormsModule } from '@angular/forms';
@@ -27,11 +32,15 @@ import { UsuarioService } from 'src/app/services/usuario.service';
   imports: [
     CommonModule,
     FormsModule,
-
     IonContent,
     IonInput,
     IonItem,
-    IonButton
+    IonButton,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonMenuButton
   ]
 })
 
