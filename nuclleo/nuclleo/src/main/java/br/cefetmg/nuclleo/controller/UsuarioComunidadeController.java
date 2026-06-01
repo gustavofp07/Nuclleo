@@ -15,7 +15,7 @@ import br.cefetmg.nuclleo.model.UsuarioComunidade;
 import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
 
 @RestController
-@RequestMapping("api/v1/UsuarioComunidade")
+@RequestMapping("api/v1/usuarioComunidade")
 @CrossOrigin(origins = "*")
 public class UsuarioComunidadeController {
     private final UsuarioComunidadeRepository repository;

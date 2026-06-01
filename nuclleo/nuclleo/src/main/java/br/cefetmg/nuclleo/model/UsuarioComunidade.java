@@ -26,10 +26,10 @@ public class UsuarioComunidade {
     private Usuario usuario;
 }
 
- /*
-    @Column(name = "dt_entrada")
-    private LocalDateTime dtEntrada;
-
-    @Column(name = "is_admin")
-    private boolean isAdmin;
-    */
+/*
+ * @Column(name = "dt_entrada")
+ * private LocalDateTime dtEntrada;
+ * 
+ * @Column(name = "is_admin")
+ * private boolean isAdmin;
+ */
