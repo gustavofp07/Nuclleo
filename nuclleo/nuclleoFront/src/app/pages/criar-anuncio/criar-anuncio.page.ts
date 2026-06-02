@@ -12,7 +12,10 @@ import {
   IonTitle,
   IonButtons,
   IonMenuButton,
-  ToastController
+  ToastController,
+  IonList,
+  IonCheckbox,
+  IonLabel
 } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -20,6 +23,12 @@ import { FormsModule } from '@angular/forms';
 
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { AnuncioService } from 'src/app/services/anuncio.service';
+import { ComunidadeModel } from 'src/app/model/comunidade.model';
+import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
+import { AnuncioVendaModel } from 'src/app/model/anuncio-venda.model';
+import { AnuncioRequerimentoModel } from 'src/app/model/anuncio-requerimento.model';
+import { AnuncioModel } from 'src/app/model/anuncio.model';
+import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 
 @Component({
   selector: 'app-criar-anuncio',
@@ -40,39 +49,83 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
     IonToolbar,
     IonTitle,
     IonButtons,
-    IonMenuButton
+    IonMenuButton,
+    IonList,
+    IonCheckbox,
+    IonLabel
   ]
 })
 export class CriarAnuncioPage {
+  anuncio!: AnuncioModel;
+  //anuncioVenda: AnuncioVendaModel;
+  //anuncioRequerimento: AnuncioRequerimentoModel;
 
   tipo = '';
 
-  nmAnuncio = '';
-  descricao = '';
-
-  valor = 0;
-
-  valorMin = 0;
-  valorMax = 0;
-
   imagemSelecionada?: File;
   previewImagem?: string;
+
+  comunidadesSelecionadas: ComunidadeModel[];
+  comunidades: ComunidadeModel[];
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
     private usuarioService: UsuarioService,
+    private usuarioComunidadeService: UsuarioComunidadeService,
+    private anuncioComunidadeService: AnuncioComunidadeService,
     private toastController: ToastController,
     private router: Router
-  ) {}
+  ) {
+
+    //this.anuncioVenda = new AnuncioVendaModel();
+    //this.anuncioRequerimento = new AnuncioRequerimentoModel();
+
+    this.comunidades = [];
+    this.comunidadesSelecionadas = [];
+  }
 
   ngOnInit() {
+    //carregar o usuario ver ser existe primeiro
 
-    this.tipo =
-      this.activatedRoute.snapshot.paramMap
-        .get('tipo')
-        ?.toUpperCase() || '';
+    this.tipo = this.activatedRoute.snapshot.paramMap.get('tipo')?.toUpperCase() || '';
 
+    if (this.tipo === 'VENDA') {
+      this.anuncio = new AnuncioVendaModel();
+    } else {
+      this.anuncio = new AnuncioRequerimentoModel();
+    }
+
+    this.carregarComunidadesUsuario();// manda o usuario logado aqui
+  }
+
+  ionViewWillEnter() {
+    this.carregarComunidadesUsuario();
+  }
+
+  carregarComunidadesUsuario() {
+    const usuario = this.usuarioService.getUsuarioSessao();
+
+    this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
+      next: (relacoes) => {
+        //olhar o funcionamento desse retorno aqui
+        this.comunidades = relacoes.map(relacao => relacao.comunidade);
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao carregar comunidades.');
+      }
+    });
+  }
+
+  alterarSelecao(comunidade: ComunidadeModel, marcado: boolean) {
+    if (marcado) {
+      this.comunidadesSelecionadas.push(comunidade);
+    } else {
+      this.comunidadesSelecionadas =
+        this.comunidadesSelecionadas.filter(
+          c => c.cdComunidade !== comunidade.cdComunidade
+        );
+    }
   }
 
   selecionarImagem(event: any) {
@@ -89,11 +142,9 @@ export class CriarAnuncioPage {
     ];
 
     if (!tiposPermitidos.includes(arquivo.type)) {
-
       this.exibirMensagem(
         'Selecione apenas imagens PNG ou JPG.'
       );
-
       return;
     }
 
@@ -102,138 +153,132 @@ export class CriarAnuncioPage {
     const reader = new FileReader();
 
     reader.onload = () => {
-
       this.previewImagem =
         reader.result as string;
-
     };
 
     reader.readAsDataURL(arquivo);
-
   }
 
   salvar() {
-
     if (this.tipo === 'VENDA') {
       this.cadastrarVenda();
-    }
-    else {
+    } else {
       this.cadastrarRequerimento();
     }
-
   }
 
   cadastrarVenda() {
+    this.anuncio.tipoAnuncio = 'VENDA';
 
-    const anuncio = {
+    //nessa pagina é melhor criar um usuario e ficar chamando ele
+    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
 
-      nmAnuncio: this.nmAnuncio,
+    //console.log(this.anuncio);
 
-      descricao: this.descricao,
+    this.anuncioService.cadastrarVenda(this.anuncio as AnuncioVendaModel).subscribe({
+      next: (anuncioSalvo: AnuncioVendaModel) => {
+        //this.exibirMensagem('Anúncio criado com sucesso!');
+        //this.router.navigate(['/tela-inicial']);
 
-      ftAnuncio: '',
+        /*
+        const relacoes = this.comunidadesSelecionadas.map(
+          comunidade => ({
+            cdAnuncio: anuncioSalvo.cdAnuncio,
+            cdComunidade: comunidade.cdComunidade
+          })
+        );
+        */
 
-      valor: this.valor,
+        this.cadastrarRelacoes(anuncioSalvo);
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao criar anúncio.');
+      }
+    });
+  }
 
-      tipoAnuncio: 'VENDA',
+  cadastrarRelacoes(anuncioSalvo: AnuncioModel) {
+    const relacoes = this.comunidadesSelecionadas.map(
+      comunidade => ({
+        anuncio: anuncioSalvo,
+        comunidade: comunidade
+      })
+    );
 
-      usuarioCria:
-        this.usuarioService.getUsuarioSessao()
-
-    };
-
-    this.anuncioService
-      .cadastrarVenda(anuncio)
-      .subscribe({
-
-        next: () => {
-
-          this.exibirMensagem(
-            'Anúncio criado com sucesso!'
-          );
-
-          this.router.navigate([
-            '/tela-inicial'
-          ]);
-
-        },
-
-        error: () => {
-
-          this.exibirMensagem(
-            'Erro ao criar anúncio.'
-          );
-
-        }
-
-      });
-
+    this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
+      next: () => {
+        this.exibirMensagem('Anúncio criado com sucesso!');
+        this.router.navigate(['/tela-inicial']);
+      },
+      error: () => {
+        this.exibirMensagem(
+          'Anúncio criado, mas houve erro ao publicar nas comunidades.'
+        );
+      }
+    });
   }
 
   cadastrarRequerimento() {
+    this.anuncio.tipoAnuncio = 'REQUERIMENTO';
+    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
 
-    const anuncio = {
+    this.anuncioService.cadastrarRequerimento(this.anuncio as AnuncioRequerimentoModel).subscribe({
+      next: (anuncioSalvo: AnuncioRequerimentoModel) => {
+        //this.exibirMensagem('Requerimento criado com sucesso!');
+        //this.router.navigate(['/tela-inicial']);
 
-      nmAnuncio: this.nmAnuncio,
+        this.cadastrarRelacoes(anuncioSalvo);
 
-      descricao: this.descricao,
-
-      ftAnuncio: '',
-
-      valorMin: this.valorMin,
-
-      valorMax: this.valorMax,
-
-      tipoAnuncio: 'REQUERIMENTO',
-
-      usuarioCria:
-        this.usuarioService.getUsuarioSessao()
-
-    };
-
-    this.anuncioService
-      .cadastrarRequerimento(anuncio)
-      .subscribe({
-
-        next: () => {
-
-          this.exibirMensagem(
-            'Requerimento criado com sucesso!'
-          );
-
-          this.router.navigate([
-            '/tela-inicial'
-          ]);
-
-        },
-
-        error: () => {
-
-          this.exibirMensagem(
-            'Erro ao criar requerimento.'
-          );
-
-        }
-
-      });
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao criar requerimento.');
+      }
+    });
 
   }
+
+
+
+
+
+
+
 
   async exibirMensagem(msg: string) {
-
     const toast =
       await this.toastController.create({
-
         message: msg,
-
         duration: 2000,
-
         position: 'top'
-
       });
-
     await toast.present();
-
   }
-
 }
+
+/*
+    const anuncio = {
+      nmAnuncio: this.nmAnuncio,
+      descricao: this.descricao,
+      ftAnuncio: '',
+      valorMin: this.valorMin,
+      valorMax: this.valorMax,
+      tipoAnuncio: 'REQUERIMENTO',
+      usuarioCria: this.usuarioService.getUsuarioSessao(),
+      comunidades: this.comunidadesSelecionadas
+    };
+
+    
+    */
+
+/*
+const anuncio = {
+  nmAnuncio: this.nmAnuncio,
+  descricao: this.descricao,
+  ftAnuncio: '',
+  valor: this.valor,
+  tipoAnuncio: 'VENDA',
+  usuarioCria: this.usuarioService.getUsuarioSessao(),
+  comunidades: this.comunidadesSelecionadas
+};
+*/

@@ -1,0 +1,125 @@
+.perfil-content {
+  --background: #f5f7fb;
+}
+
+.toolbar {
+  --background: #7d17f1;
+  --color: #ffffff;
+}
+
+.container {
+  width: 100%;
+  max-width: 650px;
+
+  margin: 0 auto;
+
+  padding: 24px 20px 80px;
+}
+
+/* TOPO */
+
+.perfil-topo {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  margin-top: 18px;
+}
+
+.foto-comunidade {
+  width: 130px;
+  height: 130px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 4px solid #ffffff;
+
+  background: #e5e7eb;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.dados-comunidade h2 {
+  margin: 0;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.dados-comunidade p {
+  margin-top: 6px;
+
+  color: #6b7280;
+}
+
+/* BOXES */
+
+.info-box {
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 22px;
+
+  margin-top: 24px;
+
+  border: 1px solid #d1d5db;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.info-box h3 {
+  margin-top: 0;
+
+  color: #111827;
+}
+
+.info-box p {
+  color: #4b5563;
+
+  line-height: 1.6;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 12px;
+}
+
+.info-item ion-icon {
+  font-size: 22px;
+
+  color: #7c3aed;
+}
+
+/* BOTÃO */
+
+.acoes-comunidade {
+  margin-top: 24px;
+}
+
+.btn-entrar {
+  height: 54px;
+
+  --background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a855f7
+  );
+
+  --border-radius: 16px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}

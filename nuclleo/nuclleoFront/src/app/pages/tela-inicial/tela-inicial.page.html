@@ -61,12 +61,10 @@
       </div>
     </div>
 
+    <!--
     <div class="section">
-
       <h2>Comunidades</h2>
-
       <ion-list>
-
         <ion-item *ngFor="let comunidade of comunidades">
 
           <ion-avatar slot="start">
@@ -79,9 +77,28 @@
           </ion-label>
 
         </ion-item>
+      </ion-list>
+    </div>
+  -->
+
+    <div class="section">
+      <h2>Comunidades</h2>
+      <ion-list>
+
+        <ion-item *ngFor="let comunidade of comunidades" button detail="true"
+          [routerLink]="['/comunidade-perfil', comunidade.cdComunidade]">
+
+          <ion-avatar slot="start">
+            <img [src]="comunidade.foto || 'https://ionicframework.com/docs/img/demos/avatar.svg'">
+          </ion-avatar>
+
+          <ion-label>
+            <h3>{{ comunidade.nmComunidade }}</h3>
+            <p>{{ comunidade.descricao }}</p>
+          </ion-label>
+        </ion-item>
 
       </ion-list>
-
     </div>
 
   </ion-content>

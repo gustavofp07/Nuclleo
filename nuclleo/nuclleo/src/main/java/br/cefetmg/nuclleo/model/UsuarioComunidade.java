@@ -7,11 +7,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tb_usuario_comunidade")
+@Table(
+    name = "tb_usuario_comunidade",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"cd_usuario", "cd_comunidade"}
+        )
+    }
+)
 public class UsuarioComunidade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

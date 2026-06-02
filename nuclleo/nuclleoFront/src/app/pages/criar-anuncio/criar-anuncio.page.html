@@ -15,91 +15,68 @@
 <ion-content [fullscreen]="true" class="criar-content">
 
   <div class="container">
-
     <!-- TOPO -->
     <div class="topo">
-
       <h1>
         {{ tipo === 'VENDA'
         ? 'Novo anúncio de venda'
         : 'Novo requerimento' }}
       </h1>
-
       <p>
         {{ tipo === 'VENDA'
         ? 'Anuncie um produto ou serviço para venda'
         : 'Descreva o que você está procurando' }}
       </p>
-
     </div>
 
     <form (ngSubmit)="salvar()">
 
       <!-- TÍTULO -->
-
       <div class="campo-label">
         <label>Título</label>
       </div>
 
       <ion-item lines="none" class="input-item">
-
-        <ion-input placeholder="Ex: Notebook Dell G15" [(ngModel)]="nmAnuncio" name="nmAnuncio">
+        <ion-input [(ngModel)]="anuncio.nmAnuncio" name="nmAnuncio">
         </ion-input>
-
       </ion-item>
 
       <!-- DESCRIÇÃO -->
-
       <div class="campo-label">
         <label>Descrição</label>
       </div>
 
       <ion-item lines="none" class="input-item textarea-item">
-
-        <ion-textarea autoGrow="true" rows="5" placeholder="Descreva os detalhes do anúncio..." [(ngModel)]="descricao"
-          name="descricao">
+        <ion-textarea [(ngModel)]="anuncio.descricao" name="descricao">
         </ion-textarea>
-
       </ion-item>
 
       <!-- IMAGEM -->
-
       <div class="upload-box">
-
         <input type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" (change)="selecionarImagem($event)"
           class="input-file">
-
       </div>
 
       <div class="preview-container" *ngIf="previewImagem">
-
         <img [src]="previewImagem" alt="Pré-visualização" class="preview-imagem">
-
       </div>
 
       <!-- VENDA -->
-
       <ng-container *ngIf="tipo === 'VENDA'">
-
         <div class="campo-label">
           <label>Preço de venda</label>
         </div>
 
         <ion-item lines="none" class="input-item">
-
           <span class="prefixo">R$</span>
-
-          <ion-input type="number" placeholder="0,00" [(ngModel)]="valor" name="valor">
+          <ion-input type="number" [(ngModel)]="$any(anuncio).valor" name="valor">
           </ion-input>
-
         </ion-item>
 
       </ng-container>
 
       <!-- REQUERIMENTO -->
-
       <ng-container *ngIf="tipo === 'REQUERIMENTO'">
-
         <div class="campo-label">
           <label>Faixa de valor desejada</label>
         </div>
@@ -107,35 +84,38 @@
         <div class="valores-grid">
 
           <ion-item lines="none" class="input-item">
-
             <span class="prefixo">R$</span>
-
-            <ion-input type="number" placeholder="Valor mínimo" [(ngModel)]="valorMin" name="valorMin">
+            <ion-input type="number" [(ngModel)]="$any(anuncio).valorMin" name="valorMin">
             </ion-input>
-
           </ion-item>
 
           <ion-item lines="none" class="input-item">
-
             <span class="prefixo">R$</span>
-
-            <ion-input type="number" placeholder="Valor máximo" [(ngModel)]="valorMax" name="valorMax">
+            <ion-input type="number" [(ngModel)]="$any(anuncio).valorMax" name="valorMax">
             </ion-input>
-
           </ion-item>
-
         </div>
-
       </ng-container>
 
+
+      <ion-list>
+        <ion-item *ngFor="let comunidade of comunidades">
+
+          <ion-checkbox slot="start" (ionChange)="alterarSelecao(comunidade, $event.detail.checked)">
+          </ion-checkbox>
+
+          <ion-label>
+            {{ comunidade.nmComunidade }}
+          </ion-label>
+
+        </ion-item>
+      </ion-list>
+
       <!-- BOTÃO -->
-
       <ion-button expand="block" type="submit" class="btn-criar">
-
         {{ tipo === 'VENDA'
         ? 'Criar anúncio'
         : 'Criar requerimento' }}
-
       </ion-button>
 
     </form>

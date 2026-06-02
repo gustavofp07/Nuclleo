@@ -52,10 +52,13 @@ export const routes: Routes = [
   },
   {
     path: 'criar-anuncio/:tipo',
-    loadComponent: () =>
-      import('./pages/criar-anuncio/criar-anuncio.page')
-        .then(m => m.CriarAnuncioPage)
+    loadComponent: () => import('./pages/criar-anuncio/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
+  {
+    path: 'comunidade-perfil/:cdComunidade',
+    loadComponent: () => import('./pages/comunidade-perfil/comunidade-perfil.page').then( m => m.ComunidadePerfilPage)
+  },
+
 
 
 

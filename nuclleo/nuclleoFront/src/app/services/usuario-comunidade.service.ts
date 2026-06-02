@@ -1,8 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { UsuarioComunidadeModel } from '../model/usuario-comunidade.model';
+import { AnuncioVendaModel } from '../model/anuncio-venda.model';
+import { ComunidadeModel } from '../model/comunidade.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,10 +20,17 @@ export class UsuarioComunidadeService {
   }
 
   listarComunidadesPorUsuario(cdUsuario: number): Observable<UsuarioComunidadeModel[]> {
-    return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
+    const params = new HttpParams().set('cdUsuario', cdUsuario.toString());
+    return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario`, { params });
   }
 
-  listarUsuariosPorComunidade(cdComunidade: number): Observable<UsuarioComunidadeModel[]> {
-    return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade/${cdComunidade}`);
-  }
+  /*
+    listarComunidadesPorUsuario(cdUsuario: number): Observable<UsuarioComunidadeModel[]> {
+      return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
+    }
+  
+    listarUsuariosPorComunidade(cdComunidade: number): Observable<UsuarioComunidadeModel[]> {
+      return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade/${cdComunidade}`);
+    }
+      */
 }
