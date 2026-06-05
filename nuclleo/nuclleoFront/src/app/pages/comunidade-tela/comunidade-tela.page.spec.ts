@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ComunidadePerfilPage } from './comunidade-perfil.page';
+import { ComunidadePerfilPage } from './comunidade-tela.page';
 
 describe('ComunidadePerfilPage', () => {
   let component: ComunidadePerfilPage;

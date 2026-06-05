@@ -1,8 +1,11 @@
 package br.cefetmg.nuclleo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.AnuncioComunidade;
 import jakarta.transaction.Transactional;
 
@@ -36,4 +39,12 @@ public interface AnuncioComunidadeRepository extends JpaRepository<AnuncioComuni
     // NOVA FUNÇÃO: Deleta a relação específica de um anúncio em uma comunidade
     @Transactional
     List<AnuncioComunidade> deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(Long cdAnuncio, Long cdComunidade);
+
+    @Query("""
+                SELECT ac.anuncio
+                FROM AnuncioComunidade ac
+                WHERE ac.comunidade.cdComunidade = :cdComunidade
+            """)
+    List<Anuncio> findAnunciosByComunidade(
+            @Param("cdComunidade") Long cdComunidade);
 }

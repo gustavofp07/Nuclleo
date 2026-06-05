@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.AnuncioComunidade;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
-
 
 @RestController
 @RequestMapping("api/v1/anuncioComunidade")
@@ -36,6 +36,13 @@ public class AnuncioComunidadeController {
     @PostMapping("/relacoes")
     public List<AnuncioComunidade> inserirRelacoes(@RequestBody List<AnuncioComunidade> relacoes) {
         return repository.saveAll(relacoes);
+    }
+
+    @GetMapping("/comunidade/anuncios")
+    public List<Anuncio> getAnunciosDaComunidade(
+            @RequestParam Long cdComunidade) {
+
+        return repository.findAnunciosByComunidade(cdComunidade);
     }
 
     // URL: GET api/v1/AnuncioComunidade
@@ -69,9 +76,11 @@ public class AnuncioComunidadeController {
     }
 
     // URL: DELETE api/v1/AnuncioComunidade/relacao?cdAnuncio=1&cdComunidade=2
-    // Deleta a relação específica de um anúncio em uma comunidade. Não retorna lista, pois é uma relação específica.
+    // Deleta a relação específica de um anúncio em uma comunidade. Não retorna
+    // lista, pois é uma relação específica.
     @DeleteMapping("/relacao")
-    public List<AnuncioComunidade> excluirRelacaoEspecifica(@RequestParam Long cdAnuncio, @RequestParam Long cdComunidade) {
+    public List<AnuncioComunidade> excluirRelacaoEspecifica(@RequestParam Long cdAnuncio,
+            @RequestParam Long cdComunidade) {
         return this.repository.deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(cdAnuncio, cdComunidade);
     }
 }

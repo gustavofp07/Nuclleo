@@ -7,6 +7,7 @@ import { AnuncioComunidadeModel } from '../model/anuncio-comunidade.model';
 import { Observable } from 'rxjs';
 import { AnuncioModel } from '../model/anuncio.model';
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -33,6 +34,16 @@ export class AnuncioComunidadeService {
     comunidade: ComunidadeModel;
   }[]): Observable<AnuncioComunidadeModel[]> {
     return this.http.post<AnuncioComunidadeModel[]>(`${this.API_URL}/relacoes`, relacoes);
+  }
+
+  listarAnunciosDaComunidade(
+    cdComunidade: number
+  ): Observable<AnuncioModel[]> {
+
+    return this.http.get<AnuncioModel[]>(
+      `${this.API_URL}/comunidade/anuncios?cdComunidade=${cdComunidade}`
+    );
+
   }
 
 }
