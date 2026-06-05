@@ -3,6 +3,7 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,16 +16,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.Comunidade;
+import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.ComunidadeRepository;
+import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
 
 @RestController
 @RequestMapping("api/v1/comunidades")
 @CrossOrigin(origins = "*")
 public class ComunidadeController {
     private final ComunidadeRepository repository;
+    private final AnuncioComunidadeRepository anuncioComunidadeRepository;
+    private final UsuarioComunidadeRepository usuarioComunidadeRepository;
 
-    ComunidadeController(ComunidadeRepository repository) {
+    ComunidadeController(
+            ComunidadeRepository repository,
+            AnuncioComunidadeRepository anuncioComunidadeRepository,
+            UsuarioComunidadeRepository usuarioComunidadeRepository) {
         this.repository = repository;
+        this.anuncioComunidadeRepository = anuncioComunidadeRepository;
+        this.usuarioComunidadeRepository = usuarioComunidadeRepository;
     }
 
     @PostMapping()
@@ -48,6 +58,7 @@ public class ComunidadeController {
         return repository.save(comunidade);
     }
 
+    @Transactional
     @DeleteMapping("/{cdComunidade}")
     public Comunidade excluir(@PathVariable Long cdComunidade) {
         Comunidade comunidade = this.repository.findById(cdComunidade).orElse(null); // mudar isso. Chamar o get
@@ -56,6 +67,8 @@ public class ComunidadeController {
                     "Entidade com id: " + cdComunidade + "não encontrado.");
         }
 
+        this.anuncioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
+        this.usuarioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
         this.repository.deleteById(cdComunidade);
         return comunidade;
     }

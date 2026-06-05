@@ -125,6 +125,33 @@
   letter-spacing: 0.5px;
 }
 
+.status-comunidade {
+  margin-top: 24px;
+  padding: 14px 16px;
+
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+
+  background: #f0fdf4;
+  color: #166534;
+
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-acoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.admin-acoes ion-button {
+  min-height: 46px;
+  font-weight: 700;
+}
+
 .abas {
 
   display: flex;
@@ -163,6 +190,11 @@
 
   color: white;
 
+}
+
+.abas button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .anuncio-card {

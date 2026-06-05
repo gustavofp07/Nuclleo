@@ -21,6 +21,8 @@ import { CommonModule } from '@angular/common';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
+import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 
 @Component({
   selector: 'app-criar-comunidade',
@@ -57,7 +59,8 @@ export class CriarComunidadePage {
     private toastController: ToastController,
     private activatedRoute: ActivatedRoute,
     private comunidadeService: ComunidadeService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private usuarioComunidadeService: UsuarioComunidadeService
   ) {
 
     this.comunidade = new ComunidadeModel();
@@ -202,13 +205,7 @@ export class CriarComunidadePage {
           comunidade: ComunidadeModel
         ) => {
 
-          this.exibirMensagem(
-            'Comunidade criada com sucesso!'
-          );
-
-          this.router.navigate([
-            '/minhas-comunidades'
-          ]);
+          this.cadastrarCriadorNaComunidade(comunidade);
 
         },
 
@@ -222,6 +219,35 @@ export class CriarComunidadePage {
 
       });
 
+  }
+
+  cadastrarCriadorNaComunidade(comunidade: ComunidadeModel) {
+    const usuarioComunidade = new UsuarioComunidadeModel();
+    usuarioComunidade.usuario = this.usuarioService.getUsuarioSessao();
+    usuarioComunidade.comunidade = comunidade;
+
+    this.usuarioComunidadeService
+      .cadastrar(usuarioComunidade)
+      .subscribe({
+        next: async () => {
+          this.exibirMensagem(
+            'Comunidade criada com sucesso!'
+          );
+
+          this.router.navigate([
+            '/minhas-comunidades'
+          ]);
+        },
+        error: async () => {
+          this.exibirMensagem(
+            'Comunidade criada, mas houve erro ao vincular o criador.'
+          );
+
+          this.router.navigate([
+            '/minhas-comunidades'
+          ]);
+        }
+      });
   }
 
   async exibirMensagem(

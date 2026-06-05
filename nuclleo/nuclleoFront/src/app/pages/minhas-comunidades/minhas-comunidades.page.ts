@@ -19,14 +19,11 @@ import {
   CommonModule
 } from '@angular/common';
 
+import { forkJoin } from 'rxjs';
+
 import {
   RouterLink
 } from '@angular/router';
-
-//tirar
-import {
-  HttpClient
-} from '@angular/common/http';
 
 import {
   AlertController,
@@ -36,12 +33,13 @@ import {
 import {
   addIcons
 } from 'ionicons';
-import { add, settingsOutline, trashOutline } from 'ionicons/icons';
+import { add, peopleOutline, settingsOutline, trashOutline } from 'ionicons/icons';
 
 import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 
 @Component({
   selector: 'app-minhas-comunidades',
@@ -73,11 +71,13 @@ export class MinhasComunidadesPage implements OnInit {
     private comunidadeService: ComunidadeService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private usuarioService: UsuarioService) {
+    private usuarioService: UsuarioService,
+    private usuarioComunidadeService: UsuarioComunidadeService) {
     this.usuario = new UsuarioModel();
     this.comunidades = [];
     addIcons({
       add,
+      peopleOutline,
       settingsOutline,
       trashOutline
     });
@@ -98,47 +98,39 @@ export class MinhasComunidadesPage implements OnInit {
 
   carregarComunidades() {
 
-    this.comunidadeService.listarComunidadesDoUsuario(this.usuario.cdUsuario).subscribe({
-      next: async (comunidades: ComunidadeModel[]) => {
-        //console.log("busquei ", comunidades);
-        this.comunidades = comunidades;
+    forkJoin({
+      vinculos: this.usuarioComunidadeService.listarComunidadesPorUsuario(this.usuario.cdUsuario),
+      criadas: this.comunidadeService.listarComunidadesDoUsuario(this.usuario.cdUsuario)
+    }).subscribe({
+      next: async ({ vinculos, criadas }) => {
+        const comunidadesParticipante = vinculos.map(
+          vinculo => vinculo.comunidade
+        );
+
+        this.comunidades = this.removerComunidadesDuplicadas([
+          ...criadas,
+          ...comunidadesParticipante
+        ]);
       },
       error: async () => {
-        //console.log('Erro ao logar');
         this.exibirMensagem('Erro ao carregar comunidades');
       }
     });
 
-    /*
-    const usuarioLogado =
-      JSON.parse(
-        localStorage.getItem(
-          'usuarioAutenticado'
-        ) || '{}'
-      );
+  }
 
-    this.http.get<any[]>(
+  removerComunidadesDuplicadas(comunidades: ComunidadeModel[]) {
+    const comunidadesPorId = new Map<number, ComunidadeModel>();
 
-      'http://localhost:8080/api/v1/comunidades/usuario/' +
-      usuarioLogado.cdUsuario
-
-    ).subscribe({
-
-      next: (dados) => {
-
-        this.comunidades = dados;
-
-      },
-
-      error: (erro) => {
-
-        console.log(erro);
-
-      }
-
+    comunidades.forEach(comunidade => {
+      comunidadesPorId.set(comunidade.cdComunidade, comunidade);
     });
-    */
 
+    return Array.from(comunidadesPorId.values());
+  }
+
+  usuarioEhAdmin(comunidade: ComunidadeModel) {
+    return comunidade.usuarioCria?.cdUsuario === this.usuario.cdUsuario;
   }
 
   async confirmarExclusao(comunidade: ComunidadeModel) {
@@ -165,6 +157,10 @@ export class MinhasComunidadesPage implements OnInit {
   }
 
   excluirComunidade(comunidade: ComunidadeModel) {
+    if (!this.usuarioEhAdmin(comunidade)) {
+      this.exibirMensagem('Apenas o administrador pode excluir esta comunidade.');
+      return;
+    }
 
     this.comunidadeService.excluir(comunidade.cdComunidade).subscribe({
       next: async (comunidade: ComunidadeModel) => {

@@ -14,8 +14,7 @@
 
 <ion-content [fullscreen]="true" class="perfil-content">
   <div class="container">
-    
-    
+
     <!-- ABAS -->
 
     <div class="abas">
@@ -26,20 +25,21 @@
 
       </button>
 
-      <button [class.ativo]="abaSelecionada === 'chat'" (click)="selecionarAba('chat')">
+      <button [class.ativo]="abaSelecionada === 'chat'" [disabled]="!usuarioEntrouNaComunidade"
+        (click)="selecionarAba('chat')">
 
         Chat
 
       </button>
 
-      <button [class.ativo]="abaSelecionada === 'anuncios'" (click)="selecionarAba('anuncios')">
+      <button [class.ativo]="abaSelecionada === 'anuncios'" [disabled]="!usuarioEntrouNaComunidade"
+        (click)="selecionarAba('anuncios')">
 
         Anúncios
 
       </button>
 
     </div>
-
 
     <div *ngIf="abaSelecionada === 'perfil'">
 
@@ -59,12 +59,11 @@
 
       </div>
 
-
-      <!-- DESCRIÇÃO -->
+      <!-- DESCRICAO -->
 
       <div class="info-box">
 
-        <h3>Descrição</h3>
+        <h3>Descriçao</h3>
 
         <p>
           {{ comunidade.descricao }}
@@ -72,7 +71,7 @@
 
       </div>
 
-      <!-- INFORMAÇÕES -->
+      <!-- INFORMACOES -->
 
       <div class="info-box">
 
@@ -96,6 +95,46 @@
 
         </div>
 
+      </div>
+
+      <!-- ACOES ADMIN -->
+
+      <div class="admin-acoes" *ngIf="usuarioEhAdmin">
+
+        <ion-button fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
+          <ion-icon name="settings-outline" slot="start">
+          </ion-icon>
+
+          Editar comunidade
+        </ion-button>
+
+        <ion-button fill="outline" color="danger" (click)="confirmarExclusao()">
+          <ion-icon name="trash-outline" slot="start">
+          </ion-icon>
+
+          Excluir comunidade
+        </ion-button>
+
+      </div>
+
+      <!-- BOTAO ENTRAR / STATUS NO PERFIL -->
+
+      <div class="acoes-comunidade" *ngIf="!usuarioEntrouNaComunidade">
+
+        <ion-button expand="block" class="btn-entrar" [disabled]="carregandoVinculo || entrandoComunidade"
+          (click)="entrarComunidade()">
+
+          <ion-icon name="people-outline" slot="start">
+          </ion-icon>
+
+          {{ entrandoComunidade ? 'Entrando...' : 'Entrar na comunidade' }}
+
+        </ion-button>
+
+      </div>
+
+      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade">
+        Você participa dessa comunidade
       </div>
 
     </div>
@@ -140,21 +179,6 @@
 
     </div>
 
-    <!-- BOTÃO ENTRAR -->
-
-    <div class="acoes-comunidade">
-
-      <ion-button expand="block" class="btn-entrar" (click)="entrarComunidade()">
-
-        <ion-icon name="people-outline" slot="start">
-        </ion-icon>
-
-        Entrar
-
-      </ion-button>
-
-    </div>
   </div>
 
-  
 </ion-content>
