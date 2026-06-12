@@ -28,7 +28,6 @@ public interface UsuarioComunidadeRepository extends JpaRepository<UsuarioComuni
     // NOVA FUNÇÃO: Deleta a relação específica de um usuário em uma comunidade
     @Transactional
     List<UsuarioComunidade> deleteByUsuarioCdUsuarioAndComunidadeCdComunidade(Long cdUsuario, Long cdComunidade);
-
     
     boolean existsByUsuarioCdUsuarioAndComunidadeCdComunidade(Long cdUsuario, Long cdComunidade);
 }

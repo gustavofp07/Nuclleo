@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+
+    <ion-title>Anúncio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="anuncio-content">
+
+  <div class="container">
+
+
+    <div class="dados-anuncio">
+
+      <h2>
+        <span>
+          {{ anuncio.nmAnuncio }}
+        </span>
+        <span class="tipo-anuncio">
+          {{ anuncio.tipoAnuncio }}
+        </span>
+      </h2>
+
+      <div class="foto-anuncio-container">
+
+        <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
+
+      </div>
+
+    </div>
+
+    <div class="info-box">
+      <h3>Descrição</h3>
+
+      <p>
+        {{ anuncio.descricao }}
+      </p>
+    </div>
+
+    <div class="info-box">
+      <h3>Informações do anunciante</h3>
+
+      <div class="info-item">
+        <ion-icon name="person-outline"></ion-icon>
+
+        <span>
+          Criado por {{ anuncio.usuarioCria.nmUsuario }}
+        </span>
+      </div>
+
+      <div class="info-item">
+        <ion-icon name="mail-outline"></ion-icon>
+
+        <span>
+          {{ anuncio.usuarioCria.email }}
+        </span>
+      </div>
+    </div>
+
+    <div class="acoes-anuncio">
+
+      <ng-container *ngIf="usuarioEhDono; else botoesVisitante">
+
+        <ion-button expand="block" fill="outline" color="medium" class="btn-editar"
+          [routerLink]="['/criar-anuncio', anuncio.tipoAnuncio, anuncio.cdAnuncio]">
+
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+
+          Editar anúncio
+
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" color="danger" class="btn-excluir" (click)="excluirAnuncio()">
+
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+
+          Excluir anúncio
+
+        </ion-button>
+
+      </ng-container>
+
+      <ng-template #botoesVisitante>
+
+        <ion-button expand="block" class="btn-contato">
+
+          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+
+          Estou interessado
+
+        </ion-button>
+
+      </ng-template>
+
+    </div>
+
+  </div>
+
+</ion-content>

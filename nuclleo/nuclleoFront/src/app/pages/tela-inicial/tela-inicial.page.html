@@ -31,31 +31,21 @@
 
       <div class="horizontal-scroll">
 
-        <ion-card class="product-card">
-          <img src="https://picsum.photos/300/200?1">
+        <ion-card *ngFor="let anuncio of anunciosRecomendados" class="product-card"
+          [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+
+          <img src="https://picsum.photos/300/200">
 
           <ion-card-header>
-            <ion-card-title>Notebook Gamer</ion-card-title>
-            <ion-card-subtitle>R$ 3.500</ion-card-subtitle>
+            <ion-card-title>
+              {{ anuncio.nmAnuncio }}
+            </ion-card-title>
+
+            <ion-card-subtitle>
+              {{ anuncio.tipoAnuncio }}
+            </ion-card-subtitle>
           </ion-card-header>
-        </ion-card>
 
-        <ion-card class="product-card">
-          <img src="https://picsum.photos/300/200?2">
-
-          <ion-card-header>
-            <ion-card-title>Headset RGB</ion-card-title>
-            <ion-card-subtitle>R$ 220</ion-card-subtitle>
-          </ion-card-header>
-        </ion-card>
-
-        <ion-card class="product-card">
-          <img src="https://picsum.photos/300/200?3">
-
-          <ion-card-header>
-            <ion-card-title>Teclado Mecânico</ion-card-title>
-            <ion-card-subtitle>R$ 180</ion-card-subtitle>
-          </ion-card-header>
         </ion-card>
 
       </div>

@@ -55,9 +55,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/criar-anuncio/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
   {
-    path: 'comunidade-tela/:cdComunidade',
-    loadComponent: () => import('./pages/comunidade-tela/comunidade-tela.page').then( m => m.ComunidadePerfilPage)
+    path: 'criar-anuncio/:tipo/:cdAnuncio',
+    loadComponent: () => import('./pages/criar-anuncio/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
+  {
+    path: 'comunidade-tela/:cdComunidade',
+    loadComponent: () => import('./pages/comunidade-tela/comunidade-tela.page').then(m => m.ComunidadePerfilPage)
+  },
+  {
+    path: 'anuncio-tela',
+    loadComponent: () => import('./pages/anuncio-tela/anuncio-tela.page').then(m => m.AnuncioTelaPage)
+  },
+  {
+    path: 'anuncio-tela/:cdAnuncio',
+    loadComponent: () => import('./pages/anuncio-tela/anuncio-tela.page').then(m => m.AnuncioTelaPage)
+  },
+
 
 
 

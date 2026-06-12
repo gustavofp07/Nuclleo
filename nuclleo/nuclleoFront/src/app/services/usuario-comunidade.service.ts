@@ -24,6 +24,12 @@ export class UsuarioComunidadeService {
     return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario`, { params });
   }
 
+  excluirPorUsuario(cdUsuario: number) {
+    return this.http.delete<number>(
+      `${this.API_URL}/usuario?cdUsuario=${cdUsuario}`
+    );
+  }
+
   /*
     listarComunidadesPorUsuario(cdUsuario: number): Observable<UsuarioComunidadeModel[]> {
       return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);

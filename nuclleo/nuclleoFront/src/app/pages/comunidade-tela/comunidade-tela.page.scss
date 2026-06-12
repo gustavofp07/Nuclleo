@@ -39,7 +39,7 @@
 
   background: #e5e7eb;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .dados-comunidade h2 {
@@ -71,7 +71,7 @@
 
   border: 1px solid #d1d5db;
 
-  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 }
 
 .info-box h3 {
@@ -110,11 +110,9 @@
 .btn-entrar {
   height: 54px;
 
-  --background: linear-gradient(
-    90deg,
-    #7c3aed,
-    #a855f7
-  );
+  --background: linear-gradient(90deg,
+      #7c3aed,
+      #a855f7);
 
   --border-radius: 16px;
 
@@ -209,6 +207,8 @@
 
   border: 1px solid #d1d5db;
 
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .anuncio-card h3 {
@@ -239,4 +239,9 @@
 
   font-weight: 700;
 
+}
+
+.anuncio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }

@@ -62,8 +62,11 @@ export class CriarAnuncioPage {
 
   tipo = '';
 
+  usuarioEhDono: boolean = false;
   imagemSelecionada?: File;
   previewImagem?: string;
+  cdAnuncioEdicao: number = 0;
+  modoEdicao: boolean = false;
 
   comunidadesSelecionadas: ComunidadeModel[];
   comunidades: ComunidadeModel[];
@@ -86,9 +89,15 @@ export class CriarAnuncioPage {
   }
 
   ngOnInit() {
-    //carregar o usuario ver ser existe primeiro
 
-    this.tipo = this.activatedRoute.snapshot.paramMap.get('tipo')?.toUpperCase() || '';
+    this.tipo =
+      this.activatedRoute.snapshot.paramMap
+        .get('tipo')
+        ?.toUpperCase() || '';
+
+    this.cdAnuncioEdicao = Number(
+      this.activatedRoute.snapshot.paramMap.get('cdAnuncio')
+    );
 
     if (this.tipo === 'VENDA') {
       this.anuncio = new AnuncioVendaModel();
@@ -96,11 +105,19 @@ export class CriarAnuncioPage {
       this.anuncio = new AnuncioRequerimentoModel();
     }
 
-    this.carregarComunidadesUsuario();// manda o usuario logado aqui
+    if (this.cdAnuncioEdicao > 0) {
+
+      this.modoEdicao = true;
+
+      this.carregarAnuncioParaEditar();
+
+    }
+
+    this.carregarComunidadesUsuario();
+
   }
 
   ionViewWillEnter() {
-    this.carregarComunidadesUsuario();
   }
 
   carregarComunidadesUsuario() {
@@ -119,7 +136,13 @@ export class CriarAnuncioPage {
 
   alterarSelecao(comunidade: ComunidadeModel, marcado: boolean) {
     if (marcado) {
-      this.comunidadesSelecionadas.push(comunidade);
+      const jaExiste = this.comunidadesSelecionadas.some(
+        c => c.cdComunidade === comunidade.cdComunidade
+      );
+
+      if (!jaExiste) {
+        this.comunidadesSelecionadas.push(comunidade);
+      }
     } else {
       this.comunidadesSelecionadas =
         this.comunidadesSelecionadas.filter(
@@ -161,11 +184,85 @@ export class CriarAnuncioPage {
   }
 
   salvar() {
+
+    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
+    this.anuncio.tipoAnuncio = this.tipo;
+
+    if (this.modoEdicao) {
+
+      if (this.tipo === 'VENDA') {
+
+        this.anuncioService.alterarVenda(this.anuncio as any).subscribe({
+          next: () => {
+            this.atualizarComunidadesDoAnuncio();
+          },
+          error: () => {
+            this.exibirMensagem('Erro ao alterar anúncio.');
+          }
+        });
+
+      } else {
+
+        this.anuncioService.alterarRequerimento(this.anuncio as any).subscribe({
+          next: () => {
+            this.atualizarComunidadesDoAnuncio();
+          },
+          error: () => {
+            this.exibirMensagem('Erro ao alterar requerimento.');
+          }
+        });
+
+      }
+
+      return;
+    }
+
     if (this.tipo === 'VENDA') {
       this.cadastrarVenda();
     } else {
       this.cadastrarRequerimento();
     }
+
+  }
+
+  atualizarComunidadesDoAnuncio() {
+
+    this.anuncioComunidadeService
+      .excluirRelacoesPorAnuncio(this.anuncio.cdAnuncio)
+      .subscribe({
+        next: () => {
+          this.cadastrarRelacoesEdicao();
+        },
+        error: () => {
+          this.exibirMensagem(
+            'Anúncio alterado, mas erro ao atualizar comunidades.'
+          );
+        }
+      });
+
+  }
+
+  cadastrarRelacoesEdicao() {
+
+    const relacoes = this.comunidadesSelecionadas.map(
+      comunidade => ({
+        anuncio: this.anuncio,
+        comunidade: comunidade
+      })
+    );
+
+    this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
+      next: () => {
+        this.exibirMensagem('Anúncio alterado com sucesso.');
+        this.router.navigate(['/anuncio-tela', this.anuncio.cdAnuncio]);
+      },
+      error: () => {
+        this.exibirMensagem(
+          'Anúncio alterado, mas erro ao publicar nas comunidades.'
+        );
+      }
+    });
+
   }
 
   cadastrarVenda() {
@@ -238,12 +335,48 @@ export class CriarAnuncioPage {
 
   }
 
+  carregarAnuncioParaEditar() {
 
+    this.anuncioService.buscarAnuncio(this.cdAnuncioEdicao).subscribe({
+      next: (anuncio) => {
+        this.anuncio = anuncio;
+        this.carregarComunidadesDoAnuncio();
+        const usuarioLogado = this.usuarioService.getUsuarioSessao();
 
+        this.usuarioEhDono =
+          this.anuncio.usuarioCria.cdUsuario === usuarioLogado.cdUsuario;
 
+        if (!this.usuarioEhDono) {
+          this.exibirMensagem('Você não pode editar este anúncio.');
+          this.router.navigate(['/anuncio-tela', this.anuncio.cdAnuncio]);
+        }
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao carregar anúncio.');
+      }
+    });
 
+  }
 
+  comunidadeEstaSelecionada(comunidade: ComunidadeModel): boolean {
+    return this.comunidadesSelecionadas.some(
+      c => c.cdComunidade === comunidade.cdComunidade
+    );
+  }
 
+  carregarComunidadesDoAnuncio() {
+    this.anuncioComunidadeService
+      .listarRelacoesPorAnuncio(this.anuncio.cdAnuncio)
+      .subscribe({
+        next: (relacoes) => {
+          this.comunidadesSelecionadas =
+            relacoes.map(relacao => relacao.comunidade);
+        },
+        error: () => {
+          this.exibirMensagem('Erro ao carregar comunidades do anúncio.');
+        }
+      });
+  }
 
   async exibirMensagem(msg: string) {
     const toast =

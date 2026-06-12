@@ -6,7 +6,11 @@
     </ion-buttons>
 
     <ion-title>
-      {{ tipo === 'VENDA' ? 'Criar anúncio' : 'Criar requerimento' }}
+      {{ modoEdicao
+      ? 'Editar anúncio'
+      : tipo === 'VENDA'
+      ? 'Criar anúncio'
+      : 'Criar requerimento' }}
     </ion-title>
 
   </ion-toolbar>
@@ -101,7 +105,8 @@
       <ion-list>
         <ion-item *ngFor="let comunidade of comunidades">
 
-          <ion-checkbox slot="start" (ionChange)="alterarSelecao(comunidade, $event.detail.checked)">
+          <ion-checkbox slot="start" [checked]="comunidadeEstaSelecionada(comunidade)"
+            (ionChange)="alterarSelecao(comunidade, $event.detail.checked)">
           </ion-checkbox>
 
           <ion-label>
@@ -113,7 +118,9 @@
 
       <!-- BOTÃO -->
       <ion-button expand="block" type="submit" class="btn-criar">
-        {{ tipo === 'VENDA'
+        {{ modoEdicao
+        ? 'Salvar alterações'
+        : tipo === 'VENDA'
         ? 'Criar anúncio'
         : 'Criar requerimento' }}
       </ion-button>

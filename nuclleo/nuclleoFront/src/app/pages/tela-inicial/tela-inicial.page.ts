@@ -30,6 +30,9 @@ import { ToastController } from '@ionic/angular';
 
 import { HttpClient } from '@angular/common/http';
 
+import { AnuncioModel } from 'src/app/model/anuncio.model';
+import { AnuncioService } from 'src/app/services/anuncio.service';
+
 @Component({
   selector: 'app-tela-inicial',
   templateUrl: './tela-inicial.page.html',
@@ -62,12 +65,14 @@ import { HttpClient } from '@angular/common/http';
 export class TelaInicialPage implements OnInit {
 
   comunidades: any[] = [];
+  anunciosRecomendados: AnuncioModel[] = [];
 
   constructor(
     private usuarioService: UsuarioService,
     private router: Router,
     private toastController: ToastController,
-    private http: HttpClient
+    private http: HttpClient,
+    private anuncioService: AnuncioService,
   ) { }
 
   ngOnInit() {
@@ -91,7 +96,7 @@ export class TelaInicialPage implements OnInit {
     }
 
     this.carregarComunidades();
-
+    this.carregarAnunciosRecomendados();
   }
 
   carregarComunidades() {
@@ -116,6 +121,19 @@ export class TelaInicialPage implements OnInit {
 
     });
 
+  }
+
+  carregarAnunciosRecomendados() {
+    this.anuncioService.listarTodos().subscribe({
+      next: (dados) => {
+        this.anunciosRecomendados = dados
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 5);
+      },
+      error: () => {
+        console.log('Erro ao carregar anúncios recomendados.');
+      }
+    });
   }
 
   async exibirMensagem(texto: string) {

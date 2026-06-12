@@ -46,4 +46,16 @@ export class AnuncioComunidadeService {
 
   }
 
+  excluirRelacoesPorAnuncio(cdAnuncio: number) {
+    return this.http.delete<AnuncioComunidadeModel[]>(
+      `${this.API_URL}/anuncio?cdAnuncio=${cdAnuncio}`
+    );
+  }
+
+  listarRelacoesPorAnuncio(cdAnuncio: number) {
+    return this.http.get<AnuncioComunidadeModel[]>(
+      `${this.API_URL}/anuncio?cdAnuncio=${cdAnuncio}`
+    );
+  }
+
 }
