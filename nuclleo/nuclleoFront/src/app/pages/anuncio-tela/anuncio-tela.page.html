@@ -62,7 +62,7 @@
 
     <div class="acoes-anuncio">
 
-      <ng-container *ngIf="usuarioEhDono; else botoesVisitante">
+      <div class="botoes-dono" *ngIf="usuarioEhDono; else botoesVisitante">
 
         <ion-button expand="block" fill="outline" color="medium" class="btn-editar"
           [routerLink]="['/criar-anuncio', anuncio.tipoAnuncio, anuncio.cdAnuncio]">
@@ -80,8 +80,7 @@
           Excluir anúncio
 
         </ion-button>
-
-      </ng-container>
+      </div>
 
       <ng-template #botoesVisitante>
 
