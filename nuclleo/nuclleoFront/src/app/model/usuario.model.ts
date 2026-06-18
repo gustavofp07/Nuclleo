@@ -4,7 +4,7 @@ export class UsuarioModel {
     ftUsuario: string;
     email: string;
     senha: string;
-    dtEntrada?: Date;
+    dtEntrada: Date;
     cpf: string;
     cep: string;
     telefone: string;
@@ -15,6 +15,7 @@ export class UsuarioModel {
         this.ftUsuario = '';
         this.email = '';
         this.senha = '';
+        this.dtEntrada = new Date();
         this.cpf = '';
         this.cep = '';
         this.telefone = '';

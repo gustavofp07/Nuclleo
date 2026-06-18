@@ -23,6 +23,7 @@ import { LoginModel } from 'src/app/model/login.model';
 import { LoginService } from 'src/app/services/login.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { UsuarioAutenticadoModel } from 'src/app/model/usuario-autenticado.model';
 
 
 @Component({
@@ -83,9 +84,9 @@ export class LoginPage implements OnInit {
     //console.log(this.login.senha);
 
     this.loginService.entrar(this.login).subscribe({
-      next: async (usuario: UsuarioModel) => {
+      next: async (usuario: UsuarioAutenticadoModel) => {
         await this.exibirMensagem('Login realizado com sucesso!');
-        //console.log(usuario);
+        console.log(usuario);
         this.usuarioService.salvarUsuarioSessao(usuario);
         //localStorage.setItem("usuarioAutenticado",JSON.stringify(usuario));
 

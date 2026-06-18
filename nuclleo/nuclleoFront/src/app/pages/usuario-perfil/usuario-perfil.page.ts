@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { home, peopleOutline, chatbubbleOutline, personOutline, createOutline, locationOutline, calendarOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { home, peopleOutline, chatbubbleOutline, personOutline, createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -44,7 +44,8 @@ export class UsuarioPerfilPage implements OnInit {
       createOutline,
       locationOutline,
       calendarOutline,
-      checkmarkCircleOutline
+      checkmarkCircleOutline,
+      trashOutline
     });
 
     this.usuario = new UsuarioModel();

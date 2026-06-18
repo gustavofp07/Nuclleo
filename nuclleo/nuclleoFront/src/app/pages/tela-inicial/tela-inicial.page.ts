@@ -17,7 +17,6 @@ import {
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonSearchbar,
   IonMenuButton,
   IonButtons
 } from '@ionic/angular/standalone';
@@ -52,7 +51,6 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
     IonHeader,
     IonTitle,
     IonToolbar,
-    IonSearchbar,
     IonMenuButton,
     IonButtons,
     CommonModule,
@@ -104,19 +102,15 @@ export class TelaInicialPage implements OnInit {
     this.http.get<any[]>(
       'http://localhost:8080/api/v1/comunidades'
     ).subscribe({
-
       next: (dados) => {
 
         this.comunidades = dados;
 
-        console.log(this.comunidades);
+        //console.log(this.comunidades);
 
       },
-
       error: (erro) => {
-
         console.log(erro);
-
       }
 
     });
@@ -137,17 +131,12 @@ export class TelaInicialPage implements OnInit {
   }
 
   async exibirMensagem(texto: string) {
-
     const toast =
       await this.toastController.create({
-
         message: texto,
         duration: 2000
-
       });
-
     toast.present();
-
   }
 
 }

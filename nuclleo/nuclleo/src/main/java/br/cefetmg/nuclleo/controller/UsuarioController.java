@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,33 +17,83 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.Usuario;
-import br.cefetmg.nuclleo.repository.UsuarioRepository;
+import br.cefetmg.nuclleo.services.UsuarioService;
+import jakarta.validation.Valid;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
-    private UsuarioRepository repository;
+    @Autowired
+    private UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioRepository repository) {
-        this.repository = repository;
+    public UsuarioController() {}
+
+    @PostMapping("")
+    @Operation(summary = "Cadastrar usuário")
+    public ResponseEntity<Usuario> inserir(@Valid @RequestBody Usuario usuario) {
+        if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
+            usuario.setCdUsuario(null);
+        }
+
+        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
+        usuario.setDtEntrada(data);
+
+        Usuario objUsuario = usuarioService.inserir(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
     }
 
-    {
-        /*
-         * usuarioList = new ArrayList<>();
-         * Usuario usuario1 = new Usuario();
-         * usuario1.setCdUsuario(nextId++);
-         * usuario1.setNmUsuario("Emanuel");
-         * 
-         * Usuario usuario2 = new Usuario();
-         * usuario2.setCdUsuario(nextId++);
-         * usuario2.setNmUsuario("Cadu");
-         * 
-         * usuarioList.add(usuario1);
-         * usuarioList.add(usuario2);
-         */
+    @PutMapping("")
+    @Operation(summary = "Atualizar usuário")
+    public ResponseEntity<Usuario> alterar(@RequestBody Usuario usuario) {
+        if (usuario.getCdUsuario() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+        }
+
+        //JogadorResponseDTO jogadorResponseDTO = jogadorService.atualizar(id, jogadorRequestDTO);
+        Usuario objUsuario = usuarioService.alterar(usuario);
+        return ResponseEntity.ok(objUsuario);
+    }    
+
+    @DeleteMapping("/{cdUsuario}")
+    @Operation(summary = "Excluir usuário")
+    public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
+        Usuario objUsuario = usuarioService.excluir(cdUsuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
     }
+
+    @GetMapping("/{cdUsuario}") // http://localhost:8080/api/v1/usuarios/numerodoId
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long cdUsuario) {
+        Usuario objUsuario = usuarioService.buscarPorId(cdUsuario);
+        return ResponseEntity.ok(objUsuario);
+        //return this.repository.findById(cdUsuario).orElse(null);
+    }
+
+    /*
+    @GetMapping
+    @Operation(summary = "Listar jogadores")
+    public ResponseEntity<List<JogadorResponseDTO>> listar() {
+        List<JogadorResponseDTO> jogadores = jogadorService.listar();
+        return ResponseEntity.ok(jogadores);
+    }
+
+
+
+
+     * @PostMapping("")
+     * public Usuario inserir(@RequestBody Usuario usuario) {
+     * if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
+     * usuario.setCdUsuario(null);
+     * }
+     * 
+     * java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
+     * usuario.setDtEntrada(data);
+     * 
+     * return this.repository.save(usuario);
+     * }
+     
 
     @GetMapping("") // http://localhost:8080/api/v1/usuarios
     public List<Usuario> getUsuarios() {
@@ -53,33 +104,6 @@ public class UsuarioController {
     public Usuario getUsuarioById(@PathVariable Long cdUsuario) {
         return this.repository.findById(cdUsuario).orElse(null);
     }
-
-    @PostMapping("")
-    public Usuario inserir(@RequestBody Usuario usuario) {
-        if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
-            usuario.setCdUsuario(null);
-        }
-
-        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
-        usuario.setDtEntrada(data);
-
-        return this.repository.save(usuario);
-    }
-
-    /*
-     * @DeleteMapping("/{cdUsuario}")
-     * public Usuario excluir(@PathVariable Long cdUsuario) {
-     * Usuario usuario = this.repository.findById(cdUsuario).orElse(null); // mudar
-     * isso. Chamar o get
-     * if (usuario == null) {
-     * throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id" +
-     * cdUsuario + "não encontrado.");
-     * }
-     * 
-     * this.repository.deleteById(cdUsuario);
-     * return usuario;
-     * }
-     */
 
     @DeleteMapping("/{cdUsuario}")
     public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
@@ -101,19 +125,9 @@ public class UsuarioController {
         }
 
         return this.repository.save(usuario);
-
-        /*
-         * for (int i = 0; i < usuarioList.size(); i++) {
-         * Usuario userAux = usuarioList.get(i);
-         * if (userAux != null && userAux.getCdUsuario() == usuario.getCdUsuario()) {
-         * usuarioList.remove(i);
-         * usuarioList.add(usuario);
-         * break;
-         * }
-         * }
-         * return usuario;
-         */
     }
+        */
+
 }
 
 /*

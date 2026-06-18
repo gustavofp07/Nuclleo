@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UsuarioModel } from '../model/usuario.model';
 import { Observable } from 'rxjs';
+import { UsuarioAutenticadoModel } from '../model/usuario-autenticado.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,7 @@ export class UsuarioService {
 
 
   //coisas da sessão
-  salvarUsuarioSessao(usuario: UsuarioModel): void {
+  salvarUsuarioSessao(usuario: UsuarioAutenticadoModel): void {
     localStorage.setItem(this.KEY_USUARIO, JSON.stringify(usuario));
   }
 

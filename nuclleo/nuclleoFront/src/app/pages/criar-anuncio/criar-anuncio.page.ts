@@ -15,7 +15,8 @@ import {
   ToastController,
   IonList,
   IonCheckbox,
-  IonLabel
+  IonLabel,
+  IonTextarea
 } from '@ionic/angular/standalone';
 
 import { CommonModule } from '@angular/common';
@@ -44,6 +45,7 @@ import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.se
     IonInput,
     IonItem,
     IonButton,
+    IonTextarea,
 
     IonHeader,
     IonToolbar,
@@ -90,14 +92,8 @@ export class CriarAnuncioPage {
 
   ngOnInit() {
 
-    this.tipo =
-      this.activatedRoute.snapshot.paramMap
-        .get('tipo')
-        ?.toUpperCase() || '';
-
-    this.cdAnuncioEdicao = Number(
-      this.activatedRoute.snapshot.paramMap.get('cdAnuncio')
-    );
+    this.tipo = this.activatedRoute.snapshot.paramMap.get('tipo')?.toUpperCase() || '';
+    this.cdAnuncioEdicao = Number(this.activatedRoute.snapshot.paramMap.get('cdAnuncio'));
 
     if (this.tipo === 'VENDA') {
       this.anuncio = new AnuncioVendaModel();
@@ -106,15 +102,11 @@ export class CriarAnuncioPage {
     }
 
     if (this.cdAnuncioEdicao > 0) {
-
       this.modoEdicao = true;
-
       this.carregarAnuncioParaEditar();
-
     }
 
     this.carregarComunidadesUsuario();
-
   }
 
   ionViewWillEnter() {

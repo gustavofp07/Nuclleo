@@ -27,10 +27,24 @@ import {
 import { addIcons } from 'ionicons';
 
 import {
-  personOutline,
+  add,
+  calendarOutline,
+  checkmarkCircleOutline,
+  chatbubbleOutline,
+  createOutline,
+  eyeOffOutline,
+  eyeOutline,
+  home,
   homeOutline,
+  imageOutline,
+  locationOutline,
   logOutOutline,
-  peopleOutline
+  mailOutline,
+  personOutline,
+  peopleOutline,
+  settingsOutline,
+  trashOutline,
+  chevronBackOutline
 } from 'ionicons/icons';
 
 
@@ -64,10 +78,24 @@ export class AppComponent {
   constructor(private router: Router) {
 
     addIcons({
-      personOutline,
+      add,
+      calendarOutline,
+      checkmarkCircleOutline,
+      chatbubbleOutline,
+      createOutline,
+      eyeOffOutline,
+      eyeOutline,
+      home,
       homeOutline,
+      imageOutline,
+      locationOutline,
       logOutOutline,
-      peopleOutline
+      mailOutline,
+      personOutline,
+      peopleOutline,
+      settingsOutline,
+      trashOutline,
+      chevronBackOutline
     });
 
     this.router.events
