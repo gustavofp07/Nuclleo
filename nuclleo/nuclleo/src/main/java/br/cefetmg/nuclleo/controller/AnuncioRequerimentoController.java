@@ -2,7 +2,9 @@ package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,68 +16,64 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.AnuncioRequerimento;
-import br.cefetmg.nuclleo.repository.AnuncioRequerimentoRepository;
+import br.cefetmg.nuclleo.services.AnuncioRequerimentoService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/anuncios/requerimentos")
 @CrossOrigin(origins = "*")
 public class AnuncioRequerimentoController {
-    private AnuncioRequerimentoRepository repository;
-
-    public AnuncioRequerimentoController(AnuncioRequerimentoRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private AnuncioRequerimentoService anuncioRequerimentoService;
 
     //não vou colocar o delete aqui, pois o anuncio é delelatdo pelo id, não precisa de um endpoint específico pra isso.
 
     @PostMapping("")
-    public AnuncioRequerimento inserir(@RequestBody AnuncioRequerimento anuncio) {
+    @Operation(summary = "Cadastrar anúncio de requerimento")
+    public ResponseEntity<AnuncioRequerimento> inserir(@RequestBody AnuncioRequerimento anuncio) {
         if (anuncio.getCdAnuncio() != null) { // gambiarra. Tem q tirar isso
             anuncio.setCdAnuncio(null);
         }
 
-        /*
-         * java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
-         * anuncio.setDtEntrada(data);
-         */
-
-        return this.repository.save(anuncio);
+        AnuncioRequerimento objAnuncio = anuncioRequerimentoService.inserir(anuncio);
+        return ResponseEntity.status(HttpStatus.CREATED).body(objAnuncio);
     }
 
     @PutMapping("")
-    public AnuncioRequerimento alterar(@RequestBody AnuncioRequerimento anuncio) {
+    @Operation(summary = "Atualizar anúncio de requerimento")
+    public ResponseEntity<AnuncioRequerimento> alterar(@RequestBody AnuncioRequerimento anuncio) {
         if (anuncio.getCdAnuncio() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
         }
 
-        return this.repository.save(anuncio);
+        AnuncioRequerimento objAnuncio = anuncioRequerimentoService.alterar(anuncio);
+        return ResponseEntity.ok(objAnuncio);
     }
 
     @GetMapping("")
-    public List<AnuncioRequerimento> getAnuncios() {
-        return this.repository.findAll();
+    @Operation(summary = "Listar anúncios de requerimento")
+    public ResponseEntity<List<AnuncioRequerimento>> getAnuncios() {
+        List<AnuncioRequerimento> anuncios = anuncioRequerimentoService.listar();
+        return ResponseEntity.ok(anuncios);
     }
 
     @GetMapping("/{cdAnuncio}")
-    public AnuncioRequerimento getAnuncioById(@PathVariable Long cdAnuncio) {
+    @Operation(summary = "Buscar anúncio de requerimento por ID")
+    public ResponseEntity<AnuncioRequerimento> getAnuncioById(@PathVariable Long cdAnuncio) {
+        if (cdAnuncio == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+        }
 
-        return this.repository.findById(cdAnuncio).orElse(null);
-
-        /*
-         * return this.repository.findById(cdAnuncio)
-         * .orElseThrow(() ->
-         * new ResponseStatusException(
-         * HttpStatus.NOT_FOUND,
-         * "Anúncio não encontrado."
-         * )
-         * );
-         */
+        AnuncioRequerimento anuncio = anuncioRequerimentoService.buscarAnuncioPorId(cdAnuncio);
+        return ResponseEntity.ok(anuncio);
     }
 
-    //retorna os anúncios de venda de um usuário
     @GetMapping("/usuario/{cdUsuario}")
-    public List<AnuncioRequerimento> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
-        return this.repository.findByUsuarioCria_CdUsuario(cdUsuario);
+    @Operation(summary = "Listar anúncios de requerimento por usuário")
+    public ResponseEntity<List<AnuncioRequerimento>> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
+        List<AnuncioRequerimento> anuncios = anuncioRequerimentoService.buscarAnunciosPorUsuario(cdUsuario);
+        return ResponseEntity.ok(anuncios);
     }
 
     /*

@@ -1,7 +1,5 @@
 package br.cefetmg.nuclleo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +63,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{cdUsuario}") // http://localhost:8080/api/v1/usuarios/numerodoId
+    @Operation(summary = "Buscar usuário por id")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long cdUsuario) {
         Usuario objUsuario = usuarioService.buscarPorId(cdUsuario);
         return ResponseEntity.ok(objUsuario);
@@ -129,43 +128,3 @@ public class UsuarioController {
         */
 
 }
-
-/*
- * @RestController
- * 
- * @RequestMapping("/api/v1/usuarios")
- * public class UsuarioController {
- * 
- * private UsuarioRepository repository;
- * 
- * public UsuarioController(UsuarioRepository repository) {
- * this.repository = repository;
- * }
- * 
- * @GetMapping("")
- * public List<Usuario> getUsuarios() {
- * return repository.findAll();
- * }
- * 
- * @GetMapping("/{codigo}")
- * public Usuario getUsuarioById(@PathVariable Long codigo) {
- * return repository.findById(codigo).orElse(null);
- * }
- * 
- * @PostMapping("")
- * public Usuario inserir(@RequestBody Usuario usuario) {
- * usuario.setCdUsuario(null); // opcional
- * return repository.save(usuario);
- * }
- * 
- * @DeleteMapping("/{cdUsuario}")
- * public void excluir(@PathVariable Long cdUsuario) {
- * repository.deleteById(cdUsuario);
- * }
- * 
- * @PutMapping("")
- * public Usuario alterar(@RequestBody Usuario usuario) {
- * return repository.save(usuario);
- * }
- * }
- */

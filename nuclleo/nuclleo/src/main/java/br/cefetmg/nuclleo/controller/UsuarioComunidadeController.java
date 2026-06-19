@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.cefetmg.nuclleo.model.AnuncioComunidade;
 import br.cefetmg.nuclleo.model.UsuarioComunidade;
 import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
 
@@ -53,37 +52,31 @@ public class UsuarioComunidadeController {
         return repository.save(usuarioComunidade);
     }
 
-    // URL: GET api/v1/UsuarioComunidade
     @GetMapping()
     public List<UsuarioComunidade> getUsuarioComunidade() {
         return this.repository.findAll();
     }
 
-    // URL: GET api/v1/UsuarioComunidade/usuario?cdUsuario=1
     @GetMapping("/usuario")
     public List<UsuarioComunidade> getByUsuario(@RequestParam Long cdUsuario) {
         return this.repository.findByUsuarioCdUsuario(cdUsuario);
     }
 
-    // URL: GET api/v1/UsuarioComunidade/comunidade?cdComunidade=1
     @GetMapping("/comunidade")
     public List<UsuarioComunidade> getByComunidade(@RequestParam Long cdComunidade) {
         return this.repository.findByComunidadeCdComunidade(cdComunidade);
     }
 
-    // URL: DELETE api/v1/UsuarioComunidade/comunidade?cdComunidade=1
     @DeleteMapping("/comunidade")
     public List<UsuarioComunidade> excluirByCdComunidade(@RequestParam Long cdComunidade) {
         return this.repository.deleteByComunidadeCdComunidade(cdComunidade);
     }
 
-    // URL: DELETE api/v1/UsuarioComunidade/usuario?cdUsuario=1
     @DeleteMapping("/usuario")
     public List<UsuarioComunidade> excluirByCdUsuario(@RequestParam Long cdUsuario) {
         return this.repository.deleteByUsuarioCdUsuario(cdUsuario);
     }
 
-    // URL: DELETE api/v1/UsuarioComunidade/relacao?cdUsuario=1&cdComunidade=2
     @DeleteMapping("/relacao")
     public List<UsuarioComunidade> excluirRelacaoEspecifica(
             @RequestParam Long cdUsuario,
@@ -91,16 +84,3 @@ public class UsuarioComunidadeController {
         return this.repository.deleteByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade);
     }
 }
-
-/*
- * @PutMapping("")
- * public Comunidade alterar(@RequestBody Comunidade comunidade) {
- * if (comunidade.getCdComunidade() == null) { //olhar isso aqui
- * throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
- * "Id é obrigatório");
- * }
- * 
- * this.repository.save(comunidade);
- * return comunidade;
- * }
- */

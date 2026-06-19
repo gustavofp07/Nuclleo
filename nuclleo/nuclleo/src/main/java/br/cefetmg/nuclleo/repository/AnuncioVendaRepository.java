@@ -9,7 +9,5 @@ import br.cefetmg.nuclleo.model.AnuncioVenda;
 
 @Repository
 public interface AnuncioVendaRepository extends JpaRepository<AnuncioVenda, Long> {
-
     List<AnuncioVenda> findByUsuarioCria_CdUsuario(Long cdUsuario);
-
 }

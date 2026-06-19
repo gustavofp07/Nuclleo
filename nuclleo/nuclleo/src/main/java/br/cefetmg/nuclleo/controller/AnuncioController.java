@@ -2,44 +2,38 @@ package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.Anuncio;
-import br.cefetmg.nuclleo.repository.AnuncioRepository;
+import br.cefetmg.nuclleo.services.AnuncioService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/anuncios")
 @CrossOrigin(origins = "*")
 public class AnuncioController {
-    private AnuncioRepository repository;
+    @Autowired
+    private AnuncioService anuncioService;
 
-    public AnuncioController(AnuncioRepository repository) {
-        this.repository = repository;
-    }
-
+    /* 
     // o post e o put não sei se são necessários, acredito que vale mais a pena
     // criar um endpoint específico para cada tipo de anúncio.
 
-    /* 
     @PostMapping("")
     public Anuncio inserir(@RequestBody Anuncio anuncio) {
         if (anuncio.getCdAnuncio() != null) { // gambiarra. Tem q tirar isso
             anuncio.setCdAnuncio(null);
         }
-
-        
-
         return this.repository.save(anuncio);
     }
 
@@ -48,45 +42,39 @@ public class AnuncioController {
         if (anuncio.getCdAnuncio() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
         }
-
         return this.repository.save(anuncio);
     }
     */
 
     @GetMapping("")
-    public List<Anuncio> getAnuncios() {
-        return this.repository.findAll();
+    @Operation(summary = "Listar todos os anúncios")
+    public ResponseEntity<List<Anuncio>> getAnuncios() {
+        List<Anuncio> anuncios = anuncioService.listar();
+        return ResponseEntity.status(HttpStatus.CREATED).body(anuncios);
     }
 
-    @GetMapping("/{cdAnuncio}")
-    public Anuncio getAnuncioById(@PathVariable Long cdAnuncio) {
+    @GetMapping("/{cdAnuncio}")     
+    @Operation(summary = "Buscar anúncio por id")
+    public ResponseEntity<Anuncio> getAnuncioById(@PathVariable Long cdAnuncio) {
 
-        return this.repository.findById(cdAnuncio).orElse(null);
-
-        /*
-         * return this.repository.findById(cdAnuncio)
-         * .orElseThrow(() ->
-         * new ResponseStatusException(
-         * HttpStatus.NOT_FOUND,
-         * "Anúncio não encontrado."
-         * )
-         * );
-         */
+        Anuncio objAnuncio = anuncioService.buscarPorId(cdAnuncio);
+        return ResponseEntity.ok(objAnuncio);
     }
 
-    // retorna os anúncios de um usuário
     @GetMapping("/usuario/{cdUsuario}")
-    public List<Anuncio> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
-        return this.repository.findByUsuarioCria_CdUsuario(cdUsuario);
+    @Operation(summary = "Listar anúncios de um usuário")
+    public ResponseEntity<List<Anuncio>> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
+        List<Anuncio> anuncios = anuncioService.listarAnunciosPorUsuario(cdUsuario);
+        return ResponseEntity.ok(anuncios);
     }
 
     @DeleteMapping("/{cdAnuncio}")
+    @Operation(summary = "Excluir anúncio")
     public ResponseEntity<Anuncio> excluir(@PathVariable Long cdAnuncio) {
-        Anuncio anuncio = this.repository.findById(cdAnuncio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anúncio não encontrado."));
+        Anuncio anuncio = anuncioService.buscarPorId(cdAnuncio);
 
         try {
-            this.repository.delete(anuncio);
+            anuncioService.excluir(anuncio);
             return ResponseEntity.ok(anuncio);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o anúncio.");
