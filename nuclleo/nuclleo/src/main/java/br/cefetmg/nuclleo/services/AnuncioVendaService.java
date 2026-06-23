@@ -3,12 +3,14 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.model.AnuncioVenda;
 import br.cefetmg.nuclleo.repository.AnuncioVendaRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class AnuncioVendaService {
     @Autowired
     private AnuncioVendaRepository anuncioVendaRepository;

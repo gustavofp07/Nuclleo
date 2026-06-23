@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.ComunidadeRepository;
-import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,17 +16,32 @@ public class ComunidadeService {
     @Autowired
     private ComunidadeRepository comunidadeRepository;
 
+    //apagar depois que criar o service
     @Autowired
     private AnuncioComunidadeRepository anuncioComunidadeRepository;
 
+    //eu ainda n criei esse service. Depois de criar corrigir a função excluirComunidade
+    /*
     @Autowired
-    private UsuarioComunidadeRepository usuarioComunidadeRepository;
+    private AnuncioComunidadeService anuncioComunidadeService;
+    */
+
+    @Autowired
+    private UsuarioComunidadeService usuarioComunidadeService;
 
     @Transactional
     public Comunidade inserir(Comunidade comunidade) {
         comunidade.setDtCriacao(new java.sql.Date(System.currentTimeMillis()));
 
-        return comunidadeRepository.save(comunidade);
+        Comunidade objComunidade = comunidadeRepository.save(comunidade);
+
+        //salvar na tabela N:N de usuarioComunidade o usuario que criou a comunidade
+        if (objComunidade != null) {
+            usuarioComunidadeService.inserir(objComunidade.getUsuarioCria(), objComunidade);
+        }
+
+
+        return objComunidade;
     }
 
     @Transactional
@@ -48,9 +62,13 @@ public class ComunidadeService {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
                 .orElseThrow(() -> new RuntimeException("Comunidade não encontrada"));
 
+                
         // Deletar nas tabelas N:N
+        //corrigir aqui para padronizar chamar o service primeiro
+        //this.anuncioComunidadeService.excluirPorComunidade(cdComunidade);
         this.anuncioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
-        this.usuarioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
+
+        this.usuarioComunidadeService.excluirPorComunidade(cdComunidade);
         comunidadeRepository.delete(comunidade);
 
         return comunidade;

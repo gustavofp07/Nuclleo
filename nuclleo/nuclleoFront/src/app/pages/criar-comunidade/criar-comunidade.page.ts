@@ -84,27 +84,20 @@ export class CriarComunidadePage {
 
       this.modoEdicao = true;
 
-      this.comunidadeService
-        .buscarComunidade(Number(cdComunidade))
-        .subscribe({
+      this.comunidadeService.buscarComunidade(Number(cdComunidade)).subscribe({
+        next: async (
+          comunidade: ComunidadeModel
+        ) => {
 
-          next: async (
-            comunidade: ComunidadeModel
-          ) => {
+          this.comunidade = comunidade;
 
-            this.comunidade = comunidade;
-
-          },
-
-          error: async () => {
-
-            this.exibirMensagem(
-              'Erro ao carregar comunidade.'
-            );
-
-          }
-
-        });
+        },
+        error: async () => {
+          this.exibirMensagem(
+            'Erro ao carregar comunidade.'
+          );
+        }
+      });
 
     }
 
@@ -119,108 +112,79 @@ export class CriarComunidadePage {
       return;
     }
 
-    if (
-      arquivo.type !== 'image/png' &&
-      arquivo.type !== 'image/jpeg'
-    ) {
+    if (arquivo.type !== 'image/png' && arquivo.type !== 'image/jpeg') {
 
       this.exibirMensagem(
         'Selecione apenas imagens PNG ou JPG.'
       );
 
       return;
-
     }
 
-    const reader =
-      new FileReader();
+    const reader = new FileReader();
 
     reader.onload = () => {
-
-      this.previewFoto =
-        reader.result;
-
+      this.previewFoto = reader.result;
     };
 
     reader.readAsDataURL(arquivo);
-
   }
 
   salvarComunidade() {
-
     if (this.modoEdicao) {
-
       this.atualizarComunidade();
-
     } else {
-
       this.cadastrarComunidade();
-
     }
-
   }
 
   async atualizarComunidade() {
 
-    this.comunidadeService
-      .atualizarComunidade(this.comunidade)
-      .subscribe({
+    this.comunidadeService.atualizarComunidade(this.comunidade).subscribe({
+      next: async (
+        comunidade: ComunidadeModel
+      ) => {
 
-        next: async (
-          comunidade: ComunidadeModel
-        ) => {
+        this.exibirMensagem(
+          'Comunidade atualizada com sucesso!'
+        );
 
-          this.exibirMensagem(
-            'Comunidade atualizada com sucesso!'
-          );
+        this.router.navigate([
+          '/minhas-comunidades'
+        ]);
 
-          this.router.navigate([
-            '/minhas-comunidades'
-          ]);
+      },
 
-        },
+      error: async () => {
 
-        error: async () => {
+        this.exibirMensagem(
+          'Erro ao atualizar comunidade.'
+        );
 
-          this.exibirMensagem(
-            'Erro ao atualizar comunidade.'
-          );
+      }
 
-        }
-
-      });
+    });
 
   }
 
   async cadastrarComunidade() {
+    this.comunidade.usuarioCria = this.usuarioService.getUsuarioSessao();
 
-    this.comunidade.usuarioCria =
-      this.usuarioService.getUsuarioSessao();
-
-    this.comunidadeService
-      .cadastrarComunidade(this.comunidade)
-      .subscribe({
-
-        next: async (
-          comunidade: ComunidadeModel
-        ) => {
-
-          this.cadastrarCriadorNaComunidade(comunidade);
-
-        },
-
-        error: async () => {
-
-          this.exibirMensagem(
-            'Erro ao criar comunidade.'
-          );
-
-        }
-
-      });
-
+    this.comunidadeService.cadastrarComunidade(this.comunidade).subscribe({
+      next: async (
+        comunidade: ComunidadeModel
+      ) => {
+        this.exibirMensagem('Comunidade criada com sucesso!');
+        this.router.navigate(['/minhas-comunidades']);
+      },
+      error: async () => {
+        this.exibirMensagem('Erro ao criar comunidade.');
+      }
+    });
   }
 
+  //já estou fazendo isso no backend, então não precisa mais dessa função.
+  /*
   cadastrarCriadorNaComunidade(comunidade: ComunidadeModel) {
     const usuarioComunidade = new UsuarioComunidadeModel();
     usuarioComunidade.usuario = this.usuarioService.getUsuarioSessao();
@@ -249,11 +213,9 @@ export class CriarComunidadePage {
         }
       });
   }
+      */
 
-  async exibirMensagem(
-    mensagem: string
-  ) {
-
+  async exibirMensagem(mensagem: string) {
     const toast =
       await this.toastController.create({
 
@@ -262,9 +224,7 @@ export class CriarComunidadePage {
         position: 'top'
 
       });
-
     await toast.present();
-
   }
 
 }
