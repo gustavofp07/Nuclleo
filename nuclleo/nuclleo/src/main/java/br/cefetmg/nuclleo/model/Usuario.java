@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 //import jakarta.persistence.Version;
 
 import lombok.AllArgsConstructor;
@@ -22,10 +23,12 @@ import lombok.ToString;
 //@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_Usuario")// é aqui que se define o nome da tabela no banco de dados
+@Entity(name = "tb_usuario")// é aqui que se define o nome da tabela no banco de dados
+@Table(name = "tb_usuario")
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cd_usuario")
     private Long cdUsuario;
 
     /*
@@ -37,28 +40,28 @@ public class Usuario {
     */
 
 
-    @Column(length = 60, nullable = false)
+    @Column(name = "nm_usuario", length = 60, nullable = false)
     private String nmUsuario;
 
-    @Column
+    @Column(name = "ft_usuario")
     private String ftUsuario;
 
-    @Column
+    @Column(name = "email")
     private String email;
 
-    @Column
+    @Column(name = "senha")
     private String senha;
 
-    @Column
+    @Column(name = "dt_entrada")
     private Date dtEntrada; // cadastro
 
-    @Column
+    @Column(name = "cpf")
     private String cpf;
 
-    @Column
+    @Column(name = "cep")
     private String cep;
 
-    @Column
+    @Column(name = "telefone")
     private String telefone;
 }
 

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,12 +22,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_Comunidade")
+@Entity(name = "tb_comunidade")
+@Table(name = "tb_comunidade")
 public class Comunidade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cdComunidade", updatable = false)
+    @Column(name = "cd_comunidade", updatable = false)
     private Long cdComunidade; // existe o tipo UUID
 
     /*
@@ -37,10 +39,10 @@ public class Comunidade {
      * private UUID cdComunidade; // existe o tipo UUID
      */
 
-    @Column(name = "nmComunidade", length = 60, nullable = false)
+    @Column(name = "nm_comunidade", length = 60, nullable = false)
     private String nmComunidade;
 
-    @Column(name = "dtCriacao")
+    @Column(name = "dt_criacao")
     private Date dtCriacao;
 
     @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
@@ -48,6 +50,6 @@ public class Comunidade {
 
     @ManyToOne
     @JsonIgnoreProperties({"senha"})
-    @JoinColumn(name = "cdUsuarioCria", referencedColumnName = "cdUsuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
+    @JoinColumn(name = "cd_usuario_cria", referencedColumnName = "cd_usuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
     private Usuario usuarioCria;
 }

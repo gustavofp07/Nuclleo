@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)// Garante que os métodos equals e hashCode considerem os atributos da classe mae
 @Entity(name = "tb_anuncio_venda")
+@Table(name = "tb_anuncio_venda")
 public class AnuncioVenda extends Anuncio {
 
-    @Column(name = "ftAnuncio", nullable = false)
+    @Column(name = "ft_anuncio", nullable = false)
     private String ftAnuncio;
 
     @Column(name = "valor", nullable = false, columnDefinition = "DECIMAL(10,2)")

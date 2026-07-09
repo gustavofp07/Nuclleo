@@ -3,7 +3,9 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
@@ -47,7 +49,7 @@ public class ComunidadeService {
     @Transactional
     public Comunidade alterar(Long cdComunidade, Comunidade comunidade) {
         Comunidade objComunidade = comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new RuntimeException("Comunidade não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
 
         objComunidade.setNmComunidade(comunidade.getNmComunidade());
         objComunidade.setDescricao(comunidade.getDescricao());
@@ -60,7 +62,7 @@ public class ComunidadeService {
     @Transactional
     public Comunidade excluir(Long cdComunidade) {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new RuntimeException("Comunidade não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
 
                 
         // Deletar nas tabelas N:N
@@ -82,7 +84,7 @@ public class ComunidadeService {
     @Transactional(readOnly = true)
     public Comunidade buscarPorId(Long cdComunidade) {
         return comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new RuntimeException("Comunidade não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
     }
 
     @Transactional(readOnly = true)

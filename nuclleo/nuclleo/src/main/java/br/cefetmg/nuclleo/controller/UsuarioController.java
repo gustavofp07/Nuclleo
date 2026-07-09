@@ -19,10 +19,12 @@ import br.cefetmg.nuclleo.services.UsuarioService;
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @CrossOrigin(origins = "*")
+@Tag(name = "Usuários", description = "Endpoints para gerenciamento de usuários")
 public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
@@ -59,7 +61,7 @@ public class UsuarioController {
     @Operation(summary = "Excluir usuário")
     public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
         Usuario objUsuario = usuarioService.excluir(cdUsuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
+        return ResponseEntity.ok(objUsuario);
     }
 
     @GetMapping("/{cdUsuario}") // http://localhost:8080/api/v1/usuarios/numerodoId

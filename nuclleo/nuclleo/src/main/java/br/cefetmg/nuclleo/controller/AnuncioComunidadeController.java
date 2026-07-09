@@ -2,6 +2,8 @@ package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,74 +15,84 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.AnuncioComunidade;
-import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
+import br.cefetmg.nuclleo.services.AnuncioComunidadeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/anuncioComunidade")
 @CrossOrigin(origins = "*")
+@Tag(name = "Relações anúncio-comunidade", description = "Endpoints para gerenciamento das relações entre anúncios e comunidades")
 public class AnuncioComunidadeController {
-    private final AnuncioComunidadeRepository repository;
+    @Autowired
+    private AnuncioComunidadeService anuncioComunidadeService;
 
-    public AnuncioComunidadeController(AnuncioComunidadeRepository repository) {
-        this.repository = repository;
-    }
-
-    @PostMapping()
-    public AnuncioComunidade inserir(@RequestBody AnuncioComunidade anuncioComunidade) {
-        if (anuncioComunidade != null) {
-            this.repository.save(anuncioComunidade);
-        }
-        return anuncioComunidade;
+    @PostMapping("")
+    @Operation(summary = "Inserir uma nova relação entre anúncio e comunidade")
+    public ResponseEntity<AnuncioComunidade> inserir(@Valid @RequestBody AnuncioComunidade anuncioComunidade) {
+        anuncioComunidadeService.inserir(anuncioComunidade);
+        return ResponseEntity.ok(anuncioComunidade);
     }
 
     @PostMapping("/relacoes")
-    public List<AnuncioComunidade> inserirRelacoes(@RequestBody List<AnuncioComunidade> relacoes) {
-        return repository.saveAll(relacoes);
+    @Operation(summary = "Inserir relações em lote entre anúncio e comunidade")
+    public ResponseEntity<List<AnuncioComunidade>> inserirRelacoes(@RequestBody List<AnuncioComunidade> relacoes) {
+        List<AnuncioComunidade> relacoesInseridas = anuncioComunidadeService.inserirRelacoes(relacoes);
+        return ResponseEntity.ok(relacoesInseridas);
     }
 
     @GetMapping("/comunidade/anuncios")
-    public List<Anuncio> getAnunciosDaComunidade(
-            @RequestParam Long cdComunidade) {
-
-        return repository.findAnunciosByComunidade(cdComunidade);
+    @Operation(summary = "Listar anúncios de uma comunidade")
+    public ResponseEntity<List<Anuncio>> listarAnunciosDaComunidade(@RequestParam Long cdComunidade) {
+        List<Anuncio> anuncios = anuncioComunidadeService.listarAnunciosDaComunidade(cdComunidade);
+        return ResponseEntity.ok(anuncios);
     }
 
-    // URL: GET api/v1/AnuncioComunidade
-    @GetMapping()
-    public List<AnuncioComunidade> getAnuncioComunidade() {
-        return this.repository.findAll();
+    @GetMapping("")
+    @Operation(summary = "Listar todas as relações anúncio-comunidade")
+    public ResponseEntity<List<AnuncioComunidade>> listarAnuncioComunidade() {
+        List<AnuncioComunidade> relacoes = anuncioComunidadeService.listarAnuncioComunidade();
+        return ResponseEntity.ok(relacoes);
     }
 
-    // URL: GET api/v1/AnuncioComunidade/
     @GetMapping("/anuncio")
-    public List<AnuncioComunidade> getByAnuncio(@RequestParam Long cdAnuncio) {
-        return this.repository.findByAnuncioCdAnuncio(cdAnuncio);
+    @Operation(summary = "Listar relações por anúncio")
+    public ResponseEntity<List<AnuncioComunidade>> listarPorAnuncio(@RequestParam Long cdAnuncio) {
+        List<AnuncioComunidade> relacoes = anuncioComunidadeService.listarPorAnuncio(cdAnuncio);
+        return ResponseEntity.ok(relacoes);
     }
 
-    // URL: GET api/v1/AnuncioComunidade/comunidade?cdComunidade=1
     @GetMapping("/comunidade")
-    public List<AnuncioComunidade> getByComunidade(@RequestParam Long cdComunidade) {
-        return this.repository.findByComunidadeCdComunidade(cdComunidade);
+    @Operation(summary = "Listar relações por comunidade")
+    public ResponseEntity<List<AnuncioComunidade>> listarPorComunidade(@RequestParam Long cdComunidade) {
+        List<AnuncioComunidade> relacoes = anuncioComunidadeService.listarPorComunidade(cdComunidade);
+        return ResponseEntity.ok(relacoes);
     }
 
-    // URL: DELETE api/v1/AnuncioComunidade/comunidade?cdComunidade=1
     @DeleteMapping("/comunidade")
-    public List<AnuncioComunidade> excluirByCdComunidade(@RequestParam Long cdComunidade) {
-        return this.repository.deleteByComunidadeCdComunidade(cdComunidade);
+    @Operation(summary = "Excluir relações por comunidade")
+    public ResponseEntity<List<AnuncioComunidade>> excluirPorComunidade(@RequestParam Long cdComunidade) {
+        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorComunidade(cdComunidade);
+        return ResponseEntity.ok(relacoesExcluidas);
     }
 
     // URL: DELETE api/v1/AnuncioComunidade/anuncio?cdAnuncio=1
     @DeleteMapping("/anuncio")
-    public List<AnuncioComunidade> excluirByCdAnuncio(@RequestParam Long cdAnuncio) {
-        return this.repository.deleteByAnuncioCdAnuncio(cdAnuncio);
+    @Operation(summary = "Excluir relações por anúncio")
+    public ResponseEntity<List<AnuncioComunidade>> excluirPorAnuncio(@RequestParam Long cdAnuncio) {
+        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorAnuncio(cdAnuncio);
+        return ResponseEntity.ok(relacoesExcluidas);
     }
 
     // URL: DELETE api/v1/AnuncioComunidade/relacao?cdAnuncio=1&cdComunidade=2
     // Deleta a relação específica de um anúncio em uma comunidade. Não retorna
     // lista, pois é uma relação específica.
     @DeleteMapping("/relacao")
-    public List<AnuncioComunidade> excluirRelacaoEspecifica(@RequestParam Long cdAnuncio,
+    @Operation(summary = "Excluir relação específica entre anúncio e comunidade")
+    public ResponseEntity<AnuncioComunidade> excluirRelacaoEspecifica(@RequestParam Long cdAnuncio,
             @RequestParam Long cdComunidade) {
-        return this.repository.deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(cdAnuncio, cdComunidade);
+        AnuncioComunidade relacaoExcluida = anuncioComunidadeService.excluirRelacaoEspecifica(cdAnuncio, cdComunidade);
+        return ResponseEntity.ok(relacaoExcluida);
     }
 }

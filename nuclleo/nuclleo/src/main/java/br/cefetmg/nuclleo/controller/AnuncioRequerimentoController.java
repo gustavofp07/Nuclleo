@@ -19,10 +19,12 @@ import br.cefetmg.nuclleo.model.AnuncioRequerimento;
 import br.cefetmg.nuclleo.services.AnuncioRequerimentoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/anuncios/requerimentos")
 @CrossOrigin(origins = "*")
+@Tag(name = "Anúncios de Requerimento", description = "Endpoints para gerenciamento de anúncios de requerimento")
 public class AnuncioRequerimentoController {
     @Autowired
     private AnuncioRequerimentoService anuncioRequerimentoService;

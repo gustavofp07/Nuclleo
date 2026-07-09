@@ -14,6 +14,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,16 +22,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_Anuncio")
+@Entity(name = "tb_anuncio")
+@Table(name = "tb_anuncio")
 @Inheritance(strategy = InheritanceType.JOINED)//configuração para herança
 public class Anuncio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cdAnuncio", updatable = false)
+    @Column(name = "cd_anuncio", updatable = false)
     private Long cdAnuncio;
 
-    @Column(name = "nmAnuncio", length = 80, nullable = false)
+    @Column(name = "nm_anuncio", length = 80, nullable = false)
     private String nmAnuncio;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
@@ -47,11 +49,11 @@ public class Anuncio {
 
     // Novo atributo mapeado para o MySQL
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipoAnuncio", length = 20, nullable = false)
+    @Column(name = "tipo_anuncio", length = 20, nullable = false)
     private TipoAnuncio tipoAnuncio;
 
     @ManyToOne
     @JsonIgnoreProperties({"senha"})
-    @JoinColumn(name = "cdUsuarioCria", referencedColumnName = "cdUsuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
+    @JoinColumn(name = "cd_usuario_cria", referencedColumnName = "cd_usuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
     private Usuario usuarioCria;
 }

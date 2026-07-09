@@ -21,10 +21,12 @@ import br.cefetmg.nuclleo.services.ComunidadeService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("api/v1/comunidades")
 @CrossOrigin(origins = "*")
+@Tag(name = "Comunidades", description = "Endpoints para gerenciamento de comunidades")
 public class ComunidadeController {
     @Autowired
     private ComunidadeService comunidadeService;

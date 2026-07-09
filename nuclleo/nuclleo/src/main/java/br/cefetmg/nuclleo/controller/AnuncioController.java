@@ -3,7 +3,6 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,16 +10,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.services.AnuncioService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/anuncios")
 @CrossOrigin(origins = "*")
+@Tag(name = "Anúncios", description = "Endpoints para gerenciamento de anúncios")
 public class AnuncioController {
     @Autowired
     private AnuncioService anuncioService;
@@ -50,7 +50,7 @@ public class AnuncioController {
     @Operation(summary = "Listar todos os anúncios")
     public ResponseEntity<List<Anuncio>> getAnuncios() {
         List<Anuncio> anuncios = anuncioService.listar();
-        return ResponseEntity.status(HttpStatus.CREATED).body(anuncios);
+        return ResponseEntity.ok(anuncios);
     }
 
     @GetMapping("/{cdAnuncio}")     
@@ -71,13 +71,7 @@ public class AnuncioController {
     @DeleteMapping("/{cdAnuncio}")
     @Operation(summary = "Excluir anúncio")
     public ResponseEntity<Anuncio> excluir(@PathVariable Long cdAnuncio) {
-        Anuncio anuncio = anuncioService.buscarPorId(cdAnuncio);
-
-        try {
-            anuncioService.excluir(anuncio);
-            return ResponseEntity.ok(anuncio);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o anúncio.");
-        }
+        Anuncio anuncio = anuncioService.excluir(cdAnuncio);
+        return ResponseEntity.ok(anuncio);
     }
 }

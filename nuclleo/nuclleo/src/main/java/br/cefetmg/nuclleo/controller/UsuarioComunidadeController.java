@@ -2,7 +2,9 @@ package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,76 +13,67 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.nuclleo.model.UsuarioComunidade;
-import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
+import br.cefetmg.nuclleo.services.UsuarioComunidadeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/usuarioComunidade")
 @CrossOrigin(origins = "*")
+@Tag(name = "Relações usuário-comunidade", description = "Endpoints para gerenciamento das relações entre usuários e comunidades")
 public class UsuarioComunidadeController {
-    private final UsuarioComunidadeRepository repository;
+    @Autowired
+    private UsuarioComunidadeService usuarioComunidadeService;
 
-    UsuarioComunidadeController(UsuarioComunidadeRepository repository) {
-        this.repository = repository;
+    @PostMapping("")
+    @Operation(summary = "Inserir uma nova relação entre usuário e comunidade")
+    public ResponseEntity<UsuarioComunidade> inserir(@Valid @RequestBody UsuarioComunidade dto) {
+        UsuarioComunidade usuarioComunidade = usuarioComunidadeService.inserir(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioComunidade);
     }
 
-    /*
-     * @PostMapping()
-     * public UsuarioComunidade inserir(@RequestBody UsuarioComunidade
-     * usuarioComunidade) {
-     * //olhar isso aqui
-     * usuarioComunidade.setId(null); // Garantir que o ID seja gerado
-     * automaticamente
-     * return this.repository.save(usuarioComunidade);
-     * }
-     */
-
-    @PostMapping()
-    public UsuarioComunidade inserir(@RequestBody UsuarioComunidade usuarioComunidade) {
-        Long cdUsuario = usuarioComunidade.getUsuario().getCdUsuario();
-        Long cdComunidade = usuarioComunidade.getComunidade().getCdComunidade();
-
-        boolean existe = repository.existsByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade);
-
-        if (existe) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Usuário já participa desta comunidade.");
-        }
-
-        usuarioComunidade.setId(null);
-        return repository.save(usuarioComunidade);
-    }
-
-    @GetMapping()
-    public List<UsuarioComunidade> getUsuarioComunidade() {
-        return this.repository.findAll();
+    @GetMapping("")
+    @Operation(summary = "Listar todas as relações")
+    public ResponseEntity<List<UsuarioComunidade>> listar() {
+        List<UsuarioComunidade> usuarioComunidades = usuarioComunidadeService.listar();
+        return ResponseEntity.ok(usuarioComunidades);
     }
 
     @GetMapping("/usuario")
-    public List<UsuarioComunidade> getByUsuario(@RequestParam Long cdUsuario) {
-        return this.repository.findByUsuarioCdUsuario(cdUsuario);
+    @Operation(summary = "Listar relações por usuário")
+    public ResponseEntity<List<UsuarioComunidade>> listarPorUsuario(@RequestParam Long cdUsuario) {
+        List<UsuarioComunidade> usuarioComunidades = usuarioComunidadeService.listarPorUsuario(cdUsuario);
+        return ResponseEntity.ok(usuarioComunidades);
     }
 
     @GetMapping("/comunidade")
-    public List<UsuarioComunidade> getByComunidade(@RequestParam Long cdComunidade) {
-        return this.repository.findByComunidadeCdComunidade(cdComunidade);
+    @Operation(summary = "Listar relações por comunidade")
+    public ResponseEntity<List<UsuarioComunidade>> listarPorComunidade(@RequestParam Long cdComunidade) {
+        List<UsuarioComunidade> usuarioComunidades = usuarioComunidadeService.listarPorComunidade(cdComunidade);
+        return ResponseEntity.ok(usuarioComunidades);
     }
 
     @DeleteMapping("/comunidade")
-    public List<UsuarioComunidade> excluirByCdComunidade(@RequestParam Long cdComunidade) {
-        return this.repository.deleteByComunidadeCdComunidade(cdComunidade);
+    @Operation(summary = "Excluir relações por comunidade")
+    public void excluirPorComunidade(@RequestParam Long cdComunidade) {
+        usuarioComunidadeService.excluirPorComunidade(cdComunidade);
+
     }
 
     @DeleteMapping("/usuario")
-    public List<UsuarioComunidade> excluirByCdUsuario(@RequestParam Long cdUsuario) {
-        return this.repository.deleteByUsuarioCdUsuario(cdUsuario);
+    @Operation(summary = "Excluir relações por usuário")
+    public void excluirPorUsuario(@RequestParam Long cdUsuario) {
+        usuarioComunidadeService.excluirPorUsuario(cdUsuario);
     }
 
     @DeleteMapping("/relacao")
-    public List<UsuarioComunidade> excluirRelacaoEspecifica(
+    @Operation(summary = "Excluir relação específica")
+    public void excluirRelacao(
             @RequestParam Long cdUsuario,
             @RequestParam Long cdComunidade) {
-        return this.repository.deleteByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade);
+        usuarioComunidadeService.excluirRelacaoEspecifica(cdUsuario, cdComunidade);
     }
 }

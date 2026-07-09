@@ -70,10 +70,8 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long cdUsuario) {
-        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow();
-
-        //return new JogadorResponseDTO(jogador);
-        return usuario;
+        return usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
     }
 
 }

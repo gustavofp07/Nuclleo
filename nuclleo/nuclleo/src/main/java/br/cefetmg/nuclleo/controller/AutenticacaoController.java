@@ -1,41 +1,32 @@
 package br.cefetmg.nuclleo.controller;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.dto.UsuarioLoginResponseDTO;
 import br.cefetmg.nuclleo.dto.UsuarioLoginResquestDTO;
 import jakarta.validation.Valid;
-import br.cefetmg.nuclleo.repository.UsuarioRepository;
+import br.cefetmg.nuclleo.services.AutenticacaoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/autenticar")
 @CrossOrigin(origins = "*")
-
+@Tag(name = "Autenticação", description = "Endpoints para autenticação de usuário")
 public class AutenticacaoController {
-    private UsuarioRepository repository;
-
-    public AutenticacaoController(UsuarioRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private AutenticacaoService autenticacaoService;
 
     @PostMapping("")
-    public UsuarioLoginResponseDTO autenticar(@Valid @RequestBody UsuarioLoginResquestDTO credenciais) {
-
-        Usuario usuario = repository.findByEmailAndSenha(credenciais.getEmail(), credenciais.getSenha());
-
-        if (usuario == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou senha inválidos");
-        }
-
-        UsuarioLoginResponseDTO usuarioLogin = new UsuarioLoginResponseDTO(usuario);
-
-        return usuarioLogin;
+    @Operation(summary = "Autenticar usuário")
+    public ResponseEntity<UsuarioLoginResponseDTO> autenticar(@Valid @RequestBody UsuarioLoginResquestDTO dto) {
+        UsuarioLoginResponseDTO usuarioLogin = autenticacaoService.autenticar(dto);
+        return ResponseEntity.ok(usuarioLogin);
     }
 }

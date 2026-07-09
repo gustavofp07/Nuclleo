@@ -38,7 +38,7 @@ public interface AnuncioComunidadeRepository extends JpaRepository<AnuncioComuni
 
     // NOVA FUNÇÃO: Deleta a relação específica de um anúncio em uma comunidade
     @Transactional
-    List<AnuncioComunidade> deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(Long cdAnuncio, Long cdComunidade);
+    AnuncioComunidade deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(Long cdAnuncio, Long cdComunidade);
 
     @Query("""
                 SELECT ac.anuncio
