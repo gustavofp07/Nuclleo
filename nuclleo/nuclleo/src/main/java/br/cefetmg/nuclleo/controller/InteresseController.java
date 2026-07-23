@@ -1,0 +1,77 @@
+package br.cefetmg.nuclleo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
+import br.cefetmg.nuclleo.model.Interesse;
+import br.cefetmg.nuclleo.services.InteresseService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/interesses")
+@CrossOrigin(origins = "*")
+@Tag(name = "Interesses", description = "Endpoints para gerenciamento de interesses")
+public class InteresseController {
+    @Autowired
+    private InteresseService interesseService;
+
+    @PostMapping("")
+    public ResponseEntity<Interesse> inserir(InteresseRequestDTO dto) {
+        if (dto.getCdUsuario() == null) {
+            throw new IllegalArgumentException("O campo código do usuario é obrigatório.");
+        }
+
+        if (dto.getCdAnuncio() == null) {
+            throw new IllegalArgumentException("O campo código do anuncio é obrigatório.");
+        }
+
+        Interesse interesse = interesseService.inserir(dto);
+        return ResponseEntity.ok(interesse);
+    }
+
+    @DeleteMapping("/excluir/{id}")
+    public ResponseEntity<Void> excluir(Long id) {
+        interesseService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Interesse> buscarPorId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O campo id é obrigatório.");
+        }
+
+        Interesse interesse = interesseService.buscarPorId(id);
+        return ResponseEntity.ok(interesse);
+    }
+
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<Interesse>> listarPorUsuario(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O campo id é obrigatório.");
+        }
+
+        List<Interesse> interesses = interesseService.listarPorUsuario(id);
+        return ResponseEntity.ok(interesses);
+    }
+
+    @GetMapping("/anuncio/{id}")
+    public ResponseEntity<List<Interesse>> listarPorAnuncio(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O campo id é obrigatório.");
+        }
+
+        List<Interesse> interesses = interesseService.listarPorAnuncio(id);
+        return ResponseEntity.ok(interesses);
+    }
+
+}

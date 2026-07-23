@@ -29,8 +29,6 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    public UsuarioController() {}
-
     @PostMapping("")
     @Operation(summary = "Cadastrar usuário")
     public ResponseEntity<Usuario> inserir(@Valid @RequestBody Usuario usuario) {
