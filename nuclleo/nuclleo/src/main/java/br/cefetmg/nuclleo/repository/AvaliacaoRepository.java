@@ -1,0 +1,21 @@
+package br.cefetmg.nuclleo.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import br.cefetmg.nuclleo.model.Avaliacao;
+
+public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
+    //Avaliacao findByTransacaoAndAvaliador(Transacao transacao, Usuario avaliador);
+
+    // Busca avaliações pendentes de um usuário (onde ele é o avaliador e nota é null)
+    List<Avaliacao> findByAvaliadorCdUsuarioAndNotaIsNull(Long cdUsuario);
+
+    // Busca todas as avaliações de um usuário como avaliado (para ver sua reputação)
+    List<Avaliacao> findByAvaliadoCdUsuarioAndNotaIsNotNull(Long cdUsuario);
+
+    // Busca todas as avaliações de uma transação
+    List<Avaliacao> findByTransacaoId(Long cdTransacao);
+
+}

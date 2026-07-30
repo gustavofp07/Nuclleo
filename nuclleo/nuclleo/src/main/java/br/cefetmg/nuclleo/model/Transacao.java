@@ -23,7 +23,6 @@ import lombok.Data;
     }
 )
 public class Transacao {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
