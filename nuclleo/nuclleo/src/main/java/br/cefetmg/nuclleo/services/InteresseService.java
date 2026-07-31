@@ -58,11 +58,11 @@ public class InteresseService {
 
     @Transactional(readOnly = true)
     public List<Interesse> listarPorUsuario(Long id) {
-        return interesseRepository.findByUsuarioId(id);
+        return interesseRepository.findByUsuarioCdUsuario(id);
     }
 
     @Transactional(readOnly = true)
     public List<Interesse> listarPorAnuncio(Long id) {
-        return interesseRepository.findByAnuncioId(id);
+        return interesseRepository.findByAnuncioCdAnuncio(id);
     }
 }

@@ -38,7 +38,7 @@ public class Anuncio {
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao; //tipo TEXT no banco?
 
-    @Column(name = "habilitado", columnDefinition = "TINYINT(1) DEFAULT 1")
+    @Column(name = "habilitado", columnDefinition = "boolean DEFAULT true")
     private boolean habilitado = true;
 
     

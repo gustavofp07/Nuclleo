@@ -10,8 +10,12 @@ import br.cefetmg.nuclleo.model.Interesse;
 @Repository
 public interface InteresseRepository extends JpaRepository<Interesse, Long>  {
 
-    List<Interesse> findByUsuarioId(Long id);
+    //List<Interesse> findByUsuarioId(Long id);
 
-    List<Interesse> findByAnuncioId(Long id);
+    //List<Interesse> findByAnuncioId(Long id);
+
+    List<Interesse> findByUsuarioCdUsuario(Long cdUsuario);
+
+    List<Interesse> findByAnuncioCdAnuncio(Long cdAnuncio);
 
 }

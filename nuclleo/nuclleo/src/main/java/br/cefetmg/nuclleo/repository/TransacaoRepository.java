@@ -10,8 +10,8 @@ import br.cefetmg.nuclleo.model.Transacao;
 @Repository
 public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
-    List<Transacao> findByUsuarioId(Long id);
+    List<Transacao> findByUsuarioCdUsuario(Long cdUsuario);
 
-    List<Transacao> findByAnuncioId(Long id);
+    List<Transacao> findByAnuncioCdAnuncio(Long cdAnuncio);
 
 }

@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "NuclleoApplication",
+            "request": "launch",
+            "mainClass": "br.cefetmg.nuclleo.NuclleoApplication",
+            "env": {
+                "DATABASE_URL": "jdbc:postgresql://ep-muddy-shadow-acv1fm6m-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require",
+                "DATABASE_USERNAME": "neondb_owner",
+                "DATABASE_PASSWORD": "npg_awMFiHqvS97e"
+            }
+        }
+    ]
+}

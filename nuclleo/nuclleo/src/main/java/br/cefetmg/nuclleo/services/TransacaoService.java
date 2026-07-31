@@ -32,12 +32,15 @@ public class TransacaoService {
         Usuario usuario = usuarioService.buscarPorId(dto.getCdUsuario());
         Anuncio anuncio = anuncioService.buscarPorId(dto.getCdAnuncio());
 
-        // passar o id do usuário logado para o backend e verificar se é o mesmo do usuário dono do anúncio
+        // passar o id do usuário logado para o backend e verificar se é o mesmo do
+        // usuário dono do anúncio
         /*
-        if (anuncio.getUsuarioCria().getCdUsuario().equals(cdUsuarioLogado.getCdUsuario())) {
-            throw new IllegalArgumentException("Usuário incorrespondente.");
-        }
-            */
+         * if
+         * (anuncio.getUsuarioCria().getCdUsuario().equals(cdUsuarioLogado.getCdUsuario(
+         * ))) {
+         * throw new IllegalArgumentException("Usuário incorrespondente.");
+         * }
+         */
 
         Transacao transacao = new Transacao();
         transacao.setValor(dto.getValor());
@@ -55,17 +58,16 @@ public class TransacaoService {
 
     @Transactional(readOnly = true)
     public Transacao buscarPorId(Long id) {
-        return transacaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
+        return transacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
     }
 
-    @Transactional(readOnly = true)
     public List<Transacao> listarPorUsuario(Long id) {
-        return transacaoRepository.findByUsuarioId(id);
+        return transacaoRepository.findByUsuarioCdUsuario(id);
     }
 
-    @Transactional(readOnly = true)
     public List<Transacao> listarPorAnuncio(Long id) {
-        return transacaoRepository.findByAnuncioId(id);
+        return transacaoRepository.findByAnuncioCdAnuncio(id);
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +77,8 @@ public class TransacaoService {
 
     @Transactional
     public void excluir(Long id) {
-        Transacao transacao = transacaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
+        Transacao transacao = transacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
         transacaoRepository.delete(transacao);
     }
 }
