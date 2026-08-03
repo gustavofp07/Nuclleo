@@ -3,12 +3,11 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import br.cefetmg.nuclleo.exception.ConflictException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.model.UsuarioComunidade;
@@ -40,7 +39,7 @@ public class UsuarioComunidadeService {
         boolean existe = repository.existsByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade);
 
         if (existe) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Usuário já participa desta comunidade.");
+            throw new ConflictException("Usuário já participa desta comunidade.");
         }
 
         UsuarioComunidade usuarioComunidade = new UsuarioComunidade();
@@ -55,7 +54,7 @@ public class UsuarioComunidadeService {
        boolean existe = repository.existsByUsuarioCdUsuarioAndComunidadeCdComunidade(usuario.getCdUsuario(), comunidade.getCdComunidade());
 
         if (existe) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Usuário já participa desta comunidade.");
+            throw new ConflictException("Usuário já participa desta comunidade.");
         }
 
         UsuarioComunidade usuarioComunidade = new UsuarioComunidade();

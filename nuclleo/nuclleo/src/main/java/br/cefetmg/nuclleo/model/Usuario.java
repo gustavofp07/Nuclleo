@@ -11,16 +11,10 @@ import jakarta.persistence.Table;
 //import jakarta.persistence.Version;
 
 import lombok.AllArgsConstructor;
-//import lombok.Data;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
-//@Data
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "tb_usuario")// é aqui que se define o nome da tabela no banco de dados

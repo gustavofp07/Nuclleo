@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -35,7 +35,7 @@ public class UsuarioController {
         //depois verificar se o usuário (email) já existe, se não existir, insere. Se existir, ou mostra o erro, ou reativa a conta, pois não há excusão de usuário, apenas desativação.
 
         if (usuario == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário é obrigatório");
+            throw new BadRequestException("Usuário é obrigatório");
         }
 
         if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
@@ -50,7 +50,7 @@ public class UsuarioController {
     @Operation(summary = "Atualizar usuário")
     public ResponseEntity<Usuario> alterar(@RequestBody Usuario usuario) {
         if (usuario.getCdUsuario() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         Usuario objUsuario = usuarioService.alterar(usuario);

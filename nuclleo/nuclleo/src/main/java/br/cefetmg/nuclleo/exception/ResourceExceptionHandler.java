@@ -46,6 +46,57 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<StandardError> badRequest(
+            BadRequestException e,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "Requisição inválida",
+                e.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<StandardError> unauthorized(
+            UnauthorizedException e,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "Não autorizado",
+                e.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<StandardError> conflict(
+            ConflictException e,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "Conflito",
+                e.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<StandardError> business(
             BusinessException e,

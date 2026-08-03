@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.AnuncioRequerimento;
 import br.cefetmg.nuclleo.services.AnuncioRequerimentoService;
 
@@ -46,7 +46,7 @@ public class AnuncioRequerimentoController {
     @Operation(summary = "Atualizar anúncio de requerimento")
     public ResponseEntity<AnuncioRequerimento> alterar(@RequestBody AnuncioRequerimento anuncio) {
         if (anuncio.getCdAnuncio() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         AnuncioRequerimento objAnuncio = anuncioRequerimentoService.alterar(anuncio);
@@ -64,7 +64,7 @@ public class AnuncioRequerimentoController {
     @Operation(summary = "Buscar anúncio de requerimento por ID")
     public ResponseEntity<AnuncioRequerimento> getAnuncioById(@PathVariable Long cdAnuncio) {
         if (cdAnuncio == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         AnuncioRequerimento anuncio = anuncioRequerimentoService.buscarAnuncioPorId(cdAnuncio);
@@ -78,18 +78,4 @@ public class AnuncioRequerimentoController {
         return ResponseEntity.ok(anuncios);
     }
 
-    /*
-    @DeleteMapping("/{cdAnuncio}")
-    public ResponseEntity<AnuncioRequerimento> excluir(@PathVariable Long cdAnuncio) {
-        AnuncioRequerimento anuncio = this.repository.findById(cdAnuncio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anúncio não encontrado."));
-
-        try {
-            this.repository.delete(anuncio);
-            return ResponseEntity.ok(anuncio);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o anúncio.");
-        }
-    }
-        */
 }

@@ -3,10 +3,9 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.AnuncioVenda;
 import br.cefetmg.nuclleo.repository.AnuncioVendaRepository;
 
@@ -35,7 +34,7 @@ public class AnuncioVendaService {
     @Transactional(readOnly = true)
     public AnuncioVenda buscarAnuncioPorId(Long cdAnuncio) {
         return anuncioVendaRepository.findById(cdAnuncio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anúncio de venda não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Anúncio de venda não encontrado."));
     }
 
     @Transactional(readOnly = true)

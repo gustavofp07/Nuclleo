@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.AnuncioVenda;
 import br.cefetmg.nuclleo.services.AnuncioVendaService;
 
@@ -48,7 +48,7 @@ public class AnuncioVendaController {
     @Operation(summary = "Atualizar anúncio de venda")
     public ResponseEntity<AnuncioVenda> alterar(@Valid @RequestBody AnuncioVenda anuncio) {
         if (anuncio.getCdAnuncio() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         AnuncioVenda objAnuncio = anuncioVendaService.alterar(anuncio);
@@ -77,18 +77,4 @@ public class AnuncioVendaController {
         return ResponseEntity.ok(anuncios);
     }
 
-    /*
-    @DeleteMapping("/{cdAnuncio}")
-    public ResponseEntity<AnuncioVenda> excluir(@PathVariable Long cdAnuncio) {
-        AnuncioVenda anuncio = this.repository.findById(cdAnuncio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anúncio não encontrado."));
-
-        try {
-            this.repository.delete(anuncio);
-            return ResponseEntity.ok(anuncio);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o anúncio.");
-        }
-    }
-        */
 }

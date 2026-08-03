@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+ 
+import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.services.AnuncioService;
 
@@ -40,7 +41,7 @@ public class AnuncioController {
     @PutMapping("")
     public Anuncio alterar(@RequestBody Anuncio anuncio) {
         if (anuncio.getCdAnuncio() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
         return this.repository.save(anuncio);
     }
@@ -56,6 +57,9 @@ public class AnuncioController {
     @GetMapping("/{cdAnuncio}")     
     @Operation(summary = "Buscar anúncio por id")
     public ResponseEntity<Anuncio> getAnuncioById(@PathVariable Long cdAnuncio) {
+        if (cdAnuncio == null) {
+            throw new BadRequestException("Id é obrigatório");
+        }
 
         Anuncio objAnuncio = anuncioService.buscarPorId(cdAnuncio);
         return ResponseEntity.ok(objAnuncio);

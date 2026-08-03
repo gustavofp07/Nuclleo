@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.services.ComunidadeService;
 
@@ -62,7 +62,7 @@ public class ComunidadeController {
     public ResponseEntity<Comunidade> alterar(@PathVariable Long cdComunidade, @Valid @RequestBody Comunidade comunidade) {
 
         if (cdComunidade == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         Comunidade objComunidade = comunidadeService.alterar(cdComunidade, comunidade);
@@ -88,7 +88,7 @@ public class ComunidadeController {
     @Operation(summary = "Obter comunidade por id")
     public ResponseEntity<Comunidade> getComunidadeById(@PathVariable Long cdComunidade) {
         if (cdComunidade == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
         
         Comunidade comunidade = comunidadeService.buscarPorId(cdComunidade);
@@ -99,7 +99,7 @@ public class ComunidadeController {
     @Operation(summary = "Obter comunidades por usuário")
     public ResponseEntity<List<Comunidade>> getComunidadesUsuario(@PathVariable Long cdUsuario) {
         if (cdUsuario == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
+            throw new BadRequestException("Id é obrigatório");
         }
 
         List<Comunidade> comunidades = comunidadeService.getComunidadesPorUsuario(cdUsuario);

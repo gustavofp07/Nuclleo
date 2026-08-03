@@ -3,10 +3,9 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.ComunidadeRepository;
@@ -49,7 +48,7 @@ public class ComunidadeService {
     @Transactional
     public Comunidade alterar(Long cdComunidade, Comunidade comunidade) {
         Comunidade objComunidade = comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
 
         objComunidade.setNmComunidade(comunidade.getNmComunidade());
         objComunidade.setDescricao(comunidade.getDescricao());
@@ -62,7 +61,7 @@ public class ComunidadeService {
     @Transactional
     public Comunidade excluir(Long cdComunidade) {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
 
                 
         // Deletar nas tabelas N:N
@@ -84,7 +83,7 @@ public class ComunidadeService {
     @Transactional(readOnly = true)
     public Comunidade buscarPorId(Long cdComunidade) {
         return comunidadeRepository.findById(cdComunidade)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunidade não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
     }
 
     @Transactional(readOnly = true)

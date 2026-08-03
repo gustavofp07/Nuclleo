@@ -1,10 +1,11 @@
 package br.cefetmg.nuclleo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.DatabaseException;
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
@@ -65,7 +66,8 @@ public class UsuarioService {
     public Usuario excluir(Long cdUsuario) {
         //Não apaga o usuário, apenas desativa
 
-        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
             
         try {
@@ -73,14 +75,15 @@ public class UsuarioService {
             usuario.setAtivo(false);
             usuarioRepository.save(usuario);
             return usuario;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o usuário.");
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Não foi possível excluir o usuário.");
         }
     }
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long cdUsuario) {
-        return usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+        return usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 
 }

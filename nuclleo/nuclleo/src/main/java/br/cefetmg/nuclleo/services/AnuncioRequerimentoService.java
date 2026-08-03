@@ -3,10 +3,9 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.AnuncioRequerimento;
 import br.cefetmg.nuclleo.repository.AnuncioRequerimentoRepository;
 
@@ -36,7 +35,7 @@ public class AnuncioRequerimentoService {
     @Transactional(readOnly = true)
     public AnuncioRequerimento buscarAnuncioPorId(Long cdAnuncio) {
         return anuncioRequerimentoRepository.findById(cdAnuncio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Anúncio de requerimento não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Anúncio de requerimento não encontrado."));
     }
 
     @Transactional(readOnly = true)
