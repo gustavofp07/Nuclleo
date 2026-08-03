@@ -17,6 +17,12 @@ public class UsuarioService {
 
     @Transactional
     public Usuario inserir(Usuario usuario) {
+
+        usuario.setAtivo(true);
+
+        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
+        usuario.setDtEntrada(data);
+
         /*
          * if (usuario.existsByNome(dto.getNome())) {
          * throw new BusinessException("Já existe um jogador com esse nome.");
@@ -57,11 +63,15 @@ public class UsuarioService {
 
     @Transactional
     public Usuario excluir(Long cdUsuario) {
-        Usuario usuario = usuarioRepository.findById(cdUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+        //Não apaga o usuário, apenas desativa
 
+        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+            
         try {
-            usuarioRepository.delete(usuario);
+            //usuarioRepository.delete(usuario);
+            usuario.setAtivo(false);
+            usuarioRepository.save(usuario);
             return usuario;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o usuário.");
@@ -70,8 +80,7 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorId(Long cdUsuario) {
-        return usuarioRepository.findById(cdUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+        return usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
     }
 
 }

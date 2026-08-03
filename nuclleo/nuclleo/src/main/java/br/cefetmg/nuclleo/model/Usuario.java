@@ -63,5 +63,8 @@ public class Usuario {
 
     @Column(name = "telefone")
     private String telefone;
+
+    @Column(name = "ativo")
+    private boolean ativo;
 }
 

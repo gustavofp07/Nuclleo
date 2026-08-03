@@ -32,12 +32,15 @@ public class UsuarioController {
     @PostMapping("")
     @Operation(summary = "Cadastrar usuário")
     public ResponseEntity<Usuario> inserir(@Valid @RequestBody Usuario usuario) {
+        //depois verificar se o usuário (email) já existe, se não existir, insere. Se existir, ou mostra o erro, ou reativa a conta, pois não há excusão de usuário, apenas desativação.
+
+        if (usuario == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário é obrigatório");
+        }
+
         if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
             usuario.setCdUsuario(null);
         }
-
-        java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
-        usuario.setDtEntrada(data);
 
         Usuario objUsuario = usuarioService.inserir(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
@@ -50,7 +53,6 @@ public class UsuarioController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
         }
 
-        //JogadorResponseDTO jogadorResponseDTO = jogadorService.atualizar(id, jogadorRequestDTO);
         Usuario objUsuario = usuarioService.alterar(usuario);
         return ResponseEntity.ok(objUsuario);
     }    
@@ -69,62 +71,5 @@ public class UsuarioController {
         return ResponseEntity.ok(objUsuario);
         //return this.repository.findById(cdUsuario).orElse(null);
     }
-
-    /*
-    @GetMapping
-    @Operation(summary = "Listar jogadores")
-    public ResponseEntity<List<JogadorResponseDTO>> listar() {
-        List<JogadorResponseDTO> jogadores = jogadorService.listar();
-        return ResponseEntity.ok(jogadores);
-    }
-
-
-
-
-     * @PostMapping("")
-     * public Usuario inserir(@RequestBody Usuario usuario) {
-     * if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
-     * usuario.setCdUsuario(null);
-     * }
-     * 
-     * java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
-     * usuario.setDtEntrada(data);
-     * 
-     * return this.repository.save(usuario);
-     * }
-     
-
-    @GetMapping("") // http://localhost:8080/api/v1/usuarios
-    public List<Usuario> getUsuarios() {
-        return this.repository.findAll();
-    }
-
-    @GetMapping("/{cdUsuario}") // http://localhost:8080/api/v1/usuarios/numerodoId
-    public Usuario getUsuarioById(@PathVariable Long cdUsuario) {
-        return this.repository.findById(cdUsuario).orElse(null);
-    }
-
-    @DeleteMapping("/{cdUsuario}")
-    public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
-        Usuario usuario = this.repository.findById(cdUsuario)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
-
-        try {
-            this.repository.delete(usuario);
-            return ResponseEntity.ok(usuario);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não foi possível excluir o usuário.");
-        }
-    }
-
-    @PutMapping("")
-    public Usuario alterar(@RequestBody Usuario usuario) {
-        if (usuario.getCdUsuario() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id é obrigatório");
-        }
-
-        return this.repository.save(usuario);
-    }
-        */
 
 }
