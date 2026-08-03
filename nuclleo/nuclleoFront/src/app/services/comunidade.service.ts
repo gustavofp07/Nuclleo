@@ -12,7 +12,7 @@ import { ComunidadeModel } from '../model/comunidade.model';
 
 export class ComunidadeService {
 
-  private readonly API_URL = 'http://localhost:8080/api/v1/comunidades';
+  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/comunidades';
   //private api = 'http://localhost:8080/api/v1/comunidades';
 
   constructor(

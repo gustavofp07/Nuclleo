@@ -10,7 +10,7 @@ import { ComunidadeModel } from '../model/comunidade.model';
   providedIn: 'root',
 })
 export class UsuarioComunidadeService {
-  private readonly API_URL = 'http://localhost:8080/api/v1/usuarioComunidade';
+  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/usuarioComunidade';
 
   constructor(private http: HttpClient) {
   }

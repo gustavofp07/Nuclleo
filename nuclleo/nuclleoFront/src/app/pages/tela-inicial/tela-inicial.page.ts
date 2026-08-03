@@ -100,7 +100,7 @@ export class TelaInicialPage implements OnInit {
   carregarComunidades() {
 
     this.http.get<any[]>(
-      'http://localhost:8080/api/v1/comunidades'
+      'https://nuclleo.onrender.com/api/v1/comunidades'
     ).subscribe({
       next: (dados) => {
 

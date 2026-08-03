@@ -12,7 +12,7 @@ import { UsuarioAutenticadoModel } from '../model/usuario-autenticado.model';
   providedIn: 'root',
 })
 export class LoginService {
-  private api = 'http://localhost:8080/api/v1/autenticar';
+  private api = 'https://nuclleo.onrender.com/api/v1/autenticar';
 
   constructor(private http: HttpClient) { }
 

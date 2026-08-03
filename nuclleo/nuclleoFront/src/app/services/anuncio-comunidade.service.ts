@@ -12,7 +12,7 @@ import { AnuncioModel } from '../model/anuncio.model';
   providedIn: 'root',
 })
 export class AnuncioComunidadeService {
-  private readonly API_URL = 'http://localhost:8080/api/v1/anuncioComunidade';
+  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/anuncioComunidade';
 
   constructor(private http: HttpClient) {
   }
