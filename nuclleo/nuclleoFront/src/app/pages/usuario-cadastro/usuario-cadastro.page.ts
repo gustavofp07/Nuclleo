@@ -99,17 +99,21 @@ export class UsuarioCadastroPage implements OnInit {
     }
 
     if (this.usuario.senha !== this.confirmarSenha) {
+
       this.exibirMensagem(
         'As senhas não coincidem!'
       );
       return;
     }
-
+    
     this.usuarioService
       .cadastrarUsuario(this.usuario)
       .subscribe({
 
         next: async () => {
+
+          console.log("Sucesso");
+
 
           await this.exibirMensagem(
             'Cadastro realizado com sucesso!'
@@ -120,6 +124,8 @@ export class UsuarioCadastroPage implements OnInit {
         },
 
         error: async (err) => {
+
+          console.log("Erro");
 
           console.error(err);
 

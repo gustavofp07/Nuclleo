@@ -10,9 +10,9 @@ import { AnuncioModel } from '../model/anuncio.model';
   providedIn: 'root'
 })
 export class AnuncioService {
-  private readonly API_URL = 'http://localhost:8080/api/v1/anuncios';
-  private readonly API_URL_VENDA = 'http://localhost:8080/api/v1/anuncios/vendas';
-  private readonly API_URL_REQUERIMENTO = 'http://localhost:8080/api/v1/anuncios/requerimentos';
+  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/anuncios';
+  private readonly API_URL_VENDA = 'https://nuclleo.onrender.com/api/v1/anuncios/vendas';
+  private readonly API_URL_REQUERIMENTO = 'https://nuclleo.onrender.com/api/v1/anuncios/requerimentos';
 
   constructor(
     private http: HttpClient
@@ -69,7 +69,7 @@ alterarRequerimento(anuncio: AnuncioRequerimentoModel): Observable<AnuncioRequer
 
     formData.append('arquivo', arquivo);
 
-    return this.http.post<any>('http://localhost:8080/api/v1/upload', formData);
+    return this.http.post<any>('https://nuclleo.onrender.com/api/v1/upload', formData);
   }
 
 }

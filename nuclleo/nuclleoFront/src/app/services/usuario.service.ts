@@ -9,7 +9,7 @@ import { UsuarioAutenticadoModel } from '../model/usuario-autenticado.model';
 })
 export class UsuarioService {
   private readonly KEY_USUARIO = 'usuarioAutenticado';
-  private readonly API_URL = 'http://localhost:8080/api/v1/usuarios';
+  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/usuarios';
 
   constructor(private http: HttpClient) { }
 
