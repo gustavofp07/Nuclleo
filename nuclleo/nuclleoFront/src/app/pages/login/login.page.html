@@ -3,14 +3,11 @@
   <div class="container">
 
     <!-- Logo / Nome -->
-<div class="brand">
+    <div class="brand">
 
-  <img
-    src="assets/img/logo.png"
-    alt="Logo Nuclleo"
-    class="logo">
-    
-</div>
+      <img src="assets/img/logo.png" alt="Logo Nuclleo" class="logo">
+
+    </div>
 
     <!-- Títulos -->
     <div class="copy">
@@ -24,12 +21,7 @@
       <!-- Email -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          type="email"
-          placeholder="E-mail"
-          [(ngModel)]="login.email"
-          name="email"
-          required>
+        <ion-input type="email" placeholder="E-mail" [(ngModel)]="login.email" name="email" required>
         </ion-input>
 
       </ion-item>
@@ -37,24 +29,14 @@
       <!-- Senha -->
       <ion-item lines="none" class="input-item">
 
-        <ion-input
-          [type]="showPassword ? 'text' : 'password'"
-          placeholder="Senha"
-          [(ngModel)]="login.senha"
-          name="password"
-          required>
+        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="login.senha"
+          name="password" required>
         </ion-input>
 
         <!-- OLHINHO -->
-        <ion-button
-          fill="clear"
-          slot="end"
-          type="button"
-          (click)="togglePassword()">
+        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
 
-          <ion-icon
-            slot="icon-only"
-            [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
           </ion-icon>
 
         </ion-button>
@@ -62,10 +44,7 @@
       </ion-item>
 
       <!-- Botão Login -->
-      <ion-button
-        expand="block"
-        type="submit"
-        class="btn-login">
+      <ion-button expand="block" type="submit" class="btn-login">
 
         Entrar
 
@@ -85,20 +64,14 @@
     </div>
 
     <!-- Google -->
-    <ion-button
-      expand="block"
-      fill="solid"
-      class="btn-google"
-      (click)="onGoogleLogin()">
+    <ion-button expand="block" fill="solid" class="btn-google" (click)="onGoogleLogin()">
 
       Continuar com Google
 
     </ion-button>
 
     <!-- Cadastro -->
-    <a
-      routerLink="/usuario-cadastro"
-      class="register-link">
+    <a routerLink="/usuario-cadastro" class="register-link">
 
       Não possuo uma conta
 

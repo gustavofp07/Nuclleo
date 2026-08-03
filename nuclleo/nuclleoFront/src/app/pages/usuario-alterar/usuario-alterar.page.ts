@@ -11,7 +11,8 @@ import {
   IonToolbar,
   IonButtons,
   IonMenuButton,
-  IonTitle
+  IonTitle,
+  IonLabel
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -37,7 +38,8 @@ import { UsuarioService } from 'src/app/services/usuario.service';
     IonToolbar,
     IonButtons,
     IonMenuButton,
-    IonTitle]
+    IonTitle,
+    IonLabel]
 })
 export class UsuarioAlterarPage implements OnInit {
   usuario: UsuarioModel;
