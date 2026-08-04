@@ -65,4 +65,9 @@ public class InteresseService {
     public List<Interesse> listarPorAnuncio(Long id) {
         return interesseRepository.findByAnuncioCdAnuncio(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<Interesse> listarPorInteressados(Long cdUsuario) {
+        return interesseRepository.findByAnuncioUsuarioCriaCdUsuario(cdUsuario);
+    }
 }

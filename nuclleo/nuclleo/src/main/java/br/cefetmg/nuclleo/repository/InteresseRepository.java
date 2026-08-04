@@ -18,4 +18,6 @@ public interface InteresseRepository extends JpaRepository<Interesse, Long>  {
 
     List<Interesse> findByAnuncioCdAnuncio(Long cdAnuncio);
 
+    List<Interesse> findByAnuncioUsuarioCriaCdUsuario(Long cdUsuario);
+
 }

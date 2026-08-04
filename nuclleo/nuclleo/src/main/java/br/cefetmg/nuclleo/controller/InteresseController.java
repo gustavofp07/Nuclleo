@@ -77,4 +77,14 @@ public class InteresseController {
         return ResponseEntity.ok(interesses);
     }
 
+    @GetMapping("/interessados/{cdUsuario}")
+    public ResponseEntity<List<Interesse>> listarPorInteressados(Long cdUsuario) {
+        if (cdUsuario == null) {
+            throw new IllegalArgumentException("O campo código do usuário é obrigatório.");
+        }
+
+        List<Interesse> interesses = interesseService.listarPorInteressados(cdUsuario);
+        return ResponseEntity.ok(interesses);
+    }
+
 }

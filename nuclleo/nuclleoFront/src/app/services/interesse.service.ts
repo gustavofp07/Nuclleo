@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { InteresseModel } from '../model/interesse.model';
 
 @Injectable({
   providedIn: 'root',
@@ -12,9 +13,13 @@ export class InteresseService {
 
   
   //tá retornando any. Mudar isso depois e criar um model de interesse
-  registrarInteresse(interesse: { cdUsuario: number; cdAnuncio: number; }): Observable<any> {
+  registrarInteresse(interesse: { cdUsuario: number; cdAnuncio: number; }): Observable<InteresseModel> {
     console.log('Registrando interesse: ', interesse);
-    return this.http.post<any>(`${this.URL}`, interesse);
+    return this.http.post<InteresseModel>(`${this.URL}`, interesse);
+  }
+
+  listarPorInteressados(cdUsuario: number): Observable<InteresseModel[]> {
+    return this.http.get<InteresseModel[]>(`${this.URL}/interessados/${cdUsuario}`);
   }
   
 }
