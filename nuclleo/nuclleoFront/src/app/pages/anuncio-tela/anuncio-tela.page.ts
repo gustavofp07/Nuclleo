@@ -12,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
+import { InteresseService } from 'src/app/services/interesse.service';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -48,8 +49,10 @@ export class AnuncioTelaPage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
+    private interesseService: InteresseService,
     private toastController: ToastController,
     private usuarioService: UsuarioService,
+    private alertController: AlertController,
     private router: Router,
     private anuncioComunidadeService: AnuncioComunidadeService,
   ) { }
@@ -99,6 +102,67 @@ export class AnuncioTelaPage implements OnInit {
       });
 
   }
+
+  registrarInteresse() {
+    const interesse = {
+      cdUsuario: this.usuarioLogado.cdUsuario,
+      cdAnuncio: this.anuncio.cdAnuncio
+    };
+
+    this.interesseService.registrarInteresse(interesse).subscribe({
+      next: (Interesse: any) => {
+        this.exibirMensagem('Interesse registrado com sucesso.');
+      },
+      error: (erro: any) => {
+        this.exibirMensagem('Erro! ' + erro.error.message);
+      }
+    });
+  }
+
+  async confirmarExclusao() {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Exclusão',
+      message: 'Deseja realmente excluir este anúncio?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Excluir',
+          role: 'destructive',
+          handler: () => {
+            this.excluirAnuncio();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async confirmarInteresse() {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Interesse',
+      message: 'Deseja realmente manifestar interesse neste anúncio?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirmar',
+          role: 'confirm',
+          handler: () => {
+            this.registrarInteresse();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
 
   async exibirMensagem(msg: string) {
     const toast = await this.toastController.create({

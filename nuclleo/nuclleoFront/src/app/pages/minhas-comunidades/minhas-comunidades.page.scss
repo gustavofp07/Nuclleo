@@ -152,8 +152,6 @@ ion-toolbar {
   text-align: center;
 
   padding: 60px 20px;
-
-  margin-bottom: 30px;
 }
 
 .empty-state ion-icon {
@@ -199,13 +197,11 @@ ion-toolbar {
   );
 
   --color: #ffffff;
-
   --border-radius: 16px;
 
   height: 54px;
 
   font-weight: 700;
-
   font-size: 15px;
 
   text-transform: uppercase;
@@ -213,7 +209,7 @@ ion-toolbar {
   letter-spacing: 0.5px;
 
   overflow: hidden;
-
+  margin-bottom: 30px;
 }
 
 .btn-criar::part(native) {

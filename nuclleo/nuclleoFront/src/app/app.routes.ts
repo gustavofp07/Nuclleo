@@ -31,20 +31,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/usuario-alterar/usuario-alterar.page').then(m => m.UsuarioAlterarPage)
   },
   {
-    path: 'minhas-comunidades',
-    loadComponent: () => import('./pages/minhas-comunidades/minhas-comunidades.page').then(m => m.MinhasComunidadesPage)
-  },
-  {
     path: 'criar-comunidade',
     loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then(m => m.CriarComunidadePage)
   },
   {
     path: 'minhas-comunidades',
     loadComponent: () => import('./pages/minhas-comunidades/minhas-comunidades.page').then(m => m.MinhasComunidadesPage)
-  },
-  {
-    path: 'criar-comunidade',
-    loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then(m => m.CriarComunidadePage)
   },
   {
     path: 'criar-comunidade/:cdComunidade',

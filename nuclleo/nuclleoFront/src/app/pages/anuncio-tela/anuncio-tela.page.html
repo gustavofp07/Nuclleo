@@ -11,8 +11,6 @@
 <ion-content [fullscreen]="true" class="anuncio-content">
 
   <div class="container">
-
-
     <div class="dados-anuncio">
 
       <h2>
@@ -25,16 +23,13 @@
       </h2>
 
       <div class="foto-anuncio-container">
-
         <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
-
       </div>
 
     </div>
 
     <div class="info-box">
       <h3>Descrição</h3>
-
       <p>
         {{ anuncio.descricao }}
       </p>
@@ -45,7 +40,6 @@
 
       <div class="info-item">
         <ion-icon name="person-outline"></ion-icon>
-
         <span>
           Criado por {{ anuncio.usuarioCria.nmUsuario }}
         </span>
@@ -53,7 +47,6 @@
 
       <div class="info-item">
         <ion-icon name="mail-outline"></ion-icon>
-
         <span>
           {{ anuncio.usuarioCria.email }}
         </span>
@@ -66,30 +59,21 @@
 
         <ion-button expand="block" fill="outline" color="medium" class="btn-editar"
           [routerLink]="['/criar-anuncio', anuncio.tipoAnuncio, anuncio.cdAnuncio]">
-
           <ion-icon name="create-outline" slot="start"></ion-icon>
-
           Editar anúncio
-
         </ion-button>
 
-        <ion-button expand="block" fill="outline" color="danger" class="btn-excluir" (click)="excluirAnuncio()">
-
+        <ion-button expand="block" fill="outline" color="danger" class="btn-excluir" (click)="confirmarExclusao()">
           <ion-icon name="trash-outline" slot="start"></ion-icon>
-
           Excluir anúncio
-
         </ion-button>
       </div>
 
       <ng-template #botoesVisitante>
 
-        <ion-button expand="block" class="btn-contato">
-
+        <ion-button expand="block" class="btn-contato" (click)="confirmarInteresse()">
           <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-
           Estou interessado
-
         </ion-button>
 
       </ng-template>

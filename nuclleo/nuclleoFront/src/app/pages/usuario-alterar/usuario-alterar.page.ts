@@ -12,7 +12,8 @@ import {
   IonButtons,
   IonMenuButton,
   IonTitle,
-  IonLabel
+  IonLabel,
+  AlertController
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -49,7 +50,8 @@ export class UsuarioAlterarPage implements OnInit {
 
   constructor(
     private router: Router,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private alertController: AlertController
   ) {
 
     addIcons({
@@ -129,18 +131,39 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   salvarAlteracoes() {
-    console.log(this.usuario);
-
-
+    //console.log(this.usuario);
     this.usuarioService.atualizar(this.usuario).subscribe({
       next: async (usuario: UsuarioModel) => {
         console.log("atualizou ", usuario);
+        //mudar a lógica para atualizar o usuário na sessão
         this.router.navigate(['/login']);
       },
-      error: async () => {
-        console.error('Erro ao logar');
+      error: async (erro) => {
+        console.error('Erro! ', erro.error?.message);
       }
     });
+  }
+
+  async confirmarAlteracoes() {
+    const alert = await this.alertController.create({
+        header: 'Confirmar Alterações',
+        message: 'Deseja realmente salvar as alterações?',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Excluir',
+            role: 'destructive',
+            handler: () => {
+              this.salvarAlteracoes();
+            }
+          }
+        ]
+      });
+
+    await alert.present();
   }
 
   cancelar() {

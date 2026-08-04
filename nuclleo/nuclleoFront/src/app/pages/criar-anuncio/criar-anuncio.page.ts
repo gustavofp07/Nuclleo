@@ -184,7 +184,7 @@ export class CriarAnuncioPage {
 
       if (this.tipo === 'VENDA') {
 
-        this.anuncioService.alterarVenda(this.anuncio as any).subscribe({
+        this.anuncioService.alterarVenda(this.anuncio as AnuncioVendaModel).subscribe({
           next: () => {
             this.atualizarComunidadesDoAnuncio();
           },
@@ -195,7 +195,7 @@ export class CriarAnuncioPage {
 
       } else {
 
-        this.anuncioService.alterarRequerimento(this.anuncio as any).subscribe({
+        this.anuncioService.alterarRequerimento(this.anuncio as AnuncioRequerimentoModel).subscribe({
           next: () => {
             this.atualizarComunidadesDoAnuncio();
           },
@@ -207,12 +207,14 @@ export class CriarAnuncioPage {
       }
 
       return;
-    }
-
-    if (this.tipo === 'VENDA') {
-      this.cadastrarVenda();
     } else {
-      this.cadastrarRequerimento();
+
+      if (this.tipo === 'VENDA') {
+        this.cadastrarVenda();
+      } else {
+        this.cadastrarRequerimento();
+      }
+
     }
 
   }
@@ -380,30 +382,3 @@ export class CriarAnuncioPage {
     await toast.present();
   }
 }
-
-/*
-    const anuncio = {
-      nmAnuncio: this.nmAnuncio,
-      descricao: this.descricao,
-      ftAnuncio: '',
-      valorMin: this.valorMin,
-      valorMax: this.valorMax,
-      tipoAnuncio: 'REQUERIMENTO',
-      usuarioCria: this.usuarioService.getUsuarioSessao(),
-      comunidades: this.comunidadesSelecionadas
-    };
-
-    
-    */
-
-/*
-const anuncio = {
-  nmAnuncio: this.nmAnuncio,
-  descricao: this.descricao,
-  ftAnuncio: '',
-  valor: this.valor,
-  tipoAnuncio: 'VENDA',
-  usuarioCria: this.usuarioService.getUsuarioSessao(),
-  comunidades: this.comunidadesSelecionadas
-};
-*/

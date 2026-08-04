@@ -20,16 +20,12 @@
     <div class="abas">
 
       <button [class.ativo]="abaSelecionada === 'perfil'" (click)="selecionarAba('perfil')">
-
         Perfil
-
       </button>
 
       <button [class.ativo]="abaSelecionada === 'chat'" [disabled]="!usuarioEntrouNaComunidade"
         (click)="selecionarAba('chat')">
-
         Chat
-
       </button>
 
       <button [class.ativo]="abaSelecionada === 'anuncios'" [disabled]="!usuarioEntrouNaComunidade"
@@ -62,39 +58,27 @@
       <!-- DESCRICAO -->
 
       <div class="info-box">
-
         <h3>Descrição</h3>
-
         <p>
           {{ comunidade.descricao }}
         </p>
-
       </div>
 
       <!-- INFORMACOES -->
-
       <div class="info-box">
-
         <div class="info-item">
-
           <ion-icon name="calendar-outline"></ion-icon>
-
           <span>
             Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
           </span>
-
         </div>
 
         <div class="info-item">
-
           <ion-icon name="person-outline"></ion-icon>
-
           <span>
             Criada por {{ comunidade.usuarioCria.nmUsuario }}
           </span>
-
         </div>
-
       </div>
 
       <!-- ACOES ADMIN -->
@@ -104,14 +88,11 @@
         <ion-button fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
           <ion-icon name="settings-outline" slot="start">
           </ion-icon>
-
           Editar comunidade
         </ion-button>
 
         <ion-button fill="outline" color="danger" (click)="confirmarExclusao()">
-          <ion-icon name="trash-outline" slot="start">
-          </ion-icon>
-
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
           Excluir comunidade
         </ion-button>
 

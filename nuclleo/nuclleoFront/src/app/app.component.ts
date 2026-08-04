@@ -21,7 +21,9 @@ import {
   IonHeader,
   IonTitle,
   IonIcon,
-  IonMenu
+  IonMenu,
+  IonAccordion,
+  IonAccordionGroup
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -34,6 +36,7 @@ import {
   createOutline,
   eyeOffOutline,
   eyeOutline,
+  heartOutline,
   home,
   homeOutline,
   imageOutline,
@@ -44,7 +47,10 @@ import {
   peopleOutline,
   settingsOutline,
   trashOutline,
-  chevronBackOutline
+  chevronBackOutline,
+  megaphoneOutline,
+  pricetagOutline,
+  handLeftOutline
 } from 'ionicons/icons';
 
 
@@ -56,7 +62,6 @@ import {
 
   imports: [
     RouterLink,
-
     IonApp,
     IonRouterOutlet,
     IonToolbar,
@@ -67,7 +72,9 @@ import {
     IonHeader,
     IonTitle,
     IonIcon,
-    IonMenu
+    IonMenu,
+    IonAccordion,
+    IonAccordionGroup
   ],
 })
 
@@ -85,6 +92,7 @@ export class AppComponent {
       createOutline,
       eyeOffOutline,
       eyeOutline,
+      heartOutline,
       home,
       homeOutline,
       imageOutline,
@@ -95,7 +103,10 @@ export class AppComponent {
       peopleOutline,
       settingsOutline,
       trashOutline,
-      chevronBackOutline
+      chevronBackOutline,
+      megaphoneOutline,
+      pricetagOutline,
+      handLeftOutline
     });
 
     this.router.events

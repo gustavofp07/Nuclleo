@@ -152,8 +152,7 @@ export class ComunidadePerfilPage implements OnInit {
       return;
     }
 
-    const alert =
-      await this.alertController.create({
+    const alert = await this.alertController.create({
         header: 'Excluir comunidade',
         message: 'Deseja realmente excluir essa comunidade?',
         buttons: [

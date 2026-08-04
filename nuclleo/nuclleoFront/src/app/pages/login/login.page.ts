@@ -92,8 +92,9 @@ export class LoginPage implements OnInit {
 
         this.router.navigate(['/tela-inicial']);
       },
-      error: async () => {
-        await this.exibirMensagem('Erro ao logar!');
+      error: async (erro: any) => {
+        console.error('Erro ao logar:', erro);
+        await this.exibirMensagem('Erro! ' + erro?.error?.message);
       }
     });
 

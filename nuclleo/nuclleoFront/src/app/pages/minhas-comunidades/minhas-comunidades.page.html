@@ -22,6 +22,9 @@
         <p>Veja as comunidades que voce participa e gerencie as que voce criou</p>
       </div>
 
+      <!-- BOTAO -->
+      <ion-button expand="block" class="btn-criar" routerLink="/criar-comunidade">Criar nova comunidade</ion-button>
+
       <!-- LISTA -->
       <div class="lista-comunidades" *ngIf="comunidades.length > 0">
         <button class="comunidade-card" type="button" *ngFor="let comunidade of comunidades"
@@ -53,16 +56,7 @@
         </p>
 
       </div>
-
-      <!-- BOTAO -->
-      <ion-button expand="block" class="btn-criar" routerLink="/criar-comunidade">
-
-        Criar comunidade
-
-      </ion-button>
-
     </div>
 
   </ion-content>
-
 </div>
