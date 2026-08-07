@@ -5,6 +5,7 @@ export class AnuncioModel {
     nmAnuncio: string;
     descricao: string;
     tipoAnuncio: string;
+    habilitado: boolean;
     usuarioCria: UsuarioModel;
 
     constructor() {
@@ -12,6 +13,7 @@ export class AnuncioModel {
         this.nmAnuncio = '';
         this.descricao = '';
         this.tipoAnuncio = '';
+        this.habilitado = true;
         this.usuarioCria = new UsuarioModel();
     }
 }

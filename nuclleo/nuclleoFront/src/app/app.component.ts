@@ -50,7 +50,7 @@ import {
   chevronBackOutline,
   megaphoneOutline,
   pricetagOutline,
-  handLeftOutline
+  cartOutline
 } from 'ionicons/icons';
 
 
@@ -106,7 +106,7 @@ export class AppComponent {
       chevronBackOutline,
       megaphoneOutline,
       pricetagOutline,
-      handLeftOutline
+      cartOutline
     });
 
     this.router.events

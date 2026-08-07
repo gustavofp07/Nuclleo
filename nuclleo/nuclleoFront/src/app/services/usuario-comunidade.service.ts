@@ -30,13 +30,9 @@ export class UsuarioComunidadeService {
     );
   }
 
-  /*
-    listarComunidadesPorUsuario(cdUsuario: number): Observable<UsuarioComunidadeModel[]> {
-      return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
-    }
-  
-    listarUsuariosPorComunidade(cdComunidade: number): Observable<UsuarioComunidadeModel[]> {
-      return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade/${cdComunidade}`);
-    }
-      */
+  listarUsuariosPorComunidade(cdComunidade: number): Observable<UsuarioComunidadeModel[]> {
+    const params = new HttpParams().set('cdComunidade', cdComunidade.toString());
+    return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade`, { params });
+  }
+
 }

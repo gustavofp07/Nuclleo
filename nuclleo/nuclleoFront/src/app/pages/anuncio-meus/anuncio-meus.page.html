@@ -1,0 +1,64 @@
+<div class="ion-page" id="main-content">
+
+  <!-- HEADER -->
+  <ion-header>
+    <ion-toolbar class="toolbar">
+
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+
+      <ion-title>{{ titulo }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- CONTEUDO -->
+  <ion-content [fullscreen]="true" class="anuncios-content">
+
+    <div class="container">
+      <!-- TOPO -->
+      <div class="topo">
+        <h1>{{ titulo }}</h1>
+        <p>{{ subtitulo }}</p>
+      </div>
+
+      <!-- BOTAO -->
+      <ion-button expand="block" class="btn-criar" [routerLink]="rotaCriar">Criar novo anúncio</ion-button>
+
+      <!-- LISTA -->
+      <div class="lista-anuncios" *ngIf="anuncios.length > 0">
+        <button class="anuncio-card" type="button" *ngFor="let anuncio of anuncios"
+          [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+
+          <div class="info">
+            <div class="titulo-anuncio">
+              <h2>{{ anuncio.nmAnuncio }}</h2>
+              <span class="dono-badge" *ngIf="usuarioEhDono(anuncio)">SEU</span>
+              <span class="status-badge" *ngIf="!anuncio.habilitado">INATIVO</span>
+            </div>
+            <p class="descricao">{{ anuncio.descricao }}</p>
+          </div>
+
+          <div class="acoes" *ngIf="usuarioEhDono(anuncio)">
+            <ion-button fill="clear" color="danger" (click)="$event.stopPropagation(); confirmarExclusao(anuncio)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+
+        </button>
+      </div>
+
+      <!-- VAZIO -->
+      <div class="empty-state" *ngIf="anuncios.length === 0">
+
+        <ion-icon [name]="icone"></ion-icon>
+
+        <h2>{{ tituloVazio }}</h2>
+
+        <p>{{ mensagemVazio }}</p>
+
+      </div>
+    </div>
+
+  </ion-content>
+</div>

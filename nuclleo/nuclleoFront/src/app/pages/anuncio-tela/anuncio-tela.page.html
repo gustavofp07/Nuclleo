@@ -41,7 +41,9 @@
       <div class="info-item">
         <ion-icon name="person-outline"></ion-icon>
         <span>
-          Criado por {{ anuncio.usuarioCria.nmUsuario }}
+          <a class="link-usuario" [routerLink]="['/usuario-perfil', anuncio.usuarioCria.cdUsuario]">
+              {{ anuncio.usuarioCria.nmUsuario }}
+            </a>
         </span>
       </div>
 

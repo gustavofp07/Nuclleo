@@ -173,3 +173,14 @@ ion-label p {
 
   color: #6b7280;
 }
+
+
+.descricao-clamp {
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}

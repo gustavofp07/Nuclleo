@@ -245,3 +245,13 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
+
+.link-usuario {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-usuario:hover {
+  text-decoration: underline;
+}

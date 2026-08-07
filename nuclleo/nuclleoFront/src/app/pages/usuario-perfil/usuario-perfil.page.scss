@@ -215,16 +215,60 @@
   border-radius: 999px;
 }
 
-.nivel1 {
-  background: #ddd6fe;
+.nivel {
+  background: #e5e7eb; 
+  transition: background 0.3s ease;
 }
 
-.nivel2 {
-  background: #a78bfa;
+.nivel.ativo {
+  background: #7c3aed; 
 }
 
-.nivel3 {
-  background: #7c3aed;
+.nivel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.nivel-header h3 {
+  margin: 0;
+
+  color: #111827;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.nivel-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+
+  padding: 4px 12px;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.validacao.pendente {
+  color: #9ca3af;
+}
+
+.validacao.pendente ion-icon {
+  color: #9ca3af;
+}
+
+.validacao a {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.validacao a:hover {
+  text-decoration: underline;
 }
 
 /* VALIDAÇÕES */

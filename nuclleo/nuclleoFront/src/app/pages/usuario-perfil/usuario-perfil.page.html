@@ -75,7 +75,7 @@
 
       </div>
 
-      <div class="acoes-perfil">
+      <div class="acoes-perfil" *ngIf="ehPerfilProprio">
 
         <ion-button routerLink="/usuario-alterar" class="btn-editar">
           <ion-icon name="create-outline"></ion-icon>
@@ -92,24 +92,35 @@
       <!-- NÍVEL -->
       <div class="nivel-box">
 
-        <h3>Nível de cadastro</h3>
-
-        <div class="barra-nivel">
-          <div class="nivel nivel1"></div>
-          <div class="nivel nivel2"></div>
-          <div class="nivel nivel3"></div>
+        <div class="nivel-header">
+          <h3>Nível de cadastro</h3>
+          <span class="nivel-badge">Nível {{ nivelCadastro }} de 3</span>
         </div>
 
-        <div class="validacoes">
+        <div class="barra-nivel">
+          <div class="nivel" [class.ativo]="nivelCadastro >= 1"></div>
+          <div class="nivel" [class.ativo]="nivelCadastro >= 2"></div>
+          <div class="nivel" [class.ativo]="nivelCadastro >= 3"></div>
+        </div>
 
-          <div class="validacao">
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <span>CPF: {{ usuario.cpf }}</span>
+        <div class="validacoes" *ngIf="ehPerfilProprio">
+
+          <div class="validacao" [class.pendente]="!usuario.cpf">
+            <ion-icon [name]="usuario.cpf ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+            <span *ngIf="usuario.cpf">CPF: {{ usuario.cpf }}</span>
+            <span *ngIf="!usuario.cpf">
+              CPF não informado
+              <a routerLink="/usuario-alterar">(adicionar)</a>
+            </span>
           </div>
 
-          <div class="validacao">
-            <ion-icon name="checkmark-circle-outline"></ion-icon>
-            <span>Telefone: {{ usuario.telefone }}</span>
+          <div class="validacao" [class.pendente]="!usuario.telefone">
+            <ion-icon [name]="usuario.telefone ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+            <span *ngIf="usuario.telefone">Telefone: {{ usuario.telefone }}</span>
+            <span *ngIf="!usuario.telefone">
+              Telefone não informado
+              <a routerLink="/usuario-alterar">(adicionar)</a>
+            </span>
           </div>
 
         </div>
@@ -119,7 +130,7 @@
       <!-- AVALIAÇÃO -->
       <div class="avaliacao-box">
 
-        <h2>Sua avaliação: 4,5</h2>
+        <h2>Sua avaliação: 4,5 [PLACEHOLDER]</h2>
 
         <div class="estrelas">
           ★★★★⯪
@@ -131,7 +142,7 @@
 
       <div class="anuncios-box">
 
-        <h2>Meus anúncios</h2>
+        <h2>{{ ehPerfilProprio ? 'Meus anúncios' : 'Anúncios publicados' }}</h2>
 
         <div *ngIf="anuncios.length === 0" class="sem-anuncios">
 

@@ -131,12 +131,13 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   salvarAlteracoes() {
-    //console.log(this.usuario);
     this.usuarioService.atualizar(this.usuario).subscribe({
       next: async (usuario: UsuarioModel) => {
         console.log("atualizou ", usuario);
-        //mudar a lógica para atualizar o usuário na sessão
-        this.router.navigate(['/login']);
+
+        this.usuarioService.salvarUsuarioSessao(usuario);
+
+        this.router.navigate(['/usuario-perfil']);
       },
       error: async (erro) => {
         console.error('Erro! ', erro.error?.message);
@@ -146,22 +147,22 @@ export class UsuarioAlterarPage implements OnInit {
 
   async confirmarAlteracoes() {
     const alert = await this.alertController.create({
-        header: 'Confirmar Alterações',
-        message: 'Deseja realmente salvar as alterações?',
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel'
-          },
-          {
-            text: 'Excluir',
-            role: 'destructive',
-            handler: () => {
-              this.salvarAlteracoes();
-            }
+      header: 'Confirmar Alterações',
+      message: 'Deseja realmente salvar as alterações?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Salvar',
+          role: 'confirm',
+          handler: () => {
+            this.salvarAlteracoes();
           }
-        ]
-      });
+        }
+      ]
+    });
 
     await alert.present();
   }

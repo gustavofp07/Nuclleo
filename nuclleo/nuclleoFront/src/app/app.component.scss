@@ -58,3 +58,24 @@ ion-menu ion-icon {
 
     font-size: 22px;
 }
+
+ion-accordion-group {
+  background: #ffffff;
+}
+
+ion-accordion {
+  background: #fff;
+
+  ion-item[slot="header"] {
+    --background: #fff;
+  }
+
+  div[slot="content"] {
+    background: #fff;
+
+    ion-item {
+      --background: #fff;
+      --color: #6a11cb;
+    }
+  }
+}

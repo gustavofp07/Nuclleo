@@ -141,3 +141,13 @@
     gap: 12px;
     overflow-x: auto;
 }
+
+.link-usuario {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-usuario:hover {
+  text-decoration: underline;
+}

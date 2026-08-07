@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { UsuarioPerfilPage } from './pages/usuario-perfil/usuario-perfil.page';
 
 export const routes: Routes = [
   {
@@ -12,7 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
+    loadComponent: () => import('./pages/usuario-login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'usuario-cadastro',
@@ -27,28 +28,32 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/usuario-perfil/usuario-perfil.page').then(m => m.UsuarioPerfilPage)
   },
   {
+    path: 'usuario-perfil/:cdUsuario',
+    loadComponent: () => import('./pages/usuario-perfil/usuario-perfil.page').then(m => m.UsuarioPerfilPage)
+  },
+  {
     path: 'usuario-alterar',
     loadComponent: () => import('./pages/usuario-alterar/usuario-alterar.page').then(m => m.UsuarioAlterarPage)
   },
   {
     path: 'criar-comunidade',
-    loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then(m => m.CriarComunidadePage)
+    loadComponent: () => import('./pages/comunidade-criar/criar-comunidade.page').then(m => m.CriarComunidadePage)
   },
   {
     path: 'minhas-comunidades',
-    loadComponent: () => import('./pages/minhas-comunidades/minhas-comunidades.page').then(m => m.MinhasComunidadesPage)
+    loadComponent: () => import('./pages/comunidade-minhas/minhas-comunidades.page').then(m => m.MinhasComunidadesPage)
   },
   {
     path: 'criar-comunidade/:cdComunidade',
-    loadComponent: () => import('./pages/criar-comunidade/criar-comunidade.page').then(m => m.CriarComunidadePage)
+    loadComponent: () => import('./pages/comunidade-criar/criar-comunidade.page').then(m => m.CriarComunidadePage)
   },
   {
     path: 'criar-anuncio/:tipo',
-    loadComponent: () => import('./pages/criar-anuncio/criar-anuncio.page').then(m => m.CriarAnuncioPage)
+    loadComponent: () => import('./pages/anuncio-criar/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
   {
     path: 'criar-anuncio/:tipo/:cdAnuncio',
-    loadComponent: () => import('./pages/criar-anuncio/criar-anuncio.page').then(m => m.CriarAnuncioPage)
+    loadComponent: () => import('./pages/anuncio-criar/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
   {
     path: 'comunidade-tela/:cdComunidade',
@@ -62,6 +67,15 @@ export const routes: Routes = [
     path: 'anuncio-tela/:cdAnuncio',
     loadComponent: () => import('./pages/anuncio-tela/anuncio-tela.page').then(m => m.AnuncioTelaPage)
   },
+  {
+    path: 'anuncio-meus',
+    loadComponent: () => import('./pages/anuncio-meus/anuncio-meus.page').then(m => m.AnuncioMeusPage)
+  },
+  {
+    path: 'anuncio-meus/:tipo',
+    loadComponent: () => import('./pages/anuncio-meus/anuncio-meus.page').then(m => m.AnuncioMeusPage)
+  },
+
 
 
 

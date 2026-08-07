@@ -9,8 +9,8 @@
       {{ modoEdicao
       ? 'Editar anúncio'
       : tipo === 'VENDA'
-      ? 'Criar anúncio'
-      : 'Criar requerimento' }}
+      ? 'Criar anúncio de venda'
+      : 'Criar anúncio de compra' }}
     </ion-title>
 
   </ion-toolbar>
@@ -24,7 +24,7 @@
       <h1>
         {{ tipo === 'VENDA'
         ? 'Novo anúncio de venda'
-        : 'Novo requerimento' }}
+        : 'Novo anúncio de compra' }}
       </h1>
       <p>
         {{ tipo === 'VENDA'
@@ -105,9 +105,12 @@
       </ng-container>
 
 
-      <ion-list>
-        <ion-item *ngFor="let comunidade of comunidades">
+      <div class="campo-label">
+        <label>Comunidades</label>
+      </div>
 
+      <ion-list *ngIf="comunidades.length > 0" class="lista-comunidades">
+        <ion-item *ngFor="let comunidade of comunidades">
           <ion-checkbox slot="start" [checked]="comunidadeEstaSelecionada(comunidade)"
             (ionChange)="alterarSelecao(comunidade, $event.detail.checked)">
           </ion-checkbox>
@@ -115,17 +118,20 @@
           <ion-label>
             {{ comunidade.nmComunidade }}
           </ion-label>
-
         </ion-item>
       </ion-list>
+
+      <div class="sem-comunidades" *ngIf="comunidades.length === 0">
+        Você ainda não participa de nenhuma comunidade.
+      </div>
 
       <!-- BOTÃO -->
       <ion-button expand="block" type="submit" class="btn-criar">
         {{ modoEdicao
         ? 'Salvar alterações'
         : tipo === 'VENDA'
-        ? 'Criar anúncio'
-        : 'Criar requerimento' }}
+        ? 'Criar anúncio de venda'
+        : 'Criar anúncio de compra' }}
       </ion-button>
 
     </form>

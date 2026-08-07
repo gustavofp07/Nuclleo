@@ -32,6 +32,7 @@ export class ComunidadePerfilPage implements OnInit {
   usuarioEhAdmin = false;
   carregandoVinculo = false;
   entrandoComunidade = false;
+  totalUsuarios: number = 0;
 
   anuncios: AnuncioModel[] = [];
 
@@ -62,6 +63,20 @@ export class ComunidadePerfilPage implements OnInit {
   ionViewWillEnter() {
 
     const cdComunidade = Number(this.activatedRoute.snapshot.paramMap.get('cdComunidade'));
+
+    this.comunidadeService.buscarComunidade(cdComunidade).subscribe({
+      next: (comunidade) => {
+        this.comunidade = comunidade;
+        this.usuarioEhAdmin = this.verificarUsuarioAdmin();
+        this.usuarioEntrouNaComunidade = this.usuarioEhAdmin;
+        this.verificarUsuarioNaComunidade(cdComunidade);
+        this.carregarTotalUsuarios(cdComunidade);
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao carregar comunidade.');
+      }
+    });
+
     this.abaSelecionada = 'perfil';
     this.usuarioEntrouNaComunidade = false;
     this.usuarioEhAdmin = false;
@@ -153,22 +168,22 @@ export class ComunidadePerfilPage implements OnInit {
     }
 
     const alert = await this.alertController.create({
-        header: 'Excluir comunidade',
-        message: 'Deseja realmente excluir essa comunidade?',
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel'
-          },
-          {
-            text: 'Excluir',
-            role: 'destructive',
-            handler: () => {
-              this.excluirComunidade();
-            }
+      header: 'Excluir comunidade',
+      message: 'Deseja realmente excluir essa comunidade?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Excluir',
+          role: 'destructive',
+          handler: () => {
+            this.excluirComunidade();
           }
-        ]
-      });
+        }
+      ]
+    });
 
     await alert.present();
   }
@@ -230,6 +245,18 @@ export class ComunidadePerfilPage implements OnInit {
         }
       });
 
+  }
+
+  carregarTotalUsuarios(cdComunidade: number) {
+    this.usuarioComunidadeService.listarUsuariosPorComunidade(cdComunidade).subscribe({
+      next: (vinculos) => {
+        this.totalUsuarios = vinculos.length;
+      },
+      error: () => {
+        console.log("penis")
+        this.totalUsuarios = 0;
+      }
+    });
   }
 
   async exibirMensagem(msg: string) {

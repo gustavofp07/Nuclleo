@@ -230,3 +230,36 @@ ion-textarea {
 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* LISTA DE COMUNIDADES */
+
+.lista-comunidades {
+  margin-bottom: 18px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* MENSAGEM SEM COMUNIDADES */
+
+.sem-comunidades {
+  margin-bottom: 18px;
+
+  padding: 14px;
+
+  background: #ffffff;
+
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+  text-align: center;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
