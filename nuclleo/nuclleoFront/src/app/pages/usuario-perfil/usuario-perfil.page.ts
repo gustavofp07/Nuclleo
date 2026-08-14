@@ -16,6 +16,7 @@ import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -36,6 +37,7 @@ export class UsuarioPerfilPage implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private toastController: ToastController,
+    private alertController: AlertController,
     private anuncioService: AnuncioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
   ) {
@@ -99,8 +101,54 @@ export class UsuarioPerfilPage implements OnInit {
     }
   }
 
+  async confirmarExclusao() {
+    const alert = await this.alertController.create({
+      header: 'Excluir perfil',
+      message: 'Essa ação é permanente. Digite sua senha para confirmar a exclusão do seu perfil.',
+      inputs: [
+        {
+          name: 'senha',
+          type: 'password',
+          placeholder: 'Senha'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Excluir',
+          role: 'destructive',
+          handler: (dados) => {
+            if (!dados.senha) {
+              this.exibirMensagem('Digite sua senha para confirmar.');
+              return false;
+            }
+            this.validarSenhaEExcluir(dados.senha);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  validarSenhaEExcluir(senha: string) {
+    const usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
+
+    this.usuarioService.autenticar({ email: usuarioLogado.email, senha }).subscribe({
+      next: () => {
+        this.excluir();
+      },
+      error: () => {
+        this.exibirMensagem('Senha incorreta.');
+      }
+    });
+  }
+
   excluir() {
-    // sem alterações
     const usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
 
     this.usuarioComunidadeService.excluirPorUsuario(usuarioLogado.cdUsuario).subscribe({

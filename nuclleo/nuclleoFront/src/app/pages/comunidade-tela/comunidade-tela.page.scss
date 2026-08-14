@@ -255,3 +255,8 @@
 .link-usuario:hover {
   text-decoration: underline;
 }
+
+.btn-sair {
+  --border-radius: 16px; // Ionic usa --border-radius, não border-radius direto
+  margin-top: 12px;
+}

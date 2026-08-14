@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline } from 'ionicons/icons';
+import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline, logOutOutline } from 'ionicons/icons';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -32,7 +32,9 @@ export class ComunidadePerfilPage implements OnInit {
   usuarioEhAdmin = false;
   carregandoVinculo = false;
   entrandoComunidade = false;
+  saindoComunidade = false;
   totalUsuarios: number = 0;
+  codigoVinculo: number | null = null;
 
   anuncios: AnuncioModel[] = [];
 
@@ -51,7 +53,8 @@ export class ComunidadePerfilPage implements OnInit {
       peopleOutline,
       personOutline,
       settingsOutline,
-      trashOutline
+      trashOutline,
+      logOutOutline
     });
 
     this.comunidade = new ComunidadeModel();
@@ -108,10 +111,12 @@ export class ComunidadePerfilPage implements OnInit {
 
     this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
       next: (vinculos) => {
-        const participa = vinculos.some(
-          (vinculo) => vinculo.comunidade.cdComunidade === cdComunidade
+        const vinculo = vinculos.find(
+          (v) => v.comunidade.cdComunidade === cdComunidade
         );
-        this.usuarioEntrouNaComunidade = this.usuarioEhAdmin || participa;
+
+        this.usuarioEntrouNaComunidade = this.usuarioEhAdmin || !!vinculo;
+        this.codigoVinculo = vinculo?.codigo ?? null;
         this.carregandoVinculo = false;
       },
       error: () => {
@@ -154,6 +159,55 @@ export class ComunidadePerfilPage implements OnInit {
       }
     });
 
+  }
+
+  async confirmarSaida() {
+    if (this.usuarioEhAdmin) {
+      this.exibirMensagem('O administrador não pode sair da própria comunidade.');
+      return;
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Sair da comunidade',
+      message: 'Deseja realmente sair dessa comunidade?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Sair',
+          role: 'destructive',
+          handler: () => {
+            this.sairComunidade();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  sairComunidade() {
+    if (!this.codigoVinculo || this.saindoComunidade) {
+      return;
+    }
+
+    this.saindoComunidade = true;
+
+    this.usuarioComunidadeService.excluir(this.codigoVinculo).subscribe({
+      next: () => {
+        this.usuarioEntrouNaComunidade = false;
+        this.codigoVinculo = null;
+        this.saindoComunidade = false;
+        this.abaSelecionada = 'perfil'; 
+        this.exibirMensagem('Você saiu da comunidade.');
+      },
+      error: () => {
+        this.saindoComunidade = false;
+        this.exibirMensagem('Erro ao sair da comunidade.');
+      }
+    });
   }
 
   verificarUsuarioAdmin() {

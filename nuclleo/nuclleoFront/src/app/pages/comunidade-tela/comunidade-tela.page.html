@@ -124,8 +124,18 @@
 
       </div>
 
-      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade">
+      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">
         Você participa dessa comunidade
+
+        <ion-button expand="block" fill="outline" color="danger" class="btn-sair" [disabled]="saindoComunidade"
+          (click)="confirmarSaida()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          {{ saindoComunidade ? 'Saindo...' : 'Sair da comunidade' }}
+        </ion-button>
+      </div>
+
+      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && usuarioEhAdmin">
+        Você é o administrador dessa comunidade
       </div>
 
     </div>

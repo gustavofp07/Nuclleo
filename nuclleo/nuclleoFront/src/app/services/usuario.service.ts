@@ -10,7 +10,11 @@ import { UsuarioAutenticadoModel } from '../model/usuario-autenticado.model';
 export class UsuarioService {
   private readonly KEY_USUARIO = 'usuarioAutenticado';
   private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/usuarios';
+  private readonly AUTH_URL = 'https://nuclleo.onrender.com/api/v1/autenticar';
 
+  autenticar(credenciais: { email: string; senha: string }): Observable<any> {
+    return this.http.post<any>(this.AUTH_URL, credenciais);
+  }
   constructor(private http: HttpClient) { }
 
   cadastrarUsuario(usuario: UsuarioModel): Observable<UsuarioModel> {//body
