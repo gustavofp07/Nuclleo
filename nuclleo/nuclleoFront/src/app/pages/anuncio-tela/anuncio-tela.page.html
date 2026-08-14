@@ -22,8 +22,20 @@
         </span>
       </h2>
 
-      <div class="foto-anuncio-container">
+
+
+    </div>
+
+    <div class="info-box">
+
         <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
+    
+      <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
+        R$ {{ $any(anuncio).valor | number:'1.2-2' }}
+      </div>
+
+      <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+        R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} - R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
       </div>
 
     </div>
@@ -42,8 +54,8 @@
         <ion-icon name="person-outline"></ion-icon>
         <span>
           <a class="link-usuario" [routerLink]="['/usuario-perfil', anuncio.usuarioCria.cdUsuario]">
-              {{ anuncio.usuarioCria.nmUsuario }}
-            </a>
+            {{ anuncio.usuarioCria.nmUsuario }}
+          </a>
         </span>
       </div>
 
