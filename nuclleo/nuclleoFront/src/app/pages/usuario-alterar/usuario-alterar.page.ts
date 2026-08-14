@@ -206,14 +206,20 @@ export class UsuarioAlterarPage implements OnInit {
 
         error: async (erro) => {
 
+          const mensagem =
+            erro.error?.message
+            || (typeof erro.error === 'string' ? erro.error : '')
+            || erro.message
+            || 'Erro ao atualizar usuário.';
+
           console.error(
             'Erro! ',
-            erro.error?.message
+            mensagem,
+            erro
           );
 
           await this.exibirMensagem(
-            erro.error?.message
-            || 'Erro ao atualizar usuário.'
+            mensagem
           );
         }
       });

@@ -5,12 +5,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.DatabaseException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -45,13 +47,24 @@ public class UsuarioService {
         usuario.setTelefone(dto.getTelefone());
 
         if (foto != null && !foto.isEmpty()) {
-            ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
 
-            usuario.setFtUsuario(arquivo.getUrl());
+                if (arquivo == null || arquivo.getUrl() == null || arquivo.getUrl().isBlank()) {
+                    throw new BusinessException("O serviço de arquivos não retornou a URL da foto.");
+                }
+
+                usuario.setFtUsuario(arquivo.getUrl());
+            } catch (RestClientException e) {
+                throw new BusinessException("Não foi possível enviar a foto. Tente novamente mais tarde.");
+            }
         }
 
-        Usuario usuarioAlterado = usuarioRepository.save(usuario);
-        return usuarioAlterado;
+        try {
+            return usuarioRepository.saveAndFlush(usuario);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Não foi possível atualizar o usuário. Verifique os dados informados.");
+        }
     }
 
     @Transactional

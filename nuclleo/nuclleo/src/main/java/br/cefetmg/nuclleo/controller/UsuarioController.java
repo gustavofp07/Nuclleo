@@ -54,10 +54,14 @@ public class UsuarioController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualizar usuário")
     public ResponseEntity<Usuario> alterar(
-            @RequestPart("usuario") Usuario dto,
+            @Valid @RequestPart("usuario") Usuario dto,
             @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.alterar(dto, foto));
+        if (dto.getCdUsuario() == null) {
+            throw new BadRequestException("Id do usuário é obrigatório.");
+        }
+
+        return ResponseEntity.ok(usuarioService.alterar(dto, foto));
     }
 
     /* 
