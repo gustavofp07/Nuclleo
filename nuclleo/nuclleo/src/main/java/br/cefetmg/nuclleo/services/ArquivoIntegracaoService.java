@@ -19,28 +19,32 @@ public class ArquivoIntegracaoService {
     }
 
     /*
+     * public ArquivoResponseDTO enviarArquivo(MultipartFile file) {
+     * 
+     * MultipartBodyBuilder body = new MultipartBodyBuilder();
+     * body.part("file", file.getResource());
+     * 
+     * return restClient.post()
+     * .uri("/arquivos")
+     * .contentType(MediaType.MULTIPART_FORM_DATA)
+     * .body(body.build())
+     * .retrieve()
+     * .body(ArquivoResponseDTO.class);
+     * }
+     */
+
     public ArquivoResponseDTO enviarArquivo(MultipartFile file) {
 
         MultipartBodyBuilder body = new MultipartBodyBuilder();
-        body.part("file", file.getResource());
 
-        return restClient.post()
-                .uri("/arquivos")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body.build())
-                .retrieve()
-                .body(ArquivoResponseDTO.class);
-    }
-                */
+        var parte = body
+                .part("file", file.getResource())
+                .filename(file.getOriginalFilename());
 
-    public ArquivoResponseDTO enviarArquivo(MultipartFile file) {
-
-        MultipartBodyBuilder body = new MultipartBodyBuilder();
-
-        body.part("file", file.getResource())
-                .filename(file.getOriginalFilename())
-                .contentType(
-                        MediaType.parseMediaType(file.getContentType()));
+        if (file.getContentType() != null) {
+            parte.contentType(
+                    MediaType.parseMediaType(file.getContentType()));
+        }
 
         return restClient.post()
                 .uri("/arquivos")
