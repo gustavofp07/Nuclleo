@@ -31,13 +31,56 @@ public class UsuarioService {
         java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
         usuario.setDtEntrada(data);
 
-    
         return usuarioRepository.save(usuario);
     }
 
+    /*
+     * @Transactional
+     * public Usuario alterar(Usuario dto, MultipartFile foto) {
+     * Usuario usuario =
+     * usuarioRepository.findById(dto.getCdUsuario()).orElseThrow(() -> new
+     * ResourceNotFoundException("Usuário não encontrado."));
+     * 
+     * usuario.setNmUsuario(dto.getNmUsuario());
+     * usuario.setEmail(dto.getEmail());
+     * usuario.setSenha(dto.getSenha());
+     * usuario.setCpf(dto.getCpf());
+     * usuario.setCep(dto.getCep());
+     * usuario.setTelefone(dto.getTelefone());
+     * 
+     * if (foto != null && !foto.isEmpty()) {
+     * try {
+     * ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+     * 
+     * if (arquivo == null || arquivo.getUrl() == null ||
+     * arquivo.getUrl().isBlank()) {
+     * throw new
+     * BusinessException("O serviço de arquivos não retornou a URL da foto.");
+     * }
+     * 
+     * usuario.setFtUsuario(arquivo.getUrl());
+     * } catch (RestClientException e) {
+     * throw new
+     * BusinessException("Não foi possível enviar a foto. Tente novamente mais tarde."
+     * );
+     * }
+     * }
+     * 
+     * try {
+     * return usuarioRepository.saveAndFlush(usuario);
+     * } catch (DataAccessException e) {
+     * throw new
+     * DatabaseException("Não foi possível atualizar o usuário. Verifique os dados informados."
+     * );
+     * }
+     * }
+     */
+
     @Transactional
     public Usuario alterar(Usuario dto, MultipartFile foto) {
-        Usuario usuario = usuarioRepository.findById(dto.getCdUsuario()).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        Usuario usuario = usuarioRepository.findById(dto.getCdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
@@ -47,23 +90,54 @@ public class UsuarioService {
         usuario.setTelefone(dto.getTelefone());
 
         if (foto != null && !foto.isEmpty()) {
+
             try {
+
+                System.out.println("===== INICIANDO UPLOAD =====");
+                System.out.println("Nome: " + foto.getOriginalFilename());
+                System.out.println("Tipo: " + foto.getContentType());
+                System.out.println("Tamanho: " + foto.getSize());
+
                 ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
 
-                if (arquivo == null || arquivo.getUrl() == null || arquivo.getUrl().isBlank()) {
-                    throw new BusinessException("O serviço de arquivos não retornou a URL da foto.");
+                System.out.println("===== RESPOSTA API ARQUIVOS =====");
+                System.out.println("arquivo = " + arquivo);
+
+                if (arquivo != null) {
+                    System.out.println("URL = " + arquivo.getUrl());
+                }
+
+                if (arquivo == null ||
+                        arquivo.getUrl() == null ||
+                        arquivo.getUrl().isBlank()) {
+
+                    throw new BusinessException(
+                            "O serviço de arquivos não retornou a URL da foto.");
                 }
 
                 usuario.setFtUsuario(arquivo.getUrl());
-            } catch (RestClientException e) {
-                throw new BusinessException("Não foi possível enviar a foto. Tente novamente mais tarde.");
+
+            } catch (Exception e) {
+
+                System.out.println("===== ERRO NO UPLOAD =====");
+                e.printStackTrace();
+
+                throw e;
             }
         }
 
         try {
+
+            System.out.println("===== SALVANDO USUARIO =====");
+
             return usuarioRepository.saveAndFlush(usuario);
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Não foi possível atualizar o usuário. Verifique os dados informados.");
+
+        } catch (Exception e) {
+
+            System.out.println("===== ERRO AO SALVAR USUARIO =====");
+            e.printStackTrace();
+
+            throw e;
         }
     }
 
@@ -71,7 +145,8 @@ public class UsuarioService {
     public Usuario excluir(Long cdUsuario) {
         // Não apaga o usuário, apenas desativa
 
-        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         try {
             // usuarioRepository.delete(usuario);
