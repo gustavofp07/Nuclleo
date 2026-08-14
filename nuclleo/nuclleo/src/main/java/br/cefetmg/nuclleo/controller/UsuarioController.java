@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Usuario;
@@ -32,7 +35,9 @@ public class UsuarioController {
     @PostMapping("")
     @Operation(summary = "Cadastrar usuário")
     public ResponseEntity<Usuario> inserir(@Valid @RequestBody Usuario usuario) {
-        //depois verificar se o usuário (email) já existe, se não existir, insere. Se existir, ou mostra o erro, ou reativa a conta, pois não há excusão de usuário, apenas desativação.
+        // depois verificar se o usuário (email) já existe, se não existir, insere. Se
+        // existir, ou mostra o erro, ou reativa a conta, pois não há excusão de
+        // usuário, apenas desativação.
 
         if (usuario == null) {
             throw new BadRequestException("Usuário é obrigatório");
@@ -46,6 +51,16 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
     }
 
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Atualizar usuário")
+    public ResponseEntity<Usuario> alterar(
+            @RequestPart("usuario") Usuario dto,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.alterar(dto, foto));
+    }
+
+    /* 
     @PutMapping("")
     @Operation(summary = "Atualizar usuário")
     public ResponseEntity<Usuario> alterar(@RequestBody Usuario usuario) {
@@ -55,7 +70,8 @@ public class UsuarioController {
 
         Usuario objUsuario = usuarioService.alterar(usuario);
         return ResponseEntity.ok(objUsuario);
-    }    
+    }
+        */
 
     @DeleteMapping("/{cdUsuario}")
     @Operation(summary = "Excluir usuário")
@@ -69,7 +85,7 @@ public class UsuarioController {
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long cdUsuario) {
         Usuario objUsuario = usuarioService.buscarPorId(cdUsuario);
         return ResponseEntity.ok(objUsuario);
-        //return this.repository.findById(cdUsuario).orElse(null);
+        // return this.repository.findById(cdUsuario).orElse(null);
     }
 
 }

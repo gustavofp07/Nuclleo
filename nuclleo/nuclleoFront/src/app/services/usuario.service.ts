@@ -29,9 +29,25 @@ export class UsuarioService {
     return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
   }
 
+  atualizar(usuario: UsuarioModel, foto?: File): Observable<UsuarioModel> {
+
+    const formData = new FormData();
+    const usuarioBlob = new Blob([JSON.stringify(usuario)], { type: 'application/json' });
+
+    formData.append('usuario', usuarioBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return this.http.put<UsuarioModel>(this.API_URL, formData);
+  }
+
+  /*
   atualizar(usuario: UsuarioModel): Observable<UsuarioModel> {//body
     return this.http.put<UsuarioModel>(this.API_URL, usuario);
   }
+    */
 
 
   //coisas da sessão

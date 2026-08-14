@@ -4,17 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
 import br.cefetmg.nuclleo.exception.DatabaseException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ArquivoIntegracaoService arquivoIntegracaoService;
 
     @Transactional
     public Usuario inserir(Usuario usuario) {
@@ -24,54 +29,39 @@ public class UsuarioService {
         java.sql.Date data = new java.sql.Date(System.currentTimeMillis());
         usuario.setDtEntrada(data);
 
-        /*
-         * if (usuario.existsByNome(dto.getNome())) {
-         * throw new BusinessException("Já existe um jogador com esse nome.");
-         * }
-         * 
-         * 
-         * //aqui recebe o usuarioRequest e passa para usuári.
-         * Jogador jogador = new Jogador();
-         * jogador.setNome(dto.getNome());
-         * jogador.setNumero(dto.getNumero());
-         * jogador.setEquipe(equipe);
-         * 
-         * return new JogadorResponseDTO(usuarioRepository.save(usuario));
-         */
+    
         return usuarioRepository.save(usuario);
     }
 
     @Transactional
-    public Usuario alterar(Usuario usuario) {
-        /* 
-        Jogador jogador = jogadorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Jogador não encontrado. Id: " + id));
+    public Usuario alterar(Usuario dto, MultipartFile foto) {
+        Usuario usuario = usuarioRepository.findById(dto.getCdUsuario()).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
-        if (jogadorRepository.existsByNomeAndIdNot(dto.getNome(), id)) {
-            throw new BusinessException(
-                    "Já existe um jogador com esse nome.");
+        usuario.setNmUsuario(dto.getNmUsuario());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(dto.getSenha());
+        usuario.setCpf(dto.getCpf());
+        usuario.setCep(dto.getCep());
+        usuario.setTelefone(dto.getTelefone());
+
+        if (foto != null && !foto.isEmpty()) {
+            ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+
+            usuario.setFtUsuario(arquivo.getUrl());
         }
 
-        jogador.setNome(dto.getNome());
-        jogador.setNumero(dto.getNumero());
-        jogador.setEquipe(equipe);
-
-        return new JogadorResponseDTO(jogadorRepository.save(jogador));
-        */
-       return usuarioRepository.save(usuario);
+        Usuario usuarioAlterado = usuarioRepository.save(usuario);
+        return usuarioAlterado;
     }
 
     @Transactional
     public Usuario excluir(Long cdUsuario) {
-        //Não apaga o usuário, apenas desativa
+        // Não apaga o usuário, apenas desativa
 
-        Usuario usuario = usuarioRepository.findById(cdUsuario)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
-            
         try {
-            //usuarioRepository.delete(usuario);
+            // usuarioRepository.delete(usuario);
             usuario.setAtivo(false);
             usuarioRepository.save(usuario);
             return usuario;

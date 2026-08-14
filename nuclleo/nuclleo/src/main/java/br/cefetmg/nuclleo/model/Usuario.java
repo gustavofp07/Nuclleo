@@ -37,7 +37,7 @@ public class Usuario {
     @Column(name = "nm_usuario", length = 60, nullable = false)
     private String nmUsuario;
 
-    @Column(name = "ft_usuario")
+    @Column(name = "ft_usuario", length = 1000)
     private String ftUsuario;
 
     @Column(name = "email")

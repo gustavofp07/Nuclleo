@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import {
   IonContent,
   IonItem,
@@ -35,17 +36,30 @@ import { UsuarioService } from 'src/app/services/usuario.service';
   templateUrl: './usuario-alterar.page.html',
   styleUrls: ['./usuario-alterar.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonItem, IonInput, IonButton, IonIcon, IonHeader,
+  imports: [
+    IonContent,
+    CommonModule,
+    FormsModule,
+    IonItem,
+    IonInput,
+    IonButton,
+    IonIcon,
+    IonHeader,
     IonToolbar,
     IonButtons,
     IonMenuButton,
     IonTitle,
-    IonLabel]
+    IonLabel
+  ]
 })
 export class UsuarioAlterarPage implements OnInit {
+
   usuario: UsuarioModel;
 
   previewFoto: string | ArrayBuffer | null = null;
+
+  imagemSelecionada?: File;
+
   showPassword: boolean = false;
 
   constructor(
@@ -62,117 +76,194 @@ export class UsuarioAlterarPage implements OnInit {
     });
 
     this.usuario = new UsuarioModel();
-
   }
 
   ngOnInit() {
-    if (localStorage.getItem("usuarioAutenticado")) {
 
-      let usuarioLogado: UsuarioModel = JSON.parse(localStorage.getItem("usuarioAutenticado") || "");
+    if (localStorage.getItem('usuarioAutenticado')) {
 
-      this.usuarioService.buscarUsuario(usuarioLogado.cdUsuario).subscribe({
-        next: async (usuario: UsuarioModel) => {
-          console.log("busquei ", usuario);
-          this.usuario = usuario;
-        },
-        error: async () => {
-          //console.error('Erro ao logar');
-          console.log('Erro ao logar');
-        }
-      });
+      const usuarioLogado: UsuarioModel =
+        JSON.parse(
+          localStorage.getItem('usuarioAutenticado') || ''
+        );
+
+      this.buscarUsuario(usuarioLogado.cdUsuario);
 
     } else {
-      console.log("Não tem nenhum usuário autenticado no momento.");
+
+      console.log(
+        'Não tem nenhum usuário autenticado no momento.'
+      );
     }
   }
 
   ionViewWillEnter() {
-    let aux = this.usuarioService.verificarSessao();
-    if (aux == false) {
-      //this.exibirMensagem("Não há usuário logado.");
+
+    const possuiSessao =
+      this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+
       this.router.navigate(['/login']);
-    } else {
-      //existe alguém logado
-      let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
-
-      this.usuarioService.buscarUsuario(usuarioLogado.cdUsuario).subscribe({
-        next: async (usuario: UsuarioModel) => {
-          console.log("busquei ", usuario);
-          this.usuario = usuario;
-        },
-        error: async () => {
-          //console.error('Erro ao logar');
-          console.log('Erro ao logar');
-        }
-      });
-
+      return;
     }
 
+    const usuarioLogado =
+      this.usuarioService.getUsuarioSessao();
+
+    this.buscarUsuario(usuarioLogado.cdUsuario);
+  }
+
+  private buscarUsuario(cdUsuario: number) {
+
+    this.usuarioService
+      .buscarUsuario(cdUsuario)
+      .subscribe({
+
+        next: (usuario: UsuarioModel) => {
+
+          console.log('busquei ', usuario);
+
+          this.usuario = usuario;
+
+          this.previewFoto = null;
+          this.imagemSelecionada = undefined;
+        },
+
+        error: () => {
+
+          console.log('Erro ao buscar usuário');
+        }
+      });
   }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  selecionarImagem(event: any) {
+  selecionarImagem(event: Event) {
 
-    const arquivo = event.target.files[0];
+    const input =
+      event.target as HTMLInputElement;
 
-    if (arquivo) {
+    const arquivo =
+      input.files?.[0];
 
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.previewFoto = reader.result;
-      };
-
-      reader.readAsDataURL(arquivo);
+    if (!arquivo) {
+      return;
     }
+
+    const tiposPermitidos = [
+      'image/jpeg',
+      'image/png'
+    ];
+
+    if (!tiposPermitidos.includes(arquivo.type)) {
+
+      input.value = '';
+
+      this.exibirMensagem(
+        'Selecione apenas imagens JPG, JPEG ou PNG.'
+      );
+
+      return;
+    }
+
+    this.imagemSelecionada = arquivo;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.previewFoto = reader.result;
+    };
+
+    reader.readAsDataURL(arquivo);
   }
 
   salvarAlteracoes() {
-    this.usuarioService.atualizar(this.usuario).subscribe({
-      next: async (usuario: UsuarioModel) => {
-        console.log("atualizou ", usuario);
 
-        this.usuarioService.salvarUsuarioSessao(usuario);
+    this.usuarioService
+      .atualizar(
+        this.usuario,
+        this.imagemSelecionada
+      )
+      .subscribe({
 
-        this.router.navigate(['/usuario-perfil']);
-      },
-      error: async (erro) => {
-        console.error('Erro! ', erro.error?.message);
-      }
-    });
+        next: (usuario: UsuarioModel) => {
+
+          console.log(
+            'atualizou ',
+            usuario
+          );
+
+          this.usuarioService
+            .salvarUsuarioSessao(usuario);
+
+          this.router.navigate([
+            '/usuario-perfil'
+          ]);
+        },
+
+        error: async (erro) => {
+
+          console.error(
+            'Erro! ',
+            erro.error?.message
+          );
+
+          await this.exibirMensagem(
+            erro.error?.message
+            || 'Erro ao atualizar usuário.'
+          );
+        }
+      });
   }
 
   async confirmarAlteracoes() {
-    const alert = await this.alertController.create({
-      header: 'Confirmar Alterações',
-      message: 'Deseja realmente salvar as alterações?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Salvar',
-          role: 'confirm',
-          handler: () => {
-            this.salvarAlteracoes();
+
+    const alert =
+      await this.alertController.create({
+
+        header: 'Confirmar Alterações',
+
+        message:
+          'Deseja realmente salvar as alterações?',
+
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Salvar',
+            role: 'confirm',
+            handler: () => {
+              this.salvarAlteracoes();
+            }
           }
-        }
-      ]
-    });
+        ]
+      });
+
+    await alert.present();
+  }
+
+  async exibirMensagem(mensagem: string) {
+
+    const alert =
+      await this.alertController.create({
+
+        header: 'Aviso',
+        message: mensagem,
+        buttons: ['OK']
+      });
 
     await alert.present();
   }
 
   cancelar() {
-    this.router.navigate(['/usuario-perfil']);
+
+    this.router.navigate([
+      '/usuario-perfil'
+    ]);
   }
-
-  teste() {
-
-  }
-
 }
