@@ -42,24 +42,24 @@ public class UsuarioService {
         usuario.setCep(dto.getCep());
         usuario.setTelefone(dto.getTelefone());
 
-        /*
-         * if (foto != null && !foto.isEmpty()) {
-         * try {
-         * ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
-         * 
-         * if (arquivo == null || arquivo.getUrl() == null ||
-         * arquivo.getUrl().isBlank()) {
-         * throw new BusinessException(
-         * "O serviço de arquivos não retornou a URL da foto.");
-         * }
-         * 
-         * usuario.setFtUsuario(arquivo.getUrl());
-         * } catch (RestClientException e) {
-         * throw new BusinessException(
-         * "Não foi possível enviar a foto. Verifique o formato e tente novamente.");
-         * }
-         * }
-         */
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+
+                if (arquivo == null || arquivo.getUrl() == null ||
+                        arquivo.getUrl().isBlank()) {
+                    throw new BusinessException(
+                            "O serviço de arquivos não retornou a URL da foto.");
+                }
+
+                usuario.setFtUsuario(arquivo.getUrl());
+                
+            } catch (RestClientException e) {
+                throw new BusinessException(
+                        "Não foi possível enviar a foto. Verifique o formato e tente novamente.");
+            }
+        }
+
         return usuarioRepository.save(usuario);
     }
 
