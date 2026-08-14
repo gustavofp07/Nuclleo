@@ -6,11 +6,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class ResourceExceptionHandler {
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<StandardError> maxUploadSize(
+            MaxUploadSizeExceededException e,
+            HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.PAYLOAD_TOO_LARGE;
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                "Arquivo muito grande",
+                "A foto deve ter no máximo 100 MB.",
+                request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<StandardError> resourceNotFound(
