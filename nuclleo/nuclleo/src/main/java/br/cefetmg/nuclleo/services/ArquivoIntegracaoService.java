@@ -4,6 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
@@ -22,7 +23,9 @@ public class ArquivoIntegracaoService {
      * public ArquivoResponseDTO enviarArquivo(MultipartFile file) {
      * 
      * MultipartBodyBuilder body = new MultipartBodyBuilder();
-     * body.part("file", file.getResource());
+     * 
+     * body.part("file", file.getResource())
+     * .filename(file.getOriginalFilename());
      * 
      * return restClient.post()
      * .uri("/arquivos")
@@ -37,20 +40,32 @@ public class ArquivoIntegracaoService {
 
         MultipartBodyBuilder body = new MultipartBodyBuilder();
 
-        var parte = body
-                .part("file", file.getResource())
+        body.part("file", file.getResource())
                 .filename(file.getOriginalFilename());
 
-        if (file.getContentType() != null) {
-            parte.contentType(
-                    MediaType.parseMediaType(file.getContentType()));
-        }
+        try {
 
-        return restClient.post()
-                .uri("/arquivos")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body.build())
-                .retrieve()
-                .body(ArquivoResponseDTO.class);
+            return restClient.post()
+                    .uri("/arquivos")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(body.build())
+                    .retrieve()
+                    .body(ArquivoResponseDTO.class);
+
+        } catch (RestClientResponseException e) {
+
+            System.out.println("===== ERRO API ARQUIVOS =====");
+            System.out.println("STATUS: " + e.getStatusCode());
+            System.out.println("BODY: " + e.getResponseBodyAsString());
+
+            throw e;
+
+        } catch (Exception e) {
+
+            System.out.println("===== ERRO DE CONEXAO =====");
+            e.printStackTrace();
+
+            throw e;
+        }
     }
 }
