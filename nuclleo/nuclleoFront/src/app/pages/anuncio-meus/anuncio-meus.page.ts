@@ -16,7 +16,7 @@ import {
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { add, pricetagOutline, cartOutline, trashOutline, createOutline } from 'ionicons/icons';
+import { add, pricetagOutline, cartOutline, createOutline } from 'ionicons/icons';
 
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -61,7 +61,6 @@ export class AnuncioMeusPage implements OnInit {
       add,
       pricetagOutline,
       cartOutline,
-      trashOutline,
       createOutline
     });
   }
@@ -126,45 +125,6 @@ export class AnuncioMeusPage implements OnInit {
 
   usuarioEhDono(anuncio: AnuncioModel) {
     return anuncio.usuarioCria?.cdUsuario === this.usuario.cdUsuario;
-  }
-
-  async confirmarExclusao(anuncio: AnuncioModel) {
-    const alert =
-      await this.alertController.create({
-        header: 'Excluir anúncio',
-        message: 'Deseja realmente excluir este anúncio?',
-        buttons: [
-          {
-            text: 'Cancelar',
-            role: 'cancel'
-          },
-          {
-            text: 'Excluir',
-            role: 'destructive',
-            handler: () => {
-              this.excluirAnuncio(anuncio);
-            }
-          }
-        ]
-      });
-    await alert.present();
-  }
-
-  excluirAnuncio(anuncio: AnuncioModel) {
-    if (!this.usuarioEhDono(anuncio)) {
-      this.exibirMensagem('Apenas o autor pode excluir este anúncio.');
-      return;
-    }
-
-    this.anuncioService.excluirAnuncio(anuncio.cdAnuncio).subscribe({
-      next: () => {
-        this.exibirMensagem('Anúncio excluído com sucesso');
-        this.carregarAnuncios();
-      },
-      error: () => {
-        this.exibirMensagem('Erro ao excluir anúncio.');
-      }
-    });
   }
 
   async exibirMensagem(mensagem: string) {

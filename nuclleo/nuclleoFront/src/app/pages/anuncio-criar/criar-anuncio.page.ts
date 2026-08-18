@@ -63,6 +63,7 @@ export class CriarAnuncioPage {
   //anuncioRequerimento: AnuncioRequerimentoModel;
 
   tipo = '';
+  limiteDescricao: number = 250;
 
   usuarioEhDono: boolean = false;
   imagemSelecionada?: File;
@@ -290,25 +291,25 @@ export class CriarAnuncioPage {
   }
 
   cadastrarRelacoes(anuncioSalvo: AnuncioModel) {
-    const relacoes = this.comunidadesSelecionadas.map(
-      comunidade => ({
-        anuncio: anuncioSalvo,
-        comunidade: comunidade
-      })
-    );
+  const relacoes = this.comunidadesSelecionadas.map(
+    comunidade => ({
+      anuncio: anuncioSalvo,
+      comunidade: comunidade
+    })
+  );
 
-    this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
-      next: () => {
-        this.exibirMensagem('Anúncio criado com sucesso!');
-        this.router.navigate(['/tela-inicial']);
-      },
-      error: () => {
-        this.exibirMensagem(
-          'Anúncio criado, mas houve erro ao publicar nas comunidades.'
-        );
-      }
-    });
-  }
+  this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
+    next: () => {
+      this.exibirMensagem('Anúncio criado com sucesso!');
+      this.router.navigate(['/anuncio-tela', anuncioSalvo.cdAnuncio]);
+    },
+    error: () => {
+      this.exibirMensagem(
+        'Anúncio criado, mas houve erro ao publicar nas comunidades.'
+      );
+    }
+  });
+}
 
   cadastrarRequerimento() {
     this.anuncio.tipoAnuncio = 'REQUERIMENTO';

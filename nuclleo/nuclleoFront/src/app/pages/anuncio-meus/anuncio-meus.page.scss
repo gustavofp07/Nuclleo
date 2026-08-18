@@ -89,13 +89,21 @@ ion-toolbar {
   outline-offset: 2px;
 }
 
-.foto-anuncio {
+.anuncio-imagem {
+  flex-shrink: 0;
+
   width: 80px;
   height: 80px;
+}
+
+.anuncio-imagem-placeholder {
+  width: 100%;
+  height: 100%;
 
   border-radius: 16px;
 
-  object-fit: cover;
+  border: 2px solid #7c3aed;
+  background: #f5f3ff;
 }
 
 .info {
@@ -235,27 +243,6 @@ ion-toolbar {
   overflow: hidden;
 }
 
-/* AÇÕES */
-
-.acoes {
-  display: flex;
-  flex-direction: column;
-
-  gap: 4px;
-}
-
-.acoes ion-button {
-  --padding-start: 0;
-  --padding-end: 0;
-
-  width: 40px;
-  height: 40px;
-}
-
-.acoes ion-button::part(native) {
-  font-size: 15px;
-}
-
 /* RESPONSIVO */
 
 @media (min-width: 768px) {
@@ -264,4 +251,19 @@ ion-toolbar {
     padding-top: 50px;
   }
 
+}
+
+.info .descricao {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 4px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  word-break: break-word;
+  overflow-wrap: break-word;
 }

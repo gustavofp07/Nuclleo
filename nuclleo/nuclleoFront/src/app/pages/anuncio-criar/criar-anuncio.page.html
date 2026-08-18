@@ -50,7 +50,8 @@
       </div>
 
       <ion-item lines="none" class="input-item textarea-item">
-        <ion-textarea [(ngModel)]="anuncio.descricao" name="descricao">
+        <ion-textarea [(ngModel)]="anuncio.descricao" name="descricao" [maxlength]="limiteDescricao" [counter]="true"
+          rows="2">
         </ion-textarea>
       </ion-item>
 

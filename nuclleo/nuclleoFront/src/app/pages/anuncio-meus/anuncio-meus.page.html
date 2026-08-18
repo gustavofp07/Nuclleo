@@ -39,10 +39,8 @@
             <p class="descricao">{{ anuncio.descricao }}</p>
           </div>
 
-          <div class="acoes" *ngIf="usuarioEhDono(anuncio)">
-            <ion-button fill="clear" color="danger" (click)="$event.stopPropagation(); confirmarExclusao(anuncio)">
-              <ion-icon name="trash-outline"></ion-icon>
-            </ion-button>
+          <div class="anuncio-imagem">
+            <div class="anuncio-imagem-placeholder"></div>
           </div>
 
         </button>

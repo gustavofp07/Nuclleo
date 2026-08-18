@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -55,6 +55,7 @@ export class AnuncioTelaPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private anuncioComunidadeService: AnuncioComunidadeService,
+    private location: Location
   ) { }
 
   ngOnInit() {
@@ -88,7 +89,7 @@ export class AnuncioTelaPage implements OnInit {
           this.anuncioService.excluirAnuncio(this.anuncio.cdAnuncio).subscribe({
             next: () => {
               this.exibirMensagem('Anúncio excluído com sucesso.');
-              this.router.navigate(['/usuario-perfil']);
+              this.location.back();
             },
             error: () => {
               this.exibirMensagem('Erro ao excluir anúncio.');

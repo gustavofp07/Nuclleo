@@ -20,6 +20,7 @@ import br.cefetmg.nuclleo.services.AnuncioRequerimentoService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/anuncios/requerimentos")
@@ -33,7 +34,7 @@ public class AnuncioRequerimentoController {
 
     @PostMapping("")
     @Operation(summary = "Cadastrar anúncio de requerimento")
-    public ResponseEntity<AnuncioRequerimento> inserir(@RequestBody AnuncioRequerimento anuncio) {
+    public ResponseEntity<AnuncioRequerimento> inserir(@Valid @RequestBody AnuncioRequerimento anuncio) {
         if (anuncio.getCdAnuncio() != null) { // gambiarra. Tem q tirar isso
             anuncio.setCdAnuncio(null);
         }
@@ -44,7 +45,7 @@ public class AnuncioRequerimentoController {
 
     @PutMapping("")
     @Operation(summary = "Atualizar anúncio de requerimento")
-    public ResponseEntity<AnuncioRequerimento> alterar(@RequestBody AnuncioRequerimento anuncio) {
+    public ResponseEntity<AnuncioRequerimento> alterar(@Valid @RequestBody AnuncioRequerimento anuncio) {
         if (anuncio.getCdAnuncio() == null) {
             throw new BadRequestException("Id é obrigatório");
         }
