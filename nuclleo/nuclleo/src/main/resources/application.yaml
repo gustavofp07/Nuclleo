@@ -21,6 +21,12 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
 integrations:
   arquivos:
     base-url: ${ARQUIVOS_API_URL:https://gerenciador-arquivos-7q58.onrender.com}
