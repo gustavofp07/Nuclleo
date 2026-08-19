@@ -247,6 +247,16 @@ export class AnuncioTelaPage implements OnInit {
     await alert.present();
   }
 
+  irParaPerfilAnunciante() {
+    const cdAnunciante = this.anuncio.usuarioCria.cdUsuario;
+
+    if (cdAnunciante === this.usuarioLogado.cdUsuario) {
+      this.router.navigate(['/usuario-perfil']);
+    } else {
+      this.router.navigate(['/usuario-perfil', cdAnunciante]);
+    }
+  }
+
 
   async exibirMensagem(msg: string) {
     const toast = await this.toastController.create({

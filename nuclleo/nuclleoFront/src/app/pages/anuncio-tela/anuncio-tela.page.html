@@ -52,7 +52,7 @@
       <div class="info-item">
         <ion-icon name="person-outline"></ion-icon>
         <span>
-          <a class="link-usuario" [routerLink]="['/usuario-perfil', anuncio.usuarioCria.cdUsuario]">
+          <a class="link-usuario" (click)="irParaPerfilAnunciante()">
             {{ anuncio.usuarioCria.nmUsuario }}
           </a>
         </span>
