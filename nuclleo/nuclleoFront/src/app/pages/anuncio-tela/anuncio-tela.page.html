@@ -27,8 +27,8 @@
 
     <div class="info-box">
 
-        <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
-    
+      <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
+
       <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
         R$ {{ $any(anuncio).valor | number:'1.2-2' }}
       </div>
@@ -84,9 +84,11 @@
 
       <ng-template #botoesVisitante>
 
-        <ion-button expand="block" class="btn-contato" (click)="confirmarInteresse()">
-          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-          Estou interessado
+        <ion-button expand="block" class="btn-contato" [class.btn-remover-interesse]="usuarioJaInteressado"
+          (click)="confirmarInteresse()">
+          <ion-icon [name]="usuarioJaInteressado ? 'heart-dislike-outline' : 'chatbubble-outline'"
+            slot="start"></ion-icon>
+          {{ usuarioJaInteressado ? 'Remover interesse' : 'Estou interessado' }}
         </ion-button>
 
       </ng-template>

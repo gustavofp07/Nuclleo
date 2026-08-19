@@ -56,11 +56,28 @@ ion-toolbar {
   border: 1px solid #e5e7eb;
 
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+
+  text-decoration: none;
+  color: inherit;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.interesse-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.12);
 }
 
 .info {
   flex: 1;
   min-width: 0;
+}
+
+.info h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
 
   text-decoration: none;
 }
@@ -101,13 +118,6 @@ ion-toolbar {
 
   border: 2px solid #7c3aed;
   background: #f5f3ff;
-}
-
-.btn-remover {
-  --padding-start: 0;
-  --padding-end: 0;
-
-  flex-shrink: 0;
 }
 
 .empty-state {

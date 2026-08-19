@@ -158,3 +158,12 @@
     font-weight: 700;
     color: #7c3aed;
 }
+
+.btn-remover-interesse {
+  --background: #ffffff;
+  --color: #dc2626;
+  --border-radius: 16px;
+  --box-shadow: none;
+
+  border: 2px solid #dc2626;
+}

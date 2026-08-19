@@ -16,7 +16,7 @@ import {
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { heartOutline, trashOutline } from 'ionicons/icons';
+import { heartOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -54,8 +54,7 @@ export class InteresseMeusPage implements OnInit {
   ) {
     this.usuario = new UsuarioModel();
     addIcons({
-      heartOutline,
-      trashOutline
+      heartOutline
     });
   }
 
