@@ -59,25 +59,35 @@
 
         <ion-accordion-group class="accordion-recebidos" *ngIf="anunciosComInteresse.length > 0">
 
-          <ion-accordion *ngFor="let item of anunciosComInteresse" [value]="item.anuncio.cdAnuncio">
+          <ion-accordion *ngFor="let anuncioItem of anunciosComInteresse; trackBy: trackByAnuncio"
+            [value]="anuncioItem.anuncio.cdAnuncio">
 
             <ion-item slot="header" class="accordion-header">
               <div class="anuncio-info">
-                <h2>{{ item.anuncio.nmAnuncio }}</h2>
+                <h2>{{ anuncioItem.anuncio.nmAnuncio }}</h2>
                 <span class="badge-interesses">
-                  {{ item.interessados.length }}
-                  {{ item.interessados.length === 1 ? 'interessado' : 'interessados' }}
+                  {{ anuncioItem.interessados.length }}
+                  {{ anuncioItem.interessados.length === 1 ? 'interessado' : 'interessados' }}
                 </span>
               </div>
             </ion-item>
 
             <div class="ion-padding" slot="content">
-              <a class="interessado-item" *ngFor="let usuario of item.interessados"
-                [routerLink]="['/usuario-perfil', usuario.cdUsuario]">
-                <ion-icon name="people-outline"></ion-icon>
-                <span>{{ usuario.nmUsuario }}</span>
-                <ion-icon name="chevron-forward-outline" class="seta"></ion-icon>
-              </a>
+              <div class="interessado-item"
+                *ngFor="let interessado of anuncioItem.interessados; trackBy: trackByInteressado">
+
+                <a class="interessado-info" [routerLink]="['/usuario-perfil', interessado.usuario.cdUsuario]">
+                  <ion-icon name="people-outline"></ion-icon>
+                  <span>{{ interessado.usuario.nmUsuario }}</span>
+                </a>
+
+                <ion-button expand="block" fill="solid" class="btn-conversar"
+                  [routerLink]="['/chat', interessado.cdInteresse]">
+                  <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+                  Conversar
+                </ion-button>
+
+              </div>
             </div>
 
           </ion-accordion>

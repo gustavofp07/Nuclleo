@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   IonContent,
@@ -23,7 +23,7 @@ import {
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { heartOutline, peopleOutline, chevronForwardOutline } from 'ionicons/icons';
+import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -31,9 +31,14 @@ import { InteresseModel } from 'src/app/model/interesse.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 
+interface InteressadoComInteresse {
+  usuario: UsuarioModel;
+  cdInteresse: number;
+}
+
 interface AnuncioComInteresse {
   anuncio: AnuncioModel;
-  interessados: UsuarioModel[];
+  interessados: InteressadoComInteresse[];
 }
 
 @Component({
@@ -74,12 +79,14 @@ export class InteresseMeusPage implements OnInit {
     private usuarioService: UsuarioService,
     private alertController: AlertController,
     private toastController: ToastController,
+    private router: Router,
   ) {
     this.usuario = new UsuarioModel();
     addIcons({
       heartOutline,
       peopleOutline,
-      chevronForwardOutline
+      chevronForwardOutline,
+      chatbubbleOutline,
     });
   }
 
@@ -130,12 +137,14 @@ export class InteresseMeusPage implements OnInit {
         mapa.set(cdAnuncio, { anuncio: interesse.anuncio, interessados: [] });
       }
 
-      mapa.get(cdAnuncio)!.interessados.push((interesse as any).usuario);
+      mapa.get(cdAnuncio)!.interessados.push({
+        usuario: (interesse as any).usuario,
+        cdInteresse: interesse.id!
+      });
     }
 
     return Array.from(mapa.values());
   }
-
   async confirmarRemocao(interesse: InteresseModel) {
     const alert = await this.alertController.create({
       header: 'Remover interesse',
@@ -169,6 +178,23 @@ export class InteresseMeusPage implements OnInit {
         this.exibirMensagem('Erro ao remover interesse.');
       }
     });
+  }
+
+  trackByAnuncio(index: number, item: AnuncioComInteresse): number {
+    return item.anuncio.cdAnuncio;
+  }
+
+  trackByInteressado(index: number, item: InteressadoComInteresse): number {
+    return item.cdInteresse;
+  }
+
+  irParaPerfil(cdUsuario: number) {
+    this.router.navigate(['/usuario-perfil', cdUsuario]);
+  }
+
+  irParaChat(event: Event, cdInteresse: number) {
+    event.stopPropagation();
+    this.router.navigate(['/chat', cdInteresse]);
   }
 
   async exibirMensagem(mensagem: string) {

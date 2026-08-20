@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/interesse-meus"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      {{ nomeOutroUsuario || 'Chat' }}
+      <span class="status-indicador" [class.online]="conectado"></span>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content #content [fullscreen]="true" class="chat-content">
+
+  <div class="lista-mensagens">
+
+    <div *ngFor="let mensagem of mensagens" class="mensagem-linha"
+      [class.minha]="ehMinhaMensagem(mensagem)">
+
+      <div class="balao">
+        <span class="conteudo">{{ mensagem.conteudo }}</span>
+        <span class="horario">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+      </div>
+
+    </div>
+
+    <div *ngIf="mensagens.length === 0" class="empty-chat">
+      <p>Nenhuma mensagem ainda. Diga oi!</p>
+    </div>
+
+  </div>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="footer-toolbar">
+    <ion-item class="input-item" lines="none">
+      <ion-input
+        [(ngModel)]="textoMensagem"
+        placeholder="Digite sua mensagem..."
+        (keyup.enter)="enviar()">
+      </ion-input>
+
+      <ion-button slot="end" fill="clear" (click)="enviar()">
+        <ion-icon name="send-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

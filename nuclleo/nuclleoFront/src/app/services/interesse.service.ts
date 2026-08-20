@@ -26,9 +26,11 @@ export class InteresseService {
     return this.http.get<InteresseModel[]>(`${this.URL}/interessados/${cdUsuario}`);
   }
 
+  buscarPorId(id: number): Observable<InteresseModel> {
+    return this.http.get<InteresseModel>(`${this.URL}/${id}`);
+  }
+
   excluirInteresse(codigo: number): Observable<void> {
     return this.http.delete<void>(`${this.URL}/excluir/${codigo}`);
   }
-
- 
 }
