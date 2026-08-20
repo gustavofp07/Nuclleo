@@ -16,19 +16,9 @@
     </div>
 
     <!-- FOTO -->
-
-    <div class="foto-box">
-
-      <img [src]="previewFoto || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
-
-      <input type="file" hidden #inputFoto accept="image/png,image/jpeg,image/jpg" (change)="selecionarImagem($event)">
-
-      <ion-button type="button" class="btn-foto" (click)="inputFoto.click()">
-
-        Selecionar foto
-
-      </ion-button>
-
+    <div class="foto-box" (click)="selecionarImagem()">
+      <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
+      <p>Alterar foto</p>
     </div>
 
     <!-- FORMULÁRIO -->

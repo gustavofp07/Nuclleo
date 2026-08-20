@@ -43,12 +43,6 @@ export class UsuarioService {
     return this.http.put<UsuarioModel>(this.API_URL, formData);
   }
 
-  /*
-  atualizar(usuario: UsuarioModel): Observable<UsuarioModel> {//body
-    return this.http.put<UsuarioModel>(this.API_URL, usuario);
-  }
-    */
-
 
   //coisas da sessão
   salvarUsuarioSessao(usuario: UsuarioAutenticadoModel): void {

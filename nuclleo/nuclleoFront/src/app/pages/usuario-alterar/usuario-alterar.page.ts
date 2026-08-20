@@ -143,11 +143,9 @@ export class UsuarioAlterarPage implements OnInit {
 
   selecionarImagem(event: Event) {
 
-    const input =
-      event.target as HTMLInputElement;
+    const input = event.target as HTMLInputElement;
 
-    const arquivo =
-      input.files?.[0];
+    const arquivo = input.files?.[0];
 
     if (!arquivo) {
       return;
@@ -162,9 +160,7 @@ export class UsuarioAlterarPage implements OnInit {
 
       input.value = '';
 
-      this.exibirMensagem(
-        'Selecione apenas imagens JPG, JPEG ou PNG.'
-      );
+      this.exibirMensagem('Selecione apenas imagens JPG, JPEG ou PNG.');
 
       return;
     }
