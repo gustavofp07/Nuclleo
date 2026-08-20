@@ -27,7 +27,7 @@
 
     <div class="info-box">
 
-      <img [src]='"assets/img/anuncioPadrao.png"' class="foto-anuncio">
+      <img [src]="anuncio.ftAnuncio || 'assets/img/anuncioPadrao.png'" class="foto-anuncio">
 
       <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
         R$ {{ $any(anuncio).valor | number:'1.2-2' }}

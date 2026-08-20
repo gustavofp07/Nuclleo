@@ -30,6 +30,7 @@ import { AnuncioVendaModel } from 'src/app/model/anuncio-venda.model';
 import { AnuncioRequerimentoModel } from 'src/app/model/anuncio-requerimento.model';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
+import { ArquivoService } from 'src/app/services/arquivo.service';
 
 @Component({
   selector: 'app-criar-anuncio',
@@ -59,20 +60,20 @@ import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.se
 })
 export class CriarAnuncioPage {
   anuncio!: AnuncioModel;
-  //anuncioVenda: AnuncioVendaModel;
-  //anuncioRequerimento: AnuncioRequerimentoModel;
 
   tipo = '';
   limiteDescricao: number = 250;
 
   usuarioEhDono: boolean = false;
-  imagemSelecionada?: File;
-  previewImagem?: string;
+
   cdAnuncioEdicao: number = 0;
   modoEdicao: boolean = false;
 
   comunidadesSelecionadas: ComunidadeModel[];
   comunidades: ComunidadeModel[];
+
+  previewFoto: string | ArrayBuffer | null = null;
+  imagemSelecionada?: File;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -80,6 +81,7 @@ export class CriarAnuncioPage {
     private usuarioService: UsuarioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private anuncioComunidadeService: AnuncioComunidadeService,
+    private arquivoService: ArquivoService,
     private toastController: ToastController,
     private router: Router
   ) {
@@ -111,6 +113,9 @@ export class CriarAnuncioPage {
   }
 
   ionViewWillEnter() {
+    this.previewFoto = null;
+    this.imagemSelecionada = undefined;
+    this.comunidadesSelecionadas = [];
   }
 
   carregarComunidadesUsuario() {
@@ -144,23 +149,20 @@ export class CriarAnuncioPage {
     }
   }
 
-  selecionarImagem(event: any) {
-
-    const arquivo = event.target.files[0];
+  async selecionarImagem() {
+    const arquivo = await this.arquivoService.capturar();
 
     if (!arquivo) {
       return;
     }
 
     const tiposPermitidos = [
-      'image/png',
-      'image/jpeg'
+      'image/jpeg',
+      'image/png'
     ];
 
     if (!tiposPermitidos.includes(arquivo.type)) {
-      this.exibirMensagem(
-        'Selecione apenas imagens PNG ou JPG.'
-      );
+      await this.exibirMensagem('Selecione apenas imagens JPG, JPEG ou PNG.');
       return;
     }
 
@@ -169,8 +171,7 @@ export class CriarAnuncioPage {
     const reader = new FileReader();
 
     reader.onload = () => {
-      this.previewImagem =
-        reader.result as string;
+      this.previewFoto = reader.result;
     };
 
     reader.readAsDataURL(arquivo);
@@ -185,7 +186,10 @@ export class CriarAnuncioPage {
 
       if (this.tipo === 'VENDA') {
 
-        this.anuncioService.alterarVenda(this.anuncio as AnuncioVendaModel).subscribe({
+        this.anuncioService.alterarVenda(
+          this.anuncio as AnuncioVendaModel,
+          this.imagemSelecionada
+        ).subscribe({
           next: () => {
             this.atualizarComunidadesDoAnuncio();
           },
@@ -196,7 +200,10 @@ export class CriarAnuncioPage {
 
       } else {
 
-        this.anuncioService.alterarRequerimento(this.anuncio as AnuncioRequerimentoModel).subscribe({
+        this.anuncioService.alterarRequerimento(
+          this.anuncio as AnuncioRequerimentoModel,
+          this.imagemSelecionada
+        ).subscribe({
           next: () => {
             this.atualizarComunidadesDoAnuncio();
           },
@@ -268,7 +275,10 @@ export class CriarAnuncioPage {
 
     //console.log(this.anuncio);
 
-    this.anuncioService.cadastrarVenda(this.anuncio as AnuncioVendaModel).subscribe({
+    this.anuncioService.cadastrarVenda(
+      this.anuncio as AnuncioVendaModel,
+      this.imagemSelecionada
+    ).subscribe({
       next: (anuncioSalvo: AnuncioVendaModel) => {
         //this.exibirMensagem('Anúncio criado com sucesso!');
         //this.router.navigate(['/tela-inicial']);
@@ -291,31 +301,34 @@ export class CriarAnuncioPage {
   }
 
   cadastrarRelacoes(anuncioSalvo: AnuncioModel) {
-  const relacoes = this.comunidadesSelecionadas.map(
-    comunidade => ({
-      anuncio: anuncioSalvo,
-      comunidade: comunidade
-    })
-  );
+    const relacoes = this.comunidadesSelecionadas.map(
+      comunidade => ({
+        anuncio: anuncioSalvo,
+        comunidade: comunidade
+      })
+    );
 
-  this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
-    next: () => {
-      this.exibirMensagem('Anúncio criado com sucesso!');
-      this.router.navigate(['/anuncio-tela', anuncioSalvo.cdAnuncio]);
-    },
-    error: () => {
-      this.exibirMensagem(
-        'Anúncio criado, mas houve erro ao publicar nas comunidades.'
-      );
-    }
-  });
-}
+    this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
+      next: () => {
+        this.exibirMensagem('Anúncio criado com sucesso!');
+        this.router.navigate(['/anuncio-tela', anuncioSalvo.cdAnuncio]);
+      },
+      error: () => {
+        this.exibirMensagem(
+          'Anúncio criado, mas houve erro ao publicar nas comunidades.'
+        );
+      }
+    });
+  }
 
   cadastrarRequerimento() {
     this.anuncio.tipoAnuncio = 'REQUERIMENTO';
     this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
 
-    this.anuncioService.cadastrarRequerimento(this.anuncio as AnuncioRequerimentoModel).subscribe({
+    this.anuncioService.cadastrarRequerimento(
+      this.anuncio as AnuncioRequerimentoModel,
+      this.imagemSelecionada
+    ).subscribe({
       next: (anuncioSalvo: AnuncioRequerimentoModel) => {
         //this.exibirMensagem('Requerimento criado com sucesso!');
         //this.router.navigate(['/tela-inicial']);

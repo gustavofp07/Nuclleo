@@ -76,9 +76,9 @@ ion-toolbar {
   color: #000000;
 }
 
-/* UPLOAD */
 
-.upload-box {
+/* FOTO */
+.foto-box {
   width: 220px;
   height: 220px;
 
@@ -98,66 +98,11 @@ ion-toolbar {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-.preview-imagem {
+.imagem {
   width: 100%;
   height: 100%;
 
   object-fit: cover;
-}
-
-.placeholder-upload {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  gap: 12px;
-
-  color: #9ca3af;
-
-  padding: 20px;
-
-  box-sizing: border-box;
-}
-
-.placeholder-upload ion-icon {
-  font-size: 64px;
-  color: #9ca3af;
-}
-
-.placeholder-upload span {
-  max-width: 130px;
-
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.btn-upload {
-  margin-bottom: 25px;
-
-  --background: linear-gradient(
-    90deg,
-    #7c3aed,
-    #a855f7
-  );
-
-  --color: #ffffff;
-
-  --border-radius: 16px;
-
-  height: 52px;
-
-  font-weight: 700;
-}
-
-.btn-upload::part(native) {
-  border-radius: 16px;
 }
 
 /* INPUTS */
@@ -228,19 +173,12 @@ ion-input {
   );
 
   --color: #ffffff;
-
   --border-radius: 16px;
-
   height: 52px;
-
   font-weight: 700;
-
   font-size: 15px;
-
   text-transform: uppercase;
-
   letter-spacing: 0.5px;
-
   overflow: hidden;
 }
 

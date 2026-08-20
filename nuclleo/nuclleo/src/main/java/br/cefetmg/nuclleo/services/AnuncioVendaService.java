@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.AnuncioVenda;
 import br.cefetmg.nuclleo.repository.AnuncioVendaRepository;
@@ -16,13 +18,18 @@ public class AnuncioVendaService {
     @Autowired
     private AnuncioVendaRepository anuncioVendaRepository;
 
+    @Autowired
+    private ArquivoIntegracaoService arquivoIntegracaoService;
+
     @Transactional
-    public AnuncioVenda inserir(AnuncioVenda anuncio) {
+    public AnuncioVenda inserir(AnuncioVenda anuncio, MultipartFile foto) {
+        aplicarFoto(anuncio, foto);
         return anuncioVendaRepository.save(anuncio);
     }
 
     @Transactional
-    public AnuncioVenda alterar(AnuncioVenda anuncio) {
+    public AnuncioVenda alterar(AnuncioVenda anuncio, MultipartFile foto) {
+        aplicarFoto(anuncio, foto);
         return anuncioVendaRepository.save(anuncio);
     }
 
@@ -40,5 +47,12 @@ public class AnuncioVendaService {
     @Transactional(readOnly = true)
     public List<AnuncioVenda> buscarAnunciosPorUsuario(Long cdUsuario) {
         return anuncioVendaRepository.findByUsuarioCria_CdUsuario(cdUsuario);
+    }
+
+    private void aplicarFoto(AnuncioVenda anuncio, MultipartFile foto) {
+        if (foto != null && !foto.isEmpty()) {
+            ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+            anuncio.setFtAnuncio(arquivo.getUrl());
+        }
     }
 }

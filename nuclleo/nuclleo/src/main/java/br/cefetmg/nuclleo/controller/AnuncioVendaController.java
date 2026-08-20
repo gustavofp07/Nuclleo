@@ -4,15 +4,17 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.AnuncioVenda;
@@ -33,25 +35,29 @@ public class AnuncioVendaController {
     //não vou colocar o delete aqui, pois o anuncio é delelatdo pelo id, não precisa de um endpoint específico pra isso.
     //O mesmo vale pro put, que é só pra atualizar o anúncio, não tem nada específico pra venda.
 
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar anúncio de venda")
-    public ResponseEntity<AnuncioVenda> inserir(@Valid @RequestBody AnuncioVenda anuncio) {
+    public ResponseEntity<AnuncioVenda> inserir(
+            @Valid @RequestPart("anuncio") AnuncioVenda anuncio,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
         if (anuncio.getCdAnuncio() != null) { // gambiarra. Tem q tirar isso
             anuncio.setCdAnuncio(null);
         }
 
-        AnuncioVenda objAnuncio = anuncioVendaService.inserir(anuncio);
+        AnuncioVenda objAnuncio = anuncioVendaService.inserir(anuncio, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objAnuncio);
     }
 
-    @PutMapping("")
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualizar anúncio de venda")
-    public ResponseEntity<AnuncioVenda> alterar(@Valid @RequestBody AnuncioVenda anuncio) {
+    public ResponseEntity<AnuncioVenda> alterar(
+            @Valid @RequestPart("anuncio") AnuncioVenda anuncio,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
         if (anuncio.getCdAnuncio() == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        AnuncioVenda objAnuncio = anuncioVendaService.alterar(anuncio);
+        AnuncioVenda objAnuncio = anuncioVendaService.alterar(anuncio, foto);
         return ResponseEntity.ok(objAnuncio);
     }
 

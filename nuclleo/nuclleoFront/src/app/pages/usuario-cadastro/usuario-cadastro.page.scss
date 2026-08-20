@@ -144,41 +144,29 @@ ion-item ion-button {
 }
 
 /* FOTO */
-
 .foto-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 220px;
+  height: 220px;
 
-  margin-bottom: 28px;
-}
+  margin: 0 auto 16px auto;
 
-.foto-usuario {
-  width: 130px;
-  height: 130px;
-
+  border: 1px solid #d1d5db;
   border-radius: 50%;
 
-  object-fit: cover;
+  background: #ffffff;
 
-  background: #e5e7eb;
+  overflow: hidden;
 
-  border: 4px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-
-  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-.btn-foto {
-  --background: #7c3aed;
-  --color: #ffffff;
+.imagem {
+  width: 100%;
+  height: 100%;
 
-  --border-radius: 14px;
-
-  height: 46px;
-
-  font-weight: 600;
-
-  text-transform: none;
+  object-fit: cover;
 }

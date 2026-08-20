@@ -35,6 +35,12 @@
 
     <form (ngSubmit)="salvar()">
 
+      <!-- FOTO -->
+      <div class="foto-box" (click)="selecionarImagem()">
+        <img [src]="previewFoto || anuncio.ftAnuncio || 'assets/img/usuarioPadrao.png'" class="imagem">
+      </div>
+      <p>Alterar foto</p>
+
       <!-- TÍTULO -->
       <div class="campo-label">
         <label>Título</label>
@@ -54,20 +60,6 @@
           rows="2">
         </ion-textarea>
       </ion-item>
-
-      <div class="campo-label">
-        <label>Imagem</label>
-      </div>
-
-      <!-- IMAGEM -->
-      <div class="upload-box">
-        <input type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" (change)="selecionarImagem($event)"
-          class="input-file">
-      </div>
-
-      <div class="preview-container" *ngIf="previewImagem">
-        <img [src]="previewImagem" alt="Pré-visualização" class="preview-imagem">
-      </div>
 
       <!-- VENDA -->
       <ng-container *ngIf="tipo === 'VENDA'">

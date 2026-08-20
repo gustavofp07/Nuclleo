@@ -30,6 +30,7 @@ import {
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { ArquivoService } from 'src/app/services/arquivo.service';
 
 @Component({
   selector: 'app-usuario-alterar',
@@ -57,7 +58,6 @@ export class UsuarioAlterarPage implements OnInit {
   usuario: UsuarioModel;
 
   previewFoto: string | ArrayBuffer | null = null;
-
   imagemSelecionada?: File;
 
   showPassword: boolean = false;
@@ -65,7 +65,8 @@ export class UsuarioAlterarPage implements OnInit {
   constructor(
     private router: Router,
     private usuarioService: UsuarioService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private arquivoService: ArquivoService
   ) {
 
     addIcons({
@@ -141,11 +142,8 @@ export class UsuarioAlterarPage implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  selecionarImagem(event: Event) {
-
-    const input = event.target as HTMLInputElement;
-
-    const arquivo = input.files?.[0];
+  async selecionarImagem() {
+    const arquivo = await this.arquivoService.capturar();
 
     if (!arquivo) {
       return;
@@ -157,11 +155,7 @@ export class UsuarioAlterarPage implements OnInit {
     ];
 
     if (!tiposPermitidos.includes(arquivo.type)) {
-
-      input.value = '';
-
-      this.exibirMensagem('Selecione apenas imagens JPG, JPEG ou PNG.');
-
+      await this.exibirMensagem('Selecione apenas imagens JPG, JPEG ou PNG.');
       return;
     }
 
@@ -178,22 +172,10 @@ export class UsuarioAlterarPage implements OnInit {
 
   salvarAlteracoes() {
 
-    this.usuarioService
-      .atualizar(
-        this.usuario,
-        this.imagemSelecionada
-      )
-      .subscribe({
-
+    this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
         next: (usuario: UsuarioModel) => {
-
-          console.log(
-            'atualizou ',
-            usuario
-          );
-
-          this.usuarioService
-            .salvarUsuarioSessao(usuario);
+          console.log('atualizou ',usuario);
+          this.usuarioService.salvarUsuarioSessao(usuario);
 
           this.router.navigate([
             '/usuario-perfil'

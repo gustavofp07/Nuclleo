@@ -21,12 +21,18 @@ export class AnuncioService {
   ) { }
 
 
-  cadastrarVenda(anuncio: AnuncioVendaModel): Observable<AnuncioVendaModel> {
-    return this.http.post<AnuncioVendaModel>(this.API_URL_VENDA, anuncio);
+  cadastrarVenda(anuncio: AnuncioVendaModel, foto?: File): Observable<AnuncioVendaModel> {
+    return this.http.post<AnuncioVendaModel>(
+      this.API_URL_VENDA,
+      this.montarFormData(anuncio, foto)
+    );
   }
 
-  cadastrarRequerimento(anuncio: AnuncioRequerimentoModel): Observable<AnuncioRequerimentoModel> {
-    return this.http.post<AnuncioRequerimentoModel>(this.API_URL_REQUERIMENTO, anuncio);
+  cadastrarRequerimento(anuncio: AnuncioRequerimentoModel, foto?: File): Observable<AnuncioRequerimentoModel> {
+    return this.http.post<AnuncioRequerimentoModel>(
+      this.API_URL_REQUERIMENTO,
+      this.montarFormData(anuncio, foto)
+    );
   }
 
   listarAnunciosPorUsuario(cdUsuario: number): Observable<AnuncioModel[]> {
@@ -59,18 +65,35 @@ export class AnuncioService {
     );
   }
 
-  alterarVenda(anuncio: AnuncioVendaModel): Observable<AnuncioVendaModel> {
+  alterarVenda(anuncio: AnuncioVendaModel, foto?: File): Observable<AnuncioVendaModel> {
     return this.http.put<AnuncioVendaModel>(
       this.API_URL_VENDA,
-      anuncio
+      this.montarFormData(anuncio, foto)
     );
   }
 
-  alterarRequerimento(anuncio: AnuncioRequerimentoModel): Observable<AnuncioRequerimentoModel> {
+  alterarRequerimento(anuncio: AnuncioRequerimentoModel, foto?: File): Observable<AnuncioRequerimentoModel> {
     return this.http.put<AnuncioRequerimentoModel>(
       this.API_URL_REQUERIMENTO,
-      anuncio
+      this.montarFormData(anuncio, foto)
     );
+  }
+
+  private montarFormData(anuncio: AnuncioModel, foto?: File): FormData {
+    const formData = new FormData();
+
+    const anuncioBlob = new Blob(
+      [JSON.stringify(anuncio)],
+      { type: 'application/json' }
+    );
+
+    formData.append('anuncio', anuncioBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return formData;
   }
 
   uploadImagem(arquivo: File) {

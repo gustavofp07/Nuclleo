@@ -4,6 +4,7 @@ export class AnuncioModel {
     cdAnuncio: number;
     nmAnuncio: string;
     descricao: string;
+    ftAnuncio: string;
     tipoAnuncio: string;
     habilitado: boolean;
     usuarioCria: UsuarioModel;
@@ -12,6 +13,7 @@ export class AnuncioModel {
         this.cdAnuncio = 0;
         this.nmAnuncio = '';
         this.descricao = '';
+        this.ftAnuncio = '';
         this.tipoAnuncio = '';
         this.habilitado = true;
         this.usuarioCria = new UsuarioModel();

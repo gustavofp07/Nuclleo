@@ -33,18 +33,11 @@
         <label>Foto de perfil</label>
       </div>
 
-      <div class="upload-box">
-        <img *ngIf="previewFoto || usuario.ftUsuario" [src]="previewFoto || usuario.ftUsuario" class="preview-imagem">
-        <div *ngIf="!previewFoto && !usuario.ftUsuario" class="placeholder-upload">
-          <ion-icon name="image-outline">
-          </ion-icon>
-          <span>Nenhuma imagem selecionada</span>
-        </div>
-        <input type="file" hidden #inputFile accept=".png,.jpg,.jpeg" (change)="selecionarImagem($event)">
+      <!-- FOTO -->
+      <div class="foto-box" (click)="selecionarImagem()">
+        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem">
       </div>
-
-      <ion-button expand="block" type="button" class="btn-upload" (click)="inputFile.click()">Selecionar
-        imagem</ion-button>
+      <p>Alterar foto</p>
 
       <div class="campo-label">
         <label>Nome</label>

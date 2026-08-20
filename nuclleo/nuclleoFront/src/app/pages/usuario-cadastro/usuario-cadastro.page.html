@@ -17,9 +17,9 @@
 
     <!-- FOTO -->
     <div class="foto-box" (click)="selecionarImagem()">
-      <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
-      <p>Alterar foto</p>
+      <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem">
     </div>
+    <p>Alterar foto</p>
 
     <!-- FORMULÁRIO -->
     <form (ngSubmit)="salvar()">

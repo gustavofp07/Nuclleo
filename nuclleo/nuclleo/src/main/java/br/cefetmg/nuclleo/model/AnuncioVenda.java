@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "tb_anuncio_venda")
 public class AnuncioVenda extends Anuncio {
 
-    @Column(name = "ft_anuncio", nullable = false)
+    @Column(name = "ft_anuncio")
     private String ftAnuncio;
 
     @Column(name = "valor", nullable = false, columnDefinition = "DECIMAL(10,2)")

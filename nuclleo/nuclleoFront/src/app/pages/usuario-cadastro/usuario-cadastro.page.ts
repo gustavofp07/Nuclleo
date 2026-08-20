@@ -138,9 +138,7 @@ export class UsuarioCadastroPage implements OnInit {
 
 
   async selecionarImagem() {
-    
     const arquivo = await this.arquivoService.capturar();
-    console.log("Selecionar imagem");
 
     if (!arquivo) {
       return;
@@ -166,7 +164,6 @@ export class UsuarioCadastroPage implements OnInit {
 
     reader.readAsDataURL(arquivo);
   }
-
 
   async exibirMensagem(texto: string) {
     const toast =

@@ -7,16 +7,19 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
   providedIn: 'root',
 })
 export class ArquivoService {
-  
+
   constructor() { }
 
   public async capturar(): Promise<File | undefined> {
+
     try {
+
       const camera = await Camera.getPhoto({
         resultType: CameraResultType.Uri,
         source: CameraSource.Prompt,
         quality: 50,
         saveToGallery: true,
+
         promptLabelHeader: 'Foto',
         promptLabelPhoto: 'Galeria',
         promptLabelPicture: 'Câmera',
@@ -31,20 +34,30 @@ export class ArquivoService {
       const blob = await response.blob();
 
       const extensao = camera.format || 'jpeg';
-      const nomeArquivo = `foto-${Date.now()}.${extensao}`;
 
-      const arquivo = new File(
+      const nomeArquivo =
+        `foto-${Date.now()}.${extensao}`;
+
+      const tipo =
+        blob.type ||
+        (extensao === 'png'
+          ? 'image/png'
+          : 'image/jpeg');
+
+      return new File(
         [blob],
         nomeArquivo,
-        { type: blob.type }
+        { type: tipo }
       );
 
-      return arquivo;
-
     } catch (erro) {
-      console.log('Captura cancelada ou não concluída.');
+
+      console.log(
+        'Captura cancelada ou não concluída.',
+        erro
+      );
+
       return;
     }
-
   }
 }
