@@ -114,9 +114,8 @@ export class UsuarioCadastroPage implements OnInit {
       return;
     }
 
-    this.usuarioService
-      .cadastrarUsuario(this.usuario)
-      .subscribe({
+    this.usuarioService.cadastrarUsuario(this.usuario, this.imagemSelecionada
+      ).subscribe({
 
         next: async () => {
           console.log("Sucesso");
@@ -231,6 +230,7 @@ export class UsuarioCadastroPage implements OnInit {
     }
 
     this.imagemSelecionada = arquivo;
+    loading.dismiss();
 
     const reader = new FileReader();
 

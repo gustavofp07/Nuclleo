@@ -17,8 +17,24 @@ export class UsuarioService {
   }
   constructor(private http: HttpClient) { }
 
-  cadastrarUsuario(usuario: UsuarioModel): Observable<UsuarioModel> {//body
-    return this.http.post<UsuarioModel>(this.API_URL, usuario);
+  cadastrarUsuario(usuario: UsuarioModel, foto?: File): Observable<UsuarioModel> {
+    const formData = new FormData();
+
+    const usuarioBlob = new Blob(
+      [JSON.stringify(usuario)],
+      { type: 'application/json' }
+    );
+
+    formData.append('usuario', usuarioBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return this.http.post<UsuarioModel>(
+      this.API_URL,
+      formData
+    );
   }
 
   excluirUsuario(cdUsuario: number): Observable<UsuarioModel> {

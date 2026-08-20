@@ -24,9 +24,27 @@ public class UsuarioService {
     private ArquivoIntegracaoService arquivoIntegracaoService;
 
     @Transactional
-    public Usuario inserir(Usuario usuario) {
+    public Usuario inserir(Usuario usuario, MultipartFile foto) {
         usuario.setAtivo(true);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
+
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+
+                if (arquivo == null || arquivo.getUrl() == null ||
+                        arquivo.getUrl().isBlank()) {
+                    throw new BusinessException(
+                            "O serviço de arquivos não retornou a URL da foto.");
+                }
+
+                usuario.setFtUsuario(arquivo.getUrl());
+
+            } catch (RestClientException e) {
+                throw new BusinessException("Não foi possível enviar a foto. Verifique o formato e tente novamente.");
+            }
+        }
+
         return usuarioRepository.save(usuario);
     }
 
@@ -53,7 +71,7 @@ public class UsuarioService {
                 }
 
                 usuario.setFtUsuario(arquivo.getUrl());
-                
+
             } catch (RestClientException e) {
                 throw new BusinessException(
                         "Não foi possível enviar a foto. Verifique o formato e tente novamente.");

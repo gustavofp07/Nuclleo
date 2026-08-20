@@ -32,22 +32,20 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar usuário")
-    public ResponseEntity<Usuario> inserir(@Valid @RequestBody Usuario usuario) {
-        // depois verificar se o usuário (email) já existe, se não existir, insere. Se
-        // existir, ou mostra o erro, ou reativa a conta, pois não há excusão de
-        // usuário, apenas desativação.
+    public ResponseEntity<Usuario> inserir(@Valid @RequestPart("usuario") Usuario dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
-        if (usuario == null) {
+        if (dto == null) {
             throw new BadRequestException("Usuário é obrigatório");
         }
 
-        if (usuario.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
-            usuario.setCdUsuario(null);
+        if (dto.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
+            dto.setCdUsuario(null);
         }
 
-        Usuario objUsuario = usuarioService.inserir(usuario);
+
+        Usuario objUsuario = usuarioService.inserir(dto, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);
     }
 
@@ -64,18 +62,19 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.alterar(dto, foto));
     }
 
-    /* 
-    @PutMapping("")
-    @Operation(summary = "Atualizar usuário")
-    public ResponseEntity<Usuario> alterar(@RequestBody Usuario usuario) {
-        if (usuario.getCdUsuario() == null) {
-            throw new BadRequestException("Id é obrigatório");
-        }
-
-        Usuario objUsuario = usuarioService.alterar(usuario);
-        return ResponseEntity.ok(objUsuario);
-    }
-        */
+    /*
+     * @PutMapping("")
+     * 
+     * @Operation(summary = "Atualizar usuário")
+     * public ResponseEntity<Usuario> alterar(@RequestBody Usuario usuario) {
+     * if (usuario.getCdUsuario() == null) {
+     * throw new BadRequestException("Id é obrigatório");
+     * }
+     * 
+     * Usuario objUsuario = usuarioService.alterar(usuario);
+     * return ResponseEntity.ok(objUsuario);
+     * }
+     */
 
     @DeleteMapping("/{cdUsuario}")
     @Operation(summary = "Excluir usuário")
