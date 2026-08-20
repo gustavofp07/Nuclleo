@@ -60,5 +60,20 @@ public class Usuario {
 
     @Column(name = "ativo")
     private boolean ativo;
-}
 
+    public Long getCdUsuario() {
+        return cdUsuario;
+    }
+
+    public void setCdUsuario(Long cdUsuario) {
+        this.cdUsuario = cdUsuario;
+    }
+
+    public String getNmUsuario() {
+        return nmUsuario;
+    }
+
+    public void setNmUsuario(String nmUsuario) {
+        this.nmUsuario = nmUsuario;
+    }
+}

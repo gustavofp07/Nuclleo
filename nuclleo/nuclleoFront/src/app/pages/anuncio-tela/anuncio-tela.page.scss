@@ -171,3 +171,9 @@
 .link-usuario {
   cursor: pointer;
 }
+
+.botoes-interessado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

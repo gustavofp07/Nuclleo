@@ -77,8 +77,16 @@ export const routes: Routes = [
   },
   {
     path: 'interesse-meus',
-    loadComponent: () => import('./pages/interesse/interesse').then( m => m.InteresseMeusPage)
+    loadComponent: () => import('./pages/interesse/interesse').then(m => m.InteresseMeusPage)
   },
+  {
+    path: 'chat/:cdInteresse',
+    loadComponent: () => import('./pages/chat/chat.page').then(m => m.ChatPage)
+  },  {
+    path: 'chat',
+    loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage)
+  },
+
 
 
 

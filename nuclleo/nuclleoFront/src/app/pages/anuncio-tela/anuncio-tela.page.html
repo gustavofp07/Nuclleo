@@ -84,12 +84,25 @@
 
       <ng-template #botoesVisitante>
 
-        <ion-button expand="block" class="btn-contato" [class.btn-remover-interesse]="usuarioJaInteressado"
-          (click)="confirmarInteresse()">
-          <ion-icon [name]="usuarioJaInteressado ? 'heart-dislike-outline' : 'chatbubble-outline'"
-            slot="start"></ion-icon>
-          {{ usuarioJaInteressado ? 'Remover interesse' : 'Estou interessado' }}
+        <ion-button expand="block" class="btn-contato" *ngIf="!usuarioJaInteressado" (click)="confirmarInteresse()">
+          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+          Estou interessado
         </ion-button>
+
+        <div class="botoes-interessado" *ngIf="usuarioJaInteressado">
+
+          <ion-button expand="block" class="btn-chat" [routerLink]="['/chat', interesseAtual?.id]">
+            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+            Conversar com o anunciante
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" color="danger" class="btn-remover-interesse"
+            (click)="confirmarInteresse()">
+            <ion-icon name="heart-dislike-outline" slot="start"></ion-icon>
+            Remover interesse
+          </ion-button>
+
+        </div>
 
       </ng-template>
 
