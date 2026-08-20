@@ -137,87 +137,14 @@ export class UsuarioCadastroPage implements OnInit {
   }
 
 
-
-  /*
-  selecionarImagem(event: any) {
-    const arquivo = event.target.files[0];
-
-    if (!arquivo) {
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      this.previewFoto = reader.result;
-    };
-
-    reader.readAsDataURL(arquivo);
-
-  }
-    */
-
-
-
-  async alterarFoto() {
-    /*
-    const arquivo = await this.arquivoService.capturar();
-
-    if (!arquivo) {
-      return;
-    }
-      */
-
-    const loading = await this.loadingController.create({
-      message: 'Aguarde...',
-      spinner: 'crescent'
-    });
-
-    await loading.present();
-
-    /*
-    this.arquivoService.salvar(arquivo).subscribe({
-      next: (resultado) => {
-        if (!resultado.url || !this.usuario.id) {
-          loading.dismiss();
-          this.exibirMensagem('Erro ao obter a URL da imagem.');
-          return;
-        }
-
-        this.usuarioService.alterarImagem(this.usuario.id, resultado.url).subscribe({
-          next: async () => {
-            this.usuario.urlImagem = resultado.url;
-            await loading.dismiss();
-            this.exibirMensagem('Foto alterada com sucesso!');
-          },
-          error: async () => {
-            await loading.dismiss();
-            this.exibirMensagem('Erro ao atualizar foto do usuário.');
-          }
-        });
-      },
-      error: async (error: any) => {
-        await loading.dismiss();
-        this.exibirMensagem('Erro ao enviar a imagem.');
-      }
-    });
-    */
-  }
-
-
   async selecionarImagem() {
+    
     const arquivo = await this.arquivoService.capturar();
+    console.log("Selecionar imagem");
 
     if (!arquivo) {
       return;
     }
-
-    const loading = await this.loadingController.create({
-      message: 'Aguarde...',
-      spinner: 'crescent'
-    });
-
-    await loading.present();
 
     const tiposPermitidos = [
       'image/jpeg',
@@ -230,7 +157,6 @@ export class UsuarioCadastroPage implements OnInit {
     }
 
     this.imagemSelecionada = arquivo;
-    loading.dismiss();
 
     const reader = new FileReader();
 
