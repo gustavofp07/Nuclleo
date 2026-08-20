@@ -3,6 +3,7 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/transacoes")
+@CrossOrigin(origins = "*")
 @Tag(name = "Transações", description = "Operações relacionadas a transações")
 public class TransacaoController {
     @Autowired
@@ -46,7 +48,7 @@ public class TransacaoController {
     }
 
     @GetMapping("/{id}")
-    public Transacao buscarPorId(Long id) {
+    public Transacao buscarPorId(@PathVariable Long id) {
         return transacaoService.buscarPorId(id);
     }
 
@@ -56,12 +58,12 @@ public class TransacaoController {
     }
 
     @GetMapping("/anuncio/{id}")
-    public List<Transacao> listarPorAnuncio(Long id) {
+    public List<Transacao> listarPorAnuncio(@PathVariable Long id) {
         return transacaoService.listarPorAnuncio(id);
     }
 
     @DeleteMapping("/{id}")
-    public void excluir(Long id) {
+    public void excluir(@PathVariable Long id) {
         transacaoService.excluir(id);
     }
 }
