@@ -1,38 +1,94 @@
 .chat-content {
-  --background: #f5f7fb;
+  --background: #eef0f7;
 }
 
 ion-toolbar.toolbar {
   --background: #7d17f1;
   --color: #ffffff;
+  --min-height: 64px;
 }
 
-.status-indicador {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 4px;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+
+  flex-shrink: 0;
+}
+
+.header-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-nome {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #9ca3af;
-  margin-left: 8px;
 
   &.online {
-    background: #22c55e;
+    background: #4ade80;
   }
+}
+
+// Wrapper central que limita a largura no desktop
+.chat-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .lista-mensagens {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 
-  padding: 16px;
-  max-width: 700px;
-  margin: 0 auto;
+  padding: 20px 24px;
+  flex: 1;
 }
 
 .mensagem-linha {
   display: flex;
   justify-content: flex-start;
+  margin-bottom: 4px;
 
   &.minha {
     justify-content: flex-end;
@@ -40,13 +96,15 @@ ion-toolbar.toolbar {
 }
 
 .balao {
-  max-width: 75%;
+  max-width: 65%;
 
   padding: 10px 14px;
   border-radius: 16px;
+  border-bottom-left-radius: 4px;
 
   background: #ffffff;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 
   display: flex;
   flex-direction: column;
@@ -58,6 +116,8 @@ ion-toolbar.toolbar {
 .mensagem-linha.minha .balao {
   background: #7c3aed;
   border-color: #7c3aed;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 4px;
 
   .conteudo {
     color: #ffffff;
@@ -69,34 +129,112 @@ ion-toolbar.toolbar {
 }
 
 .conteudo {
-  font-size: 15px;
+  font-size: 14.5px;
+  line-height: 1.4;
   color: #111827;
 }
 
 .horario {
-  font-size: 11px;
+  font-size: 10.5px;
   color: #9ca3af;
   align-self: flex-end;
 }
 
 .empty-chat {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   text-align: center;
-  padding: 60px 20px;
-  color: #6b7280;
+  color: #9ca3af;
+  gap: 10px;
 }
 
-.footer-toolbar {
-  --background: #ffffff;
-  --border-color: #e5e7eb;
+.empty-chat ion-icon {
+  font-size: 48px;
+  color: #c4b5fd;
+}
+
+.empty-chat p {
+  font-size: 14px;
+  margin: 0;
+}
+
+// Rodapé
+ion-footer {
+  --background: transparent;
+}
+
+ion-footer {
+  --background: transparent;
+}
+
+.footer-bar {
+  background: #ffffff;
+  padding: 8px 0 12px;
+}
+
+.footer-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .input-item {
-  --background: #f5f7fb;
-  border-radius: 20px;
-  margin: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  background: #f5f7fb;
+  border-radius: 24px;
+  min-height: 46px;
+
+  padding-left: 16px;
+  padding-right: 6px;
 
   ion-input {
     --color: #111827;
     --placeholder-color: #9ca3af;
+    --padding-start: 0;
+    --padding-end: 0;
+    --highlight-color-focused: #7c3aed;
+    --highlight-color-valid: #7c3aed;
+    font-size: 14.5px;
+    flex: 1;
+  }
+}
+
+.chat-content {
+  --background: #eef0f7;
+  overflow-y: scroll;
+}
+
+.btn-enviar {
+  --color: #7c3aed;
+  --padding-start: 8px;
+  --padding-end: 8px;
+
+  margin: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+// Em telas maiores, dá uma moldura de "card" pro chat inteiro
+@media (min-width: 820px) {
+  .chat-wrapper {
+    background: #eef0f7;
+  }
+
+  ion-content.chat-content {
+    --background: #dcdfe8;
+  }
+
+  .lista-mensagens {
+    background: #eef0f7;
   }
 }

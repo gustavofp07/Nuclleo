@@ -1,31 +1,43 @@
 <ion-header>
   <ion-toolbar class="toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/interesse-meus"></ion-back-button>
+      <ion-back-button defaultHref="/interesse-meus" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>
-      {{ nomeOutroUsuario || 'Chat' }}
-      <span class="status-indicador" [class.online]="conectado"></span>
-    </ion-title>
+
+    <div class="header-info">
+      <div class="avatar">{{ nomeOutroUsuario.charAt(0) }}</div>
+      <div class="header-texto">
+        <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
+        <span class="header-status">
+          <span class="status-dot" [class.online]="conectado"></span>
+          {{ conectado ? 'Online' : 'Conectando...' }}
+        </span>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content #content [fullscreen]="true" class="chat-content">
 
-  <div class="lista-mensagens">
+  <div class="chat-wrapper">
 
-    <div *ngFor="let mensagem of mensagens" class="mensagem-linha"
-      [class.minha]="ehMinhaMensagem(mensagem)">
+    <div class="lista-mensagens">
 
-      <div class="balao">
-        <span class="conteudo">{{ mensagem.conteudo }}</span>
-        <span class="horario">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+      <div *ngFor="let mensagem of mensagens" class="mensagem-linha"
+        [class.minha]="ehMinhaMensagem(mensagem)">
+
+        <div class="balao">
+          <span class="conteudo">{{ mensagem.conteudo }}</span>
+          <span class="horario">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+        </div>
+
       </div>
 
-    </div>
+      <div *ngIf="mensagens.length === 0" class="empty-chat">
+        <ion-icon name="chatbubble-outline"></ion-icon>
+        <p>Nenhuma mensagem ainda. Diga oi!</p>
+      </div>
 
-    <div *ngIf="mensagens.length === 0" class="empty-chat">
-      <p>Nenhuma mensagem ainda. Diga oi!</p>
     </div>
 
   </div>
@@ -33,17 +45,19 @@
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar class="footer-toolbar">
-    <ion-item class="input-item" lines="none">
-      <ion-input
-        [(ngModel)]="textoMensagem"
-        placeholder="Digite sua mensagem..."
-        (keyup.enter)="enviar()">
-      </ion-input>
+  <div class="footer-bar">
+    <div class="footer-wrapper">
+      <div class="input-item">
+        <ion-input
+          [(ngModel)]="textoMensagem"
+          placeholder="Digite sua mensagem..."
+          (keyup.enter)="enviar()">
+        </ion-input>
 
-      <ion-button slot="end" fill="clear" (click)="enviar()">
-        <ion-icon name="send-outline"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-toolbar>
+        <ion-button fill="clear" class="btn-enviar" (click)="enviar()">
+          <ion-icon name="send-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
 </ion-footer>
