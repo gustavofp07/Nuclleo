@@ -62,8 +62,8 @@ public class TransacaoService {
                 .orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
     }
 
-    public List<Transacao> listarPorUsuario(Long id) {
-        return transacaoRepository.findByUsuarioCdUsuario(id);
+    public List<Transacao> listarPorUsuarioEnvolvido(Long id) {
+        return transacaoRepository.findByUsuarioCdUsuarioOrAnuncioUsuarioCriaCdUsuarioOrderByDataDesc(id, id);
     }
 
     public List<Transacao> listarPorAnuncio(Long id) {

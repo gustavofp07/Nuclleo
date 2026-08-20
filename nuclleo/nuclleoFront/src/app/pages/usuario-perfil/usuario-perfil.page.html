@@ -70,7 +70,12 @@
 
         <div class="info-item">
           <ion-icon name="location-outline"></ion-icon>
-          <span>Coronel Fabriciano, MG</span>
+          <span>Coronel Fabriciano, MG [PLACEHOLDER]</span>
+        </div>
+
+        <div class="info-item info-item-clicavel" *ngIf="ehPerfilProprio" routerLink="/transacoes">
+          <ion-icon name="cash-outline"></ion-icon>
+          <span>Ver histórico de transações</span>
         </div>
 
       </div>
@@ -130,10 +135,12 @@
       <!-- AVALIAÇÃO -->
       <div class="avaliacao-box">
 
-        <h2>{{ ehPerfilProprio ? 'Sua avaliação' : 'Avaliação' }}: 4,5 [PLACEHOLDER]</h2>
+        <h2>{{ ehPerfilProprio ? 'Sua avaliação' : 'Avaliação' }}: {{ mediaAvaliacao | number: '1.1-1' }}</h2>
 
         <div class="estrelas">
-          ★★★★⯪
+          <ion-icon *ngFor="let n of estrelasArray"
+            [name]="n <= mediaAvaliacao ? 'star' : (n - 0.5 <= mediaAvaliacao ? 'star-half' : 'star-outline')">
+          </ion-icon>
         </div>
 
       </div>

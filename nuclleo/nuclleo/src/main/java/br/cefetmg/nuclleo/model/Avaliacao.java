@@ -26,7 +26,7 @@ public class Avaliacao {
     private Long cdAvaliacao;
 
     @ManyToOne
-    @JoinColumn(name = "cd_transacao", nullable = false)
+    @JoinColumn(name = "cd_transacao", nullable = true)
     private Transacao transacao;
 
     @ManyToOne

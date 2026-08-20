@@ -33,4 +33,12 @@ export class InteresseService {
   excluirInteresse(codigo: number): Observable<void> {
     return this.http.delete<void>(`${this.URL}/excluir/${codigo}`);
   }
+
+  finalizarConversa(id: number, dados: { cdUsuarioSolicitante: number; ocorreuTransacao: boolean; valor?: number; notaInteressado: number; }): Observable<void> {
+    return this.http.put<void>(`${this.URL}/${id}/finalizar`, dados);
+  }
+
+  avaliarAnunciante(id: number, dados: { cdUsuarioSolicitante: number; nota: number; }): Observable<void> {
+    return this.http.put<void>(`${this.URL}/${id}/avaliar-anunciante`, dados);
+  }
 }

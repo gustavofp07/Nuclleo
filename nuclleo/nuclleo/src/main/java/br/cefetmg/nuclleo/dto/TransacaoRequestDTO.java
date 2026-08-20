@@ -2,8 +2,10 @@ package br.cefetmg.nuclleo.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class TransacaoRequestDTO {
 
     @NotNull(message = "O valor da transação não pode ser nulo.")

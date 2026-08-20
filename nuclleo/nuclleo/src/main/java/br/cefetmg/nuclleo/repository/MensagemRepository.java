@@ -9,4 +9,6 @@ import br.cefetmg.nuclleo.model.Mensagem;
 public interface MensagemRepository extends JpaRepository<Mensagem, Long> {
 
     List<Mensagem> findByInteresseIdOrderByDataEnvioAsc(Long cdInteresse);
+
+    void deleteByInteresseId(Long cdInteresse);
 }

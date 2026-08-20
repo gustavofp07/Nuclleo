@@ -437,3 +437,16 @@ ion-menu ion-item ion-icon {
   transform: translateY(-3px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
+
+.info-item-clicavel {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.info-item-clicavel:hover {
+  color: #7c3aed;
+}
+
+.info-item-clicavel ion-icon {
+  color: #7c3aed;
+}

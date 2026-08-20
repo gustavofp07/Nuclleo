@@ -18,12 +18,17 @@ public class AvaliacaoService {
 
     // Chamado pelo TransacaoService ao criar uma transação
     @Transactional
-    public void criarAvaliacoesPendentes(Transacao transacao) {
+    public List<Avaliacao> criarAvaliacoesPendentes(Transacao transacao) {
+        return criarPar(transacao.getUsuario(), transacao.getAnuncio().getUsuarioCria(), transacao);
+    }
 
-        Usuario user1 = transacao.getUsuario();
-        Usuario user2 = transacao.getAnuncio().getUsuarioCria();
+    // Chamado quando a conversa é finalizada SEM transação
+    @Transactional
+    public List<Avaliacao> criarAvaliacoesPendentes(Usuario user1, Usuario user2) {
+        return criarPar(user1, user2, null);
+    }
 
-        // Avaliação 1:
+    private List<Avaliacao> criarPar(Usuario user1, Usuario user2, Transacao transacao) {
         Avaliacao avaliacao1 = new Avaliacao();
         avaliacao1.setTransacao(transacao);
         avaliacao1.setAvaliador(user1);
@@ -32,7 +37,6 @@ public class AvaliacaoService {
         avaliacao1.setDtAvaliacao(null);
         avaliacaoRepository.save(avaliacao1);
 
-        // Avaliação 2:
         Avaliacao avaliacao2 = new Avaliacao();
         avaliacao2.setTransacao(transacao);
         avaliacao2.setAvaliador(user2);
@@ -40,6 +44,8 @@ public class AvaliacaoService {
         avaliacao2.setNota(null);
         avaliacao2.setDtAvaliacao(null);
         avaliacaoRepository.save(avaliacao2);
+
+        return java.util.List.of(avaliacao1, avaliacao2);
     }
 
     // Registra a nota de uma avaliação pendente
@@ -57,7 +63,8 @@ public class AvaliacaoService {
             throw new IllegalArgumentException("Você não tem permissão para realizar esta avaliação.");
         }
 
-        // estava pensando em colocar um atributo boolean "avaliada" na entidade Avaliacao.
+        // estava pensando em colocar um atributo boolean "avaliada" na entidade
+        // Avaliacao.
         if (avaliacao.getNota() != null) {
             throw new IllegalArgumentException("Esta avaliação já foi realizada.");
         }
@@ -93,7 +100,6 @@ public class AvaliacaoService {
 
         return (float) (soma / avaliacoes.size());
     }
-
 
     // Lista todas as avaliações de uma transação
     @Transactional(readOnly = true)

@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar class="toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/usuario-perfil" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Histórico de transações</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="transacoes-content">
+  <div class="container">
+
+    <div *ngIf="transacoes.length === 0" class="sem-transacoes">
+      <ion-icon name="cash-outline"></ion-icon>
+      <p>Você ainda não tem transações registradas.</p>
+    </div>
+
+    <div *ngFor="let transacao of transacoes" class="transacao-card">
+      <div class="transacao-topo">
+        <span class="tipo-badge" [class.compra]="souComprador(transacao)">
+          {{ souComprador(transacao) ? 'Compra' : 'Venda' }}
+        </span>
+        <span class="valor">R$ {{ transacao.valor | number: '1.2-2' }}</span>
+      </div>
+
+      <p class="anuncio-nome">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        {{ transacao.anuncio.nmAnuncio }}
+      </p>
+
+      <div class="transacao-info">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>{{ souComprador(transacao) ? 'Vendedor' : 'Comprador' }}: {{ outroUsuario(transacao).nmUsuario }}</span>
+      </div>
+
+      <div class="transacao-info">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ transacao.data | date: 'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

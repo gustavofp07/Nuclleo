@@ -14,4 +14,5 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
     List<Transacao> findByAnuncioCdAnuncio(Long cdAnuncio);
 
+    List<Transacao> findByUsuarioCdUsuarioOrAnuncioUsuarioCriaCdUsuarioOrderByDataDesc(Long cdUsuario1, Long cdUsuario2);
 }

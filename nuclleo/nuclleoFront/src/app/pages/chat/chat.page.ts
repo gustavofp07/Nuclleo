@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   IonContent,
@@ -16,9 +16,10 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { sendOutline, chatbubbleOutline } from 'ionicons/icons';
+import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
 
 import { ChatService } from 'src/app/services/chat.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -66,6 +67,10 @@ export class ChatPage implements OnInit, OnDestroy {
   nomeOutroUsuario: string = '';
   outroUsuarioDigitando: boolean = false;
 
+  souAnunciante: boolean = false;
+  chatFinalizado: boolean = false;
+  aguardandoAvaliacaoOutro: boolean = false;
+
   private timeoutDigitando: any = null;
 
   constructor(
@@ -74,8 +79,11 @@ export class ChatPage implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private interesseService: InteresseService,
     private ngZone: NgZone,
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private router: Router,
   ) {
-    addIcons({ sendOutline, chatbubbleOutline });
+    addIcons({ sendOutline, chatbubbleOutline, flagOutline });
   }
 
   ngOnInit() {
@@ -142,6 +150,17 @@ export class ChatPage implements OnInit, OnDestroy {
         this.nomeOutroUsuario = souEuOInteressado
           ? interesse.anuncio.usuarioCria.nmUsuario
           : interesse.usuario.nmUsuario;
+
+        this.souAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+        this.chatFinalizado = interesse.finalizado;
+
+        if (this.chatFinalizado) {
+          if (!this.souAnunciante && !interesse.avaliacaoAnuncianteFeita) {
+            this.solicitarAvaliacaoAnunciante();
+          } else {
+            this.aguardandoAvaliacaoOutro = true;
+          }
+        }
       }
     });
   }
@@ -156,6 +175,10 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   enviar() {
+    if (this.chatFinalizado) {
+      return;
+    }
+
     const texto = this.textoMensagem.trim();
 
     if (!texto || texto.length > 500) {
@@ -185,6 +208,10 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   onDigitar() {
+    if (this.chatFinalizado) {
+      return;
+    }
+
     this.chatService.enviarDigitando(this.cdInteresse, this.usuarioLogado.cdUsuario, true);
 
     clearTimeout(this.timeoutDigitando);
@@ -206,5 +233,144 @@ export class ChatPage implements OnInit, OnDestroy {
     setTimeout(() => {
       this.content?.scrollToBottom(200);
     }, 100);
+  }
+
+  // ---------- FINALIZAR CONVERSA (fluxo do anunciante) ----------
+
+  async abrirFinalizarConversa() {
+    const alert = await this.alertController.create({
+      header: 'Finalizar conversa',
+      message: 'Ocorreu uma transação com este usuário?',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Não',
+          handler: () => this.solicitarAvaliacaoInteressado(false)
+        },
+        {
+          text: 'Sim',
+          handler: () => this.solicitarValorTransacao()
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async solicitarValorTransacao() {
+    const alert = await this.alertController.create({
+      header: 'Valor da transação',
+      backdropDismiss: false,
+      inputs: [
+        {
+          name: 'valor',
+          type: 'number',
+          placeholder: 'Ex: 150.00',
+          min: 0.01
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Continuar',
+          handler: (dados) => {
+            const valor = Number(dados.valor);
+            if (!valor || valor <= 0) {
+              this.exibirMensagem('Informe um valor válido.');
+              return false;
+            }
+            this.solicitarAvaliacaoInteressado(true, valor);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async solicitarAvaliacaoInteressado(ocorreuTransacao: boolean, valor?: number) {
+    const alert = await this.alertController.create({
+      header: `Avalie ${this.nomeOutroUsuario}`,
+      subHeader: 'De 1 a 5 estrelas',
+      backdropDismiss: false,
+      inputs: [1, 2, 3, 4, 5].map(n => ({
+        name: 'nota',
+        type: 'radio' as const,
+        label: '⭐'.repeat(n),
+        value: n,
+        checked: n === 5
+      })),
+      buttons: [
+        {
+          text: 'Confirmar',
+          handler: (nota) => this.finalizarConversa(ocorreuTransacao, valor, nota)
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  finalizarConversa(ocorreuTransacao: boolean, valor: number | undefined, nota: number) {
+    this.interesseService.finalizarConversa(this.cdInteresse, {
+      cdUsuarioSolicitante: this.usuarioLogado.cdUsuario,
+      ocorreuTransacao,
+      valor,
+      notaInteressado: nota
+    }).subscribe({
+      next: () => {
+        this.exibirMensagem('Conversa finalizada com sucesso.');
+        this.router.navigate(['/interesse-meus']);
+      },
+      error: (err) => {
+        this.exibirMensagem(err?.error?.message || 'Erro ao finalizar a conversa.');
+      }
+    });
+  }
+
+  // ---------- AVALIAÇÃO OBRIGATÓRIA (fluxo do interessado) ----------
+
+  async solicitarAvaliacaoAnunciante() {
+    const alert = await this.alertController.create({
+      header: 'Conversa finalizada',
+      subHeader: `Avalie ${this.nomeOutroUsuario} de 1 a 5 estrelas para continuar`,
+      backdropDismiss: false,
+      inputs: [1, 2, 3, 4, 5].map(n => ({
+        name: 'nota',
+        type: 'radio' as const,
+        label: '⭐'.repeat(n),
+        value: n,
+        checked: n === 5
+      })),
+      buttons: [
+        {
+          text: 'Confirmar',
+          handler: (nota) => this.avaliarAnunciante(nota)
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  avaliarAnunciante(nota: number) {
+    this.interesseService.avaliarAnunciante(this.cdInteresse, {
+      cdUsuarioSolicitante: this.usuarioLogado.cdUsuario,
+      nota
+    }).subscribe({
+      next: () => {
+        this.exibirMensagem('Avaliação enviada. Obrigado!');
+        this.router.navigate(['/interesse-meus']);
+      },
+      error: (err) => {
+        this.exibirMensagem(err?.error?.message || 'Erro ao enviar avaliação.');
+      }
+    });
+  }
+
+  async exibirMensagem(texto: string) {
+    const toast = await this.toastController.create({ message: texto, duration: 2500 });
+    toast.present();
   }
 }

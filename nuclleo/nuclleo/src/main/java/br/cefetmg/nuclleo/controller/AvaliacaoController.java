@@ -40,6 +40,11 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacaoService.listarPorTransacao(cdTransacao));
     }
 
+    @GetMapping("/media/{cdUsuario}")
+    public ResponseEntity<Float> media(@PathVariable Long cdUsuario) {
+        return ResponseEntity.ok(avaliacaoService.calcularAvaliacao(cdUsuario));
+    }
+
     // Registra a nota de uma avaliação pendente
     @PatchMapping("/{cdAvaliacao}/nota")
     public ResponseEntity<Avaliacao> avaliar(

@@ -15,17 +15,15 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "interesse",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"cd_usuario", "cd_anuncio"})
-    }
-)
+@Table(name = "interesse", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "cd_usuario", "cd_anuncio" })
+})
 public class Interesse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
     @JoinColumn(name = "usuario", nullable = false)
     private Usuario usuario;
@@ -37,6 +35,12 @@ public class Interesse {
     @Column(name = "dt_criacao", nullable = false)
     private Date data;
 
-    @Column(name = "ativo")
-    private boolean ativo;
+    @Column(name = "finalizado")
+    private boolean finalizado;
+
+    @Column(name = "avaliacao_interessado_feita")
+    private boolean avaliacaoInteressadoFeita; // anunciante avaliou o interessado
+
+    @Column(name = "avaliacao_anunciante_feita")
+    private boolean avaliacaoAnuncianteFeita; // interessado avaliou o anunciante
 }

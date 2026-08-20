@@ -4,7 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { home, peopleOutline, chatbubbleOutline, personOutline, createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline, ellipseOutline } from 'ionicons/icons';
+import {
+  home, peopleOutline, chatbubbleOutline, personOutline, createOutline,
+  locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
+  ellipseOutline, star, starHalf, starOutline, cashOutline
+} from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -17,6 +21,8 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
 
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { AlertController } from '@ionic/angular';
+
+import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -32,6 +38,9 @@ export class UsuarioPerfilPage implements OnInit {
   nivelCadastro: number = 1;
   ehPerfilProprio: boolean = true;
 
+  mediaAvaliacao: number = 0;
+  estrelasArray = [1, 2, 3, 4, 5];
+
   constructor(
     private usuarioService: UsuarioService,
     private router: Router,
@@ -40,11 +49,13 @@ export class UsuarioPerfilPage implements OnInit {
     private alertController: AlertController,
     private anuncioService: AnuncioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
+    private avaliacaoService: AvaliacaoService,
   ) {
     addIcons({
       home, peopleOutline, chatbubbleOutline, personOutline,
       createOutline, locationOutline, calendarOutline,
-      checkmarkCircleOutline, trashOutline, ellipseOutline
+      checkmarkCircleOutline, trashOutline, ellipseOutline,
+      star, starHalf, starOutline, cashOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -56,13 +67,11 @@ export class UsuarioPerfilPage implements OnInit {
     const cdUsuarioParam = this.activatedRoute.snapshot.paramMap.get('cdUsuario');
 
     if (cdUsuarioParam) {
-      // Visitando perfil de outro usuário
       this.ehPerfilProprio = false;
       this.carregarUsuarioPorId(Number(cdUsuarioParam));
       return;
     }
 
-    // Perfil próprio (comportamento original)
     this.ehPerfilProprio = true;
 
     let aux = this.usuarioService.verificarSessao();
@@ -80,11 +89,19 @@ export class UsuarioPerfilPage implements OnInit {
         this.usuario = usuario;
         this.calcularNivelCadastro();
         this.carregarAnunciosUsuario();
+        this.carregarAvaliacao();
       },
       error: async () => {
         console.log('Erro ao buscar usuário.');
         this.exibirMensagem('Erro ao carregar perfil.');
       }
+    });
+  }
+
+  carregarAvaliacao() {
+    this.avaliacaoService.media(this.usuario.cdUsuario).subscribe({
+      next: (media) => this.mediaAvaliacao = media ?? 0,
+      error: () => this.mediaAvaliacao = 0
     });
   }
 

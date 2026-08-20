@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-
+import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
+import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
 import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.services.InteresseService;
@@ -86,6 +88,19 @@ public class InteresseController {
 
         List<Interesse> interesses = interesseService.listarPorInteressados(cdUsuario);
         return ResponseEntity.ok(interesses);
+    }
+
+    @PutMapping("/{id}/finalizar")
+    public ResponseEntity<Void> finalizar(@PathVariable Long id, @Valid @RequestBody FinalizarConversaRequestDTO dto) {
+        interesseService.finalizarConversa(id, dto.getCdUsuarioSolicitante(), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/avaliar-anunciante")
+    public ResponseEntity<Void> avaliarAnunciante(@PathVariable Long id,
+            @Valid @RequestBody AvaliarAnuncianteRequestDTO dto) {
+        interesseService.avaliarAnunciante(id, dto.getCdUsuarioSolicitante(), dto);
+        return ResponseEntity.noContent().build();
     }
 
 }
