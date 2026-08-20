@@ -10,7 +10,7 @@
         <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
         <span class="header-status">
           <span class="status-dot" [class.online]="conectado"></span>
-          {{ conectado ? 'Online' : 'Conectando...' }} 
+          {{ conectado ? 'Online' : 'Conectando...' }}
         </span>
       </div>
     </div>
@@ -55,15 +55,21 @@
 <ion-footer>
   <div class="footer-bar">
     <div class="footer-wrapper">
-      <div class="input-item">
-        <ion-input [(ngModel)]="textoMensagem" placeholder="Digite sua mensagem..." (ionInput)="onDigitar()"
-          (keyup.enter)="enviar()">
+      <div class="input-item" [class.com-contador]="textoMensagem.length > 400">
+        <ion-input [(ngModel)]="textoMensagem" placeholder="Digite sua mensagem..." maxlength="500"
+          (ionInput)="onDigitar()" (keyup.enter)="enviar()">
         </ion-input>
 
         <ion-button fill="clear" class="btn-enviar" (click)="enviar()">
           <ion-icon name="send-outline"></ion-icon>
         </ion-button>
+
+        <span class="contador-caracteres" *ngIf="textoMensagem.length > 400"
+          [class.limite]="textoMensagem.length >= 500">
+          {{ textoMensagem.length }}/500
+        </span>
       </div>
+
     </div>
   </div>
 </ion-footer>
