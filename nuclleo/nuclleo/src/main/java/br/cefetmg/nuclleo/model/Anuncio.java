@@ -15,6 +15,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class Anuncio {
     private String nmAnuncio;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
+    @Size(max = 250, message = "A descrição deve ter no máximo 250 caracteres")
     private String descricao; //tipo TEXT no banco?
 
     @Column(name = "habilitado", columnDefinition = "boolean DEFAULT true")

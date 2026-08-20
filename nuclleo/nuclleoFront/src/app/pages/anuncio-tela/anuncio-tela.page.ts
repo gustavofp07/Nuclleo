@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, NgZone } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -14,6 +14,9 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 
+import { addIcons } from 'ionicons';
+import { createOutline, trashOutline, chatbubbleOutline, personOutline, mailOutline, heartDislikeOutline } from 'ionicons/icons';
+
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { Router } from '@angular/router';
@@ -21,6 +24,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { InteresseService } from 'src/app/services/interesse.service';
+import { InteresseModel } from 'src/app/model/interesse.model';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -46,6 +50,10 @@ export class AnuncioTelaPage implements OnInit {
   usuarioLogado: UsuarioModel = new UsuarioModel();
   usuarioEhDono: boolean = false;
 
+  usuarioJaInteressado: boolean = false;
+  interesseAtual: InteresseModel | null = null;
+  carregandoInteresse: boolean = false;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
@@ -55,7 +63,18 @@ export class AnuncioTelaPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private anuncioComunidadeService: AnuncioComunidadeService,
-  ) { }
+    private location: Location,
+    private ngZone: NgZone,
+  ) {
+    addIcons({
+      createOutline,
+      trashOutline,
+      chatbubbleOutline,
+      personOutline,
+      mailOutline,
+      heartDislikeOutline
+    });
+  }
 
   ngOnInit() {
   }
@@ -71,9 +90,29 @@ export class AnuncioTelaPage implements OnInit {
         this.usuarioLogado = this.usuarioService.getUsuarioSessao();
         this.usuarioEhDono =
           this.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+
+        if (!this.usuarioEhDono) {
+          this.verificarInteresse();
+        }
       },
       error: () => {
         this.exibirMensagem('Erro ao carregar anúncio.');
+      }
+    });
+  }
+
+  verificarInteresse() {
+    this.interesseService.listarPorUsuario(this.usuarioLogado.cdUsuario).subscribe({
+      next: (interesses) => {
+        const interesse = interesses.find(
+          i => i.anuncio.cdAnuncio === this.anuncio.cdAnuncio
+        );
+
+        this.usuarioJaInteressado = !!interesse;
+        this.interesseAtual = interesse ?? null;
+      },
+      error: () => {
+        // falha silenciosa aqui é aceitável: só não vai marcar o botão corretamente
       }
     });
   }
@@ -88,7 +127,7 @@ export class AnuncioTelaPage implements OnInit {
           this.anuncioService.excluirAnuncio(this.anuncio.cdAnuncio).subscribe({
             next: () => {
               this.exibirMensagem('Anúncio excluído com sucesso.');
-              this.router.navigate(['/usuario-perfil']);
+              this.location.back();
             },
             error: () => {
               this.exibirMensagem('Erro ao excluir anúncio.');
@@ -104,17 +143,56 @@ export class AnuncioTelaPage implements OnInit {
   }
 
   registrarInteresse() {
+    if (this.carregandoInteresse) {
+      return;
+    }
+
     const interesse = {
       cdUsuario: this.usuarioLogado.cdUsuario,
       cdAnuncio: this.anuncio.cdAnuncio
     };
 
+    this.carregandoInteresse = true;
+
     this.interesseService.registrarInteresse(interesse).subscribe({
-      next: (Interesse: any) => {
+      next: (interesseSalvo: InteresseModel) => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+          this.usuarioJaInteressado = true;
+          this.interesseAtual = interesseSalvo;
+        });
         this.exibirMensagem('Interesse registrado com sucesso.');
       },
       error: (erro: any) => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+        });
         this.exibirMensagem('Erro! ' + erro.error.message);
+      }
+    });
+  }
+
+  removerInteresse() {
+    if (this.carregandoInteresse || !this.interesseAtual?.id) {
+      return;
+    }
+
+    this.carregandoInteresse = true;
+
+    this.interesseService.excluirInteresse(this.interesseAtual.id).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+          this.usuarioJaInteressado = false;
+          this.interesseAtual = null;
+        });
+        this.exibirMensagem('Interesse removido.');
+      },
+      error: () => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+        });
+        this.exibirMensagem('Erro ao remover interesse.');
       }
     });
   }
@@ -143,24 +221,40 @@ export class AnuncioTelaPage implements OnInit {
 
   async confirmarInteresse() {
     const alert = await this.alertController.create({
-      header: 'Confirmar Interesse',
-      message: 'Deseja realmente manifestar interesse neste anúncio?',
+      header: this.usuarioJaInteressado ? 'Remover interesse' : 'Confirmar Interesse',
+      message: this.usuarioJaInteressado
+        ? 'Deseja realmente remover seu interesse neste anúncio?'
+        : 'Deseja realmente manifestar interesse neste anúncio?',
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel'
         },
         {
-          text: 'Confirmar',
-          role: 'confirm',
+          text: this.usuarioJaInteressado ? 'Remover' : 'Confirmar',
+          role: this.usuarioJaInteressado ? 'destructive' : 'confirm',
           handler: () => {
-            this.registrarInteresse();
+            if (this.usuarioJaInteressado) {
+              this.removerInteresse();
+            } else {
+              this.registrarInteresse();
+            }
           }
         }
       ]
     });
 
     await alert.present();
+  }
+
+  irParaPerfilAnunciante() {
+    const cdAnunciante = this.anuncio.usuarioCria.cdUsuario;
+
+    if (cdAnunciante === this.usuarioLogado.cdUsuario) {
+      this.router.navigate(['/usuario-perfil']);
+    } else {
+      this.router.navigate(['/usuario-perfil', cdAnunciante]);
+    }
   }
 
 

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,23 +43,13 @@ public class InteresseController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Void> excluir(Long id) {
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
         interesseService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Interesse> buscarPorId(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("O campo id é obrigatório.");
-        }
-
-        Interesse interesse = interesseService.buscarPorId(id);
-        return ResponseEntity.ok(interesse);
-    }
-
     @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<Interesse>> listarPorUsuario(Long id) {
+    public ResponseEntity<List<Interesse>> listarPorUsuario(@PathVariable Long id) {
         if (id == null) {
             throw new IllegalArgumentException("O campo id é obrigatório.");
         }
@@ -67,8 +58,18 @@ public class InteresseController {
         return ResponseEntity.ok(interesses);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Interesse> buscarPorId(@PathVariable Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("O campo id é obrigatório.");
+        }
+
+        Interesse interesse = interesseService.buscarPorId(id);
+        return ResponseEntity.ok(interesse);
+    }
+
     @GetMapping("/anuncio/{id}")
-    public ResponseEntity<List<Interesse>> listarPorAnuncio(Long id) {
+    public ResponseEntity<List<Interesse>> listarPorAnuncio(@PathVariable Long id) {
         if (id == null) {
             throw new IllegalArgumentException("O campo id é obrigatório.");
         }
@@ -78,7 +79,7 @@ public class InteresseController {
     }
 
     @GetMapping("/interessados/{cdUsuario}")
-    public ResponseEntity<List<Interesse>> listarPorInteressados(Long cdUsuario) {
+    public ResponseEntity<List<Interesse>> listarPorInteressados(@PathVariable Long cdUsuario) {
         if (cdUsuario == null) {
             throw new IllegalArgumentException("O campo código do usuário é obrigatório.");
         }

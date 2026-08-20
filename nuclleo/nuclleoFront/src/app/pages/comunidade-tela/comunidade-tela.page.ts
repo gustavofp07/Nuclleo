@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton } from '@ionic/angular/standalone';
@@ -47,6 +47,7 @@ export class ComunidadePerfilPage implements OnInit {
     private anuncioComunidadeService: AnuncioComunidadeService,
     private alertController: AlertController,
     private toastController: ToastController,
+    private ngZone: NgZone,
   ) {
     addIcons({
       calendarOutline,
@@ -189,25 +190,37 @@ export class ComunidadePerfilPage implements OnInit {
   }
 
   sairComunidade() {
-    if (!this.codigoVinculo || this.saindoComunidade) {
+    if (this.saindoComunidade) {
+      return;
+    }
+
+    const usuario = this.usuarioService.getUsuarioSessao();
+
+    if (!usuario?.cdUsuario || !this.comunidade.cdComunidade) {
       return;
     }
 
     this.saindoComunidade = true;
 
-    this.usuarioComunidadeService.excluir(this.codigoVinculo).subscribe({
-      next: () => {
-        this.usuarioEntrouNaComunidade = false;
-        this.codigoVinculo = null;
-        this.saindoComunidade = false;
-        this.abaSelecionada = 'perfil'; 
-        this.exibirMensagem('Você saiu da comunidade.');
-      },
-      error: () => {
-        this.saindoComunidade = false;
-        this.exibirMensagem('Erro ao sair da comunidade.');
-      }
-    });
+    this.usuarioComunidadeService
+      .excluirRelacaoEspecifica(usuario.cdUsuario, this.comunidade.cdComunidade)
+      .subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.usuarioEntrouNaComunidade = false;
+            this.codigoVinculo = null;
+            this.saindoComunidade = false;
+            this.abaSelecionada = 'perfil';
+          });
+          this.exibirMensagem('Você saiu da comunidade.');
+        },
+        error: () => {
+          this.ngZone.run(() => {
+            this.saindoComunidade = false;
+          });
+          this.exibirMensagem('Erro ao sair da comunidade.');
+        }
+      });
   }
 
   verificarUsuarioAdmin() {

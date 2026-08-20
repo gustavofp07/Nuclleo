@@ -34,6 +34,13 @@ export class UsuarioComunidadeService {
     );
   }
 
+  excluirRelacaoEspecifica(cdUsuario: number, cdComunidade: number): Observable<void> {
+    const params = new HttpParams()
+      .set('cdUsuario', cdUsuario.toString())
+      .set('cdComunidade', cdComunidade.toString());
+    return this.http.delete<void>(`${this.API_URL}/relacao`, { params });
+  }
+
   listarUsuariosPorComunidade(cdComunidade: number): Observable<UsuarioComunidadeModel[]> {
     const params = new HttpParams().set('cdComunidade', cdComunidade.toString());
     return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade`, { params });
