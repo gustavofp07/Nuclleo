@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class MensagemRequestDTO {
 
@@ -9,6 +10,7 @@ public class MensagemRequestDTO {
     private Long cdUsuarioRemetente;
 
     @NotBlank(message = "O conteúdo da mensagem não pode ser vazio.")
+    @Size(max = 500, message = "A mensagem não pode ter mais que 500 caracteres.")
     private String conteudo;
 
     public Long getCdUsuarioRemetente() {

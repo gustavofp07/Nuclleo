@@ -158,7 +158,7 @@ export class ChatPage implements OnInit, OnDestroy {
   enviar() {
     const texto = this.textoMensagem.trim();
 
-    if (!texto) {
+    if (!texto || texto.length > 500) {
       return;
     }
 
