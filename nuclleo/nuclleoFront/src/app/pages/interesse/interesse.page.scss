@@ -182,26 +182,6 @@ ion-accordion {
   }
 }
 
-.interessado-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 12px 8px;
-
-  border-radius: 10px;
-  background: #ffffff;
-
-  text-decoration: none;
-  color: #111827;
-
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.interessado-item:hover {
-  background: #f5f3ff;
-}
 
 .accordion-header {
   --background: #ffffff;
@@ -234,20 +214,59 @@ ion-accordion {
   background: #f5f3ff;
   padding: 3px 10px;
   border-radius: 999px;
-} 
+}
 
-.interessado-item ion-icon:first-child {
+.interessado-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 14px;
+  margin-bottom: 10px;
+
+  background: #f9fafb;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.interessado-item:last-child {
+  margin-bottom: 0;
+}
+
+.interessado-item:hover {
+  background: #f5f3ff;
+}
+
+.interessado-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  text-decoration: none;
+  color: #111827;
+}
+
+.interessado-info ion-icon {
   font-size: 20px;
   color: #7c3aed;
 }
 
-.interessado-item span {
-  flex: 1;
+.interessado-info span {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.interessado-item .seta {
-  font-size: 16px;
-  color: #9ca3af;
+.btn-conversar {
+  --background: #7c3aed;
+  --background-hover: #6d28d9;
+  --background-activated: #6d28d9;
+  --color: #ffffff;
+  --border-radius: 10px;
+  --box-shadow: none;
+
+  font-weight: 600;
+  font-size: 14px;
+  height: 40px;
+
+  margin: 0;
 }
