@@ -9,13 +9,8 @@
       <div class="header-texto">
         <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
         <span class="header-status">
-          <ng-container *ngIf="!outroUsuarioDigitando">
-            <span class="status-dot" [class.online]="conectado"></span>
-            {{ conectado ? 'Online' : 'Conectando...' }}
-          </ng-container>
-          <ng-container *ngIf="outroUsuarioDigitando">
-            digitando...
-          </ng-container>
+          <span class="status-dot" [class.online]="conectado"></span>
+          {{ conectado ? 'Online' : 'Conectando...' }} 
         </span>
       </div>
     </div>
@@ -28,21 +23,22 @@
 
     <div class="lista-mensagens">
 
-      <div *ngFor="let mensagem of mensagens" class="mensagem-linha"
-        [class.minha]="ehMinhaMensagem(mensagem)">
-
+      <div *ngFor="let mensagem of mensagens" class="mensagem-linha" [class.minha]="ehMinhaMensagem(mensagem)">
         <div class="balao" [class.enviando]="mensagem.enviando">
           <span class="conteudo">{{ mensagem.conteudo }}</span>
-
-          <span class="horario" *ngIf="!mensagem.enviando">
-            {{ mensagem.dataEnvio | date: 'HH:mm' }}
-          </span>
-
+          <span class="horario" *ngIf="!mensagem.enviando">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
           <span class="dots-enviando" *ngIf="mensagem.enviando">
             <span></span><span></span><span></span>
           </span>
         </div>
+      </div>
 
+      <div *ngIf="outroUsuarioDigitando" class="mensagem-linha typing-indicator">
+        <div class="balao">
+          <span class="dots-typing">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
       </div>
 
       <div *ngIf="mensagens.length === 0" class="empty-chat">
@@ -60,10 +56,7 @@
   <div class="footer-bar">
     <div class="footer-wrapper">
       <div class="input-item">
-        <ion-input
-          [(ngModel)]="textoMensagem"
-          placeholder="Digite sua mensagem..."
-          (ionInput)="onDigitar()"
+        <ion-input [(ngModel)]="textoMensagem" placeholder="Digite sua mensagem..." (ionInput)="onDigitar()"
           (keyup.enter)="enviar()">
         </ion-input>
 
