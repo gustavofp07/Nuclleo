@@ -5,6 +5,11 @@ import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { MensagemModel } from '../model/mensagem.model';
 
+interface DigitandoEvento {
+  cdUsuario: number;
+  digitando: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
@@ -13,6 +18,7 @@ export class ChatService {
   private client: Client | null = null;
   private mensagemRecebida = new Subject<MensagemModel>();
   private statusConexao = new Subject<boolean>();
+  private digitandoEvento = new Subject<DigitandoEvento>();
 
   constructor(private http: HttpClient) {}
 
@@ -30,6 +36,11 @@ export class ChatService {
         this.client!.subscribe(`/topic/chat/${cdInteresse}`, (msg: IMessage) => {
           const mensagem: MensagemModel = JSON.parse(msg.body);
           this.mensagemRecebida.next(mensagem);
+        });
+
+        this.client!.subscribe(`/topic/chat/${cdInteresse}/digitando`, (msg: IMessage) => {
+          const evento: DigitandoEvento = JSON.parse(msg.body);
+          this.digitandoEvento.next(evento);
         });
       },
       onDisconnect: () => {
@@ -54,12 +65,27 @@ export class ChatService {
     });
   }
 
+  enviarDigitando(cdInteresse: number, cdUsuario: number, digitando: boolean) {
+    if (!this.client?.active) {
+      return;
+    }
+
+    this.client.publish({
+      destination: `/app/chat/${cdInteresse}/digitando`,
+      body: JSON.stringify({ cdUsuario, digitando })
+    });
+  }
+
   onMensagemRecebida(): Observable<MensagemModel> {
     return this.mensagemRecebida.asObservable();
   }
 
   onStatusConexao(): Observable<boolean> {
     return this.statusConexao.asObservable();
+  }
+
+  onDigitando(): Observable<DigitandoEvento> {
+    return this.digitandoEvento.asObservable();
   }
 
   desconectar() {

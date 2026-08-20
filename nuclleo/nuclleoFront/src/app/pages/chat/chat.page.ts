@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -18,7 +18,7 @@ import {
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { sendOutline } from 'ionicons/icons';
+import { sendOutline, chatbubbleOutline } from 'ionicons/icons';
 
 import { ChatService } from 'src/app/services/chat.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -26,6 +26,10 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { InteresseModel } from 'src/app/model/interesse.model';
+
+interface MensagemView extends MensagemModel {
+  enviando?: boolean;
+}
 
 @Component({
   selector: 'app-chat',
@@ -56,18 +60,22 @@ export class ChatPage implements OnInit, OnDestroy {
   usuarioLogado: UsuarioModel = new UsuarioModel();
   interesse: InteresseModel | null = null;
 
-  mensagens: MensagemModel[] = [];
+  mensagens: MensagemView[] = [];
   textoMensagem: string = '';
   conectado: boolean = false;
   nomeOutroUsuario: string = '';
+  outroUsuarioDigitando: boolean = false;
+
+  private timeoutDigitando: any = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
     private usuarioService: UsuarioService,
     private interesseService: InteresseService,
+    private ngZone: NgZone,
   ) {
-    addIcons({ sendOutline });
+    addIcons({ sendOutline, chatbubbleOutline });
   }
 
   ngOnInit() {
@@ -81,12 +89,39 @@ export class ChatPage implements OnInit, OnDestroy {
     this.chatService.conectar(this.cdInteresse);
 
     this.chatService.onMensagemRecebida().subscribe((mensagem) => {
-      this.mensagens.push(mensagem);
-      this.rolarParaFinal();
+      this.ngZone.run(() => {
+        const indicePendente = this.mensagens.findIndex(m =>
+          m.enviando &&
+          m.cdUsuarioRemetente === mensagem.cdUsuarioRemetente &&
+          m.conteudo === mensagem.conteudo
+        );
+
+        if (indicePendente > -1) {
+          this.mensagens[indicePendente] = mensagem;
+        } else {
+          this.mensagens.push(mensagem);
+        }
+
+        this.rolarParaFinal();
+      });
     });
 
     this.chatService.onStatusConexao().subscribe((status) => {
-      this.conectado = status;
+      this.ngZone.run(() => {
+        this.conectado = status;
+      });
+    });
+
+    this.chatService.onDigitando().subscribe((evento) => {
+      this.ngZone.run(() => {
+        if (evento.cdUsuario !== this.usuarioLogado.cdUsuario) {
+          this.outroUsuarioDigitando = evento.digitando;
+
+          if (evento.digitando) {
+            this.rolarParaFinal();
+          }
+        }
+      });
     });
   }
 
@@ -127,12 +162,40 @@ export class ChatPage implements OnInit, OnDestroy {
       return;
     }
 
+    const mensagemOtimista: MensagemView = {
+      id: Date.now(),
+      cdInteresse: this.cdInteresse,
+      cdUsuarioRemetente: this.usuarioLogado.cdUsuario,
+      nomeRemetente: this.usuarioLogado.nmUsuario,
+      conteudo: texto,
+      dataEnvio: new Date().toISOString(),
+      enviando: true
+    };
+
+    this.mensagens.push(mensagemOtimista);
+    this.rolarParaFinal();
+
     this.chatService.enviarMensagem(this.cdInteresse, {
       cdUsuarioRemetente: this.usuarioLogado.cdUsuario,
       conteudo: texto
     });
 
     this.textoMensagem = '';
+    this.pararDigitacao();
+  }
+
+  onDigitar() {
+    this.chatService.enviarDigitando(this.cdInteresse, this.usuarioLogado.cdUsuario, true);
+
+    clearTimeout(this.timeoutDigitando);
+    this.timeoutDigitando = setTimeout(() => {
+      this.pararDigitacao();
+    }, 2000);
+  }
+
+  pararDigitacao() {
+    clearTimeout(this.timeoutDigitando);
+    this.chatService.enviarDigitando(this.cdInteresse, this.usuarioLogado.cdUsuario, false);
   }
 
   ehMinhaMensagem(mensagem: MensagemModel): boolean {

@@ -9,8 +9,13 @@
       <div class="header-texto">
         <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
         <span class="header-status">
-          <span class="status-dot" [class.online]="conectado"></span>
-          {{ conectado ? 'Online' : 'Conectando...' }}
+          <ng-container *ngIf="!outroUsuarioDigitando">
+            <span class="status-dot" [class.online]="conectado"></span>
+            {{ conectado ? 'Online' : 'Conectando...' }}
+          </ng-container>
+          <ng-container *ngIf="outroUsuarioDigitando">
+            digitando...
+          </ng-container>
         </span>
       </div>
     </div>
@@ -26,9 +31,16 @@
       <div *ngFor="let mensagem of mensagens" class="mensagem-linha"
         [class.minha]="ehMinhaMensagem(mensagem)">
 
-        <div class="balao">
+        <div class="balao" [class.enviando]="mensagem.enviando">
           <span class="conteudo">{{ mensagem.conteudo }}</span>
-          <span class="horario">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+
+          <span class="horario" *ngIf="!mensagem.enviando">
+            {{ mensagem.dataEnvio | date: 'HH:mm' }}
+          </span>
+
+          <span class="dots-enviando" *ngIf="mensagem.enviando">
+            <span></span><span></span><span></span>
+          </span>
         </div>
 
       </div>
@@ -51,6 +63,7 @@
         <ion-input
           [(ngModel)]="textoMensagem"
           placeholder="Digite sua mensagem..."
+          (ionInput)="onDigitar()"
           (keyup.enter)="enviar()">
         </ion-input>
 

@@ -8,7 +8,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import jakarta.validation.Valid;
-
+import br.cefetmg.nuclleo.dto.DigitandoDTO;
 import br.cefetmg.nuclleo.dto.MensagemDTO;
 import br.cefetmg.nuclleo.dto.MensagemRequestDTO;
 import br.cefetmg.nuclleo.services.MensagemService;
@@ -23,5 +23,11 @@ public class ChatController {
     @SendTo("/topic/chat/{cdInteresse}")
     public MensagemDTO enviar(@DestinationVariable Long cdInteresse, @Valid @Payload MensagemRequestDTO dto) {
         return mensagemService.salvar(cdInteresse, dto);
+    }
+
+    @MessageMapping("/chat/{cdInteresse}/digitando")
+    @SendTo("/topic/chat/{cdInteresse}/digitando")
+    public DigitandoDTO digitando(@DestinationVariable Long cdInteresse, @Payload DigitandoDTO dto) {
+        return dto;
     }
 }
