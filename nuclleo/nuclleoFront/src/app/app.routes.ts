@@ -74,9 +74,10 @@ export const routes: Routes = [
   {
     path: 'anuncio-meus/:tipo',
     loadComponent: () => import('./pages/anuncio-meus/anuncio-meus.page').then(m => m.AnuncioMeusPage)
-  },  {
+  },
+  {
     path: 'interesse-meus',
-    loadComponent: () => import('./pages/interesse-meus/interesse-meus.page').then( m => m.InteresseMeusPage)
+    loadComponent: () => import('./pages/interesse/interesse').then( m => m.InteresseMeusPage)
   },
 
 

@@ -1,0 +1,98 @@
+<div class="ion-page" id="main-content">
+
+  <ion-header>
+    <ion-toolbar class="toolbar">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Interesses</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [fullscreen]="true" class="interesses-content">
+
+    <div class="container">
+
+      <div class="topo">
+        <h1>Interesses</h1>
+        <p>Acompanhe seus interesses e os que você recebeu</p>
+      </div>
+
+      <ion-segment [value]="segmentoAtivo" (ionChange)="onSegmentChange($event)" class="segmento">
+        <ion-segment-button value="meus">
+          <ion-label>Meus interesses</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="recebidos">
+          <ion-label>Interesses recebidos</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- MEUS INTERESSES -->
+      <div *ngIf="segmentoAtivo === 'meus'">
+
+        <div class="lista-interesses" *ngIf="interesses.length > 0">
+          <a class="interesse-card" *ngFor="let interesse of interesses"
+            [routerLink]="['/anuncio-tela', interesse.anuncio.cdAnuncio]">
+
+            <div class="info">
+              <h2>{{ interesse.anuncio.nmAnuncio }}</h2>
+              <p class="descricao">{{ interesse.anuncio.descricao }}</p>
+            </div>
+
+            <div class="anuncio-imagem">
+              <div class="anuncio-imagem-placeholder"></div>
+            </div>
+
+          </a>
+        </div>
+
+        <div class="empty-state" *ngIf="interesses.length === 0">
+          <ion-icon name="heart-outline"></ion-icon>
+          <h2>Nenhum interesse registrado</h2>
+          <p>Quando você demonstrar interesse em um anúncio, ele vai aparecer aqui.</p>
+        </div>
+
+      </div>
+
+      <!-- INTERESSES RECEBIDOS -->
+      <div *ngIf="segmentoAtivo === 'recebidos'">
+
+        <ion-accordion-group class="accordion-recebidos" *ngIf="anunciosComInteresse.length > 0">
+
+          <ion-accordion *ngFor="let item of anunciosComInteresse" [value]="item.anuncio.cdAnuncio">
+
+            <ion-item slot="header" class="accordion-header">
+              <div class="anuncio-info">
+                <h2>{{ item.anuncio.nmAnuncio }}</h2>
+                <span class="badge-interesses">
+                  {{ item.interessados.length }}
+                  {{ item.interessados.length === 1 ? 'interessado' : 'interessados' }}
+                </span>
+              </div>
+            </ion-item>
+
+            <div class="ion-padding" slot="content">
+              <a class="interessado-item" *ngFor="let usuario of item.interessados"
+                [routerLink]="['/usuario-perfil', usuario.cdUsuario]">
+                <ion-icon name="people-outline"></ion-icon>
+                <span>{{ usuario.nmUsuario }}</span>
+                <ion-icon name="chevron-forward-outline" class="seta"></ion-icon>
+              </a>
+            </div>
+
+          </ion-accordion>
+
+        </ion-accordion-group>
+
+        <div class="empty-state" *ngIf="anunciosComInteresse.length === 0">
+          <ion-icon name="people-outline"></ion-icon>
+          <h2>Nenhum interesse recebido</h2>
+          <p>Quando alguém demonstrar interesse em um dos seus anúncios, ele vai aparecer aqui.</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </ion-content>
+</div>
