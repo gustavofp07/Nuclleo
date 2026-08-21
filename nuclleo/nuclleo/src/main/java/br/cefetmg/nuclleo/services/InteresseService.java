@@ -159,7 +159,7 @@ public class InteresseService {
     public void excluir(Long id) {
         Interesse interesse = interesseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Interesse não encontrado. Id: " + id));
-
+        mensagemRepository.deleteByInteresseId(interesse.getId());
         interesseRepository.delete(interesse);
     }
 
