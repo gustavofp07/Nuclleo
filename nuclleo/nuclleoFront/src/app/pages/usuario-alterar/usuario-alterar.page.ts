@@ -26,8 +26,6 @@ import { addIcons } from 'ionicons';
 
 import {
   chevronBackOutline,
-  eyeOffOutline,
-  eyeOutline,
   imageOutline,
   cameraOutline
 } from 'ionicons/icons';
@@ -63,8 +61,7 @@ export class UsuarioAlterarPage implements OnInit {
 
   previewFoto: string | ArrayBuffer | null = null;
   imagemSelecionada?: File;
-
-  showPassword: boolean = false;
+  senhaOriginal: string = '';
 
   constructor(
     private router: Router,
@@ -76,8 +73,6 @@ export class UsuarioAlterarPage implements OnInit {
 
     addIcons({
       chevronBackOutline,
-      eyeOutline,
-      eyeOffOutline,
       imageOutline,
       cameraOutline
     });
@@ -135,6 +130,8 @@ export class UsuarioAlterarPage implements OnInit {
 
           this.previewFoto = null;
           this.imagemSelecionada = undefined;
+
+          this.senhaOriginal = usuario.senha;
         },
 
         error: () => {
@@ -142,10 +139,6 @@ export class UsuarioAlterarPage implements OnInit {
           console.log('Erro ao buscar usuário');
         }
       });
-  }
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
   }
 
   async selecionarImagem() {
@@ -203,34 +196,34 @@ export class UsuarioAlterarPage implements OnInit {
   salvarAlteracoes() {
 
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
-        next: (usuario: UsuarioModel) => {
-          console.log('atualizou ',usuario);
-          this.usuarioService.salvarUsuarioSessao(usuario);
+      next: (usuario: UsuarioModel) => {
+        console.log('atualizou ', usuario);
+        this.usuarioService.salvarUsuarioSessao(usuario);
 
-          this.router.navigate([
-            '/usuario-perfil'
-          ]);
-        },
+        this.router.navigate([
+          '/usuario-perfil'
+        ]);
+      },
 
-        error: async (erro) => {
+      error: async (erro) => {
 
-          const mensagem =
-            erro.error?.message
-            || (typeof erro.error === 'string' ? erro.error : '')
-            || erro.message
-            || 'Erro ao atualizar usuário.';
+        const mensagem =
+          erro.error?.message
+          || (typeof erro.error === 'string' ? erro.error : '')
+          || erro.message
+          || 'Erro ao atualizar usuário.';
 
-          console.error(
-            'Erro! ',
-            mensagem,
-            erro
-          );
+        console.error(
+          'Erro! ',
+          mensagem,
+          erro
+        );
 
-          await this.exibirMensagem(
-            mensagem
-          );
-        }
-      });
+        await this.exibirMensagem(
+          mensagem
+        );
+      }
+    });
   }
 
   async confirmarAlteracoes() {
@@ -259,6 +252,108 @@ export class UsuarioAlterarPage implements OnInit {
       });
 
     await alert.present();
+  }
+
+  async abrirAlterarSenha() {
+
+    const alert =
+      await this.alertController.create({
+
+        header: 'Alterar senha',
+
+        message:
+          'Informe a senha atual e a nova senha para confirmar a alteração.',
+
+        inputs: [
+          {
+            name: 'senhaAtual',
+            type: 'password',
+            placeholder: 'Senha atual'
+          },
+          {
+            name: 'novaSenha',
+            type: 'password',
+            placeholder: 'Nova senha'
+          },
+          {
+            name: 'confirmarNovaSenha',
+            type: 'password',
+            placeholder: 'Confirmar nova senha'
+          }
+        ],
+
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Confirmar',
+            role: 'confirm',
+            handler: async (dados) => {
+
+              if (!dados.senhaAtual || dados.senhaAtual !== this.senhaOriginal) {
+                await this.exibirMensagem('Senha atual incorreta.');
+                return false;
+              }
+
+              if (!dados.novaSenha) {
+                await this.exibirMensagem('Informe a nova senha.');
+                return false;
+              }
+
+              if (dados.novaSenha !== dados.confirmarNovaSenha) {
+                await this.exibirMensagem('A confirmação não corresponde à nova senha.');
+                return false;
+              }
+
+              this.usuario.senha = dados.novaSenha;
+              this.salvarSenha();
+
+              return true;
+            }
+          }
+        ]
+      });
+
+    await alert.present();
+  }
+
+  salvarSenha() {
+
+    this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
+
+      next: async (usuario: UsuarioModel) => {
+
+        console.log('senha atualizada ', usuario);
+
+        this.usuarioService.salvarUsuarioSessao(usuario);
+
+        this.usuario = usuario;
+        this.senhaOriginal = usuario.senha;
+
+        await this.exibirMensagem('Senha alterada com sucesso!');
+      },
+
+      error: async (erro) => {
+
+        const mensagem =
+          erro.error?.message
+          || (typeof erro.error === 'string' ? erro.error : '')
+          || erro.message
+          || 'Erro ao atualizar senha.';
+
+        console.error(
+          'Erro! ',
+          mensagem,
+          erro
+        );
+
+        await this.exibirMensagem(
+          mensagem
+        );
+      }
+    });
   }
 
   async exibirMensagem(mensagem: string) {

@@ -315,3 +315,16 @@ ion-footer {
   border-radius: 14px;
   padding: 14px;
 }
+
+.avatar-foto {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+
+  flex-shrink: 0;
+}

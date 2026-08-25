@@ -36,10 +36,15 @@
     <form (ngSubmit)="salvar()">
 
       <!-- FOTO -->
-      <div class="foto-box" (click)="selecionarImagem()">
-        <img [src]="previewFoto || anuncio.ftAnuncio || 'assets/img/usuarioPadrao.png'" class="imagem">
+      <div class="campo-label campo-label--foto">
+        <label>Foto do anúncio</label>
       </div>
-      <p>Alterar foto</p>
+
+      <div class="foto-box" (click)="selecionarImagem()">
+        <img [src]="previewFoto || anuncio.ftAnuncio || 'assets/img/comunidadePadrao.png'" class="foto-anuncio">
+      </div>
+
+      <hr>
 
       <!-- TÍTULO -->
       <div class="campo-label">
@@ -99,7 +104,7 @@
 
 
       <div class="campo-label">
-        <label>Comunidades</label>
+        <label>Comunidades em que o anúncio será visível</label>
       </div>
 
       <ion-list *ngIf="comunidades.length > 0" class="lista-comunidades">

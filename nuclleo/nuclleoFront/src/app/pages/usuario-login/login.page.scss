@@ -156,3 +156,24 @@ ion-input {
   width: 120px;
   height: auto;
 }
+
+/* LABELS */
+.campo-label {
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.campo-label:first-child {
+  margin-top: 0;
+}
+
+.campo-label label {
+  display: block;
+
+  padding-left: 4px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #000000;
+}

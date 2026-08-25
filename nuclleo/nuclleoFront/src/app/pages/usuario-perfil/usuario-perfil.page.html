@@ -159,15 +159,26 @@
 
         <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
-          <h3>{{ anuncio.nmAnuncio }}</h3>
+          <div class="anuncio-info">
 
-          <span class="tipo-anuncio">
-            {{ anuncio.tipoAnuncio }}
-          </span>
+            <h3>{{ anuncio.nmAnuncio }}</h3>
 
-          <p>
-            {{ anuncio.descricao }}
-          </p>
+            <span class="tipo-anuncio">
+              {{ anuncio.tipoAnuncio }}
+            </span>
+
+            <p>
+              {{ anuncio.descricao }}
+            </p>
+
+          </div>
+
+          <div class="anuncio-imagem">
+            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
+            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+            </div>
+          </div>
 
         </div>
 

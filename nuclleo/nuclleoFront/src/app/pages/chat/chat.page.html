@@ -5,14 +5,19 @@
     </ion-buttons>
 
     <div class="header-info">
-      <div class="avatar">{{ nomeOutroUsuario.charAt(0) }}</div>
-      <div class="header-texto">
-        <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
-        <span class="header-status">
-          <span class="status-dot" [class.online]="conectado"></span>
-          {{ conectado ? 'Online' : 'Conectando...' }}
-        </span>
-      </div>
+      <div class="header-info">
+
+        <img *ngIf="fotoOutroUsuario" [src]="fotoOutroUsuario" class="avatar-foto">
+        <div *ngIf="!fotoOutroUsuario" class="avatar">{{ nomeOutroUsuario.charAt(0) }}</div>
+
+        <div class="header-texto">
+          <span class="header-nome">{{ nomeOutroUsuario || 'Chat' }}</span>
+          <span class="header-status">
+            <span class="status-dot" [class.online]="conectado"></span>
+            {{ conectado ? 'Online' : 'Conectando...' }}
+          </span>
+        </div>
+    </div>
     </div>
 
     <ion-buttons slot="end" *ngIf="souAnunciante && !chatFinalizado">

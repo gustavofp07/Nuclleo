@@ -29,16 +29,22 @@
     <!-- FORM -->
     <form (ngSubmit)="confirmarAlteracoes()">
 
-      <div class="campo-label">
-        <label>Foto de perfil</label>
-      </div>
-
       <!-- FOTO -->
       <div class="foto-box" (click)="selecionarImagem()">
-        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem">
-      </div>
-      <p>Alterar foto</p>
 
+        <div class="foto-circle">
+          <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem"
+            [class.placeholder]="!previewFoto && !usuario.ftUsuario">
+        </div>
+
+        <div class="camera-badge">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+
+      </div>
+      <p class="foto-label">Alterar foto</p>
+
+      <!-- NOME -->
       <div class="campo-label">
         <label>Nome</label>
       </div>
@@ -48,15 +54,7 @@
         </ion-input>
       </ion-item>
 
-      <div class="campo-label">
-        <label>E-mail</label>
-      </div>
-
-      <ion-item lines="none" class="input-item">
-        <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email">
-        </ion-input>
-      </ion-item>
-
+      <!-- CPF -->
       <div class="campo-label">
         <label>CPF</label>
       </div>
@@ -66,6 +64,7 @@
         </ion-input>
       </ion-item>
 
+      <!-- CEP -->
       <div class="campo-label">
         <label>CEP</label>
       </div>
@@ -75,6 +74,7 @@
         </ion-input>
       </ion-item>
 
+      <!-- TELEFONE -->
       <div class="campo-label">
         <label>Telefone</label>
       </div>
@@ -83,36 +83,19 @@
         <ion-input placeholder="Telefone" [(ngModel)]="usuario.telefone" name="telefone">
         </ion-input>
       </ion-item>
+      
+      <!-- SENHA -->
+<div class="campo-label">
+  <label>Senha</label>
+</div>
 
-      <div class="campo-label">
-        <label>Data de Entrada</label>
-      </div>
-
-      <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Data de Entrada" [value]="usuario.dtEntrada | date: 'dd/MM/yyyy'" name="dtEntrada" readonly>
-        </ion-input>
-      </ion-item>
-
-      <div class="campo-label">
-        <label>Senha</label>
-      </div>
-
-      <ion-item lines="none" class="input-item">
-        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
-          name="senha" required>
-        </ion-input>
-
-        <!-- OLHINHO -->
-        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
-          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
-          </ion-icon>
-        </ion-button>
-      </ion-item>
+<ion-button expand="block" fill="outline" class="btn-alterar-senha" type="button" (click)="abrirAlterarSenha()">
+  Alterar senha
+</ion-button>
 
       <!-- BOTÕES -->
       <div class="acoes">
         <ion-button expand="block" class="btn-salvar" type="submit">Salvar alterações</ion-button>
-        <ion-button expand="block" fill="outline" class="btn-cancelar" type="button" (click)="cancelar()">Cancelar</ion-button>
       </div>
 
     </form>

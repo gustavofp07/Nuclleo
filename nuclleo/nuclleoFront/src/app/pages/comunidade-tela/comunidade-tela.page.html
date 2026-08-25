@@ -177,7 +177,10 @@
         </div>
 
         <div class="anuncio-imagem">
-          <div class="anuncio-imagem-placeholder"></div>
+          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
+          <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+            <ion-icon name="image-outline"></ion-icon>
+          </div>
         </div>
 
       </div>

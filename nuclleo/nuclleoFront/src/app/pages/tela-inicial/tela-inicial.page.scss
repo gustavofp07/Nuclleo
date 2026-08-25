@@ -94,11 +94,27 @@ ion-toolbar {
   border: 1px solid #e5e7eb;
 }
 
-.product-card img {
+.foto-produto {
   width: 100%;
   height: 140px;
 
   object-fit: cover;
+}
+
+.foto-produto-placeholder {
+  width: 100%;
+  height: 140px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f5f3ff;
+}
+
+.foto-produto-placeholder ion-icon {
+  font-size: 40px;
+  color: #7c3aed;
 }
 
 ion-card-header {

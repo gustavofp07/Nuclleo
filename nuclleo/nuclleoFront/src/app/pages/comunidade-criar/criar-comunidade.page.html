@@ -12,57 +12,58 @@
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content [fullscreen]="true" class="criar-content">
 
-  <ion-content [fullscreen]="true" class="criar-content">
+  <div class="container">
 
-    <div class="container">
-
-      <!-- TOPO -->
-      <div class="topo">
-        <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
-        <p>Preencha as informações abaixo</p>
-      </div>
-
-      <!-- FORM -->
-      <form (ngSubmit)="salvarComunidade()">
-
-        <!-- NOME -->
-        <ion-item lines="none" class="input-item">
-
-          <ion-input placeholder="Nome da comunidade" [(ngModel)]="comunidade.nmComunidade" name="nmComunidade">
-          </ion-input>
-
-        </ion-item>
-
-        <!-- DESCRIÇÃO -->
-        <ion-item lines="none" class="input-item">
-
-          <ion-input placeholder="Descrição" [(ngModel)]="comunidade.descricao" name="descricao">
-          </ion-input>
-
-        </ion-item>
-
-        <!-- FOTO DA COMUNIDADE -->
-
-        <div class="campo-label">
-          <label>Imagem da comunidade</label>
-        </div>
-
-        <div class="foto-box" (click)="selecionarImagem()">
-          <img [src]="previewFoto || comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
-        </div>
-
-        <p class="foto-dica">
-          Toque na imagem para selecionar uma foto PNG ou JPG
-        </p>
-
-        <!-- BOTÃO -->
-        <ion-button expand="block" type="submit" class="btn-criar">{{ modoEdicao ? 'Salvar alterações' : 'Criar
-          comunidade' }}</ion-button>
-
-      </form>
-
+    <!-- TOPO -->
+    <div class="topo">
+      <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
     </div>
 
-  </ion-content>
+    <!-- FORM -->
+    <form (ngSubmit)="salvarComunidade()">
+
+      <!-- FOTO DA COMUNIDADE -->
+
+      <div class="campo-label campo-label--foto">
+        <label>Imagem da comunidade</label>
+      </div>
+
+      <div class="foto-box" (click)="selecionarImagem()">
+        <img [src]="previewFoto || comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
+      </div>
+
+      <hr>
+      <!-- NOME -->
+      <div class="campo-label">
+        <label>Nome da comunidade</label>
+      </div>
+      <ion-item lines="none" class="input-item">
+
+        <ion-input placeholder="Nome da comunidade" [(ngModel)]="comunidade.nmComunidade" name="nmComunidade">
+        </ion-input>
+
+      </ion-item>
+
+      <!-- DESCRIÇÃO -->
+      <div class="campo-label">
+        <label>Descrição</label>
+      </div>
+      <ion-item lines="none" class="input-item">
+
+        <ion-input placeholder="Descrição" [(ngModel)]="comunidade.descricao" name="descricao">
+        </ion-input>
+
+      </ion-item>
+
+      <!-- BOTÃO -->
+      <ion-button expand="block" type="submit" class="btn-criar">{{ modoEdicao ? 'Salvar alterações' : 'Criar
+        comunidade' }}</ion-button>
+
+    </form>
+
+  </div>
+
+</ion-content>

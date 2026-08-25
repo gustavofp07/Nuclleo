@@ -65,6 +65,7 @@ export class ChatPage implements OnInit, OnDestroy {
   textoMensagem: string = '';
   conectado: boolean = false;
   nomeOutroUsuario: string = '';
+  fotoOutroUsuario: string | null = null;
   outroUsuarioDigitando: boolean = false;
 
   souAnunciante: boolean = false;
@@ -147,9 +148,14 @@ export class ChatPage implements OnInit, OnDestroy {
         this.interesse = interesse;
 
         const souEuOInteressado = interesse.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
+
         this.nomeOutroUsuario = souEuOInteressado
           ? interesse.anuncio.usuarioCria.nmUsuario
           : interesse.usuario.nmUsuario;
+
+        this.fotoOutroUsuario = souEuOInteressado
+          ? interesse.anuncio.usuarioCria.ftUsuario
+          : interesse.usuario.ftUsuario;
 
         this.souAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
         this.chatFinalizado = interesse.finalizado;

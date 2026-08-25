@@ -31,7 +31,7 @@
   width: 130px;
   height: 130px;
 
-  border-radius: 50%;
+  border-radius: 20%;
 
   object-fit: cover;
 
@@ -258,22 +258,33 @@
   height: 120px;
 }
 
-.anuncio-imagem img {
+.anuncio-imagem-foto {
   width: 100%;
   height: 100%;
 
   object-fit: cover;
   border-radius: 12px;
+
+  border: 1px solid #d1d5db;
 }
 
 .anuncio-imagem-placeholder {
   width: 100%;
   height: 100%;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 12px;
 
   border: 2px solid #7c3aed;
   background: #f5f3ff;
+}
+
+.anuncio-imagem-placeholder ion-icon {
+  font-size: 32px;
+  color: #7c3aed;
 }
 
 .anuncio-card h3 {

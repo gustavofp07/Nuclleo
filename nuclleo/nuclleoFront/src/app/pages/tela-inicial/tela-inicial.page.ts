@@ -18,7 +18,8 @@ import {
   IonTitle,
   IonToolbar,
   IonMenuButton,
-  IonButtons
+  IonButtons,
+  IonIcon
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -56,7 +57,8 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
     CommonModule,
     FormsModule,
     IonButton,
-    RouterLink
+    RouterLink,
+    IonIcon
   ]
 })
 

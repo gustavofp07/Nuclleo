@@ -19,6 +19,9 @@
     <form (ngSubmit)="entrar()">
 
       <!-- Email -->
+      <div class="campo-label">
+        <label>E-mail</label>
+      </div>
       <ion-item lines="none" class="input-item">
 
         <ion-input type="email" placeholder="E-mail" [(ngModel)]="login.email" name="email" required>
@@ -27,6 +30,9 @@
       </ion-item>
 
       <!-- Senha -->
+      <div class="campo-label">
+        <label>Senha</label>
+      </div>
       <ion-item lines="none" class="input-item">
 
         <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="login.senha"
