@@ -14,14 +14,19 @@ import {
   IonIcon,
   ToastController,
   IonAvatar,
-  LoadingController
+  LoadingController,
+  ActionSheetController
 } from '@ionic/angular/standalone';
+
+import { CameraSource } from '@capacitor/camera';
 
 import { addIcons } from 'ionicons';
 
 import {
   eyeOutline,
-  eyeOffOutline
+  eyeOffOutline,
+  cameraOutline,
+  imageOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -63,14 +68,17 @@ export class UsuarioCadastroPage implements OnInit {
     private toastController: ToastController,
     private usuarioService: UsuarioService,
     private loadingController: LoadingController,
-    private arquivoService: ArquivoService
+    private arquivoService: ArquivoService,
+    private actionSheetController: ActionSheetController
   ) {
 
     this.usuario = new UsuarioModel();
 
     addIcons({
       eyeOutline,
-      eyeOffOutline
+      eyeOffOutline,
+      cameraOutline,
+      imageOutline
     });
 
   }
@@ -138,7 +146,31 @@ export class UsuarioCadastroPage implements OnInit {
 
 
   async selecionarImagem() {
-    const arquivo = await this.arquivoService.capturar();
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Foto',
+      buttons: [
+        {
+          text: 'Câmera',
+          icon: 'camera-outline',
+          handler: () => this.capturarImagem(CameraSource.Camera)
+        },
+        {
+          text: 'Galeria',
+          icon: 'image-outline',
+          handler: () => this.capturarImagem(CameraSource.Photos)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async capturarImagem(source: CameraSource) {
+    const arquivo = await this.arquivoService.capturar(source);
 
     if (!arquivo) {
       return;

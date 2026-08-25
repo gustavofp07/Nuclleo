@@ -10,20 +10,17 @@ export class ArquivoService {
 
   constructor() { }
 
-  public async capturar(): Promise<File | undefined> {
+  public async capturar(
+    source: CameraSource = CameraSource.Photos
+  ): Promise<File | undefined> {
 
     try {
 
       const camera = await Camera.getPhoto({
         resultType: CameraResultType.Uri,
-        source: CameraSource.Prompt,
+        source,
         quality: 50,
-        saveToGallery: true,
-
-        promptLabelHeader: 'Foto',
-        promptLabelPhoto: 'Galeria',
-        promptLabelPicture: 'Câmera',
-        promptLabelCancel: 'Cancelar'
+        saveToGallery: source === CameraSource.Camera
       });
 
       if (!camera.webPath) {
@@ -52,7 +49,7 @@ export class ArquivoService {
 
     } catch (erro) {
 
-      console.log(
+      console.error(
         'Captura cancelada ou não concluída.',
         erro
       );

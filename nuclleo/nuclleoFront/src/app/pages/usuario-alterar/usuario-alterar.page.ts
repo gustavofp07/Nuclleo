@@ -14,8 +14,11 @@ import {
   IonMenuButton,
   IonTitle,
   IonLabel,
-  AlertController
+  AlertController,
+  ActionSheetController
 } from '@ionic/angular/standalone';
+
+import { CameraSource } from '@capacitor/camera';
 
 import { Router } from '@angular/router';
 
@@ -25,7 +28,8 @@ import {
   chevronBackOutline,
   eyeOffOutline,
   eyeOutline,
-  imageOutline
+  imageOutline,
+  cameraOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -66,14 +70,16 @@ export class UsuarioAlterarPage implements OnInit {
     private router: Router,
     private usuarioService: UsuarioService,
     private alertController: AlertController,
-    private arquivoService: ArquivoService
+    private arquivoService: ArquivoService,
+    private actionSheetController: ActionSheetController
   ) {
 
     addIcons({
       chevronBackOutline,
       eyeOutline,
       eyeOffOutline,
-      imageOutline
+      imageOutline,
+      cameraOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -143,7 +149,31 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   async selecionarImagem() {
-    const arquivo = await this.arquivoService.capturar();
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Foto',
+      buttons: [
+        {
+          text: 'Câmera',
+          icon: 'camera-outline',
+          handler: () => this.capturarImagem(CameraSource.Camera)
+        },
+        {
+          text: 'Galeria',
+          icon: 'image-outline',
+          handler: () => this.capturarImagem(CameraSource.Photos)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async capturarImagem(source: CameraSource) {
+    const arquivo = await this.arquivoService.capturar(source);
 
     if (!arquivo) {
       return;

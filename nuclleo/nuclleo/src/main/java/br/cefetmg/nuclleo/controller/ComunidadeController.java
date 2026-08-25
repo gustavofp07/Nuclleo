@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Comunidade;
@@ -31,41 +33,44 @@ public class ComunidadeController {
     @Autowired
     private ComunidadeService comunidadeService;
 
+    /*
+     * private final ComunidadeRepository repository;
+     * private final AnuncioComunidadeRepository anuncioComunidadeRepository;
+     * private final UsuarioComunidadeRepository usuarioComunidadeRepository;
+     * 
+     * ComunidadeController(
+     * ComunidadeRepository repository,
+     * AnuncioComunidadeRepository anuncioComunidadeRepository,
+     * UsuarioComunidadeRepository usuarioComunidadeRepository) {
+     * this.repository = repository;
+     * this.anuncioComunidadeRepository = anuncioComunidadeRepository;
+     * this.usuarioComunidadeRepository = usuarioComunidadeRepository;
+     * }
+     */
 
-
-    /* 
-    private final ComunidadeRepository repository;
-    private final AnuncioComunidadeRepository anuncioComunidadeRepository;
-    private final UsuarioComunidadeRepository usuarioComunidadeRepository;
-
-    ComunidadeController(
-            ComunidadeRepository repository,
-            AnuncioComunidadeRepository anuncioComunidadeRepository,
-            UsuarioComunidadeRepository usuarioComunidadeRepository) {
-        this.repository = repository;
-        this.anuncioComunidadeRepository = anuncioComunidadeRepository;
-        this.usuarioComunidadeRepository = usuarioComunidadeRepository;
-    }
-    */
-
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar comunidade")
-    public ResponseEntity<Comunidade> inserir(@Valid @RequestBody Comunidade comunidade) {
-        comunidade.setCdComunidade(null); //gambiarra
+    public ResponseEntity<Comunidade> inserir(
+            @Valid @RequestPart("comunidade") Comunidade comunidade,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+        comunidade.setCdComunidade(null); // gambiarra
 
-        Comunidade objComunidade = comunidadeService.inserir(comunidade);
+        Comunidade objComunidade = comunidadeService.inserir(comunidade, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objComunidade);
     }
 
-    @PutMapping("/{cdComunidade}")
+    @PutMapping(value = "/{cdComunidade}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualizar comunidade")
-    public ResponseEntity<Comunidade> alterar(@PathVariable Long cdComunidade, @Valid @RequestBody Comunidade comunidade) {
+    public ResponseEntity<Comunidade> alterar(
+            @PathVariable Long cdComunidade,
+            @Valid @RequestPart("comunidade") Comunidade comunidade,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
         if (cdComunidade == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        Comunidade objComunidade = comunidadeService.alterar(cdComunidade, comunidade);
+        Comunidade objComunidade = comunidadeService.alterar(cdComunidade, comunidade, foto);
         return ResponseEntity.ok(objComunidade);
     }
 
@@ -76,7 +81,6 @@ public class ComunidadeController {
         return ResponseEntity.ok(objComunidade);
     }
 
-    
     @GetMapping("")
     @Operation(summary = "Listar comunidades")
     public ResponseEntity<List<Comunidade>> getComunidades() {
@@ -90,7 +94,7 @@ public class ComunidadeController {
         if (cdComunidade == null) {
             throw new BadRequestException("Id é obrigatório");
         }
-        
+
         Comunidade comunidade = comunidadeService.buscarPorId(cdComunidade);
         return ResponseEntity.ok(comunidade);
     }

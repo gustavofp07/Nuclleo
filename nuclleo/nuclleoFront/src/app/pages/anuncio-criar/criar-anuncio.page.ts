@@ -16,8 +16,13 @@ import {
   IonList,
   IonCheckbox,
   IonLabel,
-  IonTextarea
+  IonTextarea,
+  ActionSheetController
 } from '@ionic/angular/standalone';
+
+import { CameraSource } from '@capacitor/camera';
+import { addIcons } from 'ionicons';
+import { cameraOutline, imageOutline } from 'ionicons/icons';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -83,8 +88,14 @@ export class CriarAnuncioPage {
     private anuncioComunidadeService: AnuncioComunidadeService,
     private arquivoService: ArquivoService,
     private toastController: ToastController,
+    private actionSheetController: ActionSheetController,
     private router: Router
   ) {
+
+    addIcons({
+      cameraOutline,
+      imageOutline
+    });
 
     //this.anuncioVenda = new AnuncioVendaModel();
     //this.anuncioRequerimento = new AnuncioRequerimentoModel();
@@ -150,7 +161,31 @@ export class CriarAnuncioPage {
   }
 
   async selecionarImagem() {
-    const arquivo = await this.arquivoService.capturar();
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Foto',
+      buttons: [
+        {
+          text: 'Câmera',
+          icon: 'camera-outline',
+          handler: () => this.capturarImagem(CameraSource.Camera)
+        },
+        {
+          text: 'Galeria',
+          icon: 'image-outline',
+          handler: () => this.capturarImagem(CameraSource.Photos)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async capturarImagem(source: CameraSource) {
+    const arquivo = await this.arquivoService.capturar(source);
 
     if (!arquivo) {
       return;

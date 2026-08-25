@@ -49,23 +49,13 @@
           <label>Imagem da comunidade</label>
         </div>
 
-        <div class="upload-box">
-
+        <div class="foto-box" (click)="selecionarImagem()">
           <img [src]="previewFoto || comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
-
-          <p>
-            Selecione uma imagem PNG ou JPG
-          </p>
-
-          <input type="file" hidden #inputFile accept=".png,.jpg,.jpeg" (change)="selecionarImagem($event)">
-
-          <ion-button type="button" class="btn-upload" (click)="inputFile.click()">
-
-            Selecionar imagem
-
-          </ion-button>
-
         </div>
+
+        <p class="foto-dica">
+          Toque na imagem para selecionar uma foto PNG ou JPG
+        </p>
 
         <!-- BOTÃO -->
         <ion-button expand="block" type="submit" class="btn-criar">{{ modoEdicao ? 'Salvar alterações' : 'Criar

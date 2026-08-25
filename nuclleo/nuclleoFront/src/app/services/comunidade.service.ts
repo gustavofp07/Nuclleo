@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
-
 import { Observable } from 'rxjs';
-
 import { ComunidadeModel } from '../model/comunidade.model';
 
 @Injectable({
@@ -19,12 +16,29 @@ export class ComunidadeService {
     private http: HttpClient
   ) { }
 
-  cadastrarComunidade(comunidade: ComunidadeModel): Observable<ComunidadeModel> {
-    return this.http.post<ComunidadeModel>(this.API_URL, comunidade);
+  cadastrarComunidade(comunidade: ComunidadeModel, foto?: File): Observable<ComunidadeModel> {
+    return this.http.post<ComunidadeModel>(this.API_URL, this.montarFormData(comunidade, foto));
   }
 
-  atualizarComunidade(comunidade: ComunidadeModel): Observable<ComunidadeModel> {
-    return this.http.put<ComunidadeModel>(`${this.API_URL}/${comunidade.cdComunidade}`, comunidade);
+  atualizarComunidade(comunidade: ComunidadeModel, foto?: File): Observable<ComunidadeModel> {
+    return this.http.put<ComunidadeModel>(`${this.API_URL}/${comunidade.cdComunidade}`, this.montarFormData(comunidade, foto));
+  }
+
+  private montarFormData(comunidade: ComunidadeModel, foto?: File): FormData {
+    const formData = new FormData();
+
+    const comunidadeBlob = new Blob(
+      [JSON.stringify(comunidade)],
+      { type: 'application/json' }
+    );
+
+    formData.append('comunidade', comunidadeBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return formData;
   }
 
   //listar todas. Tirar depois

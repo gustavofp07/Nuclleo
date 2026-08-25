@@ -4,7 +4,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
@@ -17,36 +21,56 @@ public class ComunidadeService {
     @Autowired
     private ComunidadeRepository comunidadeRepository;
 
-    //apagar depois que criar o service
+    // apagar depois que criar o service
     @Autowired
     private AnuncioComunidadeRepository anuncioComunidadeRepository;
 
-    //eu ainda n criei esse service. Depois de criar corrigir a função excluirComunidade
+    // eu ainda n criei esse service. Depois de criar corrigir a função
+    // excluirComunidade
     /*
-    @Autowired
-    private AnuncioComunidadeService anuncioComunidadeService;
-    */
+     * @Autowired
+     * private AnuncioComunidadeService anuncioComunidadeService;
+     */
 
     @Autowired
     private UsuarioComunidadeService usuarioComunidadeService;
 
+    @Autowired
+    private ArquivoIntegracaoService arquivoIntegracaoService;
+
     @Transactional
-    public Comunidade inserir(Comunidade comunidade) {
+    public Comunidade inserir(Comunidade comunidade, MultipartFile foto) {
         comunidade.setDtCriacao(new java.sql.Date(System.currentTimeMillis()));
+
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+
+                if (arquivo == null || arquivo.getUrl() == null ||
+                        arquivo.getUrl().isBlank()) {
+                    throw new BusinessException(
+                            "O serviço de arquivos não retornou a URL da foto.");
+                }
+
+                comunidade.setFoto(arquivo.getUrl());
+
+            } catch (RestClientException e) {
+                throw new BusinessException("Não foi possível enviar a foto. Verifique o formato e tente novamente.");
+            }
+        }
 
         Comunidade objComunidade = comunidadeRepository.save(comunidade);
 
-        //salvar na tabela N:N de usuarioComunidade o usuario que criou a comunidade
+        // salvar na tabela N:N de usuarioComunidade o usuario que criou a comunidade
         if (objComunidade != null) {
             usuarioComunidadeService.inserir(objComunidade.getUsuarioCria(), objComunidade);
         }
-
 
         return objComunidade;
     }
 
     @Transactional
-    public Comunidade alterar(Long cdComunidade, Comunidade comunidade) {
+    public Comunidade alterar(Long cdComunidade, Comunidade comunidade, MultipartFile foto) {
         Comunidade objComunidade = comunidadeRepository.findById(cdComunidade)
                 .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
 
@@ -54,6 +78,23 @@ public class ComunidadeService {
         objComunidade.setDescricao(comunidade.getDescricao());
         // objComunidade.setDtCriacao(comunidade.getDtCriacao());
         // objComunidade.setCdUsuarioCriacao();
+
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+
+                if (arquivo == null || arquivo.getUrl() == null ||
+                        arquivo.getUrl().isBlank()) {
+                    throw new BusinessException(
+                            "O serviço de arquivos não retornou a URL da foto.");
+                }
+
+                objComunidade.setFoto(arquivo.getUrl());
+
+            } catch (RestClientException e) {
+                throw new BusinessException("Não foi possível enviar a foto. Verifique o formato e tente novamente.");
+            }
+        }
 
         return comunidadeRepository.save(objComunidade);
     }
@@ -63,10 +104,9 @@ public class ComunidadeService {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
                 .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
 
-                
         // Deletar nas tabelas N:N
-        //corrigir aqui para padronizar chamar o service primeiro
-        //this.anuncioComunidadeService.excluirPorComunidade(cdComunidade);
+        // corrigir aqui para padronizar chamar o service primeiro
+        // this.anuncioComunidadeService.excluirPorComunidade(cdComunidade);
         this.anuncioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
 
         this.usuarioComunidadeService.excluirPorComunidade(cdComunidade);

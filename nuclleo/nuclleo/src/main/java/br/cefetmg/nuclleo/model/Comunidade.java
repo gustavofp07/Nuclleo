@@ -48,6 +48,9 @@ public class Comunidade {
     @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
+    @Column(name = "foto", length = 1000)
+    private String foto;
+
     @ManyToOne
     @JsonIgnoreProperties({"senha"})
     @JoinColumn(name = "cd_usuario_cria", referencedColumnName = "cd_usuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))

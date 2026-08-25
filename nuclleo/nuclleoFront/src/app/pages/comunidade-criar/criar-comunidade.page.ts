@@ -13,6 +13,7 @@ import {
   IonTitle,
   IonButtons,
   IonMenuButton,
+  ActionSheetController
 } from '@ionic/angular/standalone';
 
 import { FormsModule } from '@angular/forms';
@@ -23,6 +24,11 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
+import { ArquivoService } from 'src/app/services/arquivo.service';
+
+import { CameraSource } from '@capacitor/camera';
+import { addIcons } from 'ionicons';
+import { cameraOutline, imageOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-criar-comunidade',
@@ -53,6 +59,7 @@ export class CriarComunidadePage {
 
   // PREVIEW DA FOTO
   previewFoto: string | ArrayBuffer | null = null;
+  imagemSelecionada?: File;
 
   constructor(
     private router: Router,
@@ -60,8 +67,15 @@ export class CriarComunidadePage {
     private activatedRoute: ActivatedRoute,
     private comunidadeService: ComunidadeService,
     private usuarioService: UsuarioService,
-    private usuarioComunidadeService: UsuarioComunidadeService
+    private usuarioComunidadeService: UsuarioComunidadeService,
+    private arquivoService: ArquivoService,
+    private actionSheetController: ActionSheetController
   ) {
+
+    addIcons({
+      cameraOutline,
+      imageOutline
+    });
 
     this.comunidade = new ComunidadeModel();
 
@@ -74,6 +88,7 @@ export class CriarComunidadePage {
 
     this.comunidade = new ComunidadeModel();
     this.previewFoto = null;
+    this.imagemSelecionada = undefined;
 
     const cdComunidade =
       this.activatedRoute.snapshot.paramMap.get(
@@ -103,10 +118,32 @@ export class CriarComunidadePage {
 
   }
 
-  selecionarImagem(event: any) {
+  async selecionarImagem() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Foto',
+      buttons: [
+        {
+          text: 'Câmera',
+          icon: 'camera-outline',
+          handler: () => this.capturarImagem(CameraSource.Camera)
+        },
+        {
+          text: 'Galeria',
+          icon: 'image-outline',
+          handler: () => this.capturarImagem(CameraSource.Photos)
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
 
-    const arquivo =
-      event.target.files[0];
+    await actionSheet.present();
+  }
+
+  private async capturarImagem(source: CameraSource) {
+    const arquivo = await this.arquivoService.capturar(source);
 
     if (!arquivo) {
       return;
@@ -120,6 +157,8 @@ export class CriarComunidadePage {
 
       return;
     }
+
+    this.imagemSelecionada = arquivo;
 
     const reader = new FileReader();
 
@@ -140,7 +179,7 @@ export class CriarComunidadePage {
 
   async atualizarComunidade() {
 
-    this.comunidadeService.atualizarComunidade(this.comunidade).subscribe({
+    this.comunidadeService.atualizarComunidade(this.comunidade, this.imagemSelecionada).subscribe({
       next: async (
         comunidade: ComunidadeModel
       ) => {
@@ -170,7 +209,7 @@ export class CriarComunidadePage {
   async cadastrarComunidade() {
     this.comunidade.usuarioCria = this.usuarioService.getUsuarioSessao();
 
-    this.comunidadeService.cadastrarComunidade(this.comunidade).subscribe({
+    this.comunidadeService.cadastrarComunidade(this.comunidade, this.imagemSelecionada).subscribe({
       next: async (
         comunidade: ComunidadeModel
       ) => {

@@ -158,9 +158,9 @@ ion-input {
   padding-left: 4px;
 }
 
-/* UPLOAD */
+/* FOTO */
 
-.upload-box {
+.foto-box {
   background: #ffffff;
 
   border: 1px solid #d1d5db;
@@ -169,11 +169,13 @@ ion-input {
 
   padding: 24px;
 
-  margin-bottom: 18px;
+  margin-bottom: 8px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  cursor: pointer;
 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
@@ -189,14 +191,14 @@ ion-input {
   background: #f3f4f6;
 
   border: 2px solid #e5e7eb;
-
-  margin-bottom: 14px;
 }
 
-.upload-box p {
+.foto-dica {
   color: #6b7280;
 
   font-size: 14px;
+
+  text-align: center;
 
   margin-bottom: 16px;
 }
