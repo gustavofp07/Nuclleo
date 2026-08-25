@@ -3,10 +3,6 @@ import { UsuarioPerfilPage } from './pages/usuario-perfil/usuario-perfil.page';
 
 export const routes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-  },
-  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
@@ -86,7 +82,8 @@ export const routes: Routes = [
   {
     path: 'chat',
     loadComponent: () => import('./pages/chat/chat.page').then( m => m.ChatPage)
-  },  {
+  },
+  {
     path: 'transacoes',
     loadComponent: () => import('./pages/transacoes/transacoes.page').then( m => m.TransacoesPage)
   },
