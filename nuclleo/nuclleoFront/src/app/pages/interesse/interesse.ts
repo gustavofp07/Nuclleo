@@ -95,10 +95,22 @@ export class InteresseMeusPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    if (this.usuario) {
-      this.carregarInteresses();
-      this.carregarInteressesRecebidos();
+
+    const possuiSessao = this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+
+      this.exibirMensagem('Não há usuário logado.');
+
+      this.router.navigate(['/login']);
+
+      return;
     }
+
+    this.usuario = this.usuarioService.getUsuarioSessao();
+
+    this.carregarInteresses();
+    this.carregarInteressesRecebidos();
   }
 
   onSegmentChange(event: any) {

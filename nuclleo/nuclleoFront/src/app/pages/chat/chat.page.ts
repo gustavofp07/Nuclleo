@@ -93,6 +93,20 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
+
+    const possuiSessao = this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+
+      this.exibirMensagem('Não há usuário logado.');
+
+      this.router.navigate(['/login']);
+
+      return;
+    }
+
+    this.usuarioLogado = this.usuarioService.getUsuarioSessao();
+
     this.carregarInteresse();
     this.carregarHistorico();
     this.chatService.conectar(this.cdInteresse);

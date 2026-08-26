@@ -4,6 +4,9 @@ import { IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent,
 import { addIcons } from 'ionicons';
 import { cashOutline, calendarOutline, personOutline, pricetagOutline } from 'ionicons/icons';
 
+import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+
 import { TransacaoModel } from 'src/app/model/transacao.model';
 import { TransacaoService } from 'src/app/services/transacao.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -24,6 +27,8 @@ export class TransacoesPage implements OnInit {
   constructor(
     private transacaoService: TransacaoService,
     private usuarioService: UsuarioService,
+    private router: Router,
+    private toastController: ToastController,
   ) {
     addIcons({ cashOutline, calendarOutline, personOutline, pricetagOutline });
   }
@@ -31,6 +36,18 @@ export class TransacoesPage implements OnInit {
   ngOnInit() { }
 
   ionViewWillEnter() {
+
+    const possuiSessao = this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+
+      this.exibirMensagem('Não há usuário logado.');
+
+      this.router.navigate(['/login']);
+
+      return;
+    }
+
     this.usuarioLogado = this.usuarioService.getUsuarioSessao();
     this.carregarTransacoes();
   }
@@ -41,13 +58,19 @@ export class TransacoesPage implements OnInit {
     });
   }
 
-  // Nas transações, "usuario" é sempre o interessado (comprador).
-  // O anunciante (vendedor) é sempre anuncio.usuarioCria.
   souComprador(transacao: TransacaoModel): boolean {
     return transacao.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
   }
 
   outroUsuario(transacao: TransacaoModel): UsuarioModel {
     return this.souComprador(transacao) ? transacao.anuncio.usuarioCria : transacao.usuario;
+  }
+
+  async exibirMensagem(texto: string) {
+    const toast = await this.toastController.create({
+      message: texto,
+      duration: 2000
+    });
+    toast.present();
   }
 }

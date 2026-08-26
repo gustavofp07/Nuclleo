@@ -22,11 +22,11 @@
         <ion-card *ngFor="let anuncio of anunciosRecomendados" class="product-card"
           [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
-          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="foto-produto">
+          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="foto-produto" (error)="onErroImagem(anuncio)">
           <div *ngIf="!anuncio.ftAnuncio" class="foto-produto-placeholder">
             <ion-icon name="image-outline"></ion-icon>
           </div>
-          
+
           <ion-card-header>
             <ion-card-title class="titulo-clamp">
               {{ anuncio.nmAnuncio | slice:0:25 }}{{ anuncio.nmAnuncio.length > 25 ? '...' : '' }}

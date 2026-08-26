@@ -79,6 +79,10 @@ export class TelaInicialPage implements OnInit {
     this.carregarComunidades();
   }
 
+  onErroImagem(anuncio: any) {
+    anuncio.ftAnuncio = null;
+  }
+
   ionViewWillEnter() {
 
     let aux = this.usuarioService.verificarSessao();
