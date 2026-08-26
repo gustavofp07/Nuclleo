@@ -132,14 +132,14 @@ export class InteresseMeusPage implements OnInit {
   carregarInteressesRecebidos() {
     this.interesseService.listarPorInteressados(this.usuario.cdUsuario).subscribe({
       next: (interesses) => {
-        this.anunciosComInteresse = this.agruparPorAnuncio(interesses);
+        const pendentes = interesses.filter(i => !(i as any).aceito);
+        this.anunciosComInteresse = this.agruparPorAnuncio(pendentes);
       },
       error: () => {
         this.exibirMensagem('Erro ao carregar interesses recebidos.');
       }
     });
   }
-
   agruparPorAnuncio(interesses: InteresseModel[]): AnuncioComInteresse[] {
     const mapa = new Map<number, AnuncioComInteresse>();
 
