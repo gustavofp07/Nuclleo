@@ -72,6 +72,7 @@ export class InteresseMeusPage implements OnInit {
   interesses: InteresseModel[] = [];
 
   anunciosComInteresse: AnuncioComInteresse[] = [];
+  totalInteressesRecebidos: number = 0;
   segmentoAtivo: 'meus' | 'recebidos' = 'meus';
 
   constructor(
@@ -134,12 +135,15 @@ export class InteresseMeusPage implements OnInit {
       next: (interesses) => {
         const pendentes = interesses.filter(i => !(i as any).aceito);
         this.anunciosComInteresse = this.agruparPorAnuncio(pendentes);
+
+        this.totalInteressesRecebidos = pendentes.length;   // <-- NOVO
       },
       error: () => {
         this.exibirMensagem('Erro ao carregar interesses recebidos.');
       }
     });
   }
+
   agruparPorAnuncio(interesses: InteresseModel[]): AnuncioComInteresse[] {
     const mapa = new Map<number, AnuncioComInteresse>();
 
@@ -186,6 +190,8 @@ export class InteresseMeusPage implements OnInit {
         anuncioItem.interessados = anuncioItem.interessados.filter(
           i => i.cdInteresse !== interessado.cdInteresse
         );
+
+        this.totalInteressesRecebidos--;   // <-- NOVO
 
         if (anuncioItem.interessados.length === 0) {
           this.anunciosComInteresse = this.anunciosComInteresse.filter(

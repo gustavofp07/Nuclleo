@@ -1,6 +1,5 @@
-// app.component.ts
-
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import {
   Router,
@@ -23,7 +22,8 @@ import {
   IonIcon,
   IonMenu,
   IonAccordion,
-  IonAccordionGroup
+  IonAccordionGroup,
+  IonBadge
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -53,6 +53,8 @@ import {
   cartOutline
 } from 'ionicons/icons';
 
+import { InteresseService } from 'src/app/services/interesse.service';
+import { UsuarioService } from 'src/app/services/usuario.service';
 
 @Component({
   selector: 'app-root',
@@ -61,6 +63,7 @@ import {
   styleUrls: ['app.component.scss'],
 
   imports: [
+    CommonModule,
     RouterLink,
     IonApp,
     IonRouterOutlet,
@@ -74,15 +77,21 @@ import {
     IonIcon,
     IonMenu,
     IonAccordion,
-    IonAccordionGroup
+    IonAccordionGroup,
+    IonBadge
   ],
 })
 
 export class AppComponent {
 
   menuHabilitado = true;
+  totalInteressesRecebidos: number = 0;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private interesseService: InteresseService,
+    private usuarioService: UsuarioService,
+  ) {
 
     addIcons({
       add,
@@ -121,8 +130,30 @@ export class AppComponent {
           rotaAtual !== '/login' &&
           rotaAtual !== '/cadastro';
 
+        this.carregarNotificacoes();
       });
 
+  }
+
+  carregarNotificacoes() {
+
+    const possuiSessao = this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+      this.totalInteressesRecebidos = 0;
+      return;
+    }
+
+    const usuario = this.usuarioService.getUsuarioSessao();
+
+    this.interesseService.listarPorInteressados(usuario.cdUsuario).subscribe({
+      next: (interesses) => {
+        this.totalInteressesRecebidos = interesses.filter(i => !(i as any).aceito).length;
+      },
+      error: () => {
+        // silencioso: não queremos toast no menu por causa disso
+      }
+    });
   }
 
 }

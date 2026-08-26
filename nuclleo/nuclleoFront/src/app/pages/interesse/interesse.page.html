@@ -24,6 +24,9 @@
         </ion-segment-button>
         <ion-segment-button value="recebidos">
           <ion-label>Interesses recebidos</ion-label>
+          <ion-badge *ngIf="totalInteressesRecebidos > 0" class="badge-notificacao">
+            {{ totalInteressesRecebidos }}
+          </ion-badge>
         </ion-segment-button>
       </ion-segment>
 
