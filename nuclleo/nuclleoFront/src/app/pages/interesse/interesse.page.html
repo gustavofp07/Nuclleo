@@ -43,7 +43,11 @@
             </div>
 
             <div class="anuncio-imagem">
-              <div class="anuncio-imagem-placeholder"></div>
+              <img *ngIf="interesse.anuncio.ftAnuncio" [src]="interesse.anuncio.ftAnuncio" class="anuncio-imagem-foto"
+                (error)="onErroImagem(interesse.anuncio)">
+              <div *ngIf="!interesse.anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
             </div>
 
           </a>

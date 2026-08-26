@@ -124,8 +124,10 @@
       </div>
 
       <!-- BOTÃO -->
-      <ion-button expand="block" type="submit" class="btn-criar">
-        {{ modoEdicao
+      <ion-button expand="block" type="submit" class="btn-criar" [disabled]="salvando">
+        {{ salvando
+        ? 'Salvando...'
+        : modoEdicao
         ? 'Salvar alterações'
         : tipo === 'VENDA'
         ? 'Criar anúncio de venda'

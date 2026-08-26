@@ -54,7 +54,7 @@ import { cameraOutline, imageOutline } from 'ionicons/icons';
 export class CriarComunidadePage {
 
   modoEdicao: boolean = false;
-
+  salvando: boolean = false;
   comunidade: ComunidadeModel;
 
   // PREVIEW DA FOTO
@@ -89,28 +89,21 @@ export class CriarComunidadePage {
     this.comunidade = new ComunidadeModel();
     this.previewFoto = null;
     this.imagemSelecionada = undefined;
+    this.salvando = false;   // <-- NOVO
 
     const cdComunidade =
-      this.activatedRoute.snapshot.paramMap.get(
-        'cdComunidade'
-      );
+      this.activatedRoute.snapshot.paramMap.get('cdComunidade');
 
     if (cdComunidade) {
 
       this.modoEdicao = true;
 
       this.comunidadeService.buscarComunidade(Number(cdComunidade)).subscribe({
-        next: async (
-          comunidade: ComunidadeModel
-        ) => {
-
+        next: async (comunidade: ComunidadeModel) => {
           this.comunidade = comunidade;
-
         },
         error: async () => {
-          this.exibirMensagem(
-            'Erro ao carregar comunidade.'
-          );
+          this.exibirMensagem('Erro ao carregar comunidade.');
         }
       });
 
@@ -170,6 +163,13 @@ export class CriarComunidadePage {
   }
 
   salvarComunidade() {
+
+    if (this.salvando) {
+      return;
+    }
+
+    this.salvando = true;
+
     if (this.modoEdicao) {
       this.atualizarComunidade();
     } else {
@@ -180,26 +180,17 @@ export class CriarComunidadePage {
   async atualizarComunidade() {
 
     this.comunidadeService.atualizarComunidade(this.comunidade, this.imagemSelecionada).subscribe({
-      next: async (
-        comunidade: ComunidadeModel
-      ) => {
+      next: async (comunidade: ComunidadeModel) => {
 
-        this.exibirMensagem(
-          'Comunidade atualizada com sucesso!'
-        );
+        this.exibirMensagem('Comunidade atualizada com sucesso!');
 
-        this.router.navigate([
-          '/minhas-comunidades'
-        ]);
+        this.router.navigate(['/minhas-comunidades']);
 
       },
 
       error: async () => {
-
-        this.exibirMensagem(
-          'Erro ao atualizar comunidade.'
-        );
-
+        this.salvando = false;
+        this.exibirMensagem('Erro ao atualizar comunidade.');
       }
 
     });
@@ -210,13 +201,12 @@ export class CriarComunidadePage {
     this.comunidade.usuarioCria = this.usuarioService.getUsuarioSessao();
 
     this.comunidadeService.cadastrarComunidade(this.comunidade, this.imagemSelecionada).subscribe({
-      next: async (
-        comunidade: ComunidadeModel
-      ) => {
+      next: async (comunidade: ComunidadeModel) => {
         this.exibirMensagem('Comunidade criada com sucesso!');
         this.router.navigate(['/minhas-comunidades']);
       },
       error: async () => {
+        this.salvando = false;   // <-- NOVO
         this.exibirMensagem('Erro ao criar comunidade.');
       }
     });

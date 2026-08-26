@@ -23,7 +23,7 @@ import {
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline, checkmarkDoneOutline } from 'ionicons/icons';
+import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline, checkmarkDoneOutline, imageOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -89,6 +89,7 @@ export class InteresseMeusPage implements OnInit {
       chevronForwardOutline,
       chatbubbleOutline,
       checkmarkDoneOutline,
+      imageOutline,
     });
   }
 
@@ -117,6 +118,10 @@ export class InteresseMeusPage implements OnInit {
 
   onSegmentChange(event: any) {
     this.segmentoAtivo = event.detail.value;
+  }
+
+  onErroImagem(anuncio: any) {
+    anuncio.ftAnuncio = null;
   }
 
   carregarInteresses() {

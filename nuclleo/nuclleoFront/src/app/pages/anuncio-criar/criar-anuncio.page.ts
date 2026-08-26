@@ -73,6 +73,7 @@ export class CriarAnuncioPage {
 
   cdAnuncioEdicao: number = 0;
   modoEdicao: boolean = false;
+  salvando: boolean = false;
 
   comunidadesSelecionadas: ComunidadeModel[];
   comunidades: ComunidadeModel[];
@@ -127,6 +128,7 @@ export class CriarAnuncioPage {
     this.previewFoto = null;
     this.imagemSelecionada = undefined;
     this.comunidadesSelecionadas = [];
+    this.salvando = false;
   }
 
   carregarComunidadesUsuario() {
@@ -214,6 +216,12 @@ export class CriarAnuncioPage {
 
   salvar() {
 
+    if (this.salvando) {
+      return;
+    }
+
+    this.salvando = true;
+
     this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
     this.anuncio.tipoAnuncio = this.tipo;
 
@@ -229,6 +237,7 @@ export class CriarAnuncioPage {
             this.atualizarComunidadesDoAnuncio();
           },
           error: () => {
+            this.salvando = false;
             this.exibirMensagem('Erro ao alterar anúncio.');
           }
         });
@@ -243,6 +252,7 @@ export class CriarAnuncioPage {
             this.atualizarComunidadesDoAnuncio();
           },
           error: () => {
+            this.salvando = false;
             this.exibirMensagem('Erro ao alterar requerimento.');
           }
         });
@@ -294,12 +304,12 @@ export class CriarAnuncioPage {
         this.router.navigate(['/anuncio-tela', this.anuncio.cdAnuncio]);
       },
       error: () => {
+        this.salvando = false;   // <-- NOVO
         this.exibirMensagem(
           'Anúncio alterado, mas erro ao publicar nas comunidades.'
         );
       }
     });
-
   }
 
   cadastrarVenda() {
@@ -349,6 +359,7 @@ export class CriarAnuncioPage {
         this.router.navigate(['/anuncio-tela', anuncioSalvo.cdAnuncio]);
       },
       error: () => {
+        this.salvando = false;   // <-- NOVO
         this.exibirMensagem(
           'Anúncio criado, mas houve erro ao publicar nas comunidades.'
         );
@@ -365,17 +376,13 @@ export class CriarAnuncioPage {
       this.imagemSelecionada
     ).subscribe({
       next: (anuncioSalvo: AnuncioRequerimentoModel) => {
-        //this.exibirMensagem('Requerimento criado com sucesso!');
-        //this.router.navigate(['/tela-inicial']);
-
         this.cadastrarRelacoes(anuncioSalvo);
-
       },
       error: () => {
+        this.salvando = false;   // <-- NOVO
         this.exibirMensagem('Erro ao criar requerimento.');
       }
     });
-
   }
 
   carregarAnuncioParaEditar() {
