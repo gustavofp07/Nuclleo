@@ -1,0 +1,49 @@
+<div class="ion-page" id="main-content">
+
+  <ion-header>
+    <ion-toolbar class="toolbar">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Conversas</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [fullscreen]="true" class="conversas-content">
+
+    <div class="container">
+
+      <div class="topo">
+        <h1>Conversas</h1>
+        <p>Solicitações de chat que você aceitou</p>
+      </div>
+
+      <div class="lista-conversas" *ngIf="conversas.length > 0">
+
+        <button class="conversa-card" type="button" *ngFor="let conversa of conversas"
+          (click)="abrirChat(conversa.cdInteresse)">
+
+          <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar-foto">
+          <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+
+          <div class="info">
+            <h2>{{ conversa.nomeOutroUsuario }}</h2>
+            <p class="anuncio-nome">{{ conversa.nmAnuncio }}</p>
+          </div>
+
+          <span class="status-badge" *ngIf="conversa.finalizado">Finalizada</span>
+
+        </button>
+
+      </div>
+
+      <div class="empty-state" *ngIf="conversas.length === 0">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+        <h2>Nenhuma conversa ainda</h2>
+        <p>Quando você aceitar uma solicitação de chat, ela vai aparecer aqui.</p>
+      </div>
+
+    </div>
+
+  </ion-content>
+</div>

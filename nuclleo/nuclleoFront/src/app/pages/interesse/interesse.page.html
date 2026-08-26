@@ -82,9 +82,9 @@
                 </a>
 
                 <ion-button expand="block" fill="solid" class="btn-conversar"
-                  [routerLink]="['/chat', interessado.cdInteresse]">
-                  <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-                  Conversar
+                  (click)="aceitarChat(anuncioItem, interessado)">
+                  <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+                  Aceitar solicitação de chat
                 </ion-button>
 
               </div>

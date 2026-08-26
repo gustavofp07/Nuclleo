@@ -156,6 +156,24 @@ public class InteresseService {
     }
 
     @Transactional
+    public void aceitarInteresse(Long idInteresse, Long cdUsuarioSolicitante) {
+        Interesse interesse = buscarPorId(idInteresse);
+
+        Usuario anunciante = interesse.getAnuncio().getUsuarioCria();
+
+        if (!anunciante.getCdUsuario().equals(cdUsuarioSolicitante)) {
+            throw new IllegalArgumentException("Apenas o anunciante pode aceitar a solicitação de chat.");
+        }
+
+        if (interesse.isAceito()) {
+            throw new IllegalArgumentException("Esta solicitação de chat já foi aceita.");
+        }
+
+        interesse.setAceito(true);
+        interesseRepository.save(interesse);
+    }
+
+    @Transactional
     public void excluir(Long id) {
         Interesse interesse = interesseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Interesse não encontrado. Id: " + id));

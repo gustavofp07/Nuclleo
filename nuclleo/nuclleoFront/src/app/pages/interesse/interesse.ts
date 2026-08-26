@@ -23,7 +23,7 @@ import {
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline } from 'ionicons/icons';
+import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline, checkmarkDoneOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -87,6 +87,7 @@ export class InteresseMeusPage implements OnInit {
       peopleOutline,
       chevronForwardOutline,
       chatbubbleOutline,
+      checkmarkDoneOutline,
     });
   }
 
@@ -174,6 +175,31 @@ export class InteresseMeusPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  aceitarChat(anuncioItem: AnuncioComInteresse, interessado: InteressadoComInteresse) {
+
+    this.interesseService.aceitarInteresse(interessado.cdInteresse, this.usuario.cdUsuario).subscribe({
+
+      next: () => {
+
+        anuncioItem.interessados = anuncioItem.interessados.filter(
+          i => i.cdInteresse !== interessado.cdInteresse
+        );
+
+        if (anuncioItem.interessados.length === 0) {
+          this.anunciosComInteresse = this.anunciosComInteresse.filter(
+            item => item.anuncio.cdAnuncio !== anuncioItem.anuncio.cdAnuncio
+          );
+        }
+
+        this.router.navigate(['/chat', interessado.cdInteresse]);
+      },
+
+      error: () => {
+        this.exibirMensagem('Erro ao aceitar solicitação de chat.');
+      }
+    });
   }
 
   removerInteresse(interesse: InteresseModel) {

@@ -38,6 +38,10 @@ export class InteresseService {
     return this.http.put<void>(`${this.URL}/${id}/finalizar`, dados);
   }
 
+  aceitarInteresse(cdInteresse: number, cdUsuarioSolicitante: number) {
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/aceitar`, { cdUsuarioSolicitante });
+  }
+
   avaliarAnunciante(id: number, dados: { cdUsuarioSolicitante: number; nota: number; }): Observable<void> {
     return this.http.put<void>(`${this.URL}/${id}/avaliar-anunciante`, dados);
   }

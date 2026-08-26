@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
+import br.cefetmg.nuclleo.dto.AceitarInteresseRequestDTO;
 import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.services.InteresseService;
@@ -93,6 +94,13 @@ public class InteresseController {
     @PutMapping("/{id}/finalizar")
     public ResponseEntity<Void> finalizar(@PathVariable Long id, @Valid @RequestBody FinalizarConversaRequestDTO dto) {
         interesseService.finalizarConversa(id, dto.getCdUsuarioSolicitante(), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/aceitar")
+    public ResponseEntity<Void> aceitar(@PathVariable Long id,
+            @Valid @RequestBody AceitarInteresseRequestDTO dto) {
+        interesseService.aceitarInteresse(id, dto.getCdUsuarioSolicitante());
         return ResponseEntity.noContent().build();
     }
 
