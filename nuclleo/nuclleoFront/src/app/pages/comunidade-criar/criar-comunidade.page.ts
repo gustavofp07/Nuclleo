@@ -163,10 +163,18 @@ export class CriarComunidadePage {
   }
 
   salvarComunidade() {
-
     if (this.salvando) {
       return;
     }
+
+    //limpa o CEP para validar ele
+    const cepLimpo = this.comunidade.cep.replace(/\D/g, '');
+    if (cepLimpo.length !== 8) {
+      this.exibirMensagem('Informe um CEP válido com 8 dígitos.');
+      return;
+    }
+
+    this.comunidade.cep = cepLimpo;
 
     this.salvando = true;
 

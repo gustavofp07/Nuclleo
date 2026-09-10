@@ -5,17 +5,24 @@ export class ComunidadeModel {
     descricao: string;
     dtCriacao?: Date;
     nmComunidade: string;
-    //cdUsuarioCria: number;
     usuarioCria: UsuarioModel;
     foto?: string;
 
+    cep: string;
+    cidade: string;
+    uf: string;
+
     constructor() {
+
         this.cdComunidade = 0;
         this.descricao = '';
         this.nmComunidade = '';
-        //this.cdUsuarioCria = 0;
         this.usuarioCria = new UsuarioModel();
         this.foto = '';
+
+        this.cep = '';
+        this.cidade = '';
+        this.uf = '';
     }
 
 }

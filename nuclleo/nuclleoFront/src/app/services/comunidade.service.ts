@@ -46,9 +46,11 @@ export class ComunidadeService {
     return this.http.get<ComunidadeModel[]>(this.API_URL);
   }
 
+  
   listarComunidadesDoUsuario(cdUsuario: number): Observable<ComunidadeModel[]> {
     return this.http.get<ComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
   }
+    
 
   excluir(cdComunidade: number): Observable<ComunidadeModel> {
     return this.http.delete<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);

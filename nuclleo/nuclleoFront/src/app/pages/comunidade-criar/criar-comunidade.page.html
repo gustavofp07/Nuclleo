@@ -17,15 +17,11 @@
 
   <div class="container">
 
-    <!-- TOPO -->
     <div class="topo">
       <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
     </div>
 
-    <!-- FORM -->
     <form (ngSubmit)="salvarComunidade()">
-
-      <!-- FOTO DA COMUNIDADE -->
 
       <div class="campo-label campo-label--foto">
         <label>Imagem da comunidade</label>
@@ -52,10 +48,18 @@
         <label>Descrição</label>
       </div>
       <ion-item lines="none" class="input-item">
-
         <ion-input placeholder="Descrição" [(ngModel)]="comunidade.descricao" name="descricao">
         </ion-input>
+      </ion-item>
 
+      <!-- CEP -->
+      <div class="campo-label">
+        <label>CEP</label>
+      </div>
+
+      <ion-item lines="none" class="input-item">
+        <ion-input placeholder="00000-000" [(ngModel)]="comunidade.cep" name="cep" maxlength="9" inputmode="numeric">
+        </ion-input>
       </ion-item>
 
       <!-- BOTÃO -->

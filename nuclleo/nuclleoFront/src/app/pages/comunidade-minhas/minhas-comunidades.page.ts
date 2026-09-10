@@ -111,6 +111,9 @@ export class MinhasComunidadesPage implements OnInit {
           ...criadas,
           ...comunidadesParticipante
         ]);
+
+        console.log('Comunidades carregadas: ', this.comunidades);
+
       },
       error: async () => {
         this.exibirMensagem('Erro ao carregar comunidades');
