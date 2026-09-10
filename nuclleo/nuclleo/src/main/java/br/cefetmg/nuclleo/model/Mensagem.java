@@ -26,8 +26,13 @@ public class Mensagem {
     @Column(nullable = false)
     private LocalDateTime dataEnvio;
 
+
+
+
+
     @PrePersist
     public void prePersist() {
+        //@PrePersist significa: execute isso automaticamente imediatamente antes do INSERT.
         this.dataEnvio = LocalDateTime.now();
     }
 

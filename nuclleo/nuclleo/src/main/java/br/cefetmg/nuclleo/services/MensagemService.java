@@ -40,8 +40,6 @@ public class MensagemService {
 
     public List<MensagemDTO> listarPorInteresse(Long cdInteresse) {
         List<Mensagem> mensagens = mensagemRepository.findByInteresseIdOrderByDataEnvioAsc(cdInteresse);
-        return mensagens.stream()
-                .map(MensagemDTO::of)
-                .collect(Collectors.toList());
+        return mensagens.stream().map(MensagemDTO::of).collect(Collectors.toList());
     }
 }
