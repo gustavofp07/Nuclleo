@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline, logOutOutline } from 'ionicons/icons';
 
@@ -22,7 +22,7 @@ import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
   templateUrl: './comunidade-tela.page.html',
   styleUrls: ['./comunidade-tela.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, CommonModule, FormsModule, RouterLink]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, CommonModule, FormsModule, RouterLink, IonSpinner]
 })
 export class ComunidadePerfilPage implements OnInit {
 
@@ -30,7 +30,10 @@ export class ComunidadePerfilPage implements OnInit {
   abaSelecionada: 'perfil' | 'chat' | 'anuncios' = 'perfil';
   usuarioEntrouNaComunidade = false;
   usuarioEhAdmin = false;
-  carregandoVinculo = false;
+  carregandoVinculo = true;
+  carregandoComunidade = true;
+  carregandoAnuncios = true;
+  carregandoMembros = true;
   entrandoComunidade = false;
   saindoComunidade = false;
   totalUsuarios: number = 0;
@@ -68,22 +71,13 @@ export class ComunidadePerfilPage implements OnInit {
 
     const cdComunidade = Number(this.activatedRoute.snapshot.paramMap.get('cdComunidade'));
 
-    this.comunidadeService.buscarComunidade(cdComunidade).subscribe({
-      next: (comunidade) => {
-        this.comunidade = comunidade;
-        this.usuarioEhAdmin = this.verificarUsuarioAdmin();
-        this.usuarioEntrouNaComunidade = this.usuarioEhAdmin;
-        this.verificarUsuarioNaComunidade(cdComunidade);
-        this.carregarTotalUsuarios(cdComunidade);
-      },
-      error: () => {
-        this.exibirMensagem('Erro ao carregar comunidade.');
-      }
-    });
-
     this.abaSelecionada = 'perfil';
     this.usuarioEntrouNaComunidade = false;
     this.usuarioEhAdmin = false;
+    this.carregandoVinculo = true;
+    this.carregandoComunidade = true;
+    this.carregandoAnuncios = true;
+    this.carregandoMembros = true;
     this.anuncios = [];
 
     this.comunidadeService.buscarComunidade(cdComunidade).subscribe({
@@ -91,9 +85,14 @@ export class ComunidadePerfilPage implements OnInit {
         this.comunidade = comunidade;
         this.usuarioEhAdmin = this.verificarUsuarioAdmin();
         this.usuarioEntrouNaComunidade = this.usuarioEhAdmin;
+        this.carregandoComunidade = false;
         this.verificarUsuarioNaComunidade(cdComunidade);
+        this.carregarTotalUsuarios(cdComunidade);
       },
       error: () => {
+        this.carregandoVinculo = false;
+        this.carregandoComunidade = false;
+        this.carregandoMembros = false;
         this.exibirMensagem(
           'Erro ao carregar comunidade.'
         );
@@ -296,6 +295,8 @@ export class ComunidadePerfilPage implements OnInit {
       return;
     }
 
+    this.carregandoAnuncios = true;
+
     this.anuncioComunidadeService
       .listarAnunciosDaComunidade(
         this.comunidade.cdComunidade
@@ -303,9 +304,11 @@ export class ComunidadePerfilPage implements OnInit {
       .subscribe({
         next: (dados) => {
           this.anuncios = dados;
+          this.carregandoAnuncios = false;
         },
 
         error: () => {
+          this.carregandoAnuncios = false;
           this.exibirMensagem(
             'Erro ao carregar anúncios.'
           );
@@ -318,10 +321,12 @@ export class ComunidadePerfilPage implements OnInit {
     this.usuarioComunidadeService.listarUsuariosPorComunidade(cdComunidade).subscribe({
       next: (vinculos) => {
         this.totalUsuarios = vinculos.length;
+        this.carregandoMembros = false;
       },
       error: () => {
-        console.log("penis")
+        console.log("Erro ao carregar total de usuários da comunidade.");
         this.totalUsuarios = 0;
+        this.carregandoMembros = false;
       }
     });
   }

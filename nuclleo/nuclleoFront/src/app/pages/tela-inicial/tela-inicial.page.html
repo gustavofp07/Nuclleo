@@ -17,7 +17,13 @@
     <div class="section">
       <h2>Sugestões para você</h2>
 
-      <div class="horizontal-scroll">
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregandoAnuncios">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div class="horizontal-scroll" *ngIf="!carregandoAnuncios">
 
         <ion-card *ngFor="let anuncio of anunciosRecomendados" class="product-card"
           [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
@@ -44,7 +50,14 @@
 
     <div class="section">
       <h2>Comunidades</h2>
-      <ion-list>
+
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregandoComunidades">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <ion-list *ngIf="!carregandoComunidades">
 
         <ion-item *ngFor="let comunidade of comunidades" button detail="true"
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">

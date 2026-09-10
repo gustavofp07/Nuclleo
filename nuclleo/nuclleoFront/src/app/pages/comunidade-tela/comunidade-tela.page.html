@@ -39,104 +39,107 @@
 
     <div *ngIf="abaSelecionada === 'perfil'">
 
-      <!-- TOPO -->
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregandoComunidade || carregandoVinculo || carregandoMembros">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
 
-      <div class="perfil-topo">
+      <ng-container *ngIf="!carregandoComunidade && !carregandoVinculo && !carregandoMembros">
 
-        <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
+        <!-- TOPO -->
 
-        <div class="dados-comunidade">
+        <div class="perfil-topo">
 
-          <h2>{{ comunidade.nmComunidade }}</h2>
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
 
-          <p>Comunidade da Nuclleo</p>
-          <p class="numMembros">{{ totalUsuarios }} {{ totalUsuarios === 1 ? 'membro' : 'membros' }}</p>
+          <div class="dados-comunidade">
+
+            <h2>{{ comunidade.nmComunidade }}</h2>
+
+            <p>Comunidade da Nuclleo</p>
+            <p class="numMembros">{{ totalUsuarios }} {{ totalUsuarios === 1 ? 'membro' : 'membros' }}</p>
+
+          </div>
 
         </div>
 
-      </div>
+        <!-- DESCRICAO -->
 
-      <!-- DESCRICAO -->
-
-      <div class="info-box">
-        <h3>Descrição</h3>
-        <p>
-          {{ comunidade.descricao }}
-        </p>
-      </div>
-
-      <!-- INFORMACOES -->
-      <div class="info-box">
-        <div class="info-item">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <span>
-            Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
-          </span>
+        <div class="info-box">
+          <h3>Descrição</h3>
+          <p>
+            {{ comunidade.descricao }}
+          </p>
         </div>
 
-        <div class="info-item">
-          <ion-icon name="person-outline"></ion-icon>
-          <span>
-            Criada por
-            <a class="link-usuario" [routerLink]="['/usuario-perfil', comunidade.usuarioCria.cdUsuario]">
-              {{ comunidade.usuarioCria.nmUsuario }}
-            </a>
-          </span>
+        <!-- INFORMACOES -->
+        <div class="info-box">
+          <div class="info-item">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>
+              Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>
+              Criada por
+              <a class="link-usuario" [routerLink]="['/usuario-perfil', comunidade.usuarioCria.cdUsuario]">
+                {{ comunidade.usuarioCria.nmUsuario }}
+              </a>
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div class="dados-comunidade">
-        <p class="total-membros">
+        <!-- ACOES ADMIN -->
 
-        </p>
-      </div>
+        <div class="admin-acoes" *ngIf="usuarioEhAdmin">
 
-      <!-- ACOES ADMIN -->
+          <ion-button fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
+            <ion-icon name="settings-outline" slot="start">
+            </ion-icon>
+            Editar comunidade
+          </ion-button>
 
-      <div class="admin-acoes" *ngIf="usuarioEhAdmin">
+          <ion-button fill="outline" color="danger" (click)="confirmarExclusao()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Excluir comunidade
+          </ion-button>
 
-        <ion-button fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
-          <ion-icon name="settings-outline" slot="start">
-          </ion-icon>
-          Editar comunidade
-        </ion-button>
+        </div>
 
-        <ion-button fill="outline" color="danger" (click)="confirmarExclusao()">
-          <ion-icon name="trash-outline" slot="start"></ion-icon>
-          Excluir comunidade
-        </ion-button>
+        <!-- BOTAO ENTRAR / STATUS NO PERFIL -->
 
-      </div>
+        <div class="acoes-comunidade" *ngIf="!usuarioEntrouNaComunidade">
 
-      <!-- BOTAO ENTRAR / STATUS NO PERFIL -->
+          <ion-button expand="block" class="btn-entrar" [disabled]="entrandoComunidade" (click)="entrarComunidade()">
 
-      <div class="acoes-comunidade" *ngIf="!usuarioEntrouNaComunidade">
+            <ion-icon name="people-outline" slot="start">
+            </ion-icon>
 
-        <ion-button expand="block" class="btn-entrar" [disabled]="carregandoVinculo || entrandoComunidade"
-          (click)="entrarComunidade()">
+            {{ entrandoComunidade ? 'Entrando...' : 'Entrar na comunidade' }}
 
-          <ion-icon name="people-outline" slot="start">
-          </ion-icon>
+          </ion-button>
 
-          {{ entrandoComunidade ? 'Entrando...' : 'Entrar na comunidade' }}
+        </div>
 
-        </ion-button>
+        <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">
+          Você participa dessa comunidade
 
-      </div>
+          <ion-button expand="block" fill="outline" color="danger" class="btn-sair" [disabled]="saindoComunidade"
+            (click)="confirmarSaida()">
+            <ion-icon name="log-out-outline" slot="start"></ion-icon>
+            {{ saindoComunidade ? 'Saindo...' : 'Sair da comunidade' }}
+          </ion-button>
+        </div>
 
-      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">
-        Você participa dessa comunidade
+        <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && usuarioEhAdmin">
+          Você é o administrador dessa comunidade
+        </div>
 
-        <ion-button expand="block" fill="outline" color="danger" class="btn-sair" [disabled]="saindoComunidade"
-          (click)="confirmarSaida()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          {{ saindoComunidade ? 'Saindo...' : 'Sair da comunidade' }}
-        </ion-button>
-      </div>
-
-      <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && usuarioEhAdmin">
-        Você é o administrador dessa comunidade
-      </div>
+      </ng-container>
 
     </div>
 
@@ -152,11 +155,17 @@
 
     <div *ngIf="abaSelecionada === 'anuncios'">
 
-      <div *ngIf="anuncios.length === 0" class="info-box">
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregandoAnuncios">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div *ngIf="!carregandoAnuncios && anuncios.length === 0" class="info-box">
         Nenhum anúncio encontrado.
       </div>
 
-      <div class="anuncios-lista" *ngIf="anuncios.length > 0">
+      <div class="anuncios-lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
         <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
           <div class="anuncio-imagem">

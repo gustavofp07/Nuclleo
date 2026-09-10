@@ -19,7 +19,8 @@ import {
   IonToolbar,
   IonMenuButton,
   IonButtons,
-  IonIcon
+  IonIcon,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -60,7 +61,8 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
     FormsModule,
     IonButton,
     RouterLink,
-    IonIcon
+    IonIcon,
+    IonSpinner
   ]
 })
 
@@ -69,6 +71,9 @@ export class TelaInicialPage implements OnInit {
   comunidades: ComunidadeModel[] = [];
 
   anunciosRecomendados: AnuncioModel[] = [];
+
+  carregandoAnuncios: boolean = true;
+  carregandoComunidades: boolean = true;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -116,25 +121,33 @@ export class TelaInicialPage implements OnInit {
       return;
     }
 
+    this.carregandoComunidades = true;
+
     this.comunidadeService.listarComunidadesProximas(usuario.cdUsuario).subscribe({
       next: (comunidades: ComunidadeModel[]) => {
         this.comunidades = comunidades;
+        this.carregandoComunidades = false;
       },
       error: (erro: any) => {
         console.error('Erro ao carregar comunidades próximas:', erro);
+        this.carregandoComunidades = false;
       }
     });
   }
 
   carregarAnunciosRecomendados() {
+    this.carregandoAnuncios = true;
+
     this.anuncioService.listarTodos().subscribe({
       next: (dados) => {
         this.anunciosRecomendados = dados
           .sort(() => Math.random() - 0.5)
           .slice(0, 5);
+        this.carregandoAnuncios = false;
       },
       error: () => {
         console.log('Erro ao carregar anúncios recomendados.');
+        this.carregandoAnuncios = false;
       }
     });
   }

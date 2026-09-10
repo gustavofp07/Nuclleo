@@ -10,7 +10,13 @@
 
 <ion-content [fullscreen]="true" class="anuncio-content">
 
-  <div class="container">
+  <!-- CARREGANDO -->
+  <div class="loading-state" *ngIf="carregandoAnuncio">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando...</p>
+  </div>
+
+  <div class="container" *ngIf="!carregandoAnuncio">
     <div class="dados-anuncio">
 
       <h2>

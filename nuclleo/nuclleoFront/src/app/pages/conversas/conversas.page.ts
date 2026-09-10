@@ -9,7 +9,8 @@ import {
   IonToolbar,
   IonMenuButton,
   IonButtons,
-  IonIcon
+  IonIcon,
+  IonSpinner  
 } from '@ionic/angular/standalone';
 
 import { ToastController } from '@ionic/angular';
@@ -28,6 +29,7 @@ interface ConversaView {
   fotoOutroUsuario: string | null;
   nmAnuncio: string;
   finalizado: boolean;
+  pendente: boolean;
 }
 
 @Component({
@@ -44,13 +46,15 @@ interface ConversaView {
     IonToolbar,
     IonMenuButton,
     IonButtons,
-    IonIcon
+    IonIcon,
+    IonSpinner
   ]
 })
 export class ConversasPage implements OnInit {
 
   usuarioLogado: UsuarioModel = new UsuarioModel();
   conversas: ConversaView[] = [];
+  carregando: boolean = false;
 
   constructor(
     private interesseService: InteresseService,
@@ -83,8 +87,8 @@ export class ConversasPage implements OnInit {
 
   carregarConversas() {
 
-    // busca os interesses onde o usuário é o interessado e onde é o anunciante,
-    // e mantém só os que já foram aceitos (aceito === true)
+    this.carregando = true;
+
     this.interesseService.listarPorUsuario(this.usuarioLogado.cdUsuario).subscribe({
       next: (comoInteressado) => {
 
@@ -92,17 +96,23 @@ export class ConversasPage implements OnInit {
           next: (comoAnunciante) => {
 
             const todos = [...comoInteressado, ...comoAnunciante];
-            const aceitos = todos.filter(i => (i as any).aceito === true);
 
             const mapa = new Map<number, InteresseModel>();
-            aceitos.forEach(i => mapa.set(i.id!, i));
+            todos.forEach(i => mapa.set(i.id!, i));
 
             this.conversas = Array.from(mapa.values()).map(interesse => this.mapearConversa(interesse));
+            this.carregando = false; 
           },
-          error: () => this.exibirMensagem('Erro ao carregar conversas.')
+          error: () => {
+            this.carregando = false; 
+            this.exibirMensagem('Erro ao carregar conversas.');
+          }
         });
       },
-      error: () => this.exibirMensagem('Erro ao carregar conversas.')
+      error: () => {
+        this.carregando = false; 
+        this.exibirMensagem('Erro ao carregar conversas.');
+      }
     });
   }
 
@@ -119,7 +129,8 @@ export class ConversasPage implements OnInit {
         ? interesse.anuncio.usuarioCria.ftUsuario
         : interesse.usuario.ftUsuario,
       nmAnuncio: interesse.anuncio.nmAnuncio,
-      finalizado: interesse.finalizado
+      finalizado: interesse.finalizado,
+      pendente: !(interesse as any).aceito && !interesse.finalizado
     };
   }
 

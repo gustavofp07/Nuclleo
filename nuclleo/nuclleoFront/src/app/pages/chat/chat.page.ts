@@ -72,6 +72,8 @@ export class ChatPage implements OnInit, OnDestroy {
   chatFinalizado: boolean = false;
   aguardandoAvaliacaoOutro: boolean = false;
 
+  aguardandoAceite: boolean = false; // <-- ADICIONADO
+
   private timeoutDigitando: any = null;
 
   constructor(
@@ -174,6 +176,9 @@ export class ChatPage implements OnInit, OnDestroy {
         this.souAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
         this.chatFinalizado = interesse.finalizado;
 
+        // Só o interessado precisa aguardar aceite; o anunciante decide quando aceitar.
+        this.aguardandoAceite = souEuOInteressado && !(interesse as any).aceito; // <-- ADICIONADO
+
         if (this.chatFinalizado) {
           if (!this.souAnunciante && !interesse.avaliacaoAnuncianteFeita) {
             this.solicitarAvaliacaoAnunciante();
@@ -195,7 +200,7 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   enviar() {
-    if (this.chatFinalizado) {
+    if (this.chatFinalizado || this.aguardandoAceite) { // <-- MUDOU
       return;
     }
 
@@ -230,7 +235,7 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   onDigitar() {
-    if (this.chatFinalizado) {
+    if (this.chatFinalizado || this.aguardandoAceite) { // <-- MUDOU
       return;
     }
 

@@ -19,14 +19,20 @@
       <!-- TOPO -->
       <div class="topo">
         <h1>Suas comunidades</h1>
-        <p>Veja as comunidades que voce participa e gerencie as que voce criou</p>
+        <p>Veja as comunidades que você participa e gerencie as que você criou</p>
       </div>
 
       <!-- BOTAO -->
-      <ion-button expand="block" class="btn-criar" routerLink="/criar-comunidade">Criar nova comunidade</ion-button>
+      <ion-button expand="block" class="btn-criar" routerLink="/criar-comunidade">Criar uma comunidade</ion-button>
+
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregando">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
 
       <!-- LISTA -->
-      <div class="lista-comunidades" *ngIf="comunidades.length > 0">
+      <div class="lista-comunidades" *ngIf="!carregando && comunidades.length > 0">
         <button class="comunidade-card" type="button" *ngFor="let comunidade of comunidades"
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
 
@@ -36,10 +42,11 @@
             <div class="titulo-comunidade">
               <h2>{{ comunidade.nmComunidade }}</h2>
               <span class="admin-badge" *ngIf="usuarioEhAdmin(comunidade)">ADMIN</span>
+              <span class="membro-badge" *ngIf="!usuarioEhAdmin(comunidade)">MEMBRO</span>
             </div>
             <p>{{ comunidade.descricao }}</p>
             <p>{{ comunidade.cep }}</p>
-            <p>{{ comunidade.cidade }},  {{ comunidade.uf }} </p>
+            <p>{{ comunidade.cidade }}, {{ comunidade.uf }} </p>
             <p>{{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}</p>
           </div>
 
@@ -47,7 +54,7 @@
       </div>
 
       <!-- VAZIO -->
-      <div class="empty-state" *ngIf="comunidades.length === 0">
+      <div class="empty-state" *ngIf="!carregando && comunidades.length === 0">
 
         <ion-icon name="people-outline"></ion-icon>
 

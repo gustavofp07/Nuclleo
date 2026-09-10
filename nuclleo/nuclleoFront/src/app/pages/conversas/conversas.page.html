@@ -15,10 +15,16 @@
 
       <div class="topo">
         <h1>Conversas</h1>
-        <p>Solicitações de chat que você aceitou</p>
+        <p>Suas conversas de interesse em anúncios</p>
       </div>
 
-      <div class="lista-conversas" *ngIf="conversas.length > 0">
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregando">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div class="lista-conversas" *ngIf="!carregando && conversas.length > 0">
 
         <button class="conversa-card" type="button" *ngFor="let conversa of conversas"
           (click)="abrirChat(conversa.cdInteresse)">
@@ -31,16 +37,17 @@
             <p class="anuncio-nome">{{ conversa.nmAnuncio }}</p>
           </div>
 
-          <span class="status-badge" *ngIf="conversa.finalizado">Finalizada</span>
+          <span class="status-badge pendente" *ngIf="conversa.pendente">Pendente</span>
+          <span class="status-badge finalizada" *ngIf="conversa.finalizado">Finalizada</span>
 
         </button>
 
       </div>
 
-      <div class="empty-state" *ngIf="conversas.length === 0">
+      <div class="empty-state" *ngIf="!carregando && conversas.length === 0">
         <ion-icon name="chatbubbles-outline"></ion-icon>
         <h2>Nenhuma conversa ainda</h2>
-        <p>Quando você aceitar uma solicitação de chat, ela vai aparecer aqui.</p>
+        <p>Quando você manifestar ou receber interesse em um anúncio, a conversa vai aparecer aqui.</p>
       </div>
 
     </div>

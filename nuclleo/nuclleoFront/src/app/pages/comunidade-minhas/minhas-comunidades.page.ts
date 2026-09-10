@@ -12,7 +12,8 @@ import {
   IonMenuButton,
   IonButtons,
   IonIcon,
-  IonButton
+  IonButton,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import {
@@ -59,13 +60,15 @@ import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.se
     IonMenuButton,
     IonButtons,
     IonIcon,
-    IonButton
+    IonButton,
+    IonSpinner
   ]
 })
 
 export class MinhasComunidadesPage implements OnInit {
   usuario: UsuarioModel;
   comunidades: ComunidadeModel[];
+  carregando: boolean = true;
 
   constructor(
     private comunidadeService: ComunidadeService,
@@ -91,12 +94,14 @@ export class MinhasComunidadesPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.usuario = this.usuarioService.getUsuarioSessao(); // <-- ADICIONADO
     if (this.usuario) {
       this.carregarComunidades();
     }
   }
 
   carregarComunidades() {
+    this.carregando = true;
 
     forkJoin({
       vinculos: this.usuarioComunidadeService.listarComunidadesPorUsuario(this.usuario.cdUsuario),
@@ -114,9 +119,12 @@ export class MinhasComunidadesPage implements OnInit {
 
         console.log('Comunidades carregadas: ', this.comunidades);
 
+        this.carregando = false;
+
       },
       error: async () => {
         this.exibirMensagem('Erro ao carregar comunidades');
+        this.carregando = false;
       }
     });
 

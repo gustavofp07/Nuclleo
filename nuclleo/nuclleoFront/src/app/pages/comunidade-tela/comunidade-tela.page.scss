@@ -16,6 +16,35 @@
   padding: 24px 20px 80px;
 }
 
+/* CARREGANDO */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 60px 20px;
+}
+
+.loading-state ion-spinner {
+  width: 48px;
+  height: 48px;
+
+  color: #7c3aed;
+
+  margin-bottom: 16px;
+}
+
+.loading-state p {
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #6b7280;
+}
+
 /* TOPO */
 
 .perfil-topo {
@@ -276,35 +305,6 @@
 }
 
 .tipo {
-  display: inline-block;
-
-  margin-top: 8px;
-  margin-bottom: 8px;
-
-  padding: 4px 10px;
-
-  border-radius: 10px;
-
-  background: #ede9fe;
-  color: #6d28d9;
-
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.descAnuncio {
-  color: #4b5563;
-
-  font-size: 14px;
-  line-height: 1.5;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.tipo {
 
   display: inline-block;
 
@@ -326,9 +326,17 @@
 
 }
 
-.anuncio-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+.descAnuncio {
+  color: #4b5563;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .link-usuario {

@@ -72,7 +72,12 @@
         <span *ngIf="aguardandoAvaliacaoOutro"> Aguardando avaliação do outro usuário.</span>
       </div>
 
-      <div class="input-item" [class.com-contador]="textoMensagem.length > 400" *ngIf="!chatFinalizado">
+      <div *ngIf="!chatFinalizado && aguardandoAceite" class="chat-aguardando-aviso">
+        Aguardando a aprovação da solicitação de chat
+      </div>
+
+      <div class="input-item" [class.com-contador]="textoMensagem.length > 400"
+        *ngIf="!chatFinalizado && !aguardandoAceite">
         <ion-input [(ngModel)]="textoMensagem" placeholder="Digite sua mensagem..." maxlength="500"
           (ionInput)="onDigitar()" (keyup.enter)="enviar()">
         </ion-input>

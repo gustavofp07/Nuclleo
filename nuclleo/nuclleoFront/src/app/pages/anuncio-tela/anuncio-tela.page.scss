@@ -14,6 +14,35 @@
     padding: 24px 20px 80px;
 }
 
+/* CARREGANDO */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 60px 20px;
+}
+
+.loading-state ion-spinner {
+  width: 48px;
+  height: 48px;
+
+  color: #7c3aed;
+
+  margin-bottom: 16px;
+}
+
+.loading-state p {
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #6b7280;
+}
+
 .anuncio-topo {
     display: flex;
     align-items: center;

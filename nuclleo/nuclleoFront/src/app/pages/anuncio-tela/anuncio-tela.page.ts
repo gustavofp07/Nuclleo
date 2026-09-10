@@ -8,7 +8,8 @@ import {
   IonButtons,
   IonMenuButton,
   IonIcon,
-  IonButton
+  IonButton,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -41,7 +42,8 @@ import { InteresseModel } from 'src/app/model/interesse.model';
     IonButtons,
     IonMenuButton,
     IonIcon,
-    IonButton
+    IonButton,
+    IonSpinner
   ]
 })
 export class AnuncioTelaPage implements OnInit {
@@ -53,6 +55,8 @@ export class AnuncioTelaPage implements OnInit {
   usuarioJaInteressado: boolean = false;
   interesseAtual: InteresseModel | null = null;
   carregandoInteresse: boolean = false;
+
+  carregandoAnuncio: boolean = true;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -84,6 +88,8 @@ export class AnuncioTelaPage implements OnInit {
       this.activatedRoute.snapshot.paramMap.get('cdAnuncio')
     );
 
+    this.carregandoAnuncio = true;
+
     this.anuncioService.buscarAnuncio(cdAnuncio).subscribe({
       next: (anuncio) => {
         this.anuncio = anuncio;
@@ -93,9 +99,12 @@ export class AnuncioTelaPage implements OnInit {
 
         if (!this.usuarioEhDono) {
           this.verificarInteresse();
+        } else {
+          this.carregandoAnuncio = false;
         }
       },
       error: () => {
+        this.carregandoAnuncio = false;
         this.exibirMensagem('Erro ao carregar anúncio.');
       }
     });
@@ -110,9 +119,11 @@ export class AnuncioTelaPage implements OnInit {
 
         this.usuarioJaInteressado = !!interesse;
         this.interesseAtual = interesse ?? null;
+        this.carregandoAnuncio = false;
       },
       error: () => {
         // falha silenciosa aqui é aceitável: só não vai marcar o botão corretamente
+        this.carregandoAnuncio = false;
       }
     });
   }
