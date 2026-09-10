@@ -70,7 +70,7 @@
       </div>
 
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="CEP" [(ngModel)]="usuario.cep" name="cep">
+        <ion-input placeholder="00000-000" [(ngModel)]="usuario.cep" name="cep" maxlength="9" inputmode="numeric">
         </ion-input>
       </ion-item>
 

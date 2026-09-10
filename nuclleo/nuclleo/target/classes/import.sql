@@ -17,7 +17,7 @@ RESTART IDENTITY CASCADE;
 -- USUÁRIOS
 -- =============================================
 INSERT INTO tb_usuario
-(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, telefone, ativo)
+(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, ativo)
 VALUES
 (
     'Gustavo Ferreira',
@@ -26,7 +26,9 @@ VALUES
     '123',
     '2024-01-10',
     '111.111.111-11',
-    '35180-000',
+    '35180008',
+    'Timóteo',
+    'MG',
     '(31) 99999-1111',
     TRUE
 ),
@@ -37,7 +39,9 @@ VALUES
     '123',
     '2024-02-15',
     '222.222.222-22',
-    '35180-001',
+    '35177000',
+    'Antônio Dias',
+    'MG',
     '(31) 99999-2222',
     TRUE
 ),
@@ -48,7 +52,9 @@ VALUES
     '123',
     '2024-03-20',
     '333.333.333-33',
-    '35180-002',
+    '35920000',
+    'Nova Era',
+    'MG',
     '(31) 99999-3333',
     TRUE
 ),
@@ -59,7 +65,9 @@ VALUES
     '123',
     '2024-04-05',
     '444.444.444-44',
-    '35180-003',
+    '30140010',
+    'Belo Horizonte',
+    'MG',
     '(31) 99999-4444',
     TRUE
 );
@@ -68,15 +76,17 @@ VALUES
 -- =============================================
 -- COMUNIDADES
 -- =============================================
-
 INSERT INTO tb_comunidade
-(nm_comunidade, dt_criacao, descricao, foto, cd_usuario_cria)
+(nm_comunidade, dt_criacao, descricao, foto, cep, cidade, uf, cd_usuario_cria)
 VALUES
 (
     'Tecnologia CEFET',
     '2024-01-15',
     'Comunidade sobre tecnologia e desenvolvimento de software',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787699083/gerenciador-arquivos/pks2dgcebo5qnldhoopv.webp',
+    '35180008',
+    'Timóteo',
+    'MG',
     1
 ),
 (
@@ -84,6 +94,9 @@ VALUES
     '2024-02-20',
     'Compra e venda de produtos em geral',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787694752/gerenciador-arquivos/rldvwbzl8frzh11p7eoq.webp',
+    '01001000',
+    'São Paulo',
+    'SP',
     2
 ),
 (
@@ -91,6 +104,9 @@ VALUES
     '2024-03-10',
     'Anúncios de eletrônicos seminovos',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787618770/gerenciador-arquivos/zxwyafmng8xvbvbqhmmm.png',
+    '35010000',
+    'Governador Valadares',
+    'MG',
     3
 ),
 (
@@ -98,14 +114,106 @@ VALUES
     '2024-04-01',
     'Troca e venda de livros e materiais de estudo',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787618766/gerenciador-arquivos/m1omnlck2bog7pxn33g1.png',
+    '50030170',
+    'Recife',
+    'PE',
     4
+),
+(
+    'Comunidade Belo Horizonte',
+    '2024-04-02',
+    'Comunidade regional de Belo Horizonte',
+    NULL,
+    '30140010',
+    'Belo Horizonte',
+    'MG',
+    1
+),
+(
+    'Comunidade Juiz de Fora',
+    '2024-04-03',
+    'Comunidade regional de Juiz de Fora',
+    NULL,
+    '36010011',
+    'Juiz de Fora',
+    'MG',
+    2
+),
+(
+    'Comunidade Paulista',
+    '2024-04-04',
+    'Comunidade da região da Avenida Paulista',
+    NULL,
+    '01310200',
+    'São Paulo',
+    'SP',
+    3
+),
+(
+    'Comunidade Santos',
+    '2024-04-05',
+    'Comunidade regional de Santos',
+    NULL,
+    '11010010',
+    'Santos',
+    'SP',
+    4
+),
+(
+    'Comunidade Cuiabá',
+    '2024-04-06',
+    'Comunidade regional de Cuiabá',
+    NULL,
+    '78005580',
+    'Cuiabá',
+    'MT',
+    1
+),
+(
+    'Comunidade Sinop',
+    '2024-04-07',
+    'Comunidade regional de Sinop',
+    NULL,
+    '78550000',
+    'Sinop',
+    'MT',
+    2
+),
+(
+    'Comunidade Rondonópolis',
+    '2024-04-08',
+    'Comunidade regional de Rondonópolis',
+    NULL,
+    '78700000',
+    'Rondonópolis',
+    'MT',
+    3
+),
+(
+    'Comunidade Olinda',
+    '2024-04-09',
+    'Comunidade regional de Olinda',
+    NULL,
+    '53020050',
+    'Olinda',
+    'PE',
+    4
+),
+(
+    'Comunidade Caruaru',
+    '2024-04-10',
+    'Comunidade regional de Caruaru',
+    NULL,
+    '55002000',
+    'Caruaru',
+    'PE',
+    1
 );
 
 
 -- =============================================
 -- ANÚNCIOS
 -- =============================================
-
 INSERT INTO tb_anuncio
 (nm_anuncio, descricao, habilitado, tipo_anuncio, cd_usuario_cria)
 VALUES
@@ -212,7 +320,6 @@ VALUES
 -- =============================================
 -- ANÚNCIOS DE VENDA
 -- =============================================
-
 INSERT INTO tb_anuncio_venda
 (cd_anuncio, ft_anuncio, valor)
 VALUES
@@ -266,7 +373,6 @@ VALUES
 -- =============================================
 -- ANÚNCIOS DE REQUERIMENTO
 -- =============================================
-
 INSERT INTO tb_anuncio_requerimento
 (cd_anuncio, ft_anuncio, valor_min, valor_max)
 VALUES
@@ -305,7 +411,6 @@ VALUES
 -- =============================================
 -- ANÚNCIOS x COMUNIDADES
 -- =============================================
-
 INSERT INTO tb_anuncio_comunidade
 (cd_anuncio, cd_comunidade)
 VALUES
@@ -329,7 +434,6 @@ VALUES
 -- =============================================
 -- USUÁRIOS x COMUNIDADES
 -- =============================================
-
 INSERT INTO tb_usuario_comunidade
 (cd_usuario, cd_comunidade)
 VALUES
@@ -343,7 +447,6 @@ VALUES
 -- =============================================
 -- INTERESSES
 -- =============================================
-
 INSERT INTO interesse
 (usuario, anuncio, dt_criacao, finalizado, aceito,
  avaliacao_interessado_feita, avaliacao_anunciante_feita)
@@ -389,7 +492,6 @@ VALUES
 -- Conversa referente ao interesse 2:
 -- Julia interessada no iPhone do Pedro.
 -- =============================================
-
 INSERT INTO mensagem
 (cd_interesse, cd_usuario_remetente, conteudo, data_envio)
 VALUES
@@ -418,7 +520,6 @@ VALUES
 -- Exemplo de uma negociação concluída.
 -- Julia comprou o iPhone anunciado pelo Pedro.
 -- =============================================
-
 INSERT INTO transacao
 (valor, data, cd_usuario, cd_anuncio)
 VALUES
@@ -434,7 +535,6 @@ VALUES
 -- AVALIAÇÕES
 -- As duas partes podem avaliar uma à outra.
 -- =============================================
-
 INSERT INTO avaliacao
 (cd_transacao, cd_avaliador, cd_avaliado, nota, dt_avaliacao)
 VALUES
@@ -457,7 +557,6 @@ VALUES
 -- =============================================
 -- ATUALIZA O INTERESSE DA NEGOCIAÇÃO CONCLUÍDA
 -- =============================================
-
 UPDATE interesse
 SET
     finalizado = TRUE,

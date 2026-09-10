@@ -42,26 +42,6 @@
       </div>
     </div>
 
-    <!--
-    <div class="section">
-      <h2>Comunidades</h2>
-      <ion-list>
-        <ion-item *ngFor="let comunidade of comunidades">
-
-          <ion-avatar slot="start">
-            <img [src]="comunidade.foto || 'https://ionicframework.com/docs/img/demos/avatar.svg'">
-          </ion-avatar>
-
-          <ion-label>
-            <h3>{{ comunidade.nmComunidade }}</h3>
-            <p>{{ comunidade.descricao }}</p>
-          </ion-label>
-
-        </ion-item>
-      </ion-list>
-    </div>
-  -->
-
     <div class="section">
       <h2>Comunidades</h2>
       <ion-list>
@@ -70,12 +50,14 @@
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
 
           <ion-avatar slot="start">
-            <img [src]="comunidade.foto || 'https://ionicframework.com/docs/img/demos/avatar.svg'">
+            <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" alt="Foto da Comunidade">
           </ion-avatar>
 
           <ion-label>
             <h3>{{ comunidade.nmComunidade }}</h3>
             <p class="descricao-clamp">{{ comunidade.descricao }}</p>
+            <p>{{ comunidade.cidade }}, {{ comunidade.uf }}</p>
+            <p>{{ comunidade.cep }}</p>
           </ion-label>
         </ion-item>
 
