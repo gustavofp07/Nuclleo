@@ -199,6 +199,7 @@ export class ChatPage implements OnInit, OnDestroy {
       return;
     }
 
+    //.trim(): É o método nativo do JavaScript que limpa a string. Ele remove espaços vazios, tabulações (Tabs) e quebras de linha que estejam antes da primeira letra ou depois da última letra. Ele não mexe nos espaços que ficam no meio das palavras.
     const texto = this.textoMensagem.trim();
 
     if (!texto || texto.length > 500) {
@@ -215,13 +216,14 @@ export class ChatPage implements OnInit, OnDestroy {
       enviando: true
     };
 
+    //insere a mensagem na lista de mensagens antes de enviar
     this.mensagens.push(mensagemOtimista);
     this.rolarParaFinal();
 
-    this.chatService.enviarMensagem(this.cdInteresse, {
-      cdUsuarioRemetente: this.usuarioLogado.cdUsuario,
-      conteudo: texto
-    });
+    this.chatService.enviarMensagem(
+      this.cdInteresse,
+      { cdUsuarioRemetente: this.usuarioLogado.cdUsuario, conteudo: texto }
+    );
 
     this.textoMensagem = '';
     this.pararDigitacao();
@@ -250,13 +252,16 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   async rolarParaFinal() {
+    // Espera um pouco para garantir que a mensagem foi renderizada na tela antes de rolar
     setTimeout(() => {
       this.content?.scrollToBottom(200);
     }, 100);
   }
 
-  // ---------- FINALIZAR CONVERSA (fluxo do anunciante) ----------
 
+
+
+  
   async abrirFinalizarConversa() {
     const alert = await this.alertController.create({
       header: 'Finalizar conversa',
@@ -349,7 +354,7 @@ export class ChatPage implements OnInit, OnDestroy {
     });
   }
 
-  // ---------- AVALIAÇÃO OBRIGATÓRIA (fluxo do interessado) ----------
+
 
   async solicitarAvaliacaoAnunciante() {
     const alert = await this.alertController.create({

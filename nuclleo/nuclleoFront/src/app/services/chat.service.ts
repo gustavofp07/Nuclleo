@@ -12,7 +12,9 @@ interface DigitandoEvento {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
+  //endereço do WebSocket (/ws-chat) para comunicação instantânea
   private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
+  //endereço da API REST padrão (/api/v1/mensagens) usada para buscar coisas antigas, como o histórico
   private readonly URL_HTTP = 'https://nuclleo.onrender.com/api/v1/mensagens';
 
   private client: Client | null = null;
@@ -22,6 +24,7 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
+  //abre a conexão em tempo real baseada em um interesse
   conectar(cdInteresse: number) {
     if (this.client?.active) {
       this.desconectar();
@@ -33,11 +36,13 @@ export class ChatService {
       onConnect: () => {
         this.statusConexao.next(true);
 
+        //escuta novas mensagens enviadas na sala. Quando chega uma, ele dá um .next(mensagem) para avisar a tela.
         this.client!.subscribe(`/topic/chat/${cdInteresse}`, (msg: IMessage) => {
           const mensagem: MensagemModel = JSON.parse(msg.body);
           this.mensagemRecebida.next(mensagem);
         });
 
+        //Escuta o evento de outras pessoas digitando
         this.client!.subscribe(`/topic/chat/${cdInteresse}/digitando`, (msg: IMessage) => {
           const evento: DigitandoEvento = JSON.parse(msg.body);
           this.digitandoEvento.next(evento);
