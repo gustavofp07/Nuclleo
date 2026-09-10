@@ -7,6 +7,8 @@ export class InteresseModel {
     anuncio: AnuncioModel;
     dataInteresse: Date;
     finalizado: boolean;
+    aceito: boolean;             
+    conversaIniciada: boolean;  
     avaliacaoInteressadoFeita: boolean;
     avaliacaoAnuncianteFeita: boolean;
 
@@ -16,6 +18,8 @@ export class InteresseModel {
         this.anuncio = new AnuncioModel();
         this.dataInteresse = new Date();
         this.finalizado = false;
+        this.aceito = false;
+        this.conversaIniciada = false;
         this.avaliacaoInteressadoFeita = false;
         this.avaliacaoAnuncianteFeita = false;
     }

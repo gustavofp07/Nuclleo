@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
 import br.cefetmg.nuclleo.dto.AceitarInteresseRequestDTO;
+import br.cefetmg.nuclleo.dto.IniciarConversaRequestDTO;
+import br.cefetmg.nuclleo.dto.RecusarConversaRequestDTO;
 import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.services.InteresseService;
@@ -104,11 +106,24 @@ public class InteresseController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/iniciar-conversa") // <-- ADICIONADO
+    public ResponseEntity<Void> iniciarConversa(@PathVariable Long id,
+            @Valid @RequestBody IniciarConversaRequestDTO dto) {
+        interesseService.iniciarConversa(id, dto.getCdUsuarioSolicitante());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/recusar-conversa") // <-- ADICIONADO
+    public ResponseEntity<Void> recusarConversa(@PathVariable Long id,
+            @Valid @RequestBody RecusarConversaRequestDTO dto) {
+        interesseService.recusarConversa(id, dto.getCdUsuarioSolicitante());
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}/avaliar-anunciante")
     public ResponseEntity<Void> avaliarAnunciante(@PathVariable Long id,
             @Valid @RequestBody AvaliarAnuncianteRequestDTO dto) {
         interesseService.avaliarAnunciante(id, dto.getCdUsuarioSolicitante(), dto);
         return ResponseEntity.noContent().build();
     }
-
 }

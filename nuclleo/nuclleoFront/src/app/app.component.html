@@ -49,14 +49,14 @@
         <ion-item button routerLink="/conversas" menuClose>
           <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
           <ion-label>Conversas</ion-label>
+          <ion-badge *ngIf="totalConversasPendentes > 0" class="badge-menu" slot="end">
+            {{ totalConversasPendentes }}
+          </ion-badge>
         </ion-item>
 
         <ion-item button routerLink="/interesse" menuClose>
           <ion-icon name="heart-outline" slot="start"></ion-icon>
           <ion-label>Interesses</ion-label>
-          <ion-badge *ngIf="totalInteressesRecebidos > 0" class="badge-menu" slot="end">
-            {{ totalInteressesRecebidos }}
-          </ion-badge>
         </ion-item>
 
         <ion-item button routerLink="/usuario-perfil" menuClose>

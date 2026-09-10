@@ -40,7 +40,10 @@ public class Interesse {
 
     @Column(name = "aceito")
     private boolean aceito;
-    
+
+    @Column(name = "conversa_iniciada") // <-- ADICIONADO
+    private boolean conversaIniciada;
+
     @Column(name = "avaliacao_interessado_feita")
     private boolean avaliacaoInteressadoFeita; // anunciante avaliou o interessado
 

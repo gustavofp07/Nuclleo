@@ -1,0 +1,53 @@
+.nao-encontrado-content {
+  --background: #f5f7fb;
+}
+
+.container {
+  min-height: 100%;
+  width: 100%;
+  max-width: 420px;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 32px 24px;
+}
+
+ion-icon {
+  font-size: 96px;
+  color: #a855f7;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 56px;
+  font-weight: 800;
+  color: #7c3aed;
+  margin: 0;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 8px 0 12px;
+}
+
+p {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 28px;
+}
+
+.btn-voltar {
+  width: 100%;
+  --background: linear-gradient(90deg, #7c3aed, #a855f7);
+  --border-radius: 16px;
+  font-weight: 700;
+}

@@ -97,7 +97,8 @@
 
         <div class="botoes-interessado" *ngIf="usuarioJaInteressado">
 
-          <ion-button expand="block" class="btn-chat" [routerLink]="['/chat', interesseAtual?.id]">
+          <ion-button expand="block" class="btn-chat" [disabled]="carregandoInteresse"
+            (click)="conversarComAnunciante()">
             <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
             Conversar com o anunciante
           </ion-button>

@@ -15,7 +15,7 @@
 
       <div class="topo">
         <h1>Conversas</h1>
-        <p>Suas conversas de interesse em anúncios</p>
+        <p>Suas solicitações de conversa, enviadas e recebidas</p>
       </div>
 
       <!-- CARREGANDO -->
@@ -26,8 +26,9 @@
 
       <div class="lista-conversas" *ngIf="!carregando && conversas.length > 0">
 
-        <button class="conversa-card" type="button" *ngFor="let conversa of conversas"
-          (click)="abrirChat(conversa.cdInteresse)">
+        <div class="conversa-card" *ngFor="let conversa of conversas"
+          [class.clicavel]="!conversa.souAnunciante || conversa.aceito"
+          (click)="abrirChat(conversa)">
 
           <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar-foto">
           <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
@@ -37,17 +38,31 @@
             <p class="anuncio-nome">{{ conversa.nmAnuncio }}</p>
           </div>
 
-          <span class="status-badge pendente" *ngIf="conversa.pendente">Pendente</span>
+          <!-- Anunciante com solicitação pendente: mostra ações em vez de badge -->
+          <div class="acoes-solicitacao" *ngIf="conversa.souAnunciante && !conversa.aceito && !conversa.finalizado">
+            <ion-button size="small" class="btn-aceitar" (click)="aceitarConversa(conversa, $event)">
+              <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button size="small" fill="outline" class="btn-recusar" (click)="confirmarRecusa(conversa, $event)">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+
+          <!-- Interessado aguardando aceite: só um aviso -->
+          <span class="status-badge pendente" *ngIf="!conversa.souAnunciante && !conversa.aceito && !conversa.finalizado">
+            Pendente
+          </span>
+
           <span class="status-badge finalizada" *ngIf="conversa.finalizado">Finalizada</span>
 
-        </button>
+        </div>
 
       </div>
 
       <div class="empty-state" *ngIf="!carregando && conversas.length === 0">
         <ion-icon name="chatbubbles-outline"></ion-icon>
         <h2>Nenhuma conversa ainda</h2>
-        <p>Quando você manifestar ou receber interesse em um anúncio, a conversa vai aparecer aqui.</p>
+        <p>Quando você iniciar ou receber uma solicitação de conversa, ela vai aparecer aqui.</p>
       </div>
 
     </div>

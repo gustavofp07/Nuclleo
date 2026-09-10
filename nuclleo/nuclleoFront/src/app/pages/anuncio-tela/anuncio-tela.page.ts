@@ -122,7 +122,6 @@ export class AnuncioTelaPage implements OnInit {
         this.carregandoAnuncio = false;
       },
       error: () => {
-        // falha silenciosa aqui é aceitável: só não vai marcar o botão corretamente
         this.carregandoAnuncio = false;
       }
     });
@@ -208,15 +207,36 @@ export class AnuncioTelaPage implements OnInit {
     });
   }
 
+  // <-- ADICIONADO: agora o botão chama isso em vez de navegar direto pelo routerLink
+  conversarComAnunciante() {
+    if (!this.interesseAtual?.id || this.carregandoInteresse) {
+      return;
+    }
+
+    this.carregandoInteresse = true;
+
+    this.interesseService.iniciarConversa(this.interesseAtual.id, this.usuarioLogado.cdUsuario).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+        });
+        this.router.navigate(['/chat', this.interesseAtual!.id]);
+      },
+      error: (erro: any) => {
+        this.ngZone.run(() => {
+          this.carregandoInteresse = false;
+        });
+        this.exibirMensagem(erro?.error?.message || 'Erro ao iniciar conversa.');
+      }
+    });
+  }
+
   async confirmarExclusao() {
     const alert = await this.alertController.create({
       header: 'Confirmar Exclusão',
       message: 'Deseja realmente excluir este anúncio?',
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Excluir',
           role: 'destructive',
@@ -237,10 +257,7 @@ export class AnuncioTelaPage implements OnInit {
         ? 'Deseja realmente remover seu interesse neste anúncio?'
         : 'Deseja realmente manifestar interesse neste anúncio?',
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: this.usuarioJaInteressado ? 'Remover' : 'Confirmar',
           role: this.usuarioJaInteressado ? 'destructive' : 'confirm',
@@ -268,7 +285,6 @@ export class AnuncioTelaPage implements OnInit {
     }
   }
 
-
   async exibirMensagem(msg: string) {
     const toast = await this.toastController.create({
       message: msg,
@@ -278,5 +294,4 @@ export class AnuncioTelaPage implements OnInit {
 
     await toast.present();
   }
-
 }

@@ -11,8 +11,6 @@ export class InteresseService {
 
   constructor(private http: HttpClient) { }
 
-
-  //tá retornando any. Mudar isso depois e criar um model de interesse
   registrarInteresse(interesse: { cdUsuario: number; cdAnuncio: number; }): Observable<InteresseModel> {
     console.log('Registrando interesse: ', interesse);
     return this.http.post<InteresseModel>(`${this.URL}`, interesse);
@@ -38,8 +36,16 @@ export class InteresseService {
     return this.http.put<void>(`${this.URL}/${id}/finalizar`, dados);
   }
 
-  aceitarInteresse(cdInteresse: number, cdUsuarioSolicitante: number) {
+  aceitarInteresse(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> {
     return this.http.put<void>(`${this.URL}/${cdInteresse}/aceitar`, { cdUsuarioSolicitante });
+  }
+
+  iniciarConversa(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> { // <-- ADICIONADO
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/iniciar-conversa`, { cdUsuarioSolicitante });
+  }
+
+  recusarConversa(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> { // <-- ADICIONADO
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/recusar-conversa`, { cdUsuarioSolicitante });
   }
 
   avaliarAnunciante(id: number, dados: { cdUsuarioSolicitante: number; nota: number; }): Observable<void> {

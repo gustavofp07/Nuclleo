@@ -91,4 +91,13 @@ export const routes: Routes = [
     path: 'conversas',
     loadComponent: () => import('./pages/conversas/conversas.page').then( m => m.ConversasPage)
   },
+  {
+    path: 'nao-encontrado',
+    loadComponent: () => import('./pages/nao-encontrado/nao-encontrado.page').then( m => m.NaoEncontradoPage)
+  },
+  {
+    path: '**', // PRECISA SER O ULTIMO ITEM DO ARRAY
+    redirectTo: 'nao-encontrado'
+  },
+
 ];

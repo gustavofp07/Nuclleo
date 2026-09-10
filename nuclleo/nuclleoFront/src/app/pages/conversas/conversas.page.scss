@@ -194,3 +194,31 @@
 
   color: #6b7280;
 }
+
+.conversa-card {
+  cursor: default;
+}
+
+.conversa-card.clicavel {
+  cursor: pointer;
+}
+
+.acoes-solicitacao {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-aceitar {
+  --background: #7c3aed;
+  --background-hover: #6d28d9;
+  --color: #ffffff;
+  --border-radius: 10px;
+  margin: 0;
+}
+
+.btn-recusar {
+  --color: #dc2626;
+  --border-color: #dc2626;
+  --border-radius: 10px;
+  margin: 0;
+}

@@ -72,7 +72,7 @@ export class ChatPage implements OnInit, OnDestroy {
   chatFinalizado: boolean = false;
   aguardandoAvaliacaoOutro: boolean = false;
 
-  aguardandoAceite: boolean = false; // <-- ADICIONADO
+  aguardandoAceite: boolean = false;
 
   private timeoutDigitando: any = null;
 
@@ -99,17 +99,78 @@ export class ChatPage implements OnInit, OnDestroy {
     const possuiSessao = this.usuarioService.verificarSessao();
 
     if (!possuiSessao) {
-
       this.exibirMensagem('Não há usuário logado.');
-
       this.router.navigate(['/login']);
-
       return;
     }
 
     this.usuarioLogado = this.usuarioService.getUsuarioSessao();
 
+    if (!this.cdInteresse || isNaN(this.cdInteresse)) {
+      this.router.navigate(['/nao-encontrado']);
+      return;
+    }
+
     this.carregarInteresse();
+  }
+
+  ionViewWillLeave() {
+    this.chatService.desconectar();
+  }
+
+  ngOnDestroy() {
+    this.chatService.desconectar();
+  }
+
+  carregarInteresse() {
+    this.interesseService.buscarPorId(this.cdInteresse).subscribe({
+      next: (interesse: InteresseModel) => {
+
+        const souEuOInteressado = interesse.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
+        const souEuOAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+
+        if (!souEuOInteressado && !souEuOAnunciante) {
+          this.router.navigate(['/nao-encontrado']);
+          return;
+        }
+
+        if (!interesse.conversaIniciada) {
+          this.router.navigate(['/nao-encontrado']);
+          return;
+        }
+
+        this.interesse = interesse;
+
+        this.nomeOutroUsuario = souEuOInteressado
+          ? interesse.anuncio.usuarioCria.nmUsuario
+          : interesse.usuario.nmUsuario;
+
+        this.fotoOutroUsuario = souEuOInteressado
+          ? interesse.anuncio.usuarioCria.ftUsuario
+          : interesse.usuario.ftUsuario;
+
+        this.souAnunciante = souEuOAnunciante;
+        this.chatFinalizado = interesse.finalizado;
+
+        this.aguardandoAceite = souEuOInteressado && !(interesse as any).aceito;
+
+        if (this.chatFinalizado) {
+          if (!this.souAnunciante && !interesse.avaliacaoAnuncianteFeita) {
+            this.solicitarAvaliacaoAnunciante();
+          } else {
+            this.aguardandoAvaliacaoOutro = true;
+          }
+        }
+
+        this.iniciarChat();
+      },
+      error: () => {
+        this.router.navigate(['/nao-encontrado']);
+      }
+    });
+  }
+
+  iniciarChat() {
     this.carregarHistorico();
     this.chatService.conectar(this.cdInteresse);
 
@@ -150,46 +211,6 @@ export class ChatPage implements OnInit, OnDestroy {
     });
   }
 
-  ionViewWillLeave() {
-    this.chatService.desconectar();
-  }
-
-  ngOnDestroy() {
-    this.chatService.desconectar();
-  }
-
-  carregarInteresse() {
-    this.interesseService.buscarPorId(this.cdInteresse).subscribe({
-      next: (interesse: InteresseModel) => {
-        this.interesse = interesse;
-
-        const souEuOInteressado = interesse.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
-
-        this.nomeOutroUsuario = souEuOInteressado
-          ? interesse.anuncio.usuarioCria.nmUsuario
-          : interesse.usuario.nmUsuario;
-
-        this.fotoOutroUsuario = souEuOInteressado
-          ? interesse.anuncio.usuarioCria.ftUsuario
-          : interesse.usuario.ftUsuario;
-
-        this.souAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
-        this.chatFinalizado = interesse.finalizado;
-
-        // Só o interessado precisa aguardar aceite; o anunciante decide quando aceitar.
-        this.aguardandoAceite = souEuOInteressado && !(interesse as any).aceito; // <-- ADICIONADO
-
-        if (this.chatFinalizado) {
-          if (!this.souAnunciante && !interesse.avaliacaoAnuncianteFeita) {
-            this.solicitarAvaliacaoAnunciante();
-          } else {
-            this.aguardandoAvaliacaoOutro = true;
-          }
-        }
-      }
-    });
-  }
-
   carregarHistorico() {
     this.chatService.listarHistorico(this.cdInteresse).subscribe({
       next: (mensagens) => {
@@ -200,11 +221,10 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   enviar() {
-    if (this.chatFinalizado || this.aguardandoAceite) { // <-- MUDOU
+    if (this.chatFinalizado || this.aguardandoAceite) {
       return;
     }
 
-    //.trim(): É o método nativo do JavaScript que limpa a string. Ele remove espaços vazios, tabulações (Tabs) e quebras de linha que estejam antes da primeira letra ou depois da última letra. Ele não mexe nos espaços que ficam no meio das palavras.
     const texto = this.textoMensagem.trim();
 
     if (!texto || texto.length > 500) {
@@ -221,7 +241,6 @@ export class ChatPage implements OnInit, OnDestroy {
       enviando: true
     };
 
-    //insere a mensagem na lista de mensagens antes de enviar
     this.mensagens.push(mensagemOtimista);
     this.rolarParaFinal();
 
@@ -235,7 +254,7 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   onDigitar() {
-    if (this.chatFinalizado || this.aguardandoAceite) { // <-- MUDOU
+    if (this.chatFinalizado || this.aguardandoAceite) {
       return;
     }
 
@@ -257,16 +276,11 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   async rolarParaFinal() {
-    // Espera um pouco para garantir que a mensagem foi renderizada na tela antes de rolar
     setTimeout(() => {
       this.content?.scrollToBottom(200);
     }, 100);
   }
 
-
-
-
-  
   async abrirFinalizarConversa() {
     const alert = await this.alertController.create({
       header: 'Finalizar conversa',
@@ -358,8 +372,6 @@ export class ChatPage implements OnInit, OnDestroy {
       }
     });
   }
-
-
 
   async solicitarAvaliacaoAnunciante() {
     const alert = await this.alertController.create({

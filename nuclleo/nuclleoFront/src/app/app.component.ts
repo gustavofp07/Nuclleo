@@ -85,7 +85,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 export class AppComponent {
 
   menuHabilitado = true;
-  totalInteressesRecebidos: number = 0;
+  totalConversasPendentes: number = 0; // <-- MUDOU: era totalInteressesRecebidos
 
   constructor(
     private router: Router,
@@ -140,7 +140,7 @@ export class AppComponent {
     const possuiSessao = this.usuarioService.verificarSessao();
 
     if (!possuiSessao) {
-      this.totalInteressesRecebidos = 0;
+      this.totalConversasPendentes = 0; // <-- MUDOU
       return;
     }
 
@@ -148,10 +148,11 @@ export class AppComponent {
 
     this.interesseService.listarPorInteressados(usuario.cdUsuario).subscribe({
       next: (interesses) => {
-        this.totalInteressesRecebidos = interesses.filter(i => !(i as any).aceito).length;
+        this.totalConversasPendentes = interesses.filter(
+          i => i.conversaIniciada === true && i.aceito === false
+        ).length;
       },
       error: () => {
-        // silencioso: não queremos toast no menu por causa disso
       }
     });
   }

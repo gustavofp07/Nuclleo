@@ -15,7 +15,6 @@ import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.AvaliacaoRepository;
 import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
-import br.cefetmg.nuclleo.repository.TransacaoRepository;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
 
@@ -146,6 +145,35 @@ public class InteresseService {
         interesseRepository.save(interesse);
 
         excluirSeAmbosAvaliaram(interesse);
+    }
+
+    @Transactional
+    public void iniciarConversa(Long id, Long cdUsuarioSolicitante) {
+        Interesse interesse = buscarPorId(id);
+
+        if (!interesse.getUsuario().getCdUsuario().equals(cdUsuarioSolicitante)) {
+            throw new IllegalArgumentException("Apenas o usuário interessado pode iniciar a conversa.");
+        }
+
+        if (interesse.isFinalizado()) {
+            throw new IllegalArgumentException("Não é possível iniciar uma conversa em um interesse já finalizado.");
+        }
+
+        interesse.setConversaIniciada(true);
+        interesseRepository.save(interesse);
+    }
+
+    @Transactional
+    public void recusarConversa(Long id, Long cdUsuarioSolicitante) {
+        Interesse interesse = buscarPorId(id);
+
+        if (!interesse.getAnuncio().getUsuarioCria().getCdUsuario().equals(cdUsuarioSolicitante)) {
+            throw new IllegalArgumentException("Apenas o anunciante pode recusar a conversa.");
+        }
+
+        interesse.setConversaIniciada(false);
+        interesse.setAceito(false);
+        interesseRepository.save(interesse);
     }
 
     private void excluirSeAmbosAvaliaram(Interesse interesse) {
