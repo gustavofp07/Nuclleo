@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.DatabaseException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
@@ -23,10 +24,20 @@ public class UsuarioService {
     @Autowired
     private ArquivoIntegracaoService arquivoIntegracaoService;
 
+    @Autowired
+    private ViaCepService viaCepService;
+
     @Transactional
     public Usuario inserir(Usuario usuario, MultipartFile foto) {
         usuario.setAtivo(true);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
+
+        ViaCepResponseDTO endereco = viaCepService.buscarCep(usuario.getCep());
+        String cepLimpo = usuario.getCep().replaceAll("\\D", "");
+
+        usuario.setCep(cepLimpo);
+        usuario.setCidade(endereco.getLocalidade());
+        usuario.setUf(endereco.getUf());
 
         if (foto != null && !foto.isEmpty()) {
             try {
@@ -55,10 +66,18 @@ public class UsuarioService {
 
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
+        // olhar isso aqui
         usuario.setSenha(dto.getSenha());
+
         usuario.setCpf(dto.getCpf());
-        usuario.setCep(dto.getCep());
         usuario.setTelefone(dto.getTelefone());
+
+        ViaCepResponseDTO endereco = viaCepService.buscarCep(dto.getCep());
+        String cepLimpo = dto.getCep().replaceAll("\\D", "");
+
+        usuario.setCep(cepLimpo);
+        usuario.setCidade(endereco.getLocalidade());
+        usuario.setUf(endereco.getUf());
 
         if (foto != null && !foto.isEmpty()) {
             try {

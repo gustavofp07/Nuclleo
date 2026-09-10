@@ -12,4 +12,6 @@ public interface ComunidadeRepository
 extends JpaRepository<Comunidade, Long> {
 
     List<Comunidade>findByUsuarioCria_CdUsuario(Long cdUsuario);
+
+    List<Comunidade> findByCepStartingWith(String inicioCep);
 }

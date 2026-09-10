@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_usuario")// é aqui que se define o nome da tabela no banco de dados
+@Entity(name = "tb_usuario") // é aqui que se define o nome da tabela no banco de dados
 @Table(name = "tb_usuario")
 public class Usuario {
     @Id
@@ -26,13 +26,15 @@ public class Usuario {
     private Long cdUsuario;
 
     /*
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(name = "cdUsuario", updatable = false)
-    private UUID cdUsuario; // existe o tipo UUID
-    */
-
+     * @Id
+     * 
+     * @GeneratedValue
+     * 
+     * @UuidGenerator
+     * 
+     * @Column(name = "cdUsuario", updatable = false)
+     * private UUID cdUsuario; // existe o tipo UUID
+     */
 
     @Column(name = "nm_usuario", length = 60, nullable = false)
     private String nmUsuario;
@@ -54,6 +56,12 @@ public class Usuario {
 
     @Column(name = "cep")
     private String cep;
+
+    @Column(name = "cidade", length = 100)
+    private String cidade;
+
+    @Column(name = "uf", length = 2)
+    private String uf;
 
     @Column(name = "telefone")
     private String telefone;

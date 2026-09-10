@@ -7,6 +7,8 @@ export class UsuarioModel {
     dtEntrada: Date;
     cpf: string;
     cep: string;
+    cidade: string;
+    uf: string;
     telefone: string;
 
     constructor() {
@@ -18,6 +20,8 @@ export class UsuarioModel {
         this.dtEntrada = new Date();
         this.cpf = '';
         this.cep = '';
+        this.cidade = '';
+        this.uf = '';
         this.telefone = '';
     }
 }

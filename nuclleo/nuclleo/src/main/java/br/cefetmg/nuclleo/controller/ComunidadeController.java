@@ -109,4 +109,13 @@ public class ComunidadeController {
         List<Comunidade> comunidades = comunidadeService.getComunidadesPorUsuario(cdUsuario);
         return ResponseEntity.ok(comunidades);
     }
+
+    @GetMapping("/proximas/{cdUsuario}")
+    @Operation(summary = "Listar comunidades próximas ao usuário")
+    public ResponseEntity<List<Comunidade>> listarComunidadesProximas(@PathVariable Long cdUsuario) {
+
+        List<Comunidade> comunidades = comunidadeService.listarComunidadesProximas(cdUsuario);
+
+        return ResponseEntity.ok(comunidades);
+    }
 }
