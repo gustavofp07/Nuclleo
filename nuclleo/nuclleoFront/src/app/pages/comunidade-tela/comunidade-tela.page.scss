@@ -195,41 +195,91 @@
   opacity: 0.45;
 }
 
-.anuncio-card {
+.anuncios-lista {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-wrap: wrap;
+
   gap: 16px;
 
-  background: white;
+  justify-content: center;
+  /* centralizado, como pedido */
 
   margin-top: 16px;
+}
 
-  padding: 20px;
+.anuncio-card {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 200px;
+  flex: 0 1 calc(33.333% - 11px);
+
+  background: white;
 
   border-radius: 16px;
 
   border: 1px solid #d1d5db;
 
+  overflow: hidden;
+
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.anuncio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.anuncio-imagem {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.anuncio-imagem-foto {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  display: block;
+}
+
+.anuncio-imagem-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 2px solid #7c3aed;
+  background: #f5f3ff;
+}
+
+.anuncio-imagem-placeholder ion-icon {
+  font-size: 26px;
+  color: #7c3aed;
+}
+
 .anuncio-info {
-  flex: 1;
-  min-width: 0; // garante que o texto possa truncar dentro do flex
+  padding: 12px;
 }
 
 .anuncio-card h3 {
-  margin-top: 0;
+  margin: 0;
+
   color: #111827;
+
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .tipo {
   display: inline-block;
 
   margin-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 
   padding: 4px 10px;
 
@@ -243,56 +293,15 @@
 }
 
 .descAnuncio {
-  color: black;
+  color: #4b5563;
+
+  font-size: 14px;
+  line-height: 1.5;
 
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.anuncio-imagem {
-  flex-shrink: 0;
-
-  width: 120px;
-  height: 120px;
-}
-
-.anuncio-imagem-foto {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-  border-radius: 12px;
-
-  border: 1px solid #d1d5db;
-}
-
-.anuncio-imagem-placeholder {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 12px;
-
-  border: 2px solid #7c3aed;
-  background: #f5f3ff;
-}
-
-.anuncio-imagem-placeholder ion-icon {
-  font-size: 32px;
-  color: #7c3aed;
-}
-
-.anuncio-card h3 {
-
-  margin-top: 0;
-
-  color: #111827;
-
 }
 
 .tipo {

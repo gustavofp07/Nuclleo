@@ -153,37 +153,28 @@
     <div *ngIf="abaSelecionada === 'anuncios'">
 
       <div *ngIf="anuncios.length === 0" class="info-box">
-
         Nenhum anúncio encontrado.
-
       </div>
 
-      <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+      <div class="anuncios-lista" *ngIf="anuncios.length > 0">
+        <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
-        <div class="anuncio-info">
-
-          <h3>
-            {{ anuncio.nmAnuncio }}
-          </h3>
-
-          <span class="tipo">
-            {{ anuncio.tipoAnuncio }}
-          </span>
-
-          <p class="descAnuncio">
-            {{ anuncio.descricao }}
-          </p>
-
-        </div>
-
-        <div class="anuncio-imagem">
-          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
-          <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
-            <ion-icon name="image-outline"></ion-icon>
+          <div class="anuncio-imagem">
+            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
+            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+            </div>
           </div>
-        </div>
 
+          <div class="anuncio-info">
+            <h3>{{ anuncio.nmAnuncio }}</h3>
+            <span class="tipo">{{ anuncio.tipoAnuncio }}</span>
+            <p class="descAnuncio">{{ anuncio.descricao }}</p>
+          </div>
+
+        </div>
       </div>
+
     </div>
 
   </div>

@@ -35,19 +35,26 @@ ion-toolbar {
   color: #6b7280;
 }
 
+/* LISTA - GRADE DE CARDS QUADRADOS */
+
 .lista-interesses {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  justify-content: center;
+
+  margin-bottom: 20px;
 }
 
 .interesse-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
 
-  gap: 12px;
-
-  padding: 16px;
+  width: 100%;
+  max-width: 200px;
+  flex: 0 1 calc(33.333% - 11px);
 
   background: #ffffff;
 
@@ -60,6 +67,8 @@ ion-toolbar {
   text-decoration: none;
   color: inherit;
 
+  overflow: hidden;
+
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -69,24 +78,16 @@ ion-toolbar {
 }
 
 .info {
-  flex: 1;
-  min-width: 0;
+  padding: 12px;
 }
 
 .info h2 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #111827;
   margin: 0 0 6px;
 
   text-decoration: none;
-}
-
-.info h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111827;
-  margin: 0 0 6px;
 }
 
 .info .descricao {
@@ -104,17 +105,8 @@ ion-toolbar {
 }
 
 .anuncio-imagem {
-  flex-shrink: 0;
-
-  width: 70px;
-  height: 70px;
-}
-
-.anuncio-imagem {
-  flex-shrink: 0;
-
-  width: 70px;
-  height: 70px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .anuncio-imagem-foto {
@@ -122,9 +114,7 @@ ion-toolbar {
   height: 100%;
 
   object-fit: cover;
-  border-radius: 14px;
-
-  border: 1px solid #d1d5db;
+  display: block;
 }
 
 .anuncio-imagem-placeholder {
@@ -135,9 +125,7 @@ ion-toolbar {
   align-items: center;
   justify-content: center;
 
-  border-radius: 14px;
-
-  border: 2px solid #7c3aed;
+  border-bottom: 2px solid #7c3aed;
   background: #f5f3ff;
 }
 
@@ -145,6 +133,37 @@ ion-toolbar {
   font-size: 26px;
   color: #7c3aed;
 }
+
+/* CARREGANDO */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 60px 20px;
+}
+
+.loading-state ion-spinner {
+  width: 48px;
+  height: 48px;
+
+  color: #7c3aed;
+
+  margin-bottom: 16px;
+}
+
+.loading-state p {
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #6b7280;
+}
+
+/* VAZIO */
 
 .empty-state {
   display: flex;
@@ -184,6 +203,9 @@ ion-toolbar {
 
   ion-segment-button {
     --color: #6b7280;
+
+    position: relative;
+    overflow: visible;
   }
 }
 
@@ -282,7 +304,16 @@ ion-accordion {
   font-weight: 600;
 }
 
+/* BOTÕES ACEITAR / RECUSAR */
+
+.acoes-solicitacao {
+  display: flex;
+  gap: 10px;
+}
+
 .btn-conversar {
+  flex: 1;
+
   --background: #7c3aed;
   --background-hover: #6d28d9;
   --background-activated: #6d28d9;
@@ -297,18 +328,19 @@ ion-accordion {
   margin: 0;
 }
 
-.segmento {
-  margin-bottom: 24px;
-  --background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+.btn-recusar {
+  flex: 1;
 
-  ion-segment-button {
-    --color: #6b7280;
+  --color: #dc2626;
+  --border-color: #dc2626;
+  --border-radius: 10px;
+  --box-shadow: none;
 
-    position: relative;
-    overflow: visible;
-  }
+  font-weight: 600;
+  font-size: 14px;
+  height: 40px;
+
+  margin: 0;
 }
 
 .badge-notificacao {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
+import { IonSpinner, IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import {
@@ -29,7 +29,7 @@ import { AvaliacaoService } from 'src/app/services/avaliacao.service';
   templateUrl: './usuario-perfil.page.html',
   styleUrls: ['./usuario-perfil.page.scss'],
   standalone: true,
-  imports: [IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon, IonMenu, IonList, IonLabel, CommonModule, FormsModule, RouterLink]
+  imports: [IonSpinner, IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon, IonMenu, IonList, IonLabel, CommonModule, FormsModule, RouterLink]
 })
 export class UsuarioPerfilPage implements OnInit {
 
@@ -37,6 +37,8 @@ export class UsuarioPerfilPage implements OnInit {
   anuncios: AnuncioModel[] = [];
   nivelCadastro: number = 1;
   ehPerfilProprio: boolean = true;
+  carregando: boolean = false;
+  carregandoAnuncios: boolean = true;
 
   mediaAvaliacao: number = 0;
   estrelasArray = [1, 2, 3, 4, 5];
@@ -84,16 +86,20 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   carregarUsuarioPorId(cdUsuario: number) {
+    this.carregando = true;
+
     this.usuarioService.buscarUsuario(cdUsuario).subscribe({
       next: async (usuario: UsuarioModel) => {
         this.usuario = usuario;
         this.calcularNivelCadastro();
         this.carregarAnunciosUsuario();
         this.carregarAvaliacao();
+        this.carregando = false;
       },
       error: async () => {
         console.log('Erro ao buscar usuário.');
         this.exibirMensagem('Erro ao carregar perfil.');
+        this.carregando = false;
       }
     });
   }
@@ -187,12 +193,16 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   carregarAnunciosUsuario() {
+    this.carregandoAnuncios = true;
+
     this.anuncioService.listarAnunciosPorUsuario(this.usuario.cdUsuario).subscribe({
       next: (dados) => {
         this.anuncios = dados;
+        this.carregandoAnuncios = false; 
       },
       error: () => {
         console.error('Erro ao carregar anúncios do usuário.');
+        this.carregandoAnuncios = false; 
       }
     });
   }

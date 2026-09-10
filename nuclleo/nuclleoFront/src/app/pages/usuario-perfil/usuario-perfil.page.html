@@ -44,12 +44,12 @@
 
 
   <!-- CONTEÚDO -->
-  <ion-content [fullscreen]="true" class="perfil-content">
+  <ion-content [fullscreen]="true" [scrollY]="!ehPerfilProprio" class="perfil-content">
 
     <div class="container">
 
       <!-- FOTO + DADOS -->
-      <div class="perfil-topo">
+      <div class="perfil-topo" *ngIf="!carregando">
 
         <img [src]="usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="foto-usuario">
 
@@ -58,6 +58,16 @@
           <p>{{ usuario.email }}</p>
         </div>
 
+      </div>
+
+      <!-- CARREGANDO PERFIL -->
+      <div class="perfil-topo-loading" *ngIf="carregando">
+        <div class="foto-usuario-skeleton"></div>
+
+        <div class="dados-usuario-loading">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Carregando...</p>
+        </div>
       </div>
 
       <!-- INFORMAÇÕES -->
@@ -147,76 +157,40 @@
 
       <!-- ANÚNCIOS -->
 
-      <div class="anuncios-box">
+      <div class="anuncios-box" *ngIf="!ehPerfilProprio">
 
-        <h2>{{ ehPerfilProprio ? 'Meus anúncios' : 'Anúncios publicados' }}</h2>
+        <h2>Anúncios</h2>
 
-        <div *ngIf="anuncios.length === 0" class="sem-anuncios">
-
-          Você ainda não criou nenhum anúncio.
-
+        <!-- CARREGANDO -->
+        <div class="anuncios-loading" *ngIf="carregandoAnuncios">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Carregando...</p>
         </div>
 
-        <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+        <div *ngIf="!carregandoAnuncios && anuncios.length === 0" class="sem-anuncios">
+          Este usuário ainda não criou nenhum anúncio.
+        </div>
 
-          <div class="anuncio-info">
+        <div class="anuncios-lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
+          <div *ngFor="let anuncio of anuncios" class="anuncio-card"
+            [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
-            <h3>{{ anuncio.nmAnuncio }}</h3>
-
-            <span class="tipo-anuncio">
-              {{ anuncio.tipoAnuncio }}
-            </span>
-
-            <p>
-              {{ anuncio.descricao }}
-            </p>
-
-          </div>
-
-          <div class="anuncio-imagem">
-            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
-            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
-              <ion-icon name="image-outline"></ion-icon>
+            <div class="anuncio-imagem">
+              <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
+              <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
             </div>
-          </div>
 
+            <div class="anuncio-info">
+              <h3>{{ anuncio.nmAnuncio }}</h3>
+              <span class="tipo-anuncio">{{ anuncio.tipoAnuncio }}</span>
+              <p>{{ anuncio.descricao }}</p>
+            </div>
+
+          </div>
         </div>
 
       </div>
 
     </div>
-
-  </ion-content>
-
-  <!-- MENU INFERIOR 
-   
-  <div class="menu-bottom">
-
-    <ion-icon
-      name="home"
-      routerLink="/tela-inicial"
-      style="cursor: pointer;">
-    </ion-icon>
-
-    <ion-icon
-      name="people-outline"
-      routerLink=""
-      style="cursor: pointer;">
-    </ion-icon>
-
-    <ion-icon
-      name="chatbubble-outline"
-      routerLink=""
-      style="cursor: pointer;">
-    </ion-icon>
-
-    <ion-icon
-      name="person-outline"
-      routerLink="/usuario-perfil"
-      style="cursor: pointer;">
-    </ion-icon>
-
-  </div>
-  -->
-
-</div>

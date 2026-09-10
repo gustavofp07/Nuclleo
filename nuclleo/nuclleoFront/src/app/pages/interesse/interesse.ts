@@ -17,13 +17,14 @@ import {
   IonAccordionGroup,
   IonAccordion,
   IonItem,
-  IonBadge
+  IonBadge,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline, checkmarkDoneOutline, imageOutline } from 'ionicons/icons';
+import { heartOutline, peopleOutline, chevronForwardOutline, chatbubbleOutline, checkmarkDoneOutline, closeOutline, imageOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -64,7 +65,8 @@ interface AnuncioComInteresse {
     IonAccordionGroup,
     IonAccordion,
     IonItem,
-    IonBadge
+    IonBadge,
+    IonSpinner
   ]
 })
 export class InteresseMeusPage implements OnInit {
@@ -74,6 +76,9 @@ export class InteresseMeusPage implements OnInit {
   anunciosComInteresse: AnuncioComInteresse[] = [];
   totalInteressesRecebidos: number = 0;
   segmentoAtivo: 'meus' | 'recebidos' = 'meus';
+
+  carregandoInteresses: boolean = true;
+  carregandoRecebidos: boolean = true;
 
   constructor(
     private interesseService: InteresseService,
@@ -89,6 +94,7 @@ export class InteresseMeusPage implements OnInit {
       chevronForwardOutline,
       chatbubbleOutline,
       checkmarkDoneOutline,
+      closeOutline,
       imageOutline,
     });
   }
@@ -125,25 +131,33 @@ export class InteresseMeusPage implements OnInit {
   }
 
   carregarInteresses() {
+    this.carregandoInteresses = true;
+
     this.interesseService.listarPorUsuario(this.usuario.cdUsuario).subscribe({
       next: (interesses) => {
         this.interesses = interesses;
+        this.carregandoInteresses = false;
       },
       error: () => {
+        this.carregandoInteresses = false;
         this.exibirMensagem('Erro ao carregar seus interesses.');
       }
     });
   }
 
   carregarInteressesRecebidos() {
+    this.carregandoRecebidos = true;
+
     this.interesseService.listarPorInteressados(this.usuario.cdUsuario).subscribe({
       next: (interesses) => {
         const pendentes = interesses.filter(i => !(i as any).aceito);
         this.anunciosComInteresse = this.agruparPorAnuncio(pendentes);
 
-        this.totalInteressesRecebidos = pendentes.length;   // <-- NOVO
+        this.totalInteressesRecebidos = pendentes.length;
+        this.carregandoRecebidos = false;
       },
       error: () => {
+        this.carregandoRecebidos = false;
         this.exibirMensagem('Erro ao carregar interesses recebidos.');
       }
     });
@@ -192,17 +206,7 @@ export class InteresseMeusPage implements OnInit {
 
       next: () => {
 
-        anuncioItem.interessados = anuncioItem.interessados.filter(
-          i => i.cdInteresse !== interessado.cdInteresse
-        );
-
-        this.totalInteressesRecebidos--;   // <-- NOVO
-
-        if (anuncioItem.interessados.length === 0) {
-          this.anunciosComInteresse = this.anunciosComInteresse.filter(
-            item => item.anuncio.cdAnuncio !== anuncioItem.anuncio.cdAnuncio
-          );
-        }
+        this.removerInteressadoDaLista(anuncioItem, interessado);
 
         this.router.navigate(['/chat', interessado.cdInteresse]);
       },
@@ -211,6 +215,54 @@ export class InteresseMeusPage implements OnInit {
         this.exibirMensagem('Erro ao aceitar solicitação de chat.');
       }
     });
+  }
+
+  async confirmarRecusa(anuncioItem: AnuncioComInteresse, interessado: InteressadoComInteresse) {
+    const alert = await this.alertController.create({
+      header: 'Recusar solicitação',
+      message: `Deseja realmente recusar a solicitação de chat de ${interessado.usuario.nmUsuario}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Recusar',
+          role: 'destructive',
+          handler: () => {
+            this.recusarChat(anuncioItem, interessado);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  recusarChat(anuncioItem: AnuncioComInteresse, interessado: InteressadoComInteresse) {
+
+    this.interesseService.excluirInteresse(interessado.cdInteresse).subscribe({
+
+      next: () => {
+        this.removerInteressadoDaLista(anuncioItem, interessado);
+        this.exibirMensagem('Solicitação recusada.');
+      },
+
+      error: () => {
+        this.exibirMensagem('Erro ao recusar solicitação de chat.');
+      }
+    });
+  }
+
+  private removerInteressadoDaLista(anuncioItem: AnuncioComInteresse, interessado: InteressadoComInteresse) {
+    anuncioItem.interessados = anuncioItem.interessados.filter(
+      i => i.cdInteresse !== interessado.cdInteresse
+    );
+
+    this.totalInteressesRecebidos--;
+
+    if (anuncioItem.interessados.length === 0) {
+      this.anunciosComInteresse = this.anunciosComInteresse.filter(
+        item => item.anuncio.cdAnuncio !== anuncioItem.anuncio.cdAnuncio
+      );
+    }
   }
 
   removerInteresse(interesse: InteresseModel) {

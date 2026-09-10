@@ -10,7 +10,8 @@ import {
   IonMenuButton,
   IonButtons,
   IonIcon,
-  IonButton
+  IonButton,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import { AlertController, ToastController } from '@ionic/angular';
@@ -40,12 +41,14 @@ import { AnuncioModel } from 'src/app/model/anuncio.model';
     IonMenuButton,
     IonButtons,
     IonIcon,
-    IonButton
+    IonButton,
+    IonSpinner
   ]
 })
 export class AnuncioMeusPage implements OnInit {
   usuario: UsuarioModel;
   anuncios: AnuncioModel[];
+  carregando: boolean = false;
 
   tipo: 'venda' | 'compra' = 'venda';
 
@@ -113,11 +116,15 @@ export class AnuncioMeusPage implements OnInit {
   }
 
   carregarAnuncios() {
+    this.carregando = true; 
+
     this.anuncioService.listarAnunciosPorUsuarioTipo(this.usuario.cdUsuario, this.tipo).subscribe({
       next: (anuncios: AnuncioModel[]) => {
         this.anuncios = anuncios;
+        this.carregando = false; 
       },
       error: () => {
+        this.carregando = false; 
         this.exibirMensagem('Erro ao carregar seus anúncios');
       }
     });

@@ -33,14 +33,15 @@
       <!-- MEUS INTERESSES -->
       <div *ngIf="segmentoAtivo === 'meus'">
 
-        <div class="lista-interesses" *ngIf="interesses.length > 0">
+        <!-- CARREGANDO -->
+        <div class="loading-state" *ngIf="carregandoInteresses">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Carregando...</p>
+        </div>
+
+        <div class="lista-interesses" *ngIf="!carregandoInteresses && interesses.length > 0">
           <a class="interesse-card" *ngFor="let interesse of interesses"
             [routerLink]="['/anuncio-tela', interesse.anuncio.cdAnuncio]">
-
-            <div class="info">
-              <h2>{{ interesse.anuncio.nmAnuncio }}</h2>
-              <p class="descricao">{{ interesse.anuncio.descricao }}</p>
-            </div>
 
             <div class="anuncio-imagem">
               <img *ngIf="interesse.anuncio.ftAnuncio" [src]="interesse.anuncio.ftAnuncio" class="anuncio-imagem-foto"
@@ -50,10 +51,15 @@
               </div>
             </div>
 
+            <div class="info">
+              <h2>{{ interesse.anuncio.nmAnuncio }}</h2>
+              <p class="descricao">{{ interesse.anuncio.descricao }}</p>
+            </div>
+
           </a>
         </div>
 
-        <div class="empty-state" *ngIf="interesses.length === 0">
+        <div class="empty-state" *ngIf="!carregandoInteresses && interesses.length === 0">
           <ion-icon name="heart-outline"></ion-icon>
           <h2>Nenhum interesse registrado</h2>
           <p>Quando você demonstrar interesse em um anúncio, ele vai aparecer aqui.</p>
@@ -64,7 +70,13 @@
       <!-- INTERESSES RECEBIDOS -->
       <div *ngIf="segmentoAtivo === 'recebidos'">
 
-        <ion-accordion-group class="accordion-recebidos" *ngIf="anunciosComInteresse.length > 0">
+        <!-- CARREGANDO -->
+        <div class="loading-state" *ngIf="carregandoRecebidos">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Carregando...</p>
+        </div>
+
+        <ion-accordion-group class="accordion-recebidos" *ngIf="!carregandoRecebidos && anunciosComInteresse.length > 0">
 
           <ion-accordion *ngFor="let anuncioItem of anunciosComInteresse; trackBy: trackByAnuncio"
             [value]="anuncioItem.anuncio.cdAnuncio">
@@ -88,11 +100,21 @@
                   <span>{{ interessado.usuario.nmUsuario }}</span>
                 </a>
 
-                <ion-button expand="block" fill="solid" class="btn-conversar"
-                  (click)="aceitarChat(anuncioItem, interessado)">
-                  <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
-                  Aceitar solicitação de chat
-                </ion-button>
+                <div class="acoes-solicitacao">
+
+                  <ion-button expand="block" fill="solid" class="btn-conversar"
+                    (click)="aceitarChat(anuncioItem, interessado)">
+                    <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+                    Aceitar
+                  </ion-button>
+
+                  <ion-button expand="block" fill="outline" class="btn-recusar"
+                    (click)="confirmarRecusa(anuncioItem, interessado)">
+                    <ion-icon name="close-outline" slot="start"></ion-icon>
+                    Recusar
+                  </ion-button>
+
+                </div>
 
               </div>
             </div>
@@ -101,7 +123,7 @@
 
         </ion-accordion-group>
 
-        <div class="empty-state" *ngIf="anunciosComInteresse.length === 0">
+        <div class="empty-state" *ngIf="!carregandoRecebidos && anunciosComInteresse.length === 0">
           <ion-icon name="people-outline"></ion-icon>
           <h2>Nenhum interesse recebido</h2>
           <p>Quando alguém demonstrar interesse em um dos seus anúncios, ele vai aparecer aqui.</p>

@@ -25,10 +25,23 @@
       <!-- BOTAO -->
       <ion-button expand="block" class="btn-criar" [routerLink]="rotaCriar">Criar novo anúncio</ion-button>
 
+      <!-- CARREGANDO -->
+      <div class="loading-state" *ngIf="carregando">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
       <!-- LISTA -->
-      <div class="lista-anuncios" *ngIf="anuncios.length > 0">
+      <div class="lista-anuncios" *ngIf="!carregando && anuncios.length > 0">
         <button class="anuncio-card" type="button" *ngFor="let anuncio of anuncios"
           [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+
+          <div class="anuncio-imagem">
+            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
+            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+            </div>
+          </div>
 
           <div class="info">
             <div class="titulo-anuncio">
@@ -39,18 +52,11 @@
             <p class="descricao">{{ anuncio.descricao }}</p>
           </div>
 
-          <div class="anuncio-imagem">
-            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
-            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
-              <ion-icon name="image-outline"></ion-icon>
-            </div>
-          </div>
-
         </button>
       </div>
 
       <!-- VAZIO -->
-      <div class="empty-state" *ngIf="anuncios.length === 0">
+      <div class="empty-state" *ngIf="!carregando && anuncios.length === 0">
 
         <ion-icon [name]="icone"></ion-icon>
 
