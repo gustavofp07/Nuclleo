@@ -245,3 +245,51 @@ ion-label p {
   text-overflow: ellipsis;
   white-space: normal;
 }
+
+
+
+
+
+
+/* BUSCA DE COMUNIDADES */
+
+ion-searchbar {
+  --background: #ffffff;
+  --border-radius: 14px;
+  --box-shadow: none;
+
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+
+/* PROXIMIDADE */
+
+.opcao-proximidade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  padding: 14px 16px;
+  margin-bottom: 16px;
+
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.opcao-proximidade span {
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #111827;
+}
+
+.opcao-proximidade ion-toggle {
+  --track-background: #d1d5db;
+  --track-background-checked: #c4b5fd;
+
+  --handle-background: #ffffff;
+  --handle-background-checked: #7d17f1;
+}

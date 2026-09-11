@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
+import br.cefetmg.nuclleo.dto.VerificarEmailRequestDTO;
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.services.UsuarioService;
@@ -35,7 +36,8 @@ public class UsuarioController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar usuário")
-    public ResponseEntity<Usuario> inserir(@Valid @RequestPart("usuario") UsuarioRequestDTO dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
+    public ResponseEntity<Usuario> inserir(@Valid @RequestPart("usuario") UsuarioRequestDTO dto,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
         if (dto == null) {
             throw new BadRequestException("Usuário é obrigatório");
         }
@@ -84,6 +86,35 @@ public class UsuarioController {
         Usuario objUsuario = usuarioService.buscarPorId(cdUsuario);
         return ResponseEntity.ok(objUsuario);
         // return this.repository.findById(cdUsuario).orElse(null);
+    }
+
+    @GetMapping("/verificar-email")
+    @Operation(summary = "Verificar se email já está cadastrado")
+    public ResponseEntity<Boolean> verificarEmail(@RequestBody VerificarEmailRequestDTO dto) {
+
+        boolean existe = usuarioService.verificarEmail(dto.getEmail());
+
+        return ResponseEntity.ok(existe);
+    }
+
+    @GetMapping("/{cdUsuario}/possui-cep")
+    @Operation(summary = "Verificar se usuário possui CEP cadastrado")
+    public ResponseEntity<Boolean> verificarCep(
+            @PathVariable Long cdUsuario) {
+
+        boolean possuiCep = usuarioService.verificarCep(cdUsuario);
+
+        return ResponseEntity.ok(possuiCep);
+    }
+
+    @GetMapping("/{cdUsuario}/possui-cpf")
+    @Operation(summary = "Verificar se usuário possui CPF cadastrado")
+    public ResponseEntity<Boolean> verificarCpf(
+            @PathVariable Long cdUsuario) {
+
+        boolean possuiCpf = usuarioService.verificarCpf(cdUsuario);
+
+        return ResponseEntity.ok(possuiCpf);
     }
 
 }

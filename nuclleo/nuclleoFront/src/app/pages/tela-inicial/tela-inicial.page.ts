@@ -20,7 +20,9 @@ import {
   IonMenuButton,
   IonButtons,
   IonIcon,
-  IonSpinner
+  IonSpinner,
+  IonToggle,
+  IonSearchbar
 } from '@ionic/angular/standalone';
 
 import { Router } from '@angular/router';
@@ -62,13 +64,18 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
     IonButton,
     RouterLink,
     IonIcon,
-    IonSpinner
+    IonSpinner,
+    IonToggle,
+    IonSearchbar
   ]
 })
 
 export class TelaInicialPage implements OnInit {
 
   comunidades: ComunidadeModel[] = [];
+
+  buscarPorProximidade: boolean = false;
+  pesquisaComunidade: string = '';
 
   anunciosRecomendados: AnuncioModel[] = [];
 
@@ -93,6 +100,8 @@ export class TelaInicialPage implements OnInit {
       return;
     }
 
+    this.carregarPreferenciaProximidade();
+
     this.carregarComunidades();
     this.carregarAnunciosRecomendados();
   }
@@ -110,29 +119,84 @@ export class TelaInicialPage implements OnInit {
       return;
     }
 
+    this.carregarPreferenciaProximidade();
+
     this.carregarComunidades();
     this.carregarAnunciosRecomendados();
   }
 
+  alterarBuscaProximidade() {
+    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
+
+    this.carregarComunidades();
+  }
+
+  carregarPreferenciaProximidade() {
+    const preferencia = localStorage.getItem('buscarComunidadesProximas');
+
+    this.buscarPorProximidade = (preferencia === 'true');
+  }
+
   carregarComunidades() {
-    const usuario = this.usuarioService.getUsuarioSessao();
-
-    if (!usuario || !usuario.cdUsuario) {
-      return;
-    }
-
     this.carregandoComunidades = true;
 
-    this.comunidadeService.listarComunidadesProximas(usuario.cdUsuario).subscribe({
+    if (this.buscarPorProximidade === true) {
+      this.carregarComunidadesProximas();
+    } else {
+      this.carregarTodasComunidades();
+    }
+  }
+
+  carregarTodasComunidades() {
+    this.comunidadeService.listarComunidades().subscribe({
       next: (comunidades: ComunidadeModel[]) => {
         this.comunidades = comunidades;
         this.carregandoComunidades = false;
       },
       error: (erro: any) => {
-        console.error('Erro ao carregar comunidades próximas:', erro);
+        console.error('Erro ao carregar comunidades:', erro);
         this.carregandoComunidades = false;
       }
     });
+  }
+
+  carregarComunidadesProximas() {
+    const usuario = this.usuarioService.getUsuarioSessao();
+
+    //penso em criar um endPoint get possui CEP, que retorna true ou false
+    //e se for false, exibir a mensagem de erro antes de tentar buscar a lista.
+    this.usuarioService.verificarCEP(usuario.cep).subscribe({
+      next: (possuiCep: boolean) => {
+        if (possuiCep) {
+
+          this.comunidadeService.listarComunidadesProximas(usuario.cdUsuario).subscribe({
+            next: (comunidades: ComunidadeModel[]) => {
+              this.comunidades = comunidades;
+              this.carregandoComunidades = false;
+            },
+            error: (erro: any) => {
+              console.error('Erro ao carregar comunidades próximas: ', erro);
+              this.exibirMensagem("Erro! " + erro.error.message);
+              this.carregandoComunidades = false;
+            }
+          });
+
+        } else {
+
+          this.buscarPorProximidade = false;
+          localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
+          this.exibirMensagem("Erro!! O usuário não possui CEP cadastrado.");
+          
+          this.carregarTodasComunidades();
+
+          return;
+        }
+      },
+      error: (erro: any) => {
+        console.error('Erro ao verificar CEP:', erro);
+      }
+    });
+
   }
 
   carregarAnunciosRecomendados() {
@@ -160,5 +224,4 @@ export class TelaInicialPage implements OnInit {
       });
     toast.present();
   }
-
 }

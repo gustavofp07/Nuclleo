@@ -38,14 +38,6 @@ export class UsuarioService {
     );
   }
 
-  excluirUsuario(cdUsuario: number): Observable<UsuarioModel> {
-    return this.http.delete<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
-  }
-
-  buscarUsuario(cdUsuario: number): Observable<UsuarioModel> {//varivel
-    return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
-  }
-
   atualizar(usuario: UsuarioModel, foto?: File): Observable<UsuarioModel> {
 
     const formData = new FormData();
@@ -60,14 +52,46 @@ export class UsuarioService {
     return this.http.put<UsuarioModel>(this.API_URL, formData);
   }
 
+  excluirUsuario(cdUsuario: number): Observable<UsuarioModel> {
+    return this.http.delete<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
+  }
+
+  buscarUsuario(cdUsuario: number): Observable<UsuarioModel> {//varivel
+    return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
+  }
+
+  verificarEmailExistente(email: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/verificar-email?email=${encodeURIComponent(email)}`);
+  }
+
+  verificarCPF(cpf: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/verificar-cpf?cpf=${encodeURIComponent(cpf)}`);
+  }
+
+  verificarCEP(cep: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/verificar-cep?cep=${encodeURIComponent(cep)}`);
+  }
+
+
+
+
+
 
   //coisas da sessão
   salvarUsuarioSessao(usuario: UsuarioAutenticadoModel): void {
     localStorage.setItem(this.KEY_USUARIO, JSON.stringify(usuario));
   }
 
+  /*
   limparSessao(): void {
     localStorage.removeItem(this.KEY_USUARIO);
+  }
+    */
+
+  limparSessao(): void {
+    localStorage.removeItem(this.KEY_USUARIO);
+
+    localStorage.removeItem('buscarComunidadesProximas');
   }
 
   verificarSessao(): boolean {

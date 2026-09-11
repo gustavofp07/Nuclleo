@@ -9,4 +9,6 @@ import br.cefetmg.nuclleo.model.Usuario;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Usuario findByEmailAndSenha(String email, String senha);
+
+    boolean existsByEmail(String email);
 }

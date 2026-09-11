@@ -117,4 +117,28 @@ public class UsuarioService {
         return usuarioRepository.findById(cdUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
+
+    @Transactional(readOnly = true)
+    public boolean verificarEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verificarCep(Long cdUsuario) {
+        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        return (usuario.getCep() != null && !usuario.getCep().isBlank());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verificarCpf(Long cdUsuario) {
+
+        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        return (usuario.getCpf() != null && !usuario.getCpf().isBlank());
+    }
 }

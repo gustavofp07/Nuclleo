@@ -175,15 +175,14 @@ public class ComunidadeService {
 
         String cepUsuario = usuario.getCep();
 
-        if (cepUsuario == null || cepUsuario.length() < 4) {
+        if (cepUsuario == null || cepUsuario.length() < 8) {
             throw new BusinessException("Usuário não possui um CEP válido.");
         }
 
-        // Primeiro dígito do CEP.
-        // Exemplo: 35171105 → "3"
+        // pega o primeiro dígito do CEP.
         String regiao = cepUsuario.substring(0, 1);
 
-        // Busca somente comunidades da mesma grande região
+        // Busca somente comunidades da mesma grande região, olhando o primeiro dígito do CEP.
         List<Comunidade> comunidades = comunidadeRepository.findByCepStartingWith(regiao);
 
         ordenarPorProximidade(comunidades, cepUsuario);
