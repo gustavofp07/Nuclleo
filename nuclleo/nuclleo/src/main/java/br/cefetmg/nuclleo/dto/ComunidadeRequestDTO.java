@@ -18,5 +18,5 @@ public class ComunidadeRequestDTO {
     private String cep;
 
     @NotNull(message = "O código do usuário que é obrigatório.")
-    private long cdUsuarioCria;
+    private Long cdUsuarioCria;
 }

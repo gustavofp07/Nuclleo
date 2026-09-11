@@ -50,11 +50,18 @@ public class ComunidadeService {
 
     @Transactional
     public Comunidade inserir(ComunidadeRequestDTO dto, MultipartFile foto) {
+        if (dto == null) {
+            throw new BusinessException("Dados da comunidade são obrigatórios.");
+        }
+
+        Usuario usuarioCriador = usuarioRepository.findById(dto.getCdUsuarioCria())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário criador não encontrado."));
+
         Comunidade comunidade = new Comunidade();
         comunidade.setNmComunidade(dto.getNmComunidade());
         comunidade.setDescricao(dto.getDescricao());
         comunidade.setCep(dto.getCep());
-
+        comunidade.setUsuarioCria(usuarioCriador);
         comunidade.setDtCriacao(new java.sql.Date(System.currentTimeMillis()));
 
         // Valida o CEP e busca cidade/UF no ViaCEP
