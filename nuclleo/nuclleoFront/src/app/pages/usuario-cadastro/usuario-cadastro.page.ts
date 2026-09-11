@@ -156,10 +156,7 @@ export class UsuarioCadastroPage implements OnInit {
     this.usuarioService.verificarEmail(email, null).subscribe({
       next: (existe: boolean) => {
         if (existe) {
-          campoEmail.setErrors({
-            ...(campoEmail.errors || {}),
-            emailExistente: true
-          });
+          campoEmail.setErrors({...(campoEmail.errors || {}), emailExistente: true});
         } else {
           this.removerErroEmailExistente(campoEmail);
         }

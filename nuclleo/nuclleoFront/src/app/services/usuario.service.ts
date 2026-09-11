@@ -66,7 +66,7 @@ export class UsuarioService {
   }
     */
 
-  verificarEmail(email: string,cdUsuario: number | null) {
+  verificarEmail(email: string, cdUsuario: number | null) {
     const dados = {
       email: email,
       cdUsuario: cdUsuario
