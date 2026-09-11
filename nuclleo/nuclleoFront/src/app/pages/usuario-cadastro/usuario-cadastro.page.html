@@ -12,8 +12,7 @@
     <div class="foto-box" (click)="selecionarImagem()">
 
       <div class="foto-circle">
-        <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem"
-          [class.placeholder]="!previewFoto && !usuario.ftUsuario">
+        <img [src]="previewFoto || 'assets/img/usuarioPadrao.png'" class="imagem" [class.placeholder]="!previewFoto">
       </div>
 
       <div class="camera-badge">
@@ -21,10 +20,13 @@
       </div>
 
     </div>
-    <p class="foto-label">Adicionar foto de perfil</p>
+
+    <p class="foto-label">
+      Adicionar foto de perfil
+    </p>
 
     <!-- FORMULÁRIO -->
-    <form (ngSubmit)="salvar()">
+    <form [formGroup]="formUsuario" (ngSubmit)="salvar()">
 
       <!-- EMAIL -->
       <div class="campo-label">
@@ -33,74 +35,147 @@
 
       <ion-item lines="none" class="input-item">
 
-        <ion-input type="email" placeholder="E-mail" [(ngModel)]="usuario.email" name="email" required>
+        <ion-input type="email" placeholder="E-mail" formControlName="email" (ionBlur)="verificarEmail()">
         </ion-input>
 
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('email')?.touched &&
+          formUsuario.get('email')?.hasError('required')
+        ">
+        Informe o e-mail.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('email')?.touched &&
+          formUsuario.get('email')?.hasError('email')
+        ">
+        Informe um e-mail válido.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('email')?.touched &&
+          formUsuario.get('email')?.hasError('emailExistente')
+        ">
+        Este e-mail já está cadastrado.
+      </p>
+
 
       <!-- NOME -->
       <div class="campo-label">
         <label>Nome</label>
       </div>
+
       <ion-item lines="none" class="input-item">
 
-        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario" required>
+        <ion-input placeholder="Nome" formControlName="nmUsuario">
         </ion-input>
 
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('nmUsuario')?.touched &&
+          formUsuario.get('nmUsuario')?.hasError('required')
+        ">
+        Informe o nome.
+      </p>
+
 
       <!-- SENHA -->
       <div class="campo-label">
         <label>Senha</label>
       </div>
+
       <ion-item lines="none" class="input-item">
 
-        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="usuario.senha"
-          name="senha" required>
+        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" formControlName="senha">
         </ion-input>
 
         <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
 
-          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
+          <ion-icon slot="icon-only" [name]="
+              showPassword
+              ? 'eye-off-outline'
+              : 'eye-outline'
+            ">
           </ion-icon>
 
         </ion-button>
 
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('senha')?.touched &&
+          formUsuario.get('senha')?.hasError('required')
+        ">
+        Informe a senha.
+      </p>
+
 
       <!-- CONFIRMAR SENHA -->
       <div class="campo-label">
         <label>Confirmar senha</label>
       </div>
+
       <ion-item lines="none" class="input-item">
 
         <ion-input [type]="showConfirmPassword ? 'text' : 'password'" placeholder="Confirmar senha"
-          [(ngModel)]="confirmarSenha" name="confirmarSenha" required>
+          formControlName="confirmarSenha">
         </ion-input>
 
         <ion-button fill="clear" slot="end" type="button" (click)="toggleConfirmPassword()">
 
-          <ion-icon slot="icon-only" [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'">
+          <ion-icon slot="icon-only" [name]="
+              showConfirmPassword
+              ? 'eye-off-outline'
+              : 'eye-outline'
+            ">
           </ion-icon>
 
         </ion-button>
 
       </ion-item>
 
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('confirmarSenha')?.touched &&
+          formUsuario.get('confirmarSenha')?.hasError('required')
+        ">
+        Confirme a senha.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('confirmarSenha')?.touched &&
+          formUsuario.hasError('senhasDiferentes')
+        ">
+        As senhas não coincidem.
+      </p>
+
+
       <!-- BOTÃO -->
-      <ion-button expand="block" type="submit" class="btn-cadastrar">
-        Cadastrar
+      <ion-button expand="block" type="submit" class="btn-cadastrar" [disabled]="
+          formUsuario.invalid ||
+          verificandoEmail ||
+          salvando
+        ">
+
+        {{
+        salvando
+        ? 'Cadastrando...'
+        : verificandoEmail
+        ? 'Verificando e-mail...'
+        : 'Cadastrar'
+        }}
+
       </ion-button>
 
     </form>
 
     <!-- TERMOS -->
     <p class="termos">
-
       Ao clicar em continuar, você concorda com os nossos
       <span>Termos de Serviço</span> e com a
       <span>Política de Privacidade</span>
-
     </p>
 
   </div>

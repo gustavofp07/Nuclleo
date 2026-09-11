@@ -92,7 +92,9 @@ public class UsuarioController {
     @Operation(summary = "Verificar se email já está cadastrado")
     public ResponseEntity<Boolean> verificarEmail(@RequestBody VerificarEmailRequestDTO dto) {
 
-        boolean existe = usuarioService.verificarEmail(dto.getEmail());
+        boolean existe = usuarioService.verificarEmail(
+                dto.getEmail(),
+                dto.getCdUsuario());
 
         return ResponseEntity.ok(existe);
     }

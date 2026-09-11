@@ -42,7 +42,7 @@ public class Usuario {
     @Column(name = "ft_usuario", length = 1000)
     private String ftUsuario;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "senha")

@@ -128,8 +128,25 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
+    public boolean verificarEmail(String email, Long cdUsuario) {
+
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+
+        if (cdUsuario == null) {
+            // estamos verificando um novo usuário
+            return usuarioRepository.existsByEmail(email);
+        } else {
+            // estamos verificando um usuário existente
+            return usuarioRepository.existsByEmailAndCdUsuarioNot(email, cdUsuario);
+        }
+    }
+
+    @Transactional(readOnly = true)
     public boolean verificarCep(Long cdUsuario) {
-        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return (usuario.getCep() != null && !usuario.getCep().isBlank());
     }
@@ -137,7 +154,8 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public boolean verificarCpf(Long cdUsuario) {
 
-        Usuario usuario = usuarioRepository.findById(cdUsuario).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findById(cdUsuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return (usuario.getCpf() != null && !usuario.getCpf().isBlank());
     }

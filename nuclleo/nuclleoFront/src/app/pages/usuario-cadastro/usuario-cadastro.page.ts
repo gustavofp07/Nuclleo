@@ -1,8 +1,14 @@
-// usuario-cadastro.page.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 
 import { Router } from '@angular/router';
 
@@ -13,15 +19,12 @@ import {
   IonButton,
   IonIcon,
   ToastController,
-  IonAvatar,
   LoadingController,
   ActionSheetController
 } from '@ionic/angular/standalone';
 
 import { CameraSource } from '@capacitor/camera';
-
 import { addIcons } from 'ionicons';
-
 import {
   eyeOutline,
   eyeOffOutline,
@@ -29,7 +32,6 @@ import {
   imageOutline
 } from 'ionicons/icons';
 
-import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
 import { UsuarioCadastroDTOModel } from 'src/app/model/usuario-cadastro-dto.model';
@@ -42,30 +44,28 @@ import { UsuarioCadastroDTOModel } from 'src/app/model/usuario-cadastro-dto.mode
   standalone: true,
 
   imports: [
+    CommonModule,
+    ReactiveFormsModule,
+
     IonContent,
     IonItem,
     IonInput,
     IonButton,
-    IonIcon,
-    FormsModule,
-    CommonModule,
-    IonAvatar
+    IonIcon
   ]
 })
 
 export class UsuarioCadastroPage implements OnInit {
-
-  usuario: UsuarioCadastroDTOModel;
-
-  confirmarSenha: string = '';
+  formUsuario: FormGroup;
   showPassword: boolean = false;
-
-  previewFoto: string | ArrayBuffer | null = null;
   showConfirmPassword: boolean = false;
-
+  previewFoto: string | ArrayBuffer | null = null;
   imagemSelecionada?: File;
+  verificandoEmail: boolean = false;
+  salvando: boolean = false;
 
   constructor(
+    private formBuilder: FormBuilder,
     private router: Router,
     private toastController: ToastController,
     private usuarioService: UsuarioService,
@@ -73,9 +73,6 @@ export class UsuarioCadastroPage implements OnInit {
     private arquivoService: ArquivoService,
     private actionSheetController: ActionSheetController
   ) {
-
-    this.usuario = new UsuarioCadastroDTOModel();
-
     addIcons({
       eyeOutline,
       eyeOffOutline,
@@ -83,18 +80,50 @@ export class UsuarioCadastroPage implements OnInit {
       imageOutline
     });
 
+    this.formUsuario = this.formBuilder.group(
+      {
+        email: ['', Validators.compose([Validators.required, Validators.email])],
+        nmUsuario: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+        senha: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+        confirmarSenha: ['', Validators.required]
+      },
+      {
+        validators: this.validarSenhas
+      }
+    );
   }
 
-  ngOnInit() {
-    this.usuario = new UsuarioCadastroDTOModel();
-    this.confirmarSenha = "";
-    this.showPassword = false;
-  }
+  ngOnInit() { }
 
   ionViewWillEnter() {
-    this.usuario = new UsuarioCadastroDTOModel();
-    this.confirmarSenha = "";
+    this.previewFoto = null;
+    this.imagemSelecionada = undefined;
     this.showPassword = false;
+    this.showConfirmPassword = false;
+    this.verificandoEmail = false;
+    this.salvando = false;
+
+    this.formUsuario.reset({
+      email: '',
+      nmUsuario: '',
+      senha: '',
+      confirmarSenha: ''
+    });
+  }
+
+  validarSenhas(control: AbstractControl): ValidationErrors | null {
+    const senha = control.get('senha')?.value;
+    const confirmarSenha = control.get('confirmarSenha')?.value;
+
+    if (!senha || !confirmarSenha) {
+      return null;
+    }
+
+    if (senha !== confirmarSenha) {
+      return { senhasDiferentes: true };
+    }
+
+    return null;
   }
 
   togglePassword() {
@@ -102,36 +131,94 @@ export class UsuarioCadastroPage implements OnInit {
   }
 
   toggleConfirmPassword() {
-    this.showConfirmPassword =
-      !this.showConfirmPassword;
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  async salvar() {
+  verificarEmail() {
+    const campoEmail = this.formUsuario.get('email');
 
-    if (!this.usuario.email || !this.usuario.nmUsuario || !this.usuario.senha) {
-      this.exibirMensagem('Preencha todos os campos!');
+    if (!campoEmail) {
       return;
     }
 
-    if (this.usuario.senha !== this.confirmarSenha) {
-      this.exibirMensagem('As senhas não coincidem!');
+    if (campoEmail.hasError('required') || campoEmail.hasError('email')) {
       return;
     }
 
-    this.usuarioService.cadastrarUsuario(this.usuario, this.imagemSelecionada).subscribe({
+    const email = campoEmail.value;
+
+    if (!email) {
+      return;
+    }
+
+    this.verificandoEmail = true;
+
+    this.usuarioService.verificarEmail(email, null).subscribe({
+      next: (existe: boolean) => {
+        if (existe) {
+          campoEmail.setErrors({
+            ...(campoEmail.errors || {}),
+            emailExistente: true
+          });
+        } else {
+          this.removerErroEmailExistente(campoEmail);
+        }
+        this.verificandoEmail = false;
+      },
+      error: (erro: any) => {
+        console.error('Erro ao verificar e-mail: ', erro);
+        this.verificandoEmail = false;
+        this.exibirMensagem(erro.error?.message || 'Erro ao verificar e-mail.');
+      }
+    });
+  }
+
+  removerErroEmailExistente(campoEmail: AbstractControl) {
+    if (!campoEmail.errors?.['emailExistente']) {
+      return;
+    }
+
+    const erros = { ...campoEmail.errors };
+    delete erros['emailExistente'];
+
+    campoEmail.setErrors(Object.keys(erros).length > 0 ? erros : null);
+  }
+
+  salvar() {
+    if (this.salvando) {
+      return;
+    }
+
+    if (this.verificandoEmail) {
+      this.exibirMensagem('Aguarde a verificação do e-mail.');
+      return;
+    }
+
+    if (this.formUsuario.invalid) {
+      this.formUsuario.markAllAsTouched();
+      this.exibirMensagem('Preencha os campos corretamente.');
+      return;
+    }
+
+    this.salvando = true;
+
+    const usuario = new UsuarioCadastroDTOModel();
+    usuario.email = this.formUsuario.value.email;
+    usuario.nmUsuario = this.formUsuario.value.nmUsuario;
+    usuario.senha = this.formUsuario.value.senha;
+
+    this.usuarioService.cadastrarUsuario(usuario, this.imagemSelecionada).subscribe({
       next: async () => {
-        console.log("Sucesso");
         await this.exibirMensagem('Cadastro realizado com sucesso!');
         this.router.navigate(['/login']);
       },
       error: async (erro: any) => {
-        console.error("Erro ao cadastrar usuário: ", erro);
-        await this.exibirMensagem('Erro ao cadastrar usuário!');
+        this.salvando = false;
+        console.error('Erro ao cadastrar usuário: ', erro);
+        await this.exibirMensagem(erro.error?.message || 'Erro ao cadastrar usuário!');
       }
     });
-
   }
-
 
   async selecionarImagem() {
     const actionSheet = await this.actionSheetController.create({
@@ -164,10 +251,7 @@ export class UsuarioCadastroPage implements OnInit {
       return;
     }
 
-    const tiposPermitidos = [
-      'image/jpeg',
-      'image/png'
-    ];
+    const tiposPermitidos = ['image/jpeg', 'image/png'];
 
     if (!tiposPermitidos.includes(arquivo.type)) {
       await this.exibirMensagem('Selecione apenas imagens JPG, JPEG ou PNG.');
@@ -186,13 +270,12 @@ export class UsuarioCadastroPage implements OnInit {
   }
 
   async exibirMensagem(texto: string) {
-    const toast =
-      await this.toastController.create({
+    const toast = await this.toastController.create({
+      message: texto,
+      duration: 2000,
+      position: 'top'
+    });
 
-        message: texto,
-        duration: 2000
-
-      });
-    toast.present();
+    await toast.present();
   }
 }

@@ -163,9 +163,8 @@ export class TelaInicialPage implements OnInit {
   carregarComunidadesProximas() {
     const usuario = this.usuarioService.getUsuarioSessao();
 
-    //penso em criar um endPoint get possui CEP, que retorna true ou false
-    //e se for false, exibir a mensagem de erro antes de tentar buscar a lista.
-    this.usuarioService.verificarCEP(usuario.cep).subscribe({
+    // O backend valida CEP por ID do usuário autenticado.
+    this.usuarioService.verificarCEP(usuario.cdUsuario).subscribe({
       next: (possuiCep: boolean) => {
         if (possuiCep) {
 
@@ -183,21 +182,27 @@ export class TelaInicialPage implements OnInit {
 
         } else {
 
-          this.buscarPorProximidade = false;
-          localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
-          this.exibirMensagem("Erro!! O usuário não possui CEP cadastrado.");
-          
-          this.carregarTodasComunidades();
-
+          this.casoDeErro();
           return;
         }
       },
       error: (erro: any) => {
-        console.error('Erro ao verificar CEP:', erro);
+        console.error('Erro ao verificar CEP: ', erro);
+        this.casoDeErro();
+        return;
       }
     });
 
   }
+
+  private casoDeErro() {
+    this.buscarPorProximidade = false;
+    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
+    this.exibirMensagem("Erro!! O usuário não possui CEP cadastrado.");
+
+    this.carregarTodasComunidades();
+  }
+
 
   carregarAnunciosRecomendados() {
     this.carregandoAnuncios = true;
@@ -209,8 +214,8 @@ export class TelaInicialPage implements OnInit {
           .slice(0, 5);
         this.carregandoAnuncios = false;
       },
-      error: () => {
-        console.log('Erro ao carregar anúncios recomendados.');
+      error: (erro: any) => {
+        console.error('Erro ao carregar anúncios recomendados.', erro);
         this.carregandoAnuncios = false;
       }
     });
@@ -220,7 +225,7 @@ export class TelaInicialPage implements OnInit {
     const toast =
       await this.toastController.create({
         message: texto,
-        duration: 2000
+        duration: 3000
       });
     toast.present();
   }

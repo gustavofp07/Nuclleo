@@ -60,16 +60,27 @@ export class UsuarioService {
     return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`);
   }
 
+  /*
   verificarEmailExistente(email: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.API_URL}/verificar-email?email=${encodeURIComponent(email)}`);
   }
+    */
 
-  verificarCPF(cpf: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.API_URL}/verificar-cpf?cpf=${encodeURIComponent(cpf)}`);
+  verificarEmail(email: string,cdUsuario: number | null) {
+    const dados = {
+      email: email,
+      cdUsuario: cdUsuario
+    };
+
+    return this.http.post<boolean>(`${this.API_URL}/verificar-email`, dados);
   }
 
-  verificarCEP(cep: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.API_URL}/verificar-cep?cep=${encodeURIComponent(cep)}`);
+  verificarCPF(cdUsuario: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cpf`);
+  }
+
+  verificarCEP(cdUsuario: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`);
   }
 
 

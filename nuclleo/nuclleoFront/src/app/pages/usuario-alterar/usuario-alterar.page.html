@@ -5,9 +5,7 @@
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
-
       <ion-title>Alterar perfil</ion-title>
-
     </ion-toolbar>
   </ion-header>
 
@@ -15,87 +13,93 @@
 
     <!-- TOPO -->
     <div class="topo">
-
       <ion-button fill="clear" class="btn-voltar" (click)="cancelar()">
-
         <ion-icon name="chevron-back-outline"></ion-icon>
-
       </ion-button>
-
       <h2>Editar perfil</h2>
-
     </div>
 
     <!-- FORM -->
-    <form (ngSubmit)="confirmarAlteracoes()">
+    <form [formGroup]="formUsuario" (ngSubmit)="confirmarAlteracoes()">
 
       <!-- FOTO -->
       <div class="foto-box" (click)="selecionarImagem()">
-
         <div class="foto-circle">
           <img [src]="previewFoto || usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="imagem"
             [class.placeholder]="!previewFoto && !usuario.ftUsuario">
         </div>
-
         <div class="camera-badge">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
-
       </div>
       <p class="foto-label">Alterar foto</p>
+
+      <!-- EMAIL -->
+      <div class="campo-label">
+        <label>E-mail</label>
+      </div>
+      <ion-item lines="none" class="input-item">
+        <ion-input type="email" placeholder="E-mail" formControlName="email" (ionBlur)="verificarEmail()"></ion-input>
+      </ion-item>
+
+      <p class="mensagem-erro"
+        *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.hasError('required')">
+        Informe o e-mail.
+      </p>
+      <p class="mensagem-erro" *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.hasError('email')">
+        Informe um e-mail válido.
+      </p>
+      <p class="mensagem-erro"
+        *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.hasError('emailExistente')">
+        Este e-mail já está cadastrado.
+      </p>
 
       <!-- NOME -->
       <div class="campo-label">
         <label>Nome</label>
       </div>
-
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Nome" [(ngModel)]="usuario.nmUsuario" name="nmUsuario">
-        </ion-input>
+        <ion-input placeholder="Nome" formControlName="nmUsuario"></ion-input>
       </ion-item>
 
       <!-- CPF -->
       <div class="campo-label">
         <label>CPF</label>
       </div>
-
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="CPF" [(ngModel)]="usuario.cpf" name="cpf">
-        </ion-input>
+        <ion-input placeholder="CPF" formControlName="cpf"></ion-input>
       </ion-item>
 
       <!-- CEP -->
       <div class="campo-label">
         <label>CEP</label>
       </div>
-
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="00000-000" [(ngModel)]="usuario.cep" name="cep" maxlength="9" inputmode="numeric">
-        </ion-input>
+        <ion-input placeholder="00000-000" formControlName="cep" maxlength="9" inputmode="numeric"></ion-input>
       </ion-item>
 
       <!-- TELEFONE -->
       <div class="campo-label">
         <label>Telefone</label>
       </div>
-
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Telefone" [(ngModel)]="usuario.telefone" name="telefone">
-        </ion-input>
+        <ion-input placeholder="Telefone" formControlName="telefone"></ion-input>
       </ion-item>
-      
-      <!-- SENHA -->
-<div class="campo-label">
-  <label>Senha</label>
-</div>
 
-<ion-button expand="block" fill="outline" class="btn-alterar-senha" type="button" (click)="abrirAlterarSenha()">
-  Alterar senha
-</ion-button>
+      <!-- SENHA -->
+      <div class="campo-label">
+        <label>Senha</label>
+      </div>
+      <ion-button expand="block" fill="outline" class="btn-alterar-senha" type="button" (click)="abrirAlterarSenha()">
+        Alterar senha
+      </ion-button>
 
       <!-- BOTÕES -->
       <div class="acoes">
-        <ion-button expand="block" class="btn-salvar" type="submit">Salvar alterações</ion-button>
+        <ion-button expand="block" class="btn-salvar" type="submit"
+          [disabled]="formUsuario.invalid || verificandoEmail || salvando">
+          {{ salvando ? 'Salvando...' : verificandoEmail ? 'Verificando e-mail...' : 'Salvar alterações' }}
+        </ion-button>
       </div>
 
     </form>
