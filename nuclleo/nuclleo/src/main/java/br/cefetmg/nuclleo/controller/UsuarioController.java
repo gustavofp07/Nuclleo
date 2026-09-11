@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.services.UsuarioService;
@@ -34,16 +35,10 @@ public class UsuarioController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar usuário")
-    public ResponseEntity<Usuario> inserir(@Valid @RequestPart("usuario") Usuario dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
-
+    public ResponseEntity<Usuario> inserir(@Valid @RequestPart("usuario") UsuarioRequestDTO dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
         if (dto == null) {
             throw new BadRequestException("Usuário é obrigatório");
         }
-
-        if (dto.getCdUsuario() == 0) {// gambiarra. Tem q tirar isso
-            dto.setCdUsuario(null);
-        }
-
 
         Usuario objUsuario = usuarioService.inserir(dto, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objUsuario);

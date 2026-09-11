@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.dto.ComunidadeRequestDTO;
 import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
@@ -48,12 +49,16 @@ public class ComunidadeService {
     private ViaCepService viaCepService;
 
     @Transactional
-    public Comunidade inserir(Comunidade comunidade, MultipartFile foto) {
+    public Comunidade inserir(ComunidadeRequestDTO dto, MultipartFile foto) {
+        Comunidade comunidade = new Comunidade();
+        comunidade.setNmComunidade(dto.getNmComunidade());
+        comunidade.setDescricao(dto.getDescricao());
+        comunidade.setCep(dto.getCep());
+
         comunidade.setDtCriacao(new java.sql.Date(System.currentTimeMillis()));
 
         // Valida o CEP e busca cidade/UF no ViaCEP
         ViaCepResponseDTO endereco = viaCepService.buscarCep(comunidade.getCep());
-
         String cepLimpo = comunidade.getCep().replaceAll("\\D", "");
 
         comunidade.setCep(cepLimpo);

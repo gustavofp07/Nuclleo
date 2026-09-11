@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.ComunidadeRequestDTO;
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.services.ComunidadeService;
@@ -33,29 +34,11 @@ public class ComunidadeController {
     @Autowired
     private ComunidadeService comunidadeService;
 
-    /*
-     * private final ComunidadeRepository repository;
-     * private final AnuncioComunidadeRepository anuncioComunidadeRepository;
-     * private final UsuarioComunidadeRepository usuarioComunidadeRepository;
-     * 
-     * ComunidadeController(
-     * ComunidadeRepository repository,
-     * AnuncioComunidadeRepository anuncioComunidadeRepository,
-     * UsuarioComunidadeRepository usuarioComunidadeRepository) {
-     * this.repository = repository;
-     * this.anuncioComunidadeRepository = anuncioComunidadeRepository;
-     * this.usuarioComunidadeRepository = usuarioComunidadeRepository;
-     * }
-     */
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar comunidade")
-    public ResponseEntity<Comunidade> inserir(
-            @Valid @RequestPart("comunidade") Comunidade comunidade,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
-        comunidade.setCdComunidade(null); // gambiarra
+    public ResponseEntity<Comunidade> inserir(@Valid @RequestPart("comunidade") ComunidadeRequestDTO dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
-        Comunidade objComunidade = comunidadeService.inserir(comunidade, foto);
+        Comunidade objComunidade = comunidadeService.inserir(dto, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objComunidade);
     }
 

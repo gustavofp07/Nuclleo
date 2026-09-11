@@ -80,7 +80,7 @@
 
         <div class="info-item">
           <ion-icon name="location-outline"></ion-icon>
-          <span>Coronel Fabriciano, MG [PLACEHOLDER]</span>
+          <span>{{ usuario.cidade }}, {{ usuario.uf }}</span>
         </div>
 
         <div class="info-item info-item-clicavel" *ngIf="ehPerfilProprio" routerLink="/transacoes">

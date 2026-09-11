@@ -18,39 +18,52 @@
   <div class="container">
 
     <div class="topo">
-      <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
+      <h1>
+        {{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}
+      </h1>
     </div>
 
-    <form (ngSubmit)="salvarComunidade()">
+    <form [formGroup]="formComunidade" (ngSubmit)="salvarComunidade()">
 
+      <!-- FOTO -->
       <div class="campo-label campo-label--foto">
         <label>Imagem da comunidade</label>
       </div>
 
       <div class="foto-box" (click)="selecionarImagem()">
-        <img [src]="previewFoto || comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
+
+        <img [src]="previewFoto || fotoAtual || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
+
       </div>
 
       <hr>
+
+
       <!-- NOME -->
       <div class="campo-label">
         <label>Nome da comunidade</label>
       </div>
+
       <ion-item lines="none" class="input-item">
 
-        <ion-input placeholder="Nome da comunidade" [(ngModel)]="comunidade.nmComunidade" name="nmComunidade">
+        <ion-input placeholder="Nome da comunidade" formControlName="nmComunidade">
         </ion-input>
 
       </ion-item>
+
 
       <!-- DESCRIÇÃO -->
       <div class="campo-label">
         <label>Descrição</label>
       </div>
+
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="Descrição" [(ngModel)]="comunidade.descricao" name="descricao">
+
+        <ion-input placeholder="Descrição" formControlName="descricao">
         </ion-input>
+
       </ion-item>
+
 
       <!-- CEP -->
       <div class="campo-label">
@@ -58,17 +71,24 @@
       </div>
 
       <ion-item lines="none" class="input-item">
-        <ion-input placeholder="00000-000" [(ngModel)]="comunidade.cep" name="cep" maxlength="9" inputmode="numeric">
+
+        <ion-input placeholder="00000-000" formControlName="cep" maxlength="9" inputmode="numeric">
         </ion-input>
+
       </ion-item>
 
+
       <!-- BOTÃO -->
-      <ion-button expand="block" type="submit" class="btn-criar" [disabled]="salvando">
-        {{ salvando
+      <ion-button expand="block" type="submit" class="btn-criar" [disabled]="formComunidade.invalid || salvando">
+
+        {{
+        salvando
         ? 'Salvando...'
         : modoEdicao
         ? 'Salvar alterações'
-        : 'Criar comunidade' }}
+        : 'Criar comunidade'
+        }}
+
       </ion-button>
 
     </form>

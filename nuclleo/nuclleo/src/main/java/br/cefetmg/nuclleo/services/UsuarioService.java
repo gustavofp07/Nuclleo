@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.DatabaseException;
@@ -27,16 +28,14 @@ public class UsuarioService {
     private ViaCepService viaCepService;
 
     @Transactional
-    public Usuario inserir(Usuario usuario, MultipartFile foto) {
+    public Usuario inserir(UsuarioRequestDTO dto, MultipartFile foto) {
+        Usuario usuario = new Usuario();
+        usuario.setNmUsuario(dto.getNmUsuario());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(dto.getSenha());
+
         usuario.setAtivo(true);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
-
-        ViaCepResponseDTO endereco = viaCepService.buscarCep(usuario.getCep());
-        String cepLimpo = usuario.getCep().replaceAll("\\D", "");
-
-        usuario.setCep(cepLimpo);
-        usuario.setCidade(endereco.getLocalidade());
-        usuario.setUf(endereco.getUf());
 
         if (foto != null && !foto.isEmpty()) {
             try {

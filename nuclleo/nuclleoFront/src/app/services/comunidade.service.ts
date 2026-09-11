@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ComunidadeModel } from '../model/comunidade.model';
+import { ComunidadeCadastroDTOModel } from '../model/comunidade-cadastro-dto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,21 +11,47 @@ import { ComunidadeModel } from '../model/comunidade.model';
 export class ComunidadeService {
 
   private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/comunidades';
-  //private api = 'http://localhost:8080/api/v1/comunidades';
 
   constructor(
     private http: HttpClient
   ) { }
 
-  cadastrarComunidade(comunidade: ComunidadeModel, foto?: File): Observable<ComunidadeModel> {
-    return this.http.post<ComunidadeModel>(this.API_URL, this.montarFormData(comunidade, foto));
+  cadastrarComunidade(comunidade: ComunidadeCadastroDTOModel, foto?: File): Observable<ComunidadeModel> {
+    const formData = new FormData();
+
+    const comunidadeBlob = new Blob(
+      [JSON.stringify(comunidade)],
+      { type: 'application/json' }
+    );
+
+    formData.append('comunidade', comunidadeBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return this.http.post<ComunidadeModel>(this.API_URL, formData);
   }
 
   atualizarComunidade(comunidade: ComunidadeModel, foto?: File): Observable<ComunidadeModel> {
-    return this.http.put<ComunidadeModel>(`${this.API_URL}/${comunidade.cdComunidade}`, this.montarFormData(comunidade, foto));
+    const formData = new FormData();
+
+    const comunidadeBlob = new Blob(
+      [JSON.stringify(comunidade)],
+      { type: 'application/json' }
+    );
+
+    formData.append('comunidade', comunidadeBlob);
+
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return this.http.put<ComunidadeModel>(`${this.API_URL}/${comunidade.cdComunidade}`, formData);
   }
 
-  private montarFormData(comunidade: ComunidadeModel, foto?: File): FormData {
+  /*
+  private montarFormData(comunidade: ComunidadeCadastroDTOModel, foto?: File): FormData {
     const formData = new FormData();
 
     const comunidadeBlob = new Blob(
@@ -40,6 +67,7 @@ export class ComunidadeService {
 
     return formData;
   }
+    */
 
   //listar todas. Tirar depois
   listarComunidades(): Observable<ComunidadeModel[]> {

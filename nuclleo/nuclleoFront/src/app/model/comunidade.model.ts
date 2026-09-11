@@ -24,5 +24,4 @@ export class ComunidadeModel {
         this.cidade = '';
         this.uf = '';
     }
-
 }

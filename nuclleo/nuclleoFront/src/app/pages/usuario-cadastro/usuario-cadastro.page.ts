@@ -32,6 +32,7 @@ import {
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
+import { UsuarioCadastroDTOModel } from 'src/app/model/usuario-cadastro-dto.model';
 
 
 @Component({
@@ -54,7 +55,8 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
 
 export class UsuarioCadastroPage implements OnInit {
 
-  usuario: UsuarioModel;
+  usuario: UsuarioCadastroDTOModel;
+
   confirmarSenha: string = '';
   showPassword: boolean = false;
 
@@ -72,7 +74,7 @@ export class UsuarioCadastroPage implements OnInit {
     private actionSheetController: ActionSheetController
   ) {
 
-    this.usuario = new UsuarioModel();
+    this.usuario = new UsuarioCadastroDTOModel();
 
     addIcons({
       eyeOutline,
@@ -83,10 +85,14 @@ export class UsuarioCadastroPage implements OnInit {
 
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.usuario = new UsuarioCadastroDTOModel();
+    this.confirmarSenha = "";
+    this.showPassword = false;
+  }
 
   ionViewWillEnter() {
-    this.usuario = new UsuarioModel();
+    this.usuario = new UsuarioCadastroDTOModel();
     this.confirmarSenha = "";
     this.showPassword = false;
   }
@@ -102,45 +108,27 @@ export class UsuarioCadastroPage implements OnInit {
 
   async salvar() {
 
-    if (
-      !this.usuario.email ||
-      !this.usuario.nmUsuario ||
-      !this.usuario.senha
-    ) {
-
-      this.exibirMensagem(
-        'Preencha todos os campos!'
-      );
+    if (!this.usuario.email || !this.usuario.nmUsuario || !this.usuario.senha) {
+      this.exibirMensagem('Preencha todos os campos!');
       return;
     }
 
     if (this.usuario.senha !== this.confirmarSenha) {
-
-      this.exibirMensagem(
-        'As senhas não coincidem!'
-      );
+      this.exibirMensagem('As senhas não coincidem!');
       return;
     }
 
-    this.usuarioService.cadastrarUsuario(this.usuario, this.imagemSelecionada
-      ).subscribe({
-
-        next: async () => {
-          console.log("Sucesso");
-          await this.exibirMensagem(
-            'Cadastro realizado com sucesso!'
-          );
-
-          this.router.navigate(['/login']);
-        },
-        error: async (err) => {
-          console.log("Erro");
-          console.error(err);
-          await this.exibirMensagem(
-            'Erro ao cadastrar usuário!'
-          );
-        }
-      });
+    this.usuarioService.cadastrarUsuario(this.usuario, this.imagemSelecionada).subscribe({
+      next: async () => {
+        console.log("Sucesso");
+        await this.exibirMensagem('Cadastro realizado com sucesso!');
+        this.router.navigate(['/login']);
+      },
+      error: async (erro: any) => {
+        console.error("Erro ao cadastrar usuário: ", erro);
+        await this.exibirMensagem('Erro ao cadastrar usuário!');
+      }
+    });
 
   }
 

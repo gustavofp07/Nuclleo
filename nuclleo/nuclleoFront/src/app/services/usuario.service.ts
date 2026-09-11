@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { UsuarioModel } from '../model/usuario.model';
 import { Observable } from 'rxjs';
 import { UsuarioAutenticadoModel } from '../model/usuario-autenticado.model';
+import { UsuarioCadastroDTOModel } from '../model/usuario-cadastro-dto.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class UsuarioService {
   }
   constructor(private http: HttpClient) { }
 
-  cadastrarUsuario(usuario: UsuarioModel, foto?: File): Observable<UsuarioModel> {
+  cadastrarUsuario(usuario: UsuarioCadastroDTOModel, foto?: File): Observable<UsuarioModel> {
     const formData = new FormData();
 
     const usuarioBlob = new Blob(
