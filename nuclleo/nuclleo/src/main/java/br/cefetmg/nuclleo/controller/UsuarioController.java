@@ -88,9 +88,9 @@ public class UsuarioController {
         // return this.repository.findById(cdUsuario).orElse(null);
     }
 
-    @GetMapping("/verificar-email")
+    @PostMapping("/verificar-email")
     @Operation(summary = "Verificar se email já está cadastrado")
-    public ResponseEntity<Boolean> verificarEmail(@RequestBody VerificarEmailRequestDTO dto) {
+    public ResponseEntity<Boolean> verificarEmail(@Valid @RequestBody VerificarEmailRequestDTO dto) {
 
         boolean existe = usuarioService.verificarEmail(
                 dto.getEmail(),
