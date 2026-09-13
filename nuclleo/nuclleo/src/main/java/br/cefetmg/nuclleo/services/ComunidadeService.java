@@ -150,9 +150,20 @@ public class ComunidadeService {
         return comunidade;
     }
 
+    /*
+     * @Transactional(readOnly = true)
+     * public List<Comunidade> listar() {
+     * return comunidadeRepository.findAll();
+     * }
+     */
     @Transactional(readOnly = true)
-    public List<Comunidade> listar() {
-        return comunidadeRepository.findAll();
+    public List<Comunidade> listar(String termo) {
+        if (termo == null || termo.isBlank()) {
+            return comunidadeRepository.findAll();
+        }
+
+        return comunidadeRepository
+                .findByNmComunidadeContainingIgnoreCaseOrDescricaoContainingIgnoreCase(termo, termo);
     }
 
     @Transactional(readOnly = true)
@@ -166,9 +177,8 @@ public class ComunidadeService {
         return comunidadeRepository.findByUsuarioCria_CdUsuario(cdUsuario);
     }
 
-
-
-    public List<Comunidade> listarComunidadesProximas(Long cdUsuario) {
+    @Transactional(readOnly = true)
+    public List<Comunidade> listarComunidadesProximas(Long cdUsuario, String termo) {
 
         Usuario usuario = usuarioRepository.findById(cdUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
@@ -182,8 +192,14 @@ public class ComunidadeService {
         // pega o primeiro dígito do CEP.
         String regiao = cepUsuario.substring(0, 1);
 
-        // Busca somente comunidades da mesma grande região, olhando o primeiro dígito do CEP.
+        // Busca somente comunidades da mesma grande região, olhando o primeiro dígito
+        // do CEP.
         List<Comunidade> comunidades = comunidadeRepository.findByCepStartingWith(regiao);
+
+        if (termo != null && !termo.isBlank()) {
+            comunidades.removeIf(comunidade -> !comunidade.getNmComunidade().toLowerCase().contains(termo.toLowerCase())
+                    && !comunidade.getDescricao().toLowerCase().contains(termo.toLowerCase()));
+        }
 
         ordenarPorProximidade(comunidades, cepUsuario);
 

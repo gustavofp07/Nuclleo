@@ -9,9 +9,12 @@ import br.cefetmg.nuclleo.model.Comunidade;
 
 @Repository
 public interface ComunidadeRepository
-extends JpaRepository<Comunidade, Long> {
+        extends JpaRepository<Comunidade, Long> {
 
-    List<Comunidade>findByUsuarioCria_CdUsuario(Long cdUsuario);
+    List<Comunidade> findByUsuarioCria_CdUsuario(Long cdUsuario);
 
     List<Comunidade> findByCepStartingWith(String inicioCep);
+
+    List<Comunidade> findByNmComunidadeContainingIgnoreCaseOrDescricaoContainingIgnoreCase(String nmComunidade,
+            String descricao);
 }

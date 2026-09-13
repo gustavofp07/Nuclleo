@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +37,8 @@ public class ComunidadeController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar comunidade")
-    public ResponseEntity<Comunidade> inserir(@Valid @RequestPart("comunidade") ComunidadeRequestDTO dto, @RequestPart(value = "foto", required = false) MultipartFile foto) {
+    public ResponseEntity<Comunidade> inserir(@Valid @RequestPart("comunidade") ComunidadeRequestDTO dto,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
 
         Comunidade objComunidade = comunidadeService.inserir(dto, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objComunidade);
@@ -65,10 +67,8 @@ public class ComunidadeController {
     }
 
     @GetMapping("")
-    @Operation(summary = "Listar comunidades")
-    public ResponseEntity<List<Comunidade>> getComunidades() {
-        List<Comunidade> comunidades = comunidadeService.listar();
-        return ResponseEntity.ok(comunidades);
+    public ResponseEntity<List<Comunidade>> listar(@RequestParam(required = false) String termo) {
+        return ResponseEntity.ok(comunidadeService.listar(termo));
     }
 
     @GetMapping("/{cdComunidade}") // http://localhost:8080/api/v1/comunidades/cdComunidade
@@ -93,12 +93,24 @@ public class ComunidadeController {
         return ResponseEntity.ok(comunidades);
     }
 
+    /*
+     * @GetMapping("/proximas/{cdUsuario}")
+     * 
+     * @Operation(summary = "Listar comunidades próximas ao usuário")
+     * public ResponseEntity<List<Comunidade>>
+     * listarComunidadesProximas(@PathVariable Long cdUsuario) {
+     * 
+     * List<Comunidade> comunidades =
+     * comunidadeService.listarComunidadesProximas(cdUsuario);
+     * 
+     * return ResponseEntity.ok(comunidades);
+     * }
+     */
     @GetMapping("/proximas/{cdUsuario}")
-    @Operation(summary = "Listar comunidades próximas ao usuário")
-    public ResponseEntity<List<Comunidade>> listarComunidadesProximas(@PathVariable Long cdUsuario) {
+    public ResponseEntity<List<Comunidade>> listarComunidadesProximas(
+            @PathVariable Long cdUsuario,
+            @RequestParam(required = false) String termo) {
 
-        List<Comunidade> comunidades = comunidadeService.listarComunidadesProximas(cdUsuario);
-
-        return ResponseEntity.ok(comunidades);
+        return ResponseEntity.ok(comunidadeService.listarComunidadesProximas(cdUsuario, termo));
     }
 }
