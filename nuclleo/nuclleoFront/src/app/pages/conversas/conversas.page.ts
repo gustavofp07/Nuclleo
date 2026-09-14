@@ -58,6 +58,14 @@ export class ConversasPage implements OnInit {
   conversas: ConversaView[] = [];
   carregando: boolean = false;
 
+  get solicitacoes(): ConversaView[] {
+    return this.conversas.filter(c => !c.aceito && !c.finalizado);
+  }
+
+  get conversasAtivas(): ConversaView[] {
+    return this.conversas.filter(c => c.aceito || c.finalizado);
+  }
+
   constructor(
     private interesseService: InteresseService,
     private usuarioService: UsuarioService,

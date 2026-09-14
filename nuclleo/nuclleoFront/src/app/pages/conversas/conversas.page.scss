@@ -222,3 +222,28 @@
   --border-radius: 10px;
   margin: 0;
 }
+
+.secao-solicitacoes {
+  margin-bottom: 24px;
+}
+
+.secao-conversas .lista-conversas {
+  margin-top: 0;
+}
+
+.titulo-secao {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  margin: 0 0 12px 4px;
+}
+
+.divisoria {
+  height: 1px;
+  background: #e5e7eb;
+
+  margin: 24px 0;
+}

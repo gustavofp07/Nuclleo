@@ -365,7 +365,7 @@ export class ChatPage implements OnInit, OnDestroy {
     }).subscribe({
       next: () => {
         this.exibirMensagem('Conversa finalizada com sucesso.');
-        this.router.navigate(['/interesse-meus']);
+        this.router.navigate(['/conversas']);
       },
       error: (err) => {
         this.exibirMensagem(err?.error?.message || 'Erro ao finalizar a conversa.');
@@ -403,7 +403,7 @@ export class ChatPage implements OnInit, OnDestroy {
     }).subscribe({
       next: () => {
         this.exibirMensagem('Avaliação enviada. Obrigado!');
-        this.router.navigate(['/interesse-meus']);
+        this.router.navigate(['/conversas']);
       },
       error: (err) => {
         this.exibirMensagem(err?.error?.message || 'Erro ao enviar avaliação.');
