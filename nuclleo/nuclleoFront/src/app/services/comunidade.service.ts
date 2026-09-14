@@ -69,13 +69,38 @@ export class ComunidadeService {
   }
     */
 
-  //listar todas. Tirar depois
+  /*
   listarComunidades(): Observable<ComunidadeModel[]> {
     return this.http.get<ComunidadeModel[]>(this.API_URL);
   }
 
   listarComunidadesProximas(cdUsuario: number): Observable<ComunidadeModel[]> {
     return this.http.get<ComunidadeModel[]>(`${this.API_URL}/proximas/${cdUsuario}`);
+  }
+    */
+
+  //.trim() remove espaços desnecessários do começo e do final.
+  //encodeURIComponent() prepara o termo para ser usado em uma URL, codificando caracteres especiais.
+  listarComunidades(termo?: string): Observable<ComunidadeModel[]> {
+    let url: string;
+    if (termo && termo.trim()) {
+      url = `${this.API_URL}?termo=${encodeURIComponent(termo.trim())}`;
+    } else {
+      url = this.API_URL;
+    }
+
+    return this.http.get<ComunidadeModel[]>(url);
+  }
+
+  listarComunidadesProximas(cdUsuario: number, termo?: string): Observable<ComunidadeModel[]> {
+    let url: string;
+    if (termo && termo.trim()) {
+      url = `${this.API_URL}/proximas/${cdUsuario}?termo=${encodeURIComponent(termo.trim())}`;
+    } else {
+      url = `${this.API_URL}/proximas/${cdUsuario}`;
+    }
+
+    return this.http.get<ComunidadeModel[]>(url);
   }
 
   listarComunidadesDoUsuario(cdUsuario: number): Observable<ComunidadeModel[]> {

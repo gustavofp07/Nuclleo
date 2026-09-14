@@ -293,3 +293,13 @@ ion-searchbar {
   --handle-background: #ffffff;
   --handle-background-checked: #7d17f1;
 }
+
+ion-searchbar {
+  --background: #ffffff;
+  --border-radius: 14px;
+  --box-shadow: none;
+  --color: #111827; // ← ADICIONA ESSA LINHA
+
+  padding: 0;
+  margin-bottom: 12px;
+}
