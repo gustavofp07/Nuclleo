@@ -21,6 +21,7 @@ export class ChatService {
   private mensagemRecebida = new Subject<MensagemModel>();
   private statusConexao = new Subject<boolean>();
   private digitandoEvento = new Subject<DigitandoEvento>();
+  private conversaFinalizada = new Subject<void>(); // <-- ADICIONADO
 
   constructor(private http: HttpClient) {}
 
@@ -46,6 +47,11 @@ export class ChatService {
         this.client!.subscribe(`/topic/chat/${cdInteresse}/digitando`, (msg: IMessage) => {
           const evento: DigitandoEvento = JSON.parse(msg.body);
           this.digitandoEvento.next(evento);
+        });
+
+        // <-- ADICIONADO: escuta o evento de a conversa ter sido finalizada
+        this.client!.subscribe(`/topic/chat/${cdInteresse}/finalizado`, (msg: IMessage) => {
+          this.conversaFinalizada.next();
         });
       },
       onDisconnect: () => {
@@ -91,6 +97,10 @@ export class ChatService {
 
   onDigitando(): Observable<DigitandoEvento> {
     return this.digitandoEvento.asObservable();
+  }
+
+  onConversaFinalizada(): Observable<void> { // <-- ADICIONADO
+    return this.conversaFinalizada.asObservable();
   }
 
   desconectar() {

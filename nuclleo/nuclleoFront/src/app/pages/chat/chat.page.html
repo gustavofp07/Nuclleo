@@ -17,12 +17,13 @@
             {{ conectado ? 'Online' : 'Conectando...' }}
           </span>
         </div>
-    </div>
+      </div>
     </div>
 
     <ion-buttons slot="end" *ngIf="souAnunciante && !chatFinalizado">
-      <ion-button (click)="abrirFinalizarConversa()">
-        <ion-icon name="flag-outline" slot="icon-only"></ion-icon>
+      <ion-button (click)="abrirFinalizarConversa()" class="btn-finalizar">
+        <ion-icon name="flag-outline" slot="start"></ion-icon>
+        Finalizar conversa
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

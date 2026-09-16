@@ -209,6 +209,22 @@ export class ChatPage implements OnInit, OnDestroy {
         }
       });
     });
+
+    this.chatService.onConversaFinalizada().subscribe(() => {
+      this.ngZone.run(() => {
+        if (this.chatFinalizado) {
+          return; // já sabia (fui eu quem finalizou, por exemplo)
+        }
+
+        this.chatFinalizado = true;
+
+        if (!this.souAnunciante) {
+          this.solicitarAvaliacaoAnunciante();
+        } else {
+          this.aguardandoAvaliacaoOutro = true;
+        }
+      });
+    });
   }
 
   carregarHistorico() {
@@ -281,7 +297,29 @@ export class ChatPage implements OnInit, OnDestroy {
     }, 100);
   }
 
+  // <-- MUDOU: agora só confirma a intenção de finalizar
   async abrirFinalizarConversa() {
+    const alert = await this.alertController.create({
+      header: 'Finalizar conversa',
+      message: 'Deseja mesmo finalizar a conversa?',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Finalizar',
+          handler: () => this.abrirPerguntaTransacao()
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // <-- ADICIONADO: só pergunta sobre a transação depois da confirmação
+  async abrirPerguntaTransacao() {
     const alert = await this.alertController.create({
       header: 'Finalizar conversa',
       message: 'Ocorreu uma transação com este usuário?',
