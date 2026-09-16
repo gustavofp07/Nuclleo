@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   IonContent,
@@ -25,7 +24,14 @@ import { addIcons } from 'ionicons';
 import { cameraOutline, imageOutline } from 'ionicons/icons';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { AnuncioService } from 'src/app/services/anuncio.service';
@@ -45,7 +51,7 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
 
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
 
     IonContent,
     IonInput,
@@ -65,9 +71,11 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
 })
 export class CriarAnuncioPage {
   anuncio!: AnuncioModel;
+  formAnuncio!: FormGroup;
 
   tipo = '';
   limiteDescricao: number = 250;
+  limiteTitulo: number = 80;
 
   usuarioEhDono: boolean = false;
 
@@ -82,6 +90,7 @@ export class CriarAnuncioPage {
   imagemSelecionada?: File;
 
   constructor(
+    private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
     private usuarioService: UsuarioService,
@@ -98,9 +107,6 @@ export class CriarAnuncioPage {
       imageOutline
     });
 
-    //this.anuncioVenda = new AnuncioVendaModel();
-    //this.anuncioRequerimento = new AnuncioRequerimentoModel();
-
     this.comunidades = [];
     this.comunidadesSelecionadas = [];
   }
@@ -116,12 +122,55 @@ export class CriarAnuncioPage {
       this.anuncio = new AnuncioRequerimentoModel();
     }
 
+    this.montarFormulario();
+
     if (this.cdAnuncioEdicao > 0) {
       this.modoEdicao = true;
       this.carregarAnuncioParaEditar();
     }
 
     this.carregarComunidadesUsuario();
+  }
+
+  montarFormulario() {
+
+    if (this.tipo === 'VENDA') {
+
+      this.formAnuncio = this.formBuilder.group({
+        nmAnuncio: ['', Validators.compose([Validators.required, Validators.maxLength(this.limiteTitulo)])],
+        descricao: ['', Validators.compose([Validators.required, Validators.maxLength(this.limiteDescricao)])],
+        valor: ['', Validators.compose([Validators.required, Validators.min(0.01), Validators.max(1000000)])]
+      });
+
+    } else {
+
+      this.formAnuncio = this.formBuilder.group(
+        {
+          nmAnuncio: ['', Validators.compose([Validators.required, Validators.maxLength(this.limiteTitulo)])],
+          descricao: ['', Validators.compose([Validators.required, Validators.maxLength(this.limiteDescricao)])],
+          valorMin: ['', Validators.compose([Validators.required, Validators.min(0.01), Validators.max(1000000)])],
+          valorMax: ['', Validators.compose([Validators.required, Validators.min(0.01), Validators.max(1000000)])]
+        },
+        {
+          validators: this.validarFaixaValores
+        }
+      );
+    }
+  }
+
+  validarFaixaValores(control: AbstractControl): ValidationErrors | null {
+    const valorMin = control.get('valorMin')?.value;
+    const valorMax = control.get('valorMax')?.value;
+
+    if (!valorMin || !valorMax) {
+      return null;
+    }
+
+    if (Number(valorMax) <= Number(valorMin)) {
+      return { faixaInvalida: true };
+    }
+
+    return null;
   }
 
   ionViewWillEnter() {
@@ -136,7 +185,6 @@ export class CriarAnuncioPage {
 
     this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
       next: (relacoes) => {
-        //olhar o funcionamento desse retorno aqui
         this.comunidades = relacoes.map(relacao => relacao.comunidade);
       },
       error: () => {
@@ -218,6 +266,22 @@ export class CriarAnuncioPage {
 
     if (this.salvando) {
       return;
+    }
+
+    if (this.formAnuncio.invalid) {
+      this.formAnuncio.markAllAsTouched();
+      this.exibirMensagem('Preencha os campos corretamente.');
+      return;
+    }
+
+    this.anuncio.nmAnuncio = this.formAnuncio.value.nmAnuncio;
+    this.anuncio.descricao = this.formAnuncio.value.descricao;
+
+    if (this.tipo === 'VENDA') {
+      (this.anuncio as AnuncioVendaModel).valor = this.formAnuncio.value.valor;
+    } else {
+      (this.anuncio as AnuncioRequerimentoModel).valorMin = this.formAnuncio.value.valorMin;
+      (this.anuncio as AnuncioRequerimentoModel).valorMax = this.formAnuncio.value.valorMax;
     }
 
     this.salvando = true;
@@ -304,7 +368,7 @@ export class CriarAnuncioPage {
         this.router.navigate(['/anuncio-tela', this.anuncio.cdAnuncio]);
       },
       error: () => {
-        this.salvando = false;   // <-- NOVO
+        this.salvando = false;
         this.exibirMensagem(
           'Anúncio alterado, mas erro ao publicar nas comunidades.'
         );
@@ -314,32 +378,17 @@ export class CriarAnuncioPage {
 
   cadastrarVenda() {
     this.anuncio.tipoAnuncio = 'VENDA';
-
-    //nessa pagina é melhor criar um usuario e ficar chamando ele
     this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
-
-    //console.log(this.anuncio);
 
     this.anuncioService.cadastrarVenda(
       this.anuncio as AnuncioVendaModel,
       this.imagemSelecionada
     ).subscribe({
       next: (anuncioSalvo: AnuncioVendaModel) => {
-        //this.exibirMensagem('Anúncio criado com sucesso!');
-        //this.router.navigate(['/tela-inicial']);
-
-        /*
-        const relacoes = this.comunidadesSelecionadas.map(
-          comunidade => ({
-            cdAnuncio: anuncioSalvo.cdAnuncio,
-            cdComunidade: comunidade.cdComunidade
-          })
-        );
-        */
-
         this.cadastrarRelacoes(anuncioSalvo);
       },
       error: () => {
+        this.salvando = false;
         this.exibirMensagem('Erro ao criar anúncio.');
       }
     });
@@ -359,7 +408,7 @@ export class CriarAnuncioPage {
         this.router.navigate(['/anuncio-tela', anuncioSalvo.cdAnuncio]);
       },
       error: () => {
-        this.salvando = false;   // <-- NOVO
+        this.salvando = false;
         this.exibirMensagem(
           'Anúncio criado, mas houve erro ao publicar nas comunidades.'
         );
@@ -379,7 +428,7 @@ export class CriarAnuncioPage {
         this.cadastrarRelacoes(anuncioSalvo);
       },
       error: () => {
-        this.salvando = false;   // <-- NOVO
+        this.salvando = false;
         this.exibirMensagem('Erro ao criar requerimento.');
       }
     });
@@ -391,6 +440,15 @@ export class CriarAnuncioPage {
       next: (anuncio) => {
         this.anuncio = anuncio;
         this.carregarComunidadesDoAnuncio();
+
+        this.formAnuncio.patchValue({
+          nmAnuncio: anuncio.nmAnuncio,
+          descricao: anuncio.descricao,
+          valor: (anuncio as AnuncioVendaModel).valor,
+          valorMin: (anuncio as AnuncioRequerimentoModel).valorMin,
+          valorMax: (anuncio as AnuncioRequerimentoModel).valorMax
+        });
+
         const usuarioLogado = this.usuarioService.getUsuarioSessao();
 
         this.usuarioEhDono =

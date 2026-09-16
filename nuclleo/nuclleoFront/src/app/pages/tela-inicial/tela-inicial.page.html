@@ -15,23 +15,6 @@
   <ion-content [fullscreen]="true">
 
     <div class="section">
-      <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisaComunidade"
-        (ionInput)="aoPesquisar($event)">
-      </ion-searchbar>
-    </div>
-
-    <!-- PROXIMIDADE -->
-    <div class="opcao-proximidade">
-
-      <span>Comunidades próximas</span>
-
-      <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
-      </ion-toggle>
-
-    </div>
-
-
-    <div class="section">
       <h2>Sugestões para você</h2>
 
       <!-- CARREGANDO -->
@@ -65,8 +48,28 @@
       </div>
     </div>
 
+
+
     <div class="section">
-      <h2>Comunidades</h2>
+
+      <div class="opcao-proximidade">
+
+        <span>Comunidades próximas</span>
+
+        <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
+        </ion-toggle>
+
+      </div>
+
+      <div class="section">
+        <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisaComunidade"
+          (ionInput)="aoPesquisar($event)">
+        </ion-searchbar>
+      </div>
+    
+
+      <!-- PROXIMIDADE -->
+
 
       <!-- CARREGANDO -->
       <div class="loading-state" *ngIf="carregandoComunidades">

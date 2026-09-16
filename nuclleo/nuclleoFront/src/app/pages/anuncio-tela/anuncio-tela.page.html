@@ -33,7 +33,12 @@
 
     <div class="info-box">
 
-      <img [src]="anuncio.ftAnuncio || 'assets/img/anuncioPadrao.png'" class="foto-anuncio">
+      <div class="anuncio-imagem">
+        <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="foto-anuncio">
+        <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+      </div>
 
       <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
         R$ {{ $any(anuncio).valor | number:'1.2-2' }}
@@ -65,9 +70,12 @@
       </div>
 
       <div class="info-item">
-        <ion-icon name="mail-outline"></ion-icon>
-        <span>
-          {{ anuncio.usuarioCria.email }}
+        <ion-icon name="location-outline"></ion-icon>
+        <span *ngIf="anuncio.usuarioCria.cidade && anuncio.usuarioCria.uf">
+          {{ anuncio.usuarioCria.cidade }}, {{ anuncio.usuarioCria.uf }}
+        </span>
+        <span *ngIf="!anuncio.usuarioCria.cidade || !anuncio.usuarioCria.uf">
+          Localização não informada
         </span>
       </div>
     </div>

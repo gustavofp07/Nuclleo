@@ -51,6 +51,20 @@
 
       </ion-item>
 
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('nmComunidade')?.touched &&
+          formComunidade.get('nmComunidade')?.hasError('required')
+        ">
+        Informe o nome da comunidade.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('nmComunidade')?.touched &&
+          formComunidade.get('nmComunidade')?.hasError('minlength')
+        ">
+        O nome deve ter no mínimo 3 caracteres.
+      </p>
+
 
       <!-- DESCRIÇÃO -->
       <div class="campo-label">
@@ -64,6 +78,20 @@
 
       </ion-item>
 
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('descricao')?.touched &&
+          formComunidade.get('descricao')?.hasError('required')
+        ">
+        Informe a descrição.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('descricao')?.touched &&
+          formComunidade.get('descricao')?.hasError('minlength')
+        ">
+        A descrição deve ter no mínimo 3 caracteres.
+      </p>
+
 
       <!-- CEP -->
       <div class="campo-label">
@@ -76,6 +104,20 @@
         </ion-input>
 
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('cep')?.touched &&
+          formComunidade.get('cep')?.hasError('required')
+        ">
+        Informe o CEP.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formComunidade.get('cep')?.touched &&
+          formComunidade.get('cep')?.hasError('pattern')
+        ">
+        Informe um CEP válido (formato 00000-000).
+      </p>
 
 
       <!-- BOTÃO -->

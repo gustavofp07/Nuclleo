@@ -16,7 +16,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, chatbubbleOutline, personOutline, mailOutline, heartDislikeOutline } from 'ionicons/icons';
+import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
@@ -75,8 +75,9 @@ export class AnuncioTelaPage implements OnInit {
       trashOutline,
       chatbubbleOutline,
       personOutline,
-      mailOutline,
-      heartDislikeOutline
+      locationOutline,
+      heartDislikeOutline,
+      imageOutline,
     });
   }
 

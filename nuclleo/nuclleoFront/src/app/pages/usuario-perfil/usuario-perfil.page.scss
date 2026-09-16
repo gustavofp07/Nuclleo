@@ -517,7 +517,7 @@ ion-menu ion-item ion-icon {
   transition: color 0.2s ease;
 }
 
-.info-item-clicavel:hover {
+.info-item-clicavel span {
   color: #7c3aed;
 }
 
@@ -603,4 +603,45 @@ ion-menu ion-item ion-icon {
   font-weight: 600;
 
   color: #6b7280;
+}
+
+/* ZONA DE PERIGO */
+
+.zona-perigo {
+  background: #fff5f5;
+
+  border-radius: 20px;
+
+  padding: 22px;
+
+  margin-top: 24px;
+
+  border: 1px solid #fecaca;
+}
+
+.zona-perigo h3 {
+  color: #dc2626;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  margin: 0 0 8px;
+}
+
+.zona-perigo p {
+  color: #7f1d1d;
+
+  font-size: 14px;
+  line-height: 1.5;
+
+  margin: 0 0 18px;
+}
+
+.zona-perigo .btn-excluir {
+  height: 48px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  --border-radius: 14px;
 }

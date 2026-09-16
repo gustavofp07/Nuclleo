@@ -44,7 +44,7 @@
 
 
   <!-- CONTEÚDO -->
-  <ion-content [fullscreen]="true" [scrollY]="!ehPerfilProprio" class="perfil-content">
+  <ion-content [fullscreen]="true" class="perfil-content">
 
     <div class="container">
 
@@ -55,7 +55,6 @@
 
         <div class="dados-usuario">
           <h2>{{ usuario.nmUsuario }}</h2>
-          <p>{{ usuario.email }}</p>
         </div>
 
       </div>
@@ -80,7 +79,8 @@
 
         <div class="info-item">
           <ion-icon name="location-outline"></ion-icon>
-          <span>{{ usuario.cidade }}, {{ usuario.uf }}</span>
+          <span *ngIf="usuario.cidade && usuario.uf">{{ usuario.cidade }}, {{ usuario.uf }}</span>
+          <span *ngIf="!usuario.cidade || !usuario.uf">Sem CEP cadastrado</span>
         </div>
 
         <div class="info-item info-item-clicavel" *ngIf="ehPerfilProprio" routerLink="/transacoes">
@@ -92,14 +92,9 @@
 
       <div class="acoes-perfil" *ngIf="ehPerfilProprio">
 
-        <ion-button routerLink="/usuario-alterar" class="btn-editar">
+        <ion-button routerLink="/usuario-alterar" class="btn-editar" expand="block">
           <ion-icon name="create-outline"></ion-icon>
           Editar perfil
-        </ion-button>
-
-        <ion-button (click)="confirmarExclusao()" class="btn-excluir">
-          <ion-icon name="trash-outline"></ion-icon>
-          Excluir perfil
         </ion-button>
 
       </div>
@@ -159,7 +154,7 @@
 
       <div class="anuncios-box" *ngIf="!ehPerfilProprio">
 
-        <h2>Anúncios</h2>
+        <h2>Anúncios<span *ngIf="!carregandoAnuncios"> ({{ anuncios.length }})</span></h2>
 
         <!-- CARREGANDO -->
         <div class="anuncios-loading" *ngIf="carregandoAnuncios">
@@ -192,5 +187,19 @@
         </div>
 
       </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div class="zona-perigo" *ngIf="ehPerfilProprio">
+
+        <h3>Excluir conta</h3>
+        <p>Ao excluir sua conta, não há como voltar atrás. Essa ação é permanente.</p>
+
+        <ion-button (click)="confirmarExclusao()" class="btn-excluir" expand="block">
+          <ion-icon name="trash-outline"></ion-icon>
+          Excluir perfil
+        </ion-button>
+
+      </div>
+
 
     </div>

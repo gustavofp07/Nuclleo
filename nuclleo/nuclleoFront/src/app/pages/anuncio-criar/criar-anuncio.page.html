@@ -33,7 +33,7 @@
       </p>
     </div>
 
-    <form (ngSubmit)="salvar()">
+    <form [formGroup]="formAnuncio" (ngSubmit)="salvar()">
 
       <!-- FOTO -->
       <div class="campo-label campo-label--foto">
@@ -52,19 +52,47 @@
       </div>
 
       <ion-item lines="none" class="input-item">
-        <ion-input [(ngModel)]="anuncio.nmAnuncio" name="nmAnuncio">
+        <ion-input formControlName="nmAnuncio" [maxlength]="limiteTitulo" [counter]="true">
         </ion-input>
       </ion-item>
 
+      <p class="mensagem-erro" *ngIf="
+          formAnuncio.get('nmAnuncio')?.touched &&
+          formAnuncio.get('nmAnuncio')?.hasError('required')
+        ">
+        Informe o título.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formAnuncio.get('nmAnuncio')?.touched &&
+          formAnuncio.get('nmAnuncio')?.hasError('maxlength')
+        ">
+        O título deve ter no máximo {{ limiteTitulo }} caracteres.
+      </p>
+
+      <!-- DESCRIÇÃO -->
       <div class="campo-label">
         <label>Descrição</label>
       </div>
 
       <ion-item lines="none" class="input-item textarea-item">
-        <ion-textarea [(ngModel)]="anuncio.descricao" name="descricao" [maxlength]="limiteDescricao" [counter]="true"
-          rows="2">
+        <ion-textarea formControlName="descricao" [maxlength]="limiteDescricao" [counter]="true" rows="2">
         </ion-textarea>
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+          formAnuncio.get('descricao')?.touched &&
+          formAnuncio.get('descricao')?.hasError('required')
+        ">
+        Informe a descrição.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+          formAnuncio.get('descricao')?.touched &&
+          formAnuncio.get('descricao')?.hasError('maxlength')
+        ">
+        A descrição deve ter no máximo {{ limiteDescricao }} caracteres.
+      </p>
 
       <!-- VENDA -->
       <ng-container *ngIf="tipo === 'VENDA'">
@@ -74,10 +102,30 @@
 
         <ion-item lines="none" class="input-item">
           <span class="prefixo">R$</span>
-          <ion-input type="number" [(ngModel)]="$any(anuncio).valor" name="valor">
+          <ion-input type="number" formControlName="valor">
           </ion-input>
         </ion-item>
 
+        <p class="mensagem-erro" *ngIf="
+            formAnuncio.get('valor')?.touched &&
+            formAnuncio.get('valor')?.hasError('required')
+          ">
+          Informe o preço.
+        </p>
+
+        <p class="mensagem-erro" *ngIf="
+            formAnuncio.get('valor')?.touched &&
+            formAnuncio.get('valor')?.hasError('min')
+          ">
+          O preço deve ser maior que zero.
+        </p>
+
+        <p class="mensagem-erro" *ngIf="
+            formAnuncio.get('valor')?.touched &&
+            formAnuncio.get('valor')?.hasError('max')
+          ">
+          O preço não pode ser maior que R$ 1.000.000,00.
+        </p>
       </ng-container>
 
       <!-- REQUERIMENTO -->
@@ -88,17 +136,71 @@
 
         <div class="valores-grid">
 
-          <ion-item lines="none" class="input-item">
-            <span class="prefixo">R$</span>
-            <ion-input type="number" [(ngModel)]="$any(anuncio).valorMin" name="valorMin">
-            </ion-input>
-          </ion-item>
+          <div>
+            <ion-item lines="none" class="input-item">
+              <span class="prefixo">R$</span>
+              <ion-input type="number" formControlName="valorMin">
+              </ion-input>
+            </ion-item>
 
-          <ion-item lines="none" class="input-item">
-            <span class="prefixo">R$</span>
-            <ion-input type="number" [(ngModel)]="$any(anuncio).valorMax" name="valorMax">
-            </ion-input>
-          </ion-item>
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMin')?.touched &&
+                formAnuncio.get('valorMin')?.hasError('required')
+              ">
+              Informe o valor mínimo.
+            </p>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMin')?.touched &&
+                formAnuncio.get('valorMin')?.hasError('min')
+              ">
+              O valor mínimo deve ser maior que zero.
+            </p>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMin')?.touched &&
+                formAnuncio.get('valorMin')?.hasError('max')
+              ">
+              O valor mínimo não pode ser maior que R$ 1.000.000,00.
+            </p>
+          </div>
+
+          <div>
+            <ion-item lines="none" class="input-item">
+              <span class="prefixo">R$</span>
+              <ion-input type="number" formControlName="valorMax">
+              </ion-input>
+            </ion-item>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMax')?.touched &&
+                formAnuncio.get('valorMax')?.hasError('required')
+              ">
+              Informe o valor máximo.
+            </p>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMax')?.touched &&
+                formAnuncio.get('valorMax')?.hasError('min')
+              ">
+              O valor máximo deve ser maior que zero.
+            </p>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMax')?.touched &&
+                formAnuncio.get('valorMax')?.hasError('max')
+              ">
+              O valor máximo não pode ser maior que R$ 1.000.000,00.
+            </p>
+
+            <p class="mensagem-erro" *ngIf="
+                formAnuncio.get('valorMax')?.touched &&
+                formAnuncio.hasError('faixaInvalida')
+              ">
+              O valor máximo deve ser maior que o valor mínimo.
+            </p>
+          </div>
+
         </div>
       </ng-container>
 
@@ -124,7 +226,10 @@
       </div>
 
       <!-- BOTÃO -->
-      <ion-button expand="block" type="submit" class="btn-criar" [disabled]="salvando">
+      <ion-button expand="block" type="submit" class="btn-criar" [disabled]="
+          formAnuncio.invalid ||
+          salvando
+        ">
         {{ salvando
         ? 'Salvando...'
         : modoEdicao

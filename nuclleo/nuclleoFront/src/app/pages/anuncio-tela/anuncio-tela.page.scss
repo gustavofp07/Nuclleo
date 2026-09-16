@@ -207,17 +207,39 @@
   gap: 10px;
 }
 
-.foto-anuncio {
-  display: block;
-
+.anuncio-imagem {
   width: 100%;
-  max-height: 320px;
-
-  margin: 0 auto 6px auto;
+  aspect-ratio: 16 / 10;
 
   border-radius: 16px;
 
-  object-fit: cover;
+  overflow: hidden;
+
+  margin: 0 auto 6px auto;
 
   background: #f3f4f6;
+}
+
+.foto-anuncio {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  display: block;
+}
+
+.anuncio-imagem-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f5f3ff;
+}
+
+.anuncio-imagem-placeholder ion-icon {
+  font-size: 48px;
+  color: #7c3aed;
 }
