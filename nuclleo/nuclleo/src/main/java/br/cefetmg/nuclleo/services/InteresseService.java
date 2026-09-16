@@ -17,6 +17,7 @@ import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,9 @@ public class InteresseService {
 
     @Autowired
     private MensagemRepository mensagemRepository;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     public Interesse inserir(InteresseRequestDTO dto) {
@@ -108,6 +112,8 @@ public class InteresseService {
         interesse.setFinalizado(true);
         interesse.setAvaliacaoInteressadoFeita(true);
         interesseRepository.save(interesse);
+
+        simpMessagingTemplate.convertAndSend("/topic/chat/" + idInteresse + "/finalizado", "finalizado");
 
         excluirSeAmbosAvaliaram(interesse);
     }
