@@ -49,6 +49,15 @@
               <span class="dono-badge" *ngIf="usuarioEhDono(anuncio)">SEU</span>
               <span class="status-badge" *ngIf="!anuncio.habilitado">INATIVO</span>
             </div>
+
+            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
+              R$ {{ $any(anuncio).valor | number:'1.2-2' }}
+            </p>
+
+            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+              R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} - R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
+            </p>
+
             <p class="descricao">{{ anuncio.descricao }}</p>
           </div>
 
