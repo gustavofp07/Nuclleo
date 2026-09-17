@@ -22,7 +22,7 @@ VALUES
 (
     'Gustavo Ferreira',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787262577/gerenciador-arquivos/aojbai2iyllycspgn88q.png',
-    'gustavo',
+    'gustavo@gmail.com',
     '123',
     '2024-01-10',
     '111.111.111-11',
@@ -35,7 +35,7 @@ VALUES
 (
     'Ana Souza',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787699783/gerenciador-arquivos/p7vuhppm4iilth9bjp5l.png',
-    'ana',
+    'ana@gmail.com',
     '123',
     '2024-02-15',
     '222.222.222-22',
@@ -48,7 +48,7 @@ VALUES
 (
     'Pedro Lima',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787784685/gerenciador-arquivos/zyk4ho5d4dubdxcz7wyu.jpg',
-    'pedro',
+    'pedro@gmail.com',
     '123',
     '2024-03-20',
     '333.333.333-33',
@@ -61,7 +61,7 @@ VALUES
 (
     'Julia Mendes',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787618221/gerenciador-arquivos/b7j0gknvct9t7vubxpa7.png',
-    'julia',
+    'julia@gmail.com',
     '123',
     '2024-04-05',
     '444.444.444-44',
@@ -350,7 +350,7 @@ VALUES
 ),
 (
     8,
-    'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787262577/gerenciador-arquivos/aojbai2iyllycspgn88q.png',
+    'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787504927/gerenciador-arquivos/eyja8q7lgq9ijt7u6pp4.jpg',
     180.00
 ),
 (
@@ -442,125 +442,3 @@ VALUES
 (3, 2),
 (4, 3),
 (1, 4);
-
-
--- =============================================
--- INTERESSES
--- =============================================
-INSERT INTO interesse
-(usuario, anuncio, dt_criacao, finalizado, aceito,
- avaliacao_interessado_feita, avaliacao_anunciante_feita)
-VALUES
-
--- Ana demonstrou interesse no Notebook Dell do Gustavo.
-(
-    2,
-    1,
-    '2024-05-01',
-    FALSE,
-    FALSE,
-    FALSE,
-    FALSE
-),
-
--- Julia demonstrou interesse no iPhone do Pedro.
--- Interesse aceito, permitindo a conversa.
-(
-    4,
-    3,
-    '2024-05-02',
-    FALSE,
-    TRUE,
-    FALSE,
-    FALSE
-),
-
--- Julia demonstrou interesse no Teclado Mecânico do Gustavo.
-(
-    4,
-    6,
-    '2024-05-03',
-    FALSE,
-    FALSE,
-    FALSE,
-    FALSE
-);
-
-
--- =============================================
--- MENSAGENS
--- Conversa referente ao interesse 2:
--- Julia interessada no iPhone do Pedro.
--- =============================================
-INSERT INTO mensagem
-(cd_interesse, cd_usuario_remetente, conteudo, data_envio)
-VALUES
-(
-    2,
-    4,
-    'Olá Pedro! O iPhone ainda está disponível?',
-    '2024-05-02 14:00:00'
-),
-(
-    2,
-    3,
-    'Olá Julia! Sim, ainda está disponível.',
-    '2024-05-02 14:05:00'
-),
-(
-    2,
-    4,
-    'Ótimo! Tenho interesse em fechar a compra.',
-    '2024-05-02 14:08:00'
-);
-
-
--- =============================================
--- TRANSAÇÃO
--- Exemplo de uma negociação concluída.
--- Julia comprou o iPhone anunciado pelo Pedro.
--- =============================================
-INSERT INTO transacao
-(valor, data, cd_usuario, cd_anuncio)
-VALUES
-(
-    3200.00,
-    '2024-05-05',
-    4,
-    3
-);
-
-
--- =============================================
--- AVALIAÇÕES
--- As duas partes podem avaliar uma à outra.
--- =============================================
-INSERT INTO avaliacao
-(cd_transacao, cd_avaliador, cd_avaliado, nota, dt_avaliacao)
-VALUES
-(
-    1,
-    4,
-    3,
-    5,
-    '2024-05-06'
-),
-(
-    1,
-    3,
-    4,
-    5,
-    '2024-05-06'
-);
-
-
--- =============================================
--- ATUALIZA O INTERESSE DA NEGOCIAÇÃO CONCLUÍDA
--- =============================================
-UPDATE interesse
-SET
-    finalizado = TRUE,
-    aceito = TRUE,
-    avaliacao_interessado_feita = TRUE,
-    avaliacao_anunciante_feita = TRUE
-WHERE id = 2;

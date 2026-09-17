@@ -77,8 +77,8 @@ export class TelaInicialPage implements OnInit {
 
   comunidades: ComunidadeModel[] = [];
 
-  buscarPorProximidade: boolean = false;
-  pesquisaComunidade: string = '';
+  buscarPorProximidade: boolean;
+  pesquisa: string;
 
   anunciosRecomendados: AnuncioModel[] = [];
 
@@ -95,22 +95,15 @@ export class TelaInicialPage implements OnInit {
     private toastController: ToastController,
     private http: HttpClient,
     private anuncioService: AnuncioService,
-  ) { }
+  ) {
+    this.buscarPorProximidade = false;
+    this.pesquisa = "";
+
+  }
 
   ngOnInit() {
-    let aux = this.usuarioService.verificarSessao();
-
-    if (aux == false) {
-      this.exibirMensagem("Não há usuário logado.");
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.carregarPreferenciaProximidade();
-
-    this.carregarComunidades();
-    this.carregarAnunciosRecomendados();
-
+    //na primeira vez que a tela é carregada, não há preferência de proximidade salva no localStorage
+    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
 
     this.pesquisaSubject
       .pipe(
@@ -118,12 +111,9 @@ export class TelaInicialPage implements OnInit {
         distinctUntilChanged()
       )
       .subscribe((termo: string) => {
+        //this.pesquisa = termo;
         this.pesquisarComunidades(termo);
       });
-  }
-
-  onErroImagem(anuncio: any) {
-    anuncio.ftAnuncio = null;
   }
 
   ionViewWillEnter() {
@@ -136,9 +126,21 @@ export class TelaInicialPage implements OnInit {
     }
 
     this.carregarPreferenciaProximidade();
-    this.pesquisaComunidade = '';
-    this.carregarComunidades();
-    this.carregarAnunciosRecomendados();
+    this.pesquisa = '';
+
+    this.pesquisarComunidades();
+  }
+
+  carregarPreferenciaProximidade() {
+    const preferencia = localStorage.getItem('buscarComunidadesProximas');
+
+    if (preferencia === "true") {
+      this.buscarPorProximidade = true;
+    } else if (preferencia === "false") {
+      this.buscarPorProximidade = false;
+    } else {
+      this.exibirMensagem("Erro ao carregar preferência de proximidade.");
+    }
   }
 
   aoPesquisar(event: any) {
@@ -148,110 +150,23 @@ export class TelaInicialPage implements OnInit {
 
   alterarBuscaProximidade() {
     localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
-    this.pesquisaComunidade = '';
-    this.carregarComunidades();
+
+    this.pesquisarComunidades(this.pesquisa);
   }
 
-  carregarPreferenciaProximidade() {
-    const preferencia = localStorage.getItem('buscarComunidadesProximas');
-
-    this.buscarPorProximidade = (preferencia === 'true');
-  }
-
-  carregarComunidades() {
+  pesquisarComunidades(termo?: string) {
+    const usuario = this.usuarioService.getUsuarioSessao();
     this.carregandoComunidades = true;
-
-    if (this.buscarPorProximidade === true) {
-      this.carregarComunidadesProximas();
-    } else {
-      this.carregarTodasComunidades();
-    }
-  }
-
-  carregarTodasComunidades() {
-    this.comunidadeService.listarComunidades().subscribe({
-      next: (comunidades: ComunidadeModel[]) => {
-        this.comunidades = comunidades;
-        this.carregandoComunidades = false;
-      },
-      error: (erro: any) => {
-        console.error('Erro ao carregar comunidades:', erro);
-        this.carregandoComunidades = false;
-      }
-    });
-  }
-
-  carregarComunidadesProximas() {
-    const usuario = this.usuarioService.getUsuarioSessao();
-
-    // O backend valida CEP por ID do usuário autenticado.
-    this.usuarioService.verificarCEP(usuario.cdUsuario).subscribe({
-      next: (possuiCep: boolean) => {
-        if (possuiCep) {
-
-          this.comunidadeService.listarComunidadesProximas(usuario.cdUsuario).subscribe({
-            next: (comunidades: ComunidadeModel[]) => {
-              this.comunidades = comunidades;
-              this.carregandoComunidades = false;
-            },
-            error: (erro: any) => {
-              console.error('Erro ao carregar comunidades próximas: ', erro);
-              this.exibirMensagem("Erro! " + erro.error.message);
-              this.carregandoComunidades = false;
-            }
-          });
-
-        } else {
-
-          this.casoDeErro();
-          return;
-        }
-      },
-      error: (erro: any) => {
-        console.error('Erro ao verificar CEP: ', erro);
-        this.casoDeErro();
-        return;
-      }
-    });
-
-  }
-
-  private casoDeErro() {
-    this.buscarPorProximidade = false;
-    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
-    this.exibirMensagem("Erro!! O usuário não possui CEP cadastrado.");
-
-    this.carregarTodasComunidades();
-  }
-
-
-  carregarAnunciosRecomendados() {
-    this.carregandoAnuncios = true;
-
-    this.anuncioService.listarTodos().subscribe({
-      next: (dados) => {
-        this.anunciosRecomendados = dados
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 5);
-        this.carregandoAnuncios = false;
-      },
-      error: (erro: any) => {
-        console.error('Erro ao carregar anúncios recomendados.', erro);
-        this.carregandoAnuncios = false;
-      }
-    });
-  }
-
-  pesquisarComunidades(termo: string) {
-    const usuario = this.usuarioService.getUsuarioSessao();
 
     if (this.buscarPorProximidade === true) {
       this.comunidadeService.listarComunidadesProximas(usuario.cdUsuario, termo).subscribe({
         next: (comunidades: ComunidadeModel[]) => {
           this.comunidades = comunidades;
+          this.carregandoComunidades = false;
         },
         error: (erro: any) => {
-          console.error('Erro ao pesquisar comunidades próximas: ', erro);
+          console.error('Erro ao pesquisar comunidades próximas:', erro);
+          this.carregandoComunidades = false;
           this.exibirMensagem(erro.error?.message || 'Erro ao pesquisar comunidades.');
         }
       });
@@ -259,13 +174,19 @@ export class TelaInicialPage implements OnInit {
       this.comunidadeService.listarComunidades(termo).subscribe({
         next: (comunidades: ComunidadeModel[]) => {
           this.comunidades = comunidades;
+          this.carregandoComunidades = false;
         },
         error: (erro: any) => {
-          console.error('Erro ao pesquisar comunidades: ', erro);
+          console.error('Erro ao pesquisar comunidades:', erro);
+          this.carregandoComunidades = false;
           this.exibirMensagem(erro.error?.message || 'Erro ao pesquisar comunidades.');
         }
       });
     }
+  }
+
+  onErroImagem(anuncio: any) {
+    anuncio.ftAnuncio = null;
   }
 
   async exibirMensagem(texto: string) {

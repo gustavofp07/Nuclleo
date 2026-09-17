@@ -15,69 +15,18 @@
   <ion-content [fullscreen]="true">
 
     <div class="section">
-      <h2>Sugestões para você</h2>
-
-      <!-- CARREGANDO -->
-      <div class="loading-state" *ngIf="carregandoAnuncios">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Carregando...</p>
-      </div>
-
-      <div class="horizontal-scroll" *ngIf="!carregandoAnuncios">
-
-        <ion-card *ngFor="let anuncio of anunciosRecomendados" class="product-card"
-          [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
-
-          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="foto-produto" (error)="onErroImagem(anuncio)">
-          <div *ngIf="!anuncio.ftAnuncio" class="foto-produto-placeholder">
-            <ion-icon name="image-outline"></ion-icon>
-          </div>
-
-          <ion-card-header>
-            <ion-card-title class="titulo-clamp">
-              {{ anuncio.nmAnuncio | slice:0:25 }}{{ anuncio.nmAnuncio.length > 25 ? '...' : '' }}
-            </ion-card-title>
-
-            <ion-card-subtitle>
-              {{ anuncio.tipoAnuncio }}
-            </ion-card-subtitle>
-
-            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
-              R$ {{ $any(anuncio).valor | number:'1.2-2' }}
-            </p>
-
-            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
-              R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} - R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
-            </p>
-          </ion-card-header>
-
-        </ion-card>
-
-      </div>
-    </div>
-
-
-
-    <div class="section">
-
-      <div class="opcao-proximidade">
-
-        <span>Comunidades próximas</span>
-
-        <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
-        </ion-toggle>
-
-      </div>
 
       <div class="section">
-        <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisaComunidade"
+        <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisa"
           (ionInput)="aoPesquisar($event)">
         </ion-searchbar>
       </div>
 
-
-      <!-- PROXIMIDADE -->
-
+      <div class="opcao-proximidade">
+        <span>Comunidades próximas</span>
+        <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
+        </ion-toggle>
+      </div>
 
       <!-- CARREGANDO -->
       <div class="loading-state" *ngIf="carregandoComunidades">

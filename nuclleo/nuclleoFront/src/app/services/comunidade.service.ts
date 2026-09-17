@@ -79,6 +79,7 @@ export class ComunidadeService {
   }
     */
 
+
   //.trim() remove espaços desnecessários do começo e do final.
   //encodeURIComponent() prepara o termo para ser usado em uma URL, codificando caracteres especiais.
   listarComunidades(termo?: string): Observable<ComunidadeModel[]> {
@@ -103,15 +104,15 @@ export class ComunidadeService {
     return this.http.get<ComunidadeModel[]>(url);
   }
 
+  buscarComunidade(cdComunidade: number): Observable<ComunidadeModel> {
+    return this.http.get<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
+  }
+
   listarComunidadesDoUsuario(cdUsuario: number): Observable<ComunidadeModel[]> {
     return this.http.get<ComunidadeModel[]>(`${this.API_URL}/usuario/${cdUsuario}`);
   }
 
   excluir(cdComunidade: number): Observable<ComunidadeModel> {
     return this.http.delete<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
-  }
-
-  buscarComunidade(cdComunidade: number): Observable<ComunidadeModel> {
-    return this.http.get<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
   }
 }
