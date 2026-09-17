@@ -10,6 +10,12 @@ interface DigitandoEvento {
   digitando: boolean;
 }
 
+export interface StatusInteresseEvento {
+  finalizado: boolean;
+  avaliacaoInteressadoFeita: boolean; 
+  avaliacaoAnuncianteFeita: boolean; 
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   //endereço do WebSocket (/ws-chat) para comunicação instantânea
@@ -21,7 +27,7 @@ export class ChatService {
   private mensagemRecebida = new Subject<MensagemModel>();
   private statusConexao = new Subject<boolean>();
   private digitandoEvento = new Subject<DigitandoEvento>();
-  private conversaFinalizada = new Subject<void>(); // <-- ADICIONADO
+  private statusInteresseAtualizado = new Subject<StatusInteresseEvento>(); // <-- MUDOU
 
   constructor(private http: HttpClient) {}
 
@@ -37,21 +43,19 @@ export class ChatService {
       onConnect: () => {
         this.statusConexao.next(true);
 
-        //escuta novas mensagens enviadas na sala. Quando chega uma, ele dá um .next(mensagem) para avisar a tela.
         this.client!.subscribe(`/topic/chat/${cdInteresse}`, (msg: IMessage) => {
           const mensagem: MensagemModel = JSON.parse(msg.body);
           this.mensagemRecebida.next(mensagem);
         });
 
-        //Escuta o evento de outras pessoas digitando
         this.client!.subscribe(`/topic/chat/${cdInteresse}/digitando`, (msg: IMessage) => {
           const evento: DigitandoEvento = JSON.parse(msg.body);
           this.digitandoEvento.next(evento);
         });
 
-        // <-- ADICIONADO: escuta o evento de a conversa ter sido finalizada
-        this.client!.subscribe(`/topic/chat/${cdInteresse}/finalizado`, (msg: IMessage) => {
-          this.conversaFinalizada.next();
+        this.client!.subscribe(`/topic/chat/${cdInteresse}/status`, (msg: IMessage) => {
+          const status: StatusInteresseEvento = JSON.parse(msg.body);
+          this.statusInteresseAtualizado.next(status);
         });
       },
       onDisconnect: () => {
@@ -99,8 +103,8 @@ export class ChatService {
     return this.digitandoEvento.asObservable();
   }
 
-  onConversaFinalizada(): Observable<void> { // <-- ADICIONADO
-    return this.conversaFinalizada.asObservable();
+  onStatusInteresseAtualizado(): Observable<StatusInteresseEvento> { // <-- MUDOU
+    return this.statusInteresseAtualizado.asObservable();
   }
 
   desconectar() {

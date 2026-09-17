@@ -21,7 +21,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
 
-import { ChatService } from 'src/app/services/chat.service';
+import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service'; // <-- MUDOU
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
@@ -74,6 +74,8 @@ export class ChatPage implements OnInit, OnDestroy {
 
   aguardandoAceite: boolean = false;
 
+  private avaliacaoSolicitada = false; // <-- ADICIONADO: evita abrir o alerta de avaliação 2x
+
   private timeoutDigitando: any = null;
 
   constructor(
@@ -111,6 +113,7 @@ export class ChatPage implements OnInit, OnDestroy {
       return;
     }
 
+    this.avaliacaoSolicitada = false; // <-- ADICIONADO
     this.carregarInteresse();
   }
 
@@ -150,17 +153,15 @@ export class ChatPage implements OnInit, OnDestroy {
           : interesse.usuario.ftUsuario;
 
         this.souAnunciante = souEuOAnunciante;
-        this.chatFinalizado = interesse.finalizado;
+
+        // <-- MUDOU: usa a mesma lógica do tempo real para aplicar o estado inicial
+        this.aplicarStatusInteresse({
+          finalizado: interesse.finalizado,
+          avaliacaoInteressadoFeita: interesse.avaliacaoInteressadoFeita,
+          avaliacaoAnuncianteFeita: interesse.avaliacaoAnuncianteFeita
+        });
 
         this.aguardandoAceite = souEuOInteressado && !(interesse as any).aceito;
-
-        if (this.chatFinalizado) {
-          if (!this.souAnunciante && !interesse.avaliacaoAnuncianteFeita) {
-            this.solicitarAvaliacaoAnunciante();
-          } else {
-            this.aguardandoAvaliacaoOutro = true;
-          }
-        }
 
         this.iniciarChat();
       },
@@ -210,21 +211,53 @@ export class ChatPage implements OnInit, OnDestroy {
       });
     });
 
-    this.chatService.onConversaFinalizada().subscribe(() => {
+    // <-- MUDOU: substitui o antigo onConversaFinalizada().
+    // Chega em tempo real quando QUALQUER um dos dois finaliza ou avalia,
+    // então tanto quem finalizou quanto quem está do outro lado ficam
+    // sincronizados sem precisar recarregar a página.
+    this.chatService.onStatusInteresseAtualizado().subscribe((status) => {
       this.ngZone.run(() => {
-        if (this.chatFinalizado) {
-          return; // já sabia (fui eu quem finalizou, por exemplo)
-        }
-
-        this.chatFinalizado = true;
-
-        if (!this.souAnunciante) {
-          this.solicitarAvaliacaoAnunciante();
-        } else {
-          this.aguardandoAvaliacaoOutro = true;
-        }
+        this.aplicarStatusInteresse(status);
       });
     });
+  }
+
+  private aplicarStatusInteresse(status: StatusInteresseEvento) {
+    const finalizouAgora = status.finalizado && !this.chatFinalizado;
+
+    this.chatFinalizado = status.finalizado;
+
+    if (!status.finalizado) {
+      this.aguardandoAvaliacaoOutro = false;
+      return;
+    }
+
+    if (!this.souAnunciante) {
+      if (!status.avaliacaoAnuncianteFeita) {
+        this.aguardandoAvaliacaoOutro = false;
+
+        if (!this.avaliacaoSolicitada) {
+          this.avaliacaoSolicitada = true;
+
+          if (finalizouAgora) {
+            this.exibirMensagem('O anunciante finalizou a conversa.');
+          }
+
+          this.solicitarAvaliacaoAnunciante();
+        }
+      } else {
+        this.aguardandoAvaliacaoOutro = false;
+      }
+    } else {
+      if (!status.avaliacaoAnuncianteFeita) {
+        this.aguardandoAvaliacaoOutro = true;
+      } else {
+        if (this.aguardandoAvaliacaoOutro) {
+          this.exibirMensagem('O outro usuário avaliou você. Obrigado!');
+        }
+        this.aguardandoAvaliacaoOutro = false;
+      }
+    }
   }
 
   carregarHistorico() {
@@ -297,7 +330,6 @@ export class ChatPage implements OnInit, OnDestroy {
     }, 100);
   }
 
-  // <-- MUDOU: agora só confirma a intenção de finalizar
   async abrirFinalizarConversa() {
     const alert = await this.alertController.create({
       header: 'Finalizar conversa',
@@ -318,7 +350,6 @@ export class ChatPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // <-- ADICIONADO: só pergunta sobre a transação depois da confirmação
   async abrirPerguntaTransacao() {
     const alert = await this.alertController.create({
       header: 'Finalizar conversa',

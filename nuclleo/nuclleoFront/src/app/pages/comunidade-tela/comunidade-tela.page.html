@@ -57,7 +57,7 @@
 
             <h2>{{ comunidade.nmComunidade }}</h2>
 
-            <p>Comunidade da Nuclleo</p>
+            <p>{{ comunidade.cidade }}{{ comunidade.cidade && comunidade.uf ? ' - ' : '' }}{{ comunidade.uf }}</p>
             <p class="numMembros">{{ totalUsuarios }} {{ totalUsuarios === 1 ? 'membro' : 'membros' }}</p>
 
           </div>
