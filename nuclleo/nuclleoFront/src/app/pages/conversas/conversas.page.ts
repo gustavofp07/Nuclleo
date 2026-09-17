@@ -135,19 +135,25 @@ export class ConversasPage implements OnInit {
         : interesse.usuario.ftUsuario,
       nmAnuncio: interesse.anuncio.nmAnuncio,
       finalizado: interesse.finalizado,
-      souAnunciante: !souEuOInteressado, // <-- ADICIONADO
-      aceito: interesse.aceito           // <-- ADICIONADO
+      souAnunciante: !souEuOInteressado, 
+      aceito: interesse.aceito 
     };
   }
 
   abrirChat(conversa: ConversaView) {
-    // anunciante que ainda não aceitou não entra direto no chat pelo card,
-    // precisa usar os botões de Aceitar/Recusar
     if (conversa.souAnunciante && !conversa.aceito) {
       return;
     }
 
-    this.router.navigate(['/chat', conversa.cdInteresse]);
+    this.interesseService.buscarPorId(conversa.cdInteresse).subscribe({
+      next: () => {
+        this.router.navigate(['/chat', conversa.cdInteresse]);
+      },
+      error: () => {
+        this.conversas = this.conversas.filter(c => c.cdInteresse !== conversa.cdInteresse);
+        this.exibirMensagem('Essa conversa já foi encerrada.');
+      }
+    });
   }
 
   aceitarConversa(conversa: ConversaView, event: Event) {

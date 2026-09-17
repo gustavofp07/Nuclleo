@@ -21,7 +21,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
 
-import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service'; // <-- MUDOU
+import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service'; 
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
@@ -74,7 +74,8 @@ export class ChatPage implements OnInit, OnDestroy {
 
   aguardandoAceite: boolean = false;
 
-  private avaliacaoSolicitada = false; // <-- ADICIONADO: evita abrir o alerta de avaliação 2x
+  private avaliacaoSolicitada = false; 
+  private encerrando = false;
 
   private timeoutDigitando: any = null;
 
@@ -113,7 +114,8 @@ export class ChatPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.avaliacaoSolicitada = false; // <-- ADICIONADO
+    this.avaliacaoSolicitada = false;
+    this.encerrando = false;
     this.carregarInteresse();
   }
 
@@ -154,7 +156,6 @@ export class ChatPage implements OnInit, OnDestroy {
 
         this.souAnunciante = souEuOAnunciante;
 
-        // <-- MUDOU: usa a mesma lógica do tempo real para aplicar o estado inicial
         this.aplicarStatusInteresse({
           finalizado: interesse.finalizado,
           avaliacaoInteressadoFeita: interesse.avaliacaoInteressadoFeita,
@@ -211,10 +212,6 @@ export class ChatPage implements OnInit, OnDestroy {
       });
     });
 
-    // <-- MUDOU: substitui o antigo onConversaFinalizada().
-    // Chega em tempo real quando QUALQUER um dos dois finaliza ou avalia,
-    // então tanto quem finalizou quanto quem está do outro lado ficam
-    // sincronizados sem precisar recarregar a página.
     this.chatService.onStatusInteresseAtualizado().subscribe((status) => {
       this.ngZone.run(() => {
         this.aplicarStatusInteresse(status);
@@ -227,36 +224,35 @@ export class ChatPage implements OnInit, OnDestroy {
 
     this.chatFinalizado = status.finalizado;
 
+    if (status.avaliacaoInteressadoFeita && status.avaliacaoAnuncianteFeita) {
+      if (this.souAnunciante && !this.encerrando) {
+        this.encerrando = true;
+        this.aguardandoAvaliacaoOutro = false;
+        this.exibirMensagem('O outro usuário avaliou você. Conversa concluída!');
+        this.router.navigate(['/conversas']);
+      }
+      return;
+    }
+
     if (!status.finalizado) {
       this.aguardandoAvaliacaoOutro = false;
       return;
     }
 
     if (!this.souAnunciante) {
-      if (!status.avaliacaoAnuncianteFeita) {
-        this.aguardandoAvaliacaoOutro = false;
+      this.aguardandoAvaliacaoOutro = false;
 
-        if (!this.avaliacaoSolicitada) {
-          this.avaliacaoSolicitada = true;
+      if (!this.avaliacaoSolicitada) {
+        this.avaliacaoSolicitada = true;
 
-          if (finalizouAgora) {
-            this.exibirMensagem('O anunciante finalizou a conversa.');
-          }
-
-          this.solicitarAvaliacaoAnunciante();
+        if (finalizouAgora) {
+          this.exibirMensagem('O anunciante finalizou a conversa.');
         }
-      } else {
-        this.aguardandoAvaliacaoOutro = false;
+
+        this.solicitarAvaliacaoAnunciante();
       }
     } else {
-      if (!status.avaliacaoAnuncianteFeita) {
-        this.aguardandoAvaliacaoOutro = true;
-      } else {
-        if (this.aguardandoAvaliacaoOutro) {
-          this.exibirMensagem('O outro usuário avaliou você. Obrigado!');
-        }
-        this.aguardandoAvaliacaoOutro = false;
-      }
+      this.aguardandoAvaliacaoOutro = true;
     }
   }
 

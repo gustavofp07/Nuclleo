@@ -18,20 +18,17 @@ export interface StatusInteresseEvento {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  //endereço do WebSocket (/ws-chat) para comunicação instantânea
   private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
-  //endereço da API REST padrão (/api/v1/mensagens) usada para buscar coisas antigas, como o histórico
   private readonly URL_HTTP = 'https://nuclleo.onrender.com/api/v1/mensagens';
 
   private client: Client | null = null;
   private mensagemRecebida = new Subject<MensagemModel>();
   private statusConexao = new Subject<boolean>();
   private digitandoEvento = new Subject<DigitandoEvento>();
-  private statusInteresseAtualizado = new Subject<StatusInteresseEvento>(); // <-- MUDOU
+  private statusInteresseAtualizado = new Subject<StatusInteresseEvento>();
 
   constructor(private http: HttpClient) {}
 
-  //abre a conexão em tempo real baseada em um interesse
   conectar(cdInteresse: number) {
     if (this.client?.active) {
       this.desconectar();
@@ -103,7 +100,7 @@ export class ChatService {
     return this.digitandoEvento.asObservable();
   }
 
-  onStatusInteresseAtualizado(): Observable<StatusInteresseEvento> { // <-- MUDOU
+  onStatusInteresseAtualizado(): Observable<StatusInteresseEvento> {
     return this.statusInteresseAtualizado.asObservable();
   }
 
