@@ -3,9 +3,11 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
+import br.cefetmg.nuclleo.dto.InteresseStatusDTO;
 import br.cefetmg.nuclleo.dto.TransacaoRequestDTO;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Avaliacao;
@@ -17,7 +19,6 @@ import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +46,7 @@ public class InteresseService {
     private MensagemRepository mensagemRepository;
 
     @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public Interesse inserir(InteresseRequestDTO dto) {
@@ -93,8 +94,6 @@ public class InteresseService {
 
             Transacao transacao = transacaoService.inserir(transacaoDto);
 
-            // avaliação do anunciante sobre o interessado (índice 1 = user2->user1 =
-            // anunciante->interessado)
             Avaliacao avaliacaoAnunciantePraInteressado = avaliacaoRepository
                     .findByTransacaoId(transacao.getId()).stream()
                     .filter(a -> a.getAvaliador().getCdUsuario().equals(anunciante.getCdUsuario()))
@@ -105,7 +104,6 @@ public class InteresseService {
                     dto.getNotaInteressado());
         } else {
             List<Avaliacao> par = avaliacaoService.criarAvaliacoesPendentes(interessado, anunciante);
-            // índice 1 = user2->user1 = anunciante->interessado
             avaliacaoService.avaliar(par.get(1).getCdAvaliacao(), anunciante.getCdUsuario(), dto.getNotaInteressado());
         }
 
@@ -113,8 +111,7 @@ public class InteresseService {
         interesse.setAvaliacaoInteressadoFeita(true);
         interesseRepository.save(interesse);
 
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + idInteresse + "/finalizado", "finalizado");
-
+        notificarStatus(interesse);
         excluirSeAmbosAvaliaram(interesse);
     }
 
@@ -150,7 +147,17 @@ public class InteresseService {
         interesse.setAvaliacaoAnuncianteFeita(true);
         interesseRepository.save(interesse);
 
+        notificarStatus(interesse);
         excluirSeAmbosAvaliaram(interesse);
+    }
+
+    private void notificarStatus(Interesse interesse) {
+        InteresseStatusDTO status = new InteresseStatusDTO(
+                interesse.isFinalizado(),
+                interesse.isAvaliacaoInteressadoFeita(),
+                interesse.isAvaliacaoAnuncianteFeita());
+
+        messagingTemplate.convertAndSend("/topic/chat/" + interesse.getId() + "/status", status);
     }
 
     @Transactional
