@@ -85,6 +85,10 @@ export class UsuarioPerfilPage implements OnInit {
     }
   }
 
+  rotuloTipoAnuncio(tipo: string): string {
+    return tipo === 'REQUERIMENTO' ? 'COMPRA' : 'VENDA';
+  }
+
   carregarUsuarioPorId(cdUsuario: number) {
     this.carregando = true;
 
@@ -198,11 +202,11 @@ export class UsuarioPerfilPage implements OnInit {
     this.anuncioService.listarAnunciosPorUsuario(this.usuario.cdUsuario).subscribe({
       next: (dados) => {
         this.anuncios = dados;
-        this.carregandoAnuncios = false; 
+        this.carregandoAnuncios = false;
       },
       error: () => {
         console.error('Erro ao carregar anúncios do usuário.');
-        this.carregandoAnuncios = false; 
+        this.carregandoAnuncios = false;
       }
     });
   }

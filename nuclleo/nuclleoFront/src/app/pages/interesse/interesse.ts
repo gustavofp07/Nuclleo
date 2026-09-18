@@ -74,6 +74,10 @@ export class InteresseMeusPage implements OnInit {
     this.carregarInteresses();
   }
 
+  rotuloTipoAnuncio(tipo: string): string {
+    return tipo === 'REQUERIMENTO' ? 'COMPRA' : 'VENDA';
+  }
+
   onErroImagem(anuncio: any) {
     anuncio.ftAnuncio = null;
   }

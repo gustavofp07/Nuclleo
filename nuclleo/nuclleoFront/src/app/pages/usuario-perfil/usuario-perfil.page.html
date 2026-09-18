@@ -179,7 +179,7 @@
 
             <div class="anuncio-info">
               <h3>{{ anuncio.nmAnuncio }}</h3>
-              <span class="tipo-anuncio">{{ anuncio.tipoAnuncio }}</span>
+              <span class="tipo-anuncio">{{ rotuloTipoAnuncio(anuncio.tipoAnuncio) }}</span>
 
               <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
                 R$ {{ $any(anuncio).valor | number:'1.2-2' }}

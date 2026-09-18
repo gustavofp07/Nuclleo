@@ -100,6 +100,10 @@ export class ComunidadePerfilPage implements OnInit {
     });
   }
 
+  rotuloTipoAnuncio(tipo: string): string {
+    return tipo === 'REQUERIMENTO' ? 'COMPRA' : 'VENDA';
+  }
+
   verificarUsuarioNaComunidade(cdComunidade: number) {
     const usuario = this.usuarioService.getUsuarioSessao();
 
