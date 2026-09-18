@@ -8,6 +8,7 @@ export class AnuncioModel {
     tipoAnuncio: string;
     habilitado: boolean;
     usuarioCria: UsuarioModel;
+    dtCriacao?: Date;
 
     constructor() {
         this.cdAnuncio = 0;

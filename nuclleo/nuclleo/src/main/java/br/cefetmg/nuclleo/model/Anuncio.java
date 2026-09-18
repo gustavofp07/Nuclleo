@@ -1,5 +1,7 @@
 package br.cefetmg.nuclleo.model;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -14,6 +16,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity(name = "tb_anuncio")
 @Table(name = "tb_anuncio")
-@Inheritance(strategy = InheritanceType.JOINED)//configuração para herança
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Anuncio {
 
     @Id
@@ -38,21 +41,26 @@ public class Anuncio {
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     @Size(max = 250, message = "A descrição deve ter no máximo 250 caracteres")
-    private String descricao; //tipo TEXT no banco?
+    private String descricao;
 
     @Column(name = "habilitado", columnDefinition = "boolean DEFAULT true")
     private boolean habilitado = true;
 
-    
-    // Criando o Enum dentro da classe (padrão PascalCase para o nome do tipo)
     public enum TipoAnuncio {
         VENDA, REQUERIMENTO
     }
 
-    // Novo atributo mapeado para o MySQL
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_anuncio", length = 20, nullable = false)
     private TipoAnuncio tipoAnuncio;
+
+    @Column(name = "dt_criacao", updatable = false)
+    private Date dtCriacao;
+
+    @PrePersist
+    protected void aoPersistir() {
+        this.dtCriacao = new Date();
+    }
 
     @ManyToOne
     @JsonIgnoreProperties({"senha"})
