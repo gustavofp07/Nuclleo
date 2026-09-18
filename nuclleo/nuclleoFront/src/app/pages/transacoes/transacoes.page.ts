@@ -59,11 +59,23 @@ export class TransacoesPage implements OnInit {
   }
 
   souComprador(transacao: TransacaoModel): boolean {
-    return transacao.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
+    const anuncioEhVenda = transacao.anuncio.tipoAnuncio === 'VENDA';
+
+    if (anuncioEhVenda) {
+      return transacao.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
+    } else {
+      return transacao.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+    }
   }
 
   outroUsuario(transacao: TransacaoModel): UsuarioModel {
-    return this.souComprador(transacao) ? transacao.anuncio.usuarioCria : transacao.usuario;
+    const anuncioEhVenda = transacao.anuncio.tipoAnuncio === 'VENDA';
+
+    if (anuncioEhVenda) {
+      return this.souComprador(transacao) ? transacao.anuncio.usuarioCria : transacao.usuario;
+    } else {
+      return this.souComprador(transacao) ? transacao.usuario : transacao.anuncio.usuarioCria;
+    }
   }
 
   async exibirMensagem(texto: string) {
