@@ -264,17 +264,20 @@ export class AnuncioTelaPage implements OnInit {
     const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDias <= 0) {
-      return 'Anunciado hoje';
-    }
-    if (diffDias === 1) {
-      return 'Anunciado há 1 dia';
-    }
-    if (diffDias < 30) {
-      return `Anunciado há ${diffDias} dias`;
+      const hora = dtCriacao.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      return `Anunciado hoje às ${hora}`;
     }
 
-    const diffMeses = Math.floor(diffDias / 30);
-    return diffMeses === 1 ? 'Anunciado há 1 mês' : `Anunciado há ${diffMeses} meses`;
+    const data = dtCriacao.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    return `Anunciado em ${data}`;
   }
 
   async confirmarInteresse() {
