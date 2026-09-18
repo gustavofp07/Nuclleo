@@ -86,6 +86,35 @@
   color: #6b7280;
 }
 
+/* Linha do contador + link "ver lista de membros" */
+
+.membros-toggle {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 6px;
+}
+
+.numMembros {
+  color: #6b7280;
+}
+
+.ver-membros {
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #7c3aed;
+
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ver-membros:hover {
+  text-decoration: underline;
+}
+
 /* BOXES */
 
 .info-box {
@@ -343,6 +372,7 @@
   color: #7c3aed;
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .link-usuario:hover {
@@ -361,4 +391,60 @@
 
   font-size: 14px;
   font-weight: 700;
+}
+
+/* MODAL DE LISTA DE MEMBROS */
+
+/* Centraliza o modal na tela em vez do padrão "sobe de baixo" do Ionic,
+   e limita a largura/altura pra parecer uma caixinha de diálogo */
+.modal-membros {
+  --width: 90%;
+  --max-width: 420px;
+
+  --height: 60vh;
+  --max-height: 80vh;
+
+  --border-radius: 20px;
+
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-toolbar {
+  --background: #7d17f1;
+  --color: #ffffff;
+}
+
+.modal-membros-content {
+  --background: #ffffff;
+  --color: #111827;
+}
+
+.modal-membros-content ion-list {
+  --ion-background-color: #ffffff;
+  background: #ffffff;
+
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.membro-item {
+  --background: #ffffff;
+  --color: #111827;
+  --border-color: #e5e7eb;
+
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+}
+
+.membro-item ion-label {
+  color: #111827;
+}
+
+.membro-item ion-avatar {
+  width: 42px;
+  height: 42px;
+}
+
+.membro-item ion-avatar img {
+  object-fit: cover;
 }

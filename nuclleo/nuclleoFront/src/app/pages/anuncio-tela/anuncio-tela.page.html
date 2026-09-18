@@ -40,6 +40,8 @@
         </div>
       </div>
 
+      <hr>
+      
       <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
         R$ {{ $any(anuncio).valor | number:'1.2-2' }}
       </div>

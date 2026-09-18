@@ -1,9 +1,24 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonSpinner } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+  IonButtons,
+  IonIcon,
+  IonMenuButton,
+  IonSpinner,
+  IonModal,
+  IonList,
+  IonItem,
+  IonAvatar,
+  IonLabel
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline, logOutOutline } from 'ionicons/icons';
+import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline, logOutOutline, personRemoveOutline, closeOutline } from 'ionicons/icons';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
@@ -22,9 +37,29 @@ import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
   templateUrl: './comunidade-tela.page.html',
   styleUrls: ['./comunidade-tela.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, CommonModule, FormsModule, RouterLink, IonSpinner]
+  imports: [
+    IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonButton,
+    IonButtons,
+    IonIcon,
+    IonMenuButton,
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    IonSpinner,
+    IonModal,
+    IonList,
+    IonItem,
+    IonAvatar,
+    IonLabel
+  ]
 })
 export class ComunidadePerfilPage implements OnInit {
+
+  @ViewChild('modalMembros') modalMembros!: IonModal;
 
   comunidade: ComunidadeModel;
   abaSelecionada: 'perfil' | 'chat' | 'anuncios' = 'perfil';
@@ -38,6 +73,10 @@ export class ComunidadePerfilPage implements OnInit {
   saindoComunidade = false;
   totalUsuarios: number = 0;
   codigoVinculo: number | null = null;
+
+  // Lista completa de membros e controle de exibição do modal
+  membros: UsuarioComunidadeModel[] = [];
+  mostrarMembros: boolean = false;
 
   anuncios: AnuncioModel[] = [];
 
@@ -58,7 +97,9 @@ export class ComunidadePerfilPage implements OnInit {
       personOutline,
       settingsOutline,
       trashOutline,
-      logOutOutline
+      logOutOutline,
+      personRemoveOutline,
+      closeOutline
     });
 
     this.comunidade = new ComunidadeModel();
@@ -79,6 +120,9 @@ export class ComunidadePerfilPage implements OnInit {
     this.carregandoAnuncios = true;
     this.carregandoMembros = true;
     this.anuncios = [];
+
+    this.membros = [];
+    this.mostrarMembros = false;
 
     this.comunidadeService.buscarComunidade(cdComunidade).subscribe({
       next: (comunidade) => {
@@ -324,15 +368,85 @@ export class ComunidadePerfilPage implements OnInit {
   carregarTotalUsuarios(cdComunidade: number) {
     this.usuarioComunidadeService.listarUsuariosPorComunidade(cdComunidade).subscribe({
       next: (vinculos) => {
+        this.membros = vinculos;
         this.totalUsuarios = vinculos.length;
         this.carregandoMembros = false;
       },
       error: () => {
         console.log("Erro ao carregar total de usuários da comunidade.");
         this.totalUsuarios = 0;
+        this.membros = [];
         this.carregandoMembros = false;
       }
     });
+  }
+
+  // Getter pra saber o cdUsuario de quem está logado (usado pro admin não remover a si mesmo)
+  get cdUsuarioLogado(): number {
+    return this.usuarioService.getUsuarioSessao()?.cdUsuario;
+  }
+
+  // Abre o modal com a lista de membros
+  abrirListaMembros() {
+    if (this.membros.length === 0) {
+      return;
+    }
+    this.mostrarMembros = true;
+  }
+
+  // Fecha o modal (chamado pelo botão de fechar e pelo didDismiss do ion-modal)
+  fecharListaMembros() {
+    this.mostrarMembros = false;
+  }
+
+  // Espera o modal REALMENTE fechar (animação + remoção do DOM)
+  // antes de navegar. Só trocar mostrarMembros pra false não é
+  // suficiente aqui porque o Ionic mantém a página em cache no
+  // DOM durante a troca de rota, e a navegação acontece rápido
+  // demais pra animação de fechamento rodar sozinha.
+  async irParaPerfilMembro(cdUsuario: number) {
+    await this.modalMembros.dismiss();
+    this.router.navigate(['/usuario-perfil', cdUsuario]);
+  }
+
+  // Confirmação antes de remover um membro (só admin vê o botão)
+  async confirmarRemoverMembro(vinculo: UsuarioComunidadeModel) {
+    const alert = await this.alertController.create({
+      header: 'Remover membro',
+      message: `Deseja realmente remover ${vinculo.usuario.nmUsuario} da comunidade?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Remover',
+          role: 'destructive',
+          handler: () => {
+            this.removerMembro(vinculo);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // Remove o membro da comunidade e atualiza a lista/contador local
+  removerMembro(vinculo: UsuarioComunidadeModel) {
+    this.usuarioComunidadeService
+      .excluirRelacaoEspecifica(vinculo.usuario.cdUsuario, this.comunidade.cdComunidade)
+      .subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.membros = this.membros.filter(
+              m => m.usuario.cdUsuario !== vinculo.usuario.cdUsuario
+            );
+            this.totalUsuarios = this.membros.length;
+          });
+          this.exibirMensagem('Membro removido da comunidade.');
+        },
+        error: () => {
+          this.exibirMensagem('Erro ao remover membro.');
+        }
+      });
   }
 
   async exibirMensagem(msg: string) {
