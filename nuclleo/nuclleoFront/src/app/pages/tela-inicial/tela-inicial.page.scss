@@ -40,7 +40,6 @@ ion-toolbar {
 .btn-requerimento {
   --background: #111827;
   --color: #ffffff;
-  //--border-color: #000000;
 
   --border-radius: 12px;
 }
@@ -49,6 +48,9 @@ ion-toolbar {
 
 .section {
   padding: 12px 16px;
+
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 .section h2 {
@@ -113,7 +115,7 @@ ion-toolbar {
   display: none;
 }
 
-/* CARDS */
+/* CARDS (produtos/anúncios) */
 
 .product-card {
   min-width: 220px;
@@ -172,59 +174,69 @@ ion-card-subtitle {
   font-weight: 600;
 }
 
-/* COMUNIDADES */
+/* GRID DE COMUNIDADES — 2 por linha */
 
-ion-list {
-  background: transparent;
+.comunidades-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-ion-item {
-  --background: #ffffff;
+.comunidade-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
 
-  --color: #111827;
+  background: #ffffff;
 
-  --border-color: transparent;
-
-  --border-radius: 18px;
-
-  margin-bottom: 12px;
-
-  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
 
   overflow: hidden;
 
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 
-  border: 1px solid #e5e7eb;
+  cursor: pointer;
 }
 
-ion-item::part(native) {
-  border-radius: 18px;
-
-  background: #ffffff;
-}
-
-/* AVATAR */
-
-ion-avatar img {
+.comunidade-foto {
+  width: 80px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
+
+  flex-shrink: 0;
 }
 
-/* TEXTO */
+.comunidade-info {
+  padding: 8px 10px;
 
-ion-label h3 {
-  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.comunidade-info h3 {
+  font-size: 13.5px;
   font-weight: 700;
 
   color: #111827;
+
+  margin: 0 0 4px;
 }
 
-ion-label p {
-  margin-top: 4px;
-
+.comunidade-info p {
+  font-size: 11.5px;
   color: #6b7280;
+
+  margin: 2px 0 0;
 }
 
+.comunidade-local {
+  color: #7c3aed;
+  font-weight: 600;
+}
 
 .descricao-clamp {
   display: -webkit-box;
@@ -246,24 +258,19 @@ ion-label p {
   white-space: normal;
 }
 
-
-
-
-
-
 /* BUSCA DE COMUNIDADES */
 
 ion-searchbar {
   --background: #ffffff;
   --border-radius: 14px;
   --box-shadow: none;
+  --color: #111827;
 
   padding: 0;
   margin-bottom: 12px;
 }
 
-
-/* PROXIMIDADE */
+/* PROXIMIDADE — botão/toggle menor */
 
 .opcao-proximidade {
   display: flex;
@@ -272,15 +279,17 @@ ion-searchbar {
 
   background: #ffffff;
 
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  width: 50%;
+  margin: 0 auto 16px;
+
+  padding: 10px 14px;
 
   border-radius: 14px;
   border: 1px solid #e5e7eb;
 }
 
 .opcao-proximidade span {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
 
   color: #111827;
@@ -292,16 +301,9 @@ ion-searchbar {
 
   --handle-background: #ffffff;
   --handle-background-checked: #7d17f1;
-}
 
-ion-searchbar {
-  --background: #ffffff;
-  --border-radius: 14px;
-  --box-shadow: none;
-  --color: #111827; // ← ADICIONA ESSA LINHA
-
-  padding: 0;
-  margin-bottom: 12px;
+  transform: scale(0.8);
+  transform-origin: right center;
 }
 
 .anuncio-preco {
@@ -311,4 +313,95 @@ ion-searchbar {
 
   font-size: 14px;
   font-weight: 700;
+}
+
+/* DESKTOP — telas maiores que 768px */
+
+@media (min-width: 768px) {
+
+  .section {
+    max-width: 960px;
+  }
+
+  .comunidades-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .comunidade-card {
+    border-radius: 20px;
+  }
+
+  .comunidade-foto {
+    width: 120px;
+  }
+
+  .comunidade-info {
+    padding: 14px 18px;
+  }
+
+  .comunidade-info h3 {
+    font-size: 18px;
+  }
+
+  .comunidade-info p {
+    font-size: 14px;
+  }
+
+  ion-searchbar {
+    --border-radius: 16px;
+    font-size: 16px;
+  }
+
+  .opcao-proximidade {
+    padding: 14px 18px;
+  }
+
+  .opcao-proximidade span {
+    font-size: 15px;
+  }
+
+  .opcao-proximidade ion-toggle {
+    transform: scale(1);
+  }
+}
+
+/* MOBILE — telas menores que 480px */
+@media (max-width: 480px) {
+  .comunidades-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .comunidade-foto {
+    width: 110px;
+  }
+
+  .comunidade-info {
+    padding: 10px 14px;
+  }
+
+  .comunidade-info h3 {
+    font-size: 16px;
+  }
+
+  .comunidade-info p {
+    font-size: 13.5px;
+  }
+
+  .opcao-proximidade {
+    width: auto;
+    min-width: 75%;
+
+    padding: 12px 18px;
+  }
+
+  .opcao-proximidade span {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  ion-searchbar {
+    font-size: 15px;
+  }
 }

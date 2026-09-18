@@ -11,19 +11,16 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- Botoes -->
   <ion-content [fullscreen]="true">
 
     <div class="section">
 
-      <div class="section">
-        <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisa"
-          (ionInput)="aoPesquisar($event)">
-        </ion-searchbar>
-      </div>
+      <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisa"
+        (ionInput)="aoPesquisar($event)">
+      </ion-searchbar>
 
       <div class="opcao-proximidade">
-        <span>Comunidades próximas</span>
+        <span>Mostrar comunidades próximas</span>
         <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
         </ion-toggle>
       </div>
@@ -34,24 +31,23 @@
         <p>Carregando...</p>
       </div>
 
-      <ion-list *ngIf="!carregandoComunidades">
+      <div class="comunidades-grid" *ngIf="!carregandoComunidades">
 
-        <ion-item *ngFor="let comunidade of comunidades" button detail="true"
+        <div class="comunidade-card" *ngFor="let comunidade of comunidades"
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
 
-          <ion-avatar slot="start">
-            <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" alt="Foto da Comunidade">
-          </ion-avatar>
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" alt="Foto da Comunidade"
+            class="comunidade-foto">
 
-          <ion-label>
-            <h3>{{ comunidade.nmComunidade }}</h3>
+          <div class="comunidade-info">
+            <h3 class="titulo-clamp">{{ comunidade.nmComunidade }}</h3>
             <p class="descricao-clamp">{{ comunidade.descricao }}</p>
-            <p>{{ comunidade.cidade }}, {{ comunidade.uf }}</p>
-            <p>{{ comunidade.cep }}</p>
-          </ion-label>
-        </ion-item>
+            <p class="comunidade-local">{{ comunidade.cidade }}, {{ comunidade.uf }}</p>
+          </div>
+        </div>
 
-      </ion-list>
+      </div>
+
     </div>
 
   </ion-content>
