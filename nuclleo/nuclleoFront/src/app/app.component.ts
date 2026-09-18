@@ -1,146 +1,109 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import {
-  Router,
-  RouterLink,
-  NavigationEnd
-} from '@angular/router';
-
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import {
-  IonApp,
-  IonRouterOutlet,
-  IonToolbar,
-  IonContent,
-  IonLabel,
-  IonItem,
-  IonList,
-  IonHeader,
-  IonTitle,
-  IonIcon,
-  IonMenu,
-  IonAccordion,
-  IonAccordionGroup,
-  IonBadge
+  IonApp, IonRouterOutlet, IonToolbar, IonContent, IonLabel, IonItem,
+  IonList, IonHeader, IonTitle, IonIcon, IonMenu, IonAccordion,
+  IonAccordionGroup, IonBadge, ToastController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-
 import {
-  add,
-  calendarOutline,
-  checkmarkCircleOutline,
-  chatbubbleOutline,
-  createOutline,
-  eyeOffOutline,
-  eyeOutline,
-  heartOutline,
-  home,
-  homeOutline,
-  imageOutline,
-  locationOutline,
-  logOutOutline,
-  mailOutline,
-  personOutline,
-  peopleOutline,
-  settingsOutline,
-  trashOutline,
-  chevronBackOutline,
-  megaphoneOutline,
-  pricetagOutline,
-  cartOutline
+  add, calendarOutline, checkmarkCircleOutline, chatbubbleOutline, createOutline,
+  eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
+  locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
+  settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
+  pricetagOutline, cartOutline
 } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { NotificacaoService } from 'src/app/services/notificacao.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
   styleUrls: ['app.component.scss'],
-
   imports: [
-    CommonModule,
-    RouterLink,
-    IonApp,
-    IonRouterOutlet,
-    IonToolbar,
-    IonContent,
-    IonLabel,
-    IonItem,
-    IonList,
-    IonHeader,
-    IonTitle,
-    IonIcon,
-    IonMenu,
-    IonAccordion,
-    IonAccordionGroup,
-    IonBadge
+    CommonModule, RouterLink, IonApp, IonRouterOutlet, IonToolbar, IonContent,
+    IonLabel, IonItem, IonList, IonHeader, IonTitle, IonIcon, IonMenu,
+    IonAccordion, IonAccordionGroup, IonBadge
   ],
 })
-
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   menuHabilitado = true;
-  totalConversasPendentes: number = 0; // <-- MUDOU: era totalInteressesRecebidos
+  totalConversasPendentes: number = 0;
 
   constructor(
     private router: Router,
     private interesseService: InteresseService,
     private usuarioService: UsuarioService,
+    private notificacaoService: NotificacaoService,
+    private toastController: ToastController,
   ) {
 
     addIcons({
-      add,
-      calendarOutline,
-      checkmarkCircleOutline,
-      chatbubbleOutline,
-      createOutline,
-      eyeOffOutline,
-      eyeOutline,
-      heartOutline,
-      home,
-      homeOutline,
-      imageOutline,
-      locationOutline,
-      logOutOutline,
-      mailOutline,
-      personOutline,
-      peopleOutline,
-      settingsOutline,
-      trashOutline,
-      chevronBackOutline,
-      megaphoneOutline,
-      pricetagOutline,
-      cartOutline
+      add, calendarOutline, checkmarkCircleOutline, chatbubbleOutline, createOutline,
+      eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
+      locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
+      settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
+      pricetagOutline, cartOutline
     });
 
     this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd)
-      )
+      .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-
         const rotaAtual = this.router.url;
 
-        this.menuHabilitado =
-          rotaAtual !== '/login' &&
-          rotaAtual !== '/cadastro';
+        this.menuHabilitado = rotaAtual !== '/login' && rotaAtual !== '/cadastro';
 
         this.carregarNotificacoes();
+        this.conectarNotificacoesTempoReal();
       });
-
   }
 
-  carregarNotificacoes() {
+  ngOnInit() {
+    this.notificacaoService.onNotificacaoRecebida().subscribe(evento => {
+      if (evento.tipo === 'SOLICITACAO_CONVERSA') {
+        this.totalConversasPendentes++;
+        this.mostrarToast(evento.mensagem);
+      }
+    });
+  }
 
+  conectarNotificacoesTempoReal() {
     const possuiSessao = this.usuarioService.verificarSessao();
 
     if (!possuiSessao) {
-      this.totalConversasPendentes = 0; // <-- MUDOU
+      this.notificacaoService.desconectar();
+      return;
+    }
+
+    const usuario = this.usuarioService.getUsuarioSessao();
+    this.notificacaoService.conectar(usuario.cdUsuario);
+  }
+
+  async mostrarToast(mensagem: string) {
+    const toast = await this.toastController.create({
+      message: mensagem,
+      duration: 3000,
+      position: 'top',
+      color: 'primary',
+      icon: 'chatbubble-outline'
+    });
+    await toast.present();
+  }
+
+  carregarNotificacoes() {
+    const possuiSessao = this.usuarioService.verificarSessao();
+
+    if (!possuiSessao) {
+      this.totalConversasPendentes = 0;
       return;
     }
 
@@ -152,9 +115,7 @@ export class AppComponent {
           i => i.conversaIniciada === true && i.aceito === false
         ).length;
       },
-      error: () => {
-      }
+      error: () => {}
     });
   }
-
 }

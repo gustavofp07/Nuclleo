@@ -1,0 +1,51 @@
+import { Injectable } from '@angular/core';
+import { Subject, Observable } from 'rxjs';
+import { Client, IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+
+export interface NotificacaoEvento {
+  tipo: string;
+  mensagem: string;
+  cdInteresse: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class NotificacaoService {
+  private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
+
+  private client: Client | null = null;
+  private cdUsuarioConectado: number | null = null;
+  private notificacaoRecebida = new Subject<NotificacaoEvento>();
+
+  conectar(cdUsuario: number) {
+    if (this.client?.active && this.cdUsuarioConectado === cdUsuario) {
+      return;
+    }
+
+    this.desconectar();
+    this.cdUsuarioConectado = cdUsuario;
+
+    this.client = new Client({
+      webSocketFactory: () => new SockJS(this.URL_WS),
+      reconnectDelay: 5000,
+      onConnect: () => {
+        this.client!.subscribe(`/topic/notificacoes/${cdUsuario}`, (msg: IMessage) => {
+          const evento: NotificacaoEvento = JSON.parse(msg.body);
+          this.notificacaoRecebida.next(evento);
+        });
+      }
+    });
+
+    this.client.activate();
+  }
+
+  onNotificacaoRecebida(): Observable<NotificacaoEvento> {
+    return this.notificacaoRecebida.asObservable();
+  }
+
+  desconectar() {
+    this.client?.deactivate();
+    this.client = null;
+    this.cdUsuarioConectado = null;
+  }
+}

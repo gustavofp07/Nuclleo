@@ -19,6 +19,7 @@ import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
 import br.cefetmg.nuclleo.dto.AvaliarAnuncianteRequestDTO;
 import br.cefetmg.nuclleo.dto.FinalizarConversaRequestDTO;
+import br.cefetmg.nuclleo.dto.NotificacaoDTO;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -176,6 +177,14 @@ public class InteresseService {
 
         interesse.setConversaIniciada(true);
         interesseRepository.save(interesse);
+
+        Usuario anunciante = interesse.getAnuncio().getUsuarioCria();
+        NotificacaoDTO notificacao = new NotificacaoDTO(
+                "SOLICITACAO_CONVERSA",
+                "Você recebeu uma nova solicitação de conversa",
+                interesse.getId());
+
+        messagingTemplate.convertAndSend("/topic/notificacoes/" + anunciante.getCdUsuario(), notificacao);
     }
 
     @Transactional
