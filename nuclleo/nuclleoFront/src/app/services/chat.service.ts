@@ -12,8 +12,10 @@ interface DigitandoEvento {
 
 export interface StatusInteresseEvento {
   finalizado: boolean;
-  avaliacaoInteressadoFeita: boolean; 
-  avaliacaoAnuncianteFeita: boolean; 
+  avaliacaoInteressadoFeita: boolean;
+  avaliacaoAnuncianteFeita: boolean;
+  aceito: boolean;
+  conversaIniciada: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

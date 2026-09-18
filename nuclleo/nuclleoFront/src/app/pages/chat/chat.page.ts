@@ -21,7 +21,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
 
-import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service'; 
+import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
@@ -74,7 +74,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
   aguardandoAceite: boolean = false;
 
-  private avaliacaoSolicitada = false; 
+  private avaliacaoSolicitada = false;
   private encerrando = false;
 
   private timeoutDigitando: any = null;
@@ -159,10 +159,10 @@ export class ChatPage implements OnInit, OnDestroy {
         this.aplicarStatusInteresse({
           finalizado: interesse.finalizado,
           avaliacaoInteressadoFeita: interesse.avaliacaoInteressadoFeita,
-          avaliacaoAnuncianteFeita: interesse.avaliacaoAnuncianteFeita
+          avaliacaoAnuncianteFeita: interesse.avaliacaoAnuncianteFeita,
+          aceito: (interesse as any).aceito,
+          conversaIniciada: interesse.conversaIniciada
         });
-
-        this.aguardandoAceite = souEuOInteressado && !(interesse as any).aceito;
 
         this.iniciarChat();
       },
@@ -221,6 +221,21 @@ export class ChatPage implements OnInit, OnDestroy {
 
   private aplicarStatusInteresse(status: StatusInteresseEvento) {
     const finalizouAgora = status.finalizado && !this.chatFinalizado;
+
+    if (!status.conversaIniciada) {
+      if (!this.souAnunciante) {
+        this.exibirMensagem('O anunciante recusou a solicitação de conversa.');
+        this.router.navigate(['/conversas']);
+      }
+      return;
+    }
+
+    const aceiteRecebidoAgora = status.aceito && this.aguardandoAceite;
+    this.aguardandoAceite = !this.souAnunciante && !status.aceito;
+
+    if (aceiteRecebidoAgora) {
+      this.exibirMensagem('Sua solicitação de chat foi aceita!');
+    }
 
     this.chatFinalizado = status.finalizado;
 

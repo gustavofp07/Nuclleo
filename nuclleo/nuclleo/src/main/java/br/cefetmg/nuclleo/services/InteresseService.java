@@ -155,7 +155,9 @@ public class InteresseService {
         InteresseStatusDTO status = new InteresseStatusDTO(
                 interesse.isFinalizado(),
                 interesse.isAvaliacaoInteressadoFeita(),
-                interesse.isAvaliacaoAnuncianteFeita());
+                interesse.isAvaliacaoAnuncianteFeita(),
+                interesse.isAceito(),
+                interesse.isConversaIniciada());
 
         messagingTemplate.convertAndSend("/topic/chat/" + interesse.getId() + "/status", status);
     }
@@ -187,6 +189,8 @@ public class InteresseService {
         interesse.setConversaIniciada(false);
         interesse.setAceito(false);
         interesseRepository.save(interesse);
+
+        notificarStatus(interesse);
     }
 
     private void excluirSeAmbosAvaliaram(Interesse interesse) {
@@ -212,6 +216,8 @@ public class InteresseService {
 
         interesse.setAceito(true);
         interesseRepository.save(interesse);
+
+        notificarStatus(interesse);
     }
 
     @Transactional
