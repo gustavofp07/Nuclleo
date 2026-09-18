@@ -16,7 +16,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline } from 'ionicons/icons';
+import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
@@ -78,6 +78,7 @@ export class AnuncioTelaPage implements OnInit {
       locationOutline,
       heartDislikeOutline,
       imageOutline,
+      calendarOutline,
     });
   }
 
@@ -249,6 +250,31 @@ export class AnuncioTelaPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  tempoPublicacao(): string {
+    if (!this.anuncio.dtCriacao) {
+      return '';
+    }
+
+    const dtCriacao = new Date(this.anuncio.dtCriacao);
+    const agora = new Date();
+
+    const diffMs = agora.getTime() - dtCriacao.getTime();
+    const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDias <= 0) {
+      return 'Anunciado hoje';
+    }
+    if (diffDias === 1) {
+      return 'Anunciado há 1 dia';
+    }
+    if (diffDias < 30) {
+      return `Anunciado há ${diffDias} dias`;
+    }
+
+    const diffMeses = Math.floor(diffDias / 30);
+    return diffMeses === 1 ? 'Anunciado há 1 mês' : `Anunciado há ${diffMeses} meses`;
   }
 
   async confirmarInteresse() {

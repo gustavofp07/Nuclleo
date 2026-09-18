@@ -48,6 +48,11 @@
         R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} - R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
       </div>
 
+      <div class="info-item" *ngIf="anuncio.dtCriacao">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ tempoPublicacao() }}</span>
+      </div>
+
     </div>
 
     <div class="info-box">
