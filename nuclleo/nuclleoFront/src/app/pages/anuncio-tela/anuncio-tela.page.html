@@ -24,7 +24,7 @@
           {{ anuncio.nmAnuncio }}
         </span>
         <span class="tipo-anuncio">
-          {{ anuncio.tipoAnuncio }}
+          {{ anuncio.tipoAnuncio === 'REQUERIMENTO' ? 'COMPRA' : anuncio.tipoAnuncio }}
         </span>
       </h2>
 
@@ -41,7 +41,7 @@
       </div>
 
       <hr>
-      
+
       <div class="valor-anuncio" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
         R$ {{ $any(anuncio).valor | number:'1.2-2' }}
       </div>
