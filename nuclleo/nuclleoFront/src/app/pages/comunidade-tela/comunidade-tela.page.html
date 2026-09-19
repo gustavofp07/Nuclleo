@@ -205,7 +205,6 @@
   </div>
 
   <!-- MODAL DE LISTA DE MEMBROS -->
-  <!-- Aparece centralizado na tela, com fundo escurecido, e o conteúdo interno rola caso a lista seja grande -->
   <ion-modal #modalMembros [isOpen]="mostrarMembros" (didDismiss)="fecharListaMembros()" class="modal-membros">
     <ng-template>
 
@@ -232,16 +231,31 @@
               <a class="link-usuario" (click)="irParaPerfilMembro(vinculo.usuario.cdUsuario)">
                 {{ vinculo.usuario.nmUsuario }}
               </a>
+              <span class="badge-admin" *ngIf="ehDono(vinculo)">ADMIN</span>
             </ion-label>
 
-            <ion-button *ngIf="usuarioEhAdmin && vinculo.usuario.cdUsuario !== cdUsuarioLogado" slot="end"
-              fill="clear" color="danger" (click)="confirmarRemoverMembro(vinculo)">
-              <ion-icon name="person-remove-outline" slot="icon-only"></ion-icon>
+            <!-- Engrenagem: só o admin vê, e não no próprio admin -->
+            <ion-button *ngIf="podeModerar(vinculo)" slot="end" fill="clear" color="medium"
+              (click)="abrirOpcoes($event, vinculo)">
+              <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
             </ion-button>
 
           </ion-item>
         </ion-list>
       </ion-content>
+
+      <!-- Abinha com a opção Expulsar -->
+      <ion-popover [isOpen]="popoverAberto" [event]="eventoPopover" (didDismiss)="popoverAberto = false"
+        class="popover-moderacao">
+        <ng-template>
+          <ion-list lines="none">
+            <ion-item button [detail]="false" (click)="escolherAcao()">
+              <ion-icon name="person-remove-outline" slot="start"></ion-icon>
+              <ion-label>Expulsar</ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-template>
+      </ion-popover>
 
     </ng-template>
   </ion-modal>

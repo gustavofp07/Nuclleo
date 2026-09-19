@@ -448,3 +448,46 @@
 .membro-item ion-avatar img {
   object-fit: cover;
 }
+
+/* ===== COLE ISSO NO FINAL do comunidade-tela.page.scss ===== */
+
+/* Selo ADMIN roxo na lista de membros */
+.badge-admin {
+  display: inline-block;
+
+  margin-left: 8px;
+  padding: 2px 8px;
+
+  border-radius: 8px;
+
+  background: #7d17f1;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  vertical-align: middle;
+}
+
+/* Popover da engrenagem (Expulsar / Banir) */
+.popover-moderacao {
+  --width: 190px;
+  --background: #ffffff;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.popover-moderacao ion-list {
+  padding: 4px 0;
+  background: #ffffff;
+}
+
+.popover-moderacao ion-item {
+  --background: #ffffff;
+  --color: #111827;
+  font-weight: 600;
+}
+
+.popover-moderacao ion-item.opcao-perigo {
+  --color: #dc2626;
+}

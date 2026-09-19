@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,15 +15,27 @@ import {
   IonList,
   IonItem,
   IonAvatar,
-  IonLabel
+  IonLabel,
+  IonPopover
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, peopleOutline, personOutline, settingsOutline, trashOutline, logOutOutline, personRemoveOutline, closeOutline } from 'ionicons/icons';
+import {
+  calendarOutline,
+  peopleOutline,
+  personOutline,
+  settingsOutline,
+  trashOutline,
+  logOutOutline,
+  personRemoveOutline,
+  closeOutline
+} from 'ionicons/icons';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AlertController, ToastController } from '@ionic/angular';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
@@ -31,6 +43,7 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
+import { ComunidadeEventosService, EventoComunidade } from 'src/app/services/comunidade-eventos.service';
 
 @Component({
   selector: 'app-comunidade-tela',
@@ -54,10 +67,11 @@ import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
     IonList,
     IonItem,
     IonAvatar,
-    IonLabel
+    IonLabel,
+    IonPopover
   ]
 })
-export class ComunidadePerfilPage implements OnInit {
+export class ComunidadePerfilPage implements OnInit, OnDestroy {
 
   @ViewChild('modalMembros') modalMembros!: IonModal;
 
@@ -78,7 +92,15 @@ export class ComunidadePerfilPage implements OnInit {
   membros: UsuarioComunidadeModel[] = [];
   mostrarMembros: boolean = false;
 
+  // Popover da engrenagem (Expulsar / Banir)
+  popoverAberto = false;
+  eventoPopover: Event | undefined;
+  membroSelecionado: UsuarioComunidadeModel | null = null;
+
   anuncios: AnuncioModel[] = [];
+
+  // Escuta em tempo real (SSE)
+  private eventosSub?: Subscription;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -87,6 +109,7 @@ export class ComunidadePerfilPage implements OnInit {
     private usuarioService: UsuarioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private anuncioComunidadeService: AnuncioComunidadeService,
+    private eventosService: ComunidadeEventosService,
     private alertController: AlertController,
     private toastController: ToastController,
     private ngZone: NgZone,
@@ -108,6 +131,10 @@ export class ComunidadePerfilPage implements OnInit {
   ngOnInit() {
   }
 
+  ngOnDestroy() {
+    this.pararEscutaEventos();
+  }
+
   ionViewWillEnter() {
 
     const cdComunidade = Number(this.activatedRoute.snapshot.paramMap.get('cdComunidade'));
@@ -123,6 +150,10 @@ export class ComunidadePerfilPage implements OnInit {
 
     this.membros = [];
     this.mostrarMembros = false;
+    this.popoverAberto = false;
+    this.membroSelecionado = null;
+
+    this.iniciarEscutaEventos();
 
     this.comunidadeService.buscarComunidade(cdComunidade).subscribe({
       next: (comunidade) => {
@@ -143,6 +174,102 @@ export class ComunidadePerfilPage implements OnInit {
       }
     });
   }
+
+  // Ao sair da tela (ex.: ir pro perfil de alguém) fecha a conexão em tempo real.
+  // Ao voltar, o ionViewWillEnter reabre e recarrega tudo.
+  ionViewWillLeave() {
+    this.pararEscutaEventos();
+  }
+
+  // =========================================================
+  // TEMPO REAL (expulso / banido)
+  // =========================================================
+
+  private iniciarEscutaEventos() {
+    this.pararEscutaEventos();
+
+    const usuario = this.usuarioService.getUsuarioSessao();
+    if (!usuario?.cdUsuario) {
+      return;
+    }
+
+    this.eventosSub = this.eventosService.conectar(usuario.cdUsuario).subscribe({
+      next: (evento) => this.tratarEvento(evento)
+    });
+  }
+
+  private pararEscutaEventos() {
+    this.eventosSub?.unsubscribe();
+    this.eventosSub = undefined;
+  }
+
+  private tratarEvento(evento: EventoComunidade) {
+    // (Re)conectou: se perdeu algum evento durante a queda, revalida o vínculo
+    if (evento.tipo === 'CONECTADO') {
+      this.revalidarVinculo();
+      return;
+    }
+
+    // Só importa se for a comunidade que esta tela está mostrando
+    if (evento.cdComunidade !== this.comunidade?.cdComunidade) {
+      return;
+    }
+
+    if (evento.tipo === 'EXPULSO') {
+      this.aplicarRemocao();
+    }
+  }
+
+  // Chama o backend "em silêncio" só pra checar se ainda faz parte da comunidade
+  private revalidarVinculo() {
+    if (
+      this.carregandoVinculo ||
+      this.carregandoComunidade ||
+      !this.comunidade?.cdComunidade ||
+      this.usuarioEhAdmin ||
+      !this.usuarioEntrouNaComunidade
+    ) {
+      return;
+    }
+
+    const usuario = this.usuarioService.getUsuarioSessao();
+    if (!usuario?.cdUsuario) {
+      return;
+    }
+
+    this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
+      next: (vinculos) => {
+        const vinculo = vinculos.find(
+          (v) => v.comunidade.cdComunidade === this.comunidade.cdComunidade
+        );
+        if (!vinculo) {
+          this.aplicarRemocao();
+        }
+      },
+      error: () => { }
+    });
+  }
+
+  // Tira o usuário da comunidade na hora e volta pra tela "normal" (aba Perfil, sem participar)
+  private aplicarRemocao() {
+    this.ngZone.run(() => {
+      this.mostrarMembros = false;
+      this.popoverAberto = false;
+      this.membroSelecionado = null;
+
+      this.usuarioEntrouNaComunidade = false;
+      this.codigoVinculo = null;
+      this.abaSelecionada = 'perfil';
+      this.anuncios = [];
+
+      // Atualiza lista/contador de membros
+      this.carregarTotalUsuarios(this.comunidade.cdComunidade);
+
+      this.exibirMensagem('Você foi removido dessa comunidade.');
+    });
+  }
+
+  // =========================================================
 
   rotuloTipoAnuncio(tipo: string): string {
     return tipo === 'REQUERIMENTO' ? 'COMPRA' : 'VENDA';
@@ -192,6 +319,7 @@ export class ComunidadePerfilPage implements OnInit {
         this.usuarioEntrouNaComunidade = true;
         this.entrandoComunidade = false;
         this.exibirMensagem('Você entrou na comunidade!');
+        this.carregarTotalUsuarios(this.comunidade.cdComunidade);
       },
       error: (error: HttpErrorResponse) => {
         this.entrandoComunidade = false;
@@ -260,6 +388,7 @@ export class ComunidadePerfilPage implements OnInit {
             this.abaSelecionada = 'perfil';
           });
           this.exibirMensagem('Você saiu da comunidade.');
+          this.carregarTotalUsuarios(this.comunidade.cdComunidade);
         },
         error: () => {
           this.ngZone.run(() => {
@@ -368,8 +497,23 @@ export class ComunidadePerfilPage implements OnInit {
   carregarTotalUsuarios(cdComunidade: number) {
     this.usuarioComunidadeService.listarUsuariosPorComunidade(cdComunidade).subscribe({
       next: (vinculos) => {
-        this.membros = vinculos;
-        this.totalUsuarios = vinculos.length;
+        const lista = [...vinculos];
+
+        // O dono pode não ter registro em tb_usuario_comunidade;
+        // garante que ele apareça na lista (com o selo ADMIN)
+        const dono = this.comunidade.usuarioCria;
+        if (dono && !lista.some(v => v.usuario.cdUsuario === dono.cdUsuario)) {
+          const vinculoDono = new UsuarioComunidadeModel();
+          vinculoDono.usuario = dono;
+          vinculoDono.comunidade = this.comunidade;
+          lista.unshift(vinculoDono);
+        }
+
+        // Dono sempre em primeiro
+        lista.sort((a, b) => Number(this.ehDono(b)) - Number(this.ehDono(a)));
+
+        this.membros = lista;
+        this.totalUsuarios = lista.length;
         this.carregandoMembros = false;
       },
       error: () => {
@@ -381,9 +525,21 @@ export class ComunidadePerfilPage implements OnInit {
     });
   }
 
-  // Getter pra saber o cdUsuario de quem está logado (usado pro admin não remover a si mesmo)
+  // Getter pra saber o cdUsuario de quem está logado
   get cdUsuarioLogado(): number {
     return this.usuarioService.getUsuarioSessao()?.cdUsuario;
+  }
+
+  // Esse membro é o dono (admin) da comunidade?
+  ehDono(vinculo: UsuarioComunidadeModel): boolean {
+    return vinculo.usuario.cdUsuario === this.comunidade.usuarioCria?.cdUsuario;
+  }
+
+  // Só o admin vê a engrenagem, e não em si mesmo
+  podeModerar(vinculo: UsuarioComunidadeModel): boolean {
+    return this.usuarioEhAdmin
+      && !this.ehDono(vinculo)
+      && vinculo.usuario.cdUsuario !== this.cdUsuarioLogado;
   }
 
   // Abre o modal com a lista de membros
@@ -397,30 +553,45 @@ export class ComunidadePerfilPage implements OnInit {
   // Fecha o modal (chamado pelo botão de fechar e pelo didDismiss do ion-modal)
   fecharListaMembros() {
     this.mostrarMembros = false;
+    this.popoverAberto = false;
   }
 
-  // Espera o modal REALMENTE fechar (animação + remoção do DOM)
-  // antes de navegar. Só trocar mostrarMembros pra false não é
-  // suficiente aqui porque o Ionic mantém a página em cache no
-  // DOM durante a troca de rota, e a navegação acontece rápido
-  // demais pra animação de fechamento rodar sozinha.
+  // Espera o modal REALMENTE fechar antes de navegar
   async irParaPerfilMembro(cdUsuario: number) {
     await this.modalMembros.dismiss();
     this.router.navigate(['/usuario-perfil', cdUsuario]);
   }
 
-  // Confirmação antes de remover um membro (só admin vê o botão)
-  async confirmarRemoverMembro(vinculo: UsuarioComunidadeModel) {
+  // ---------- Engrenagem: Expulsar ----------
+
+  abrirOpcoes(evento: Event, vinculo: UsuarioComunidadeModel) {
+    this.eventoPopover = evento;
+    this.membroSelecionado = vinculo;
+    this.popoverAberto = true;
+  }
+
+  escolherAcao() {
+    const alvo = this.membroSelecionado;
+    this.popoverAberto = false;
+
+    if (!alvo) {
+      return;
+    }
+
+    this.confirmarExpulsao(alvo);
+  }
+
+  async confirmarExpulsao(vinculo: UsuarioComunidadeModel) {
     const alert = await this.alertController.create({
-      header: 'Remover membro',
-      message: `Deseja realmente remover ${vinculo.usuario.nmUsuario} da comunidade?`,
+      header: 'Expulsar membro',
+      message: `Expulsar ${vinculo.usuario.nmUsuario}? Ele será removido, mas poderá entrar de novo.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Remover',
+          text: 'Expulsar',
           role: 'destructive',
           handler: () => {
-            this.removerMembro(vinculo);
+            this.expulsarMembro(vinculo);
           }
         }
       ]
@@ -429,22 +600,29 @@ export class ComunidadePerfilPage implements OnInit {
     await alert.present();
   }
 
-  // Remove o membro da comunidade e atualiza a lista/contador local
-  removerMembro(vinculo: UsuarioComunidadeModel) {
+  // 1) apaga o vínculo (endpoint que você já tinha)  2) avisa o usuário em tempo real
+  private expulsarMembro(vinculo: UsuarioComunidadeModel) {
+    const cdComunidade = this.comunidade.cdComunidade;
+    const cdUsuario = vinculo.usuario.cdUsuario;
+    const cdAdmin = this.cdUsuarioLogado;
+
     this.usuarioComunidadeService
-      .excluirRelacaoEspecifica(vinculo.usuario.cdUsuario, this.comunidade.cdComunidade)
+      .excluirRelacaoEspecifica(cdUsuario, cdComunidade)
+      .pipe(
+        switchMap(() => this.comunidadeService.expulsarMembro(cdComunidade, cdUsuario, cdAdmin))
+      )
       .subscribe({
         next: () => {
           this.ngZone.run(() => {
-            this.membros = this.membros.filter(
-              m => m.usuario.cdUsuario !== vinculo.usuario.cdUsuario
-            );
+            this.membros = this.membros.filter(m => m.usuario.cdUsuario !== cdUsuario);
             this.totalUsuarios = this.membros.length;
           });
-          this.exibirMensagem('Membro removido da comunidade.');
+          this.exibirMensagem('Membro expulso da comunidade.');
         },
-        error: () => {
-          this.exibirMensagem('Erro ao remover membro.');
+        error: (erro: HttpErrorResponse) => {
+          console.error(erro);
+          this.exibirMensagem('Erro ao expulsar membro.');
+          this.carregarTotalUsuarios(cdComunidade);
         }
       });
   }

@@ -48,6 +48,9 @@ public class ComunidadeService {
     @Autowired
     private ViaCepService viaCepService;
 
+    @Autowired
+    private ComunidadeEventosService comunidadeEventosService;
+
     @Transactional
     public Comunidade inserir(ComunidadeRequestDTO dto, MultipartFile foto) {
         if (dto == null) {
@@ -204,6 +207,29 @@ public class ComunidadeService {
         ordenarPorProximidade(comunidades, cepUsuario);
 
         return comunidades;
+    }
+
+    /**
+     * Confere se quem pediu é o dono da comunidade e avisa o membro expulso em
+     * tempo real. O vínculo em si é apagado pelo endpoint de usuário-comunidade
+     * que o front já chama antes deste.
+     */
+    @Transactional(readOnly = true)
+    public void expulsarMembro(Long cdComunidade, Long cdUsuario, Long cdAdmin) {
+        Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
+
+        Long cdDono = comunidade.getUsuarioCria().getCdUsuario();
+
+        if (!cdDono.equals(cdAdmin)) {
+            throw new BusinessException("Apenas o administrador pode expulsar membros.");
+        }
+
+        if (cdDono.equals(cdUsuario)) {
+            throw new BusinessException("O administrador não pode ser removido da própria comunidade.");
+        }
+
+        comunidadeEventosService.notificar(cdUsuario, "EXPULSO", cdComunidade);
     }
 
     private void ordenarPorProximidade(

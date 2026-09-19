@@ -113,4 +113,16 @@ public class ComunidadeController {
 
         return ResponseEntity.ok(comunidadeService.listarComunidadesProximas(cdUsuario, termo));
     }
+
+    // Avisa em tempo real o membro expulso (o vínculo é apagado pelo endpoint de usuário-comunidade)
+    @PostMapping("/{cdComunidade}/usuarios/{cdUsuario}/expulsar")
+    @Operation(summary = "Expulsar membro da comunidade (avisa o membro em tempo real)")
+    public ResponseEntity<Void> expulsarMembro(
+            @PathVariable Long cdComunidade,
+            @PathVariable Long cdUsuario,
+            @RequestParam Long cdAdmin) {
+
+        comunidadeService.expulsarMembro(cdComunidade, cdUsuario, cdAdmin);
+        return ResponseEntity.noContent().build();
+    }
 }

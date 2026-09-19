@@ -115,4 +115,13 @@ export class ComunidadeService {
   excluir(cdComunidade: number): Observable<ComunidadeModel> {
     return this.http.delete<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`);
   }
+
+  // Avisa em tempo real o membro expulso (chamar DEPOIS de apagar o vínculo)
+  expulsarMembro(cdComunidade: number, cdUsuario: number, cdAdmin: number): Observable<void> {
+    return this.http.post<void>(
+      `${this.API_URL}/${cdComunidade}/usuarios/${cdUsuario}/expulsar`,
+      null,
+      { params: { cdAdmin } }
+    );
+  }
 }
