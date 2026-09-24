@@ -95,13 +95,19 @@ ion-toolbar {
 .anuncio-imagem {
   width: 100%;
   aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: hidden;
 }
 
 .anuncio-imagem-foto {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
 
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
@@ -225,17 +231,13 @@ ion-toolbar {
 /* BOTÃO */
 
 .btn-criar {
-  --background: linear-gradient(
-    90deg,
-    #7c3aed,
-    #a855f7
-  );
+  --background: linear-gradient(90deg,
+      #7c3aed,
+      #a855f7);
 
-  --background-hover: linear-gradient(
-    90deg,
-    #6d28d9,
-    #9333ea
-  );
+  --background-hover: linear-gradient(90deg,
+      #6d28d9,
+      #9333ea);
 
   --color: #ffffff;
   --border-radius: 16px;
