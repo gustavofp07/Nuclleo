@@ -36,7 +36,7 @@
         <button class="comunidade-card" type="button" *ngFor="let comunidade of comunidades"
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
 
-          <img [src]="comunidade.foto || 'https://picsum.photos/200'" class="foto-comunidade">
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
 
           <div class="info">
             <div class="titulo-comunidade">
