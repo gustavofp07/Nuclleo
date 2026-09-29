@@ -7,7 +7,7 @@
 
     <ion-title>
       {{ modoEdicao
-      ? 'Editar anúncio'
+      ? 'Atualizar anúncio'
       : tipo === 'VENDA'
       ? 'Criar anúncio de venda'
       : 'Criar anúncio de compra' }}
@@ -22,7 +22,9 @@
     <!-- TOPO -->
     <div class="topo">
       <h1>
-        {{ tipo === 'VENDA'
+        {{ modoEdicao
+        ? 'Atualizar anúncio'
+        : tipo === 'VENDA'
         ? 'Novo anúncio de venda'
         : 'Novo anúncio de compra' }}
       </h1>
