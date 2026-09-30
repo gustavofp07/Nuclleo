@@ -29,7 +29,7 @@ import {
 import {
   AlertController,
   ToastController
-} from '@ionic/angular';
+} from '@ionic/angular/standalone';
 
 import {
   addIcons

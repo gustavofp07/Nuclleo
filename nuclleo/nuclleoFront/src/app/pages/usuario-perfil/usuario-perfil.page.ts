@@ -14,14 +14,11 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular/standalone';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
-
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
-import { AlertController } from '@ionic/angular';
-
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 
 @Component({

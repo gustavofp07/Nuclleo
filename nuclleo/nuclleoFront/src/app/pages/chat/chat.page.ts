@@ -16,7 +16,7 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
@@ -42,12 +42,10 @@ interface MensagemView extends MensagemModel {
     FormsModule,
     IonContent,
     IonHeader,
-    IonTitle,
     IonToolbar,
     IonButtons,
     IonBackButton,
     IonFooter,
-    IonItem,
     IonInput,
     IonButton,
     IonIcon

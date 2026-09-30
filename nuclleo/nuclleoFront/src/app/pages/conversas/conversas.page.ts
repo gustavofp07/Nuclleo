@@ -14,7 +14,7 @@ import {
   IonSpinner
 } from '@ionic/angular/standalone';
 
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import { chatbubblesOutline, checkmarkDoneOutline, closeOutline } from 'ionicons/icons';

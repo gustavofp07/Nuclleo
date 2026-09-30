@@ -32,7 +32,7 @@ import {
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';

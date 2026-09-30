@@ -29,7 +29,7 @@ import { Router } from '@angular/router';
 
 import { UsuarioService } from 'src/app/services/usuario.service';
 
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
 
 import { HttpClient } from '@angular/common/http';
 
@@ -49,14 +49,6 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
 
   imports: [
     IonContent,
-    IonLabel,
-    IonAvatar,
-    IonItem,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCard,
-    IonCardHeader,
-    IonList,
     IonHeader,
     IonTitle,
     IonToolbar,
@@ -64,9 +56,7 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
     IonButtons,
     CommonModule,
     FormsModule,
-    IonButton,
     RouterLink,
-    IonIcon,
     IonSpinner,
     IonToggle,
     IonSearchbar

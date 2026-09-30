@@ -9,11 +9,12 @@ import {
   IonMenuButton,
   IonIcon,
   IonButton,
-  IonSpinner
+  IonSpinner,
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AlertController, ToastController } from '@ionic/angular';
 
 import { addIcons } from 'ionicons';
 import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline } from 'ionicons/icons';
@@ -179,7 +180,9 @@ export class AnuncioTelaPage implements OnInit {
         this.ngZone.run(() => {
           this.carregandoInteresse = false;
         });
-        this.exibirMensagem('Erro! ' + erro.error.message);
+        this.exibirMensagem(
+          erro?.error?.message || erro?.message || 'Erro ao registrar interesse.'
+        );
       }
     });
   }

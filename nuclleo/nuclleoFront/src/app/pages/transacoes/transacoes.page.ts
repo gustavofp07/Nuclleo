@@ -5,7 +5,7 @@ import { addIcons } from 'ionicons';
 import { cashOutline, calendarOutline, personOutline, pricetagOutline } from 'ionicons/icons';
 
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
 
 import { TransacaoModel } from 'src/app/model/transacao.model';
 import { TransacaoService } from 'src/app/services/transacao.service';

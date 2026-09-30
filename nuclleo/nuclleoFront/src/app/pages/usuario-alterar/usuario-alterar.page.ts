@@ -32,8 +32,7 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
     IonToolbar,
     IonButtons,
     IonMenuButton,
-    IonTitle,
-    IonLabel
+    IonTitle
   ]
 })
 export class UsuarioAlterarPage implements OnInit {
@@ -351,6 +350,7 @@ export class UsuarioAlterarPage implements OnInit {
         this.usuario = usuario;
         this.senhaOriginal = usuario.senha;
         await this.exibirMensagem('Senha alterada com sucesso!');
+        this.router.navigate(['/usuario-perfil']);
       },
       error: async (erro) => {
         const mensagem =
