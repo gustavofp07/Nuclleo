@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
 import {
   IonContent,
@@ -34,7 +40,7 @@ import { UsuarioAutenticadoModel } from 'src/app/model/usuario-autenticado.model
 
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     RouterLink,
 
     IonContent,
@@ -46,10 +52,12 @@ import { UsuarioAutenticadoModel } from 'src/app/model/usuario-autenticado.model
 })
 
 export class LoginPage implements OnInit {
+  formLogin: FormGroup;
   login: LoginModel;
   showPassword: boolean = false;
 
   constructor(
+    private formBuilder: FormBuilder,
     private router: Router,
     private toastController: ToastController,
     private loginService: LoginService,
@@ -57,6 +65,16 @@ export class LoginPage implements OnInit {
   ) {
 
     this.login = new LoginModel();
+
+    this.formLogin = this.formBuilder.group({
+      email: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)
+      ]],
+
+      senha: ['', Validators.required]
+    });
 
     addIcons({
       eyeOutline,
@@ -72,6 +90,11 @@ export class LoginPage implements OnInit {
     this.usuarioService.limparSessao();
     this.login = new LoginModel();
     this.showPassword = false;
+
+    this.formLogin.reset({
+      email: '',
+      senha: ''
+    });
   }
 
   togglePassword() {
@@ -79,16 +102,20 @@ export class LoginPage implements OnInit {
   }
 
   entrar() {
-    //console.log('Login');
-    //console.log(this.login.email);
-    //console.log(this.login.senha);
+    if (this.formLogin.invalid) {
+      this.formLogin.markAllAsTouched();
+      return;
+    }
+
+    this.login.email = this.formLogin.value.email;
+    this.login.senha = this.formLogin.value.senha;
 
     this.loginService.entrar(this.login).subscribe({
       next: async (usuario: UsuarioAutenticadoModel) => {
         await this.exibirMensagem('Login realizado com sucesso!');
         console.log(usuario);
+
         this.usuarioService.salvarUsuarioSessao(usuario);
-        //localStorage.setItem("usuarioAutenticado",JSON.stringify(usuario));
 
         this.router.navigate(['/tela-inicial']);
       },
@@ -97,7 +124,6 @@ export class LoginPage implements OnInit {
         await this.exibirMensagem('Erro! ' + erro?.error?.message);
       }
     });
-
   }
 
   onGoogleLogin() {

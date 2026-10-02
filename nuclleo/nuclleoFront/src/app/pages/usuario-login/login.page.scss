@@ -50,8 +50,6 @@
   --padding-start: 0;
   --inner-padding-end: 0;
 
-  margin-bottom: 18px;
-
   border: 1px solid #424242;
   border-radius: 14px;
 
@@ -157,7 +155,7 @@ ion-input {
 
 /* LABELS */
 .campo-label {
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   margin-top: 18px;
 }
 
@@ -174,4 +172,11 @@ ion-input {
   font-weight: 600;
 
   color: #000000;
+}
+
+.mensagem-erro {
+  color: #dc2626;
+  font-size: 12px;
+  margin-left: 8px;
+  margin-right: 8px;
 }

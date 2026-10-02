@@ -70,12 +70,19 @@ public class UsuarioService {
         usuario.setCpf(dto.getCpf());
         usuario.setTelefone(dto.getTelefone());
 
-        ViaCepResponseDTO endereco = viaCepService.buscarCep(dto.getCep());
-        String cepLimpo = dto.getCep().replaceAll("\\D", "");
+        // o CEP não é obrigatório, mas se for informado, deve ser validado e preenchido
+        if (dto.getCep() != null && dto.getCep().isBlank()) {
+            ViaCepResponseDTO endereco = viaCepService.buscarCep(dto.getCep());
+            String cepLimpo = dto.getCep().replaceAll("\\D", "");
 
-        usuario.setCep(cepLimpo);
-        usuario.setCidade(endereco.getLocalidade());
-        usuario.setUf(endereco.getUf());
+            usuario.setCep(cepLimpo);
+            usuario.setCidade(endereco.getLocalidade());
+            usuario.setUf(endereco.getUf());
+        } else {
+            usuario.setCep(null);
+            usuario.setCidade(null);
+            usuario.setUf(null);
+        }
 
         if (foto != null && !foto.isEmpty()) {
             try {

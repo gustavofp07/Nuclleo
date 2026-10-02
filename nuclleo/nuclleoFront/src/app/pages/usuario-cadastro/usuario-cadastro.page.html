@@ -48,9 +48,8 @@
       </p>
 
       <p class="mensagem-erro" *ngIf="
-          formUsuario.get('email')?.touched &&
-          formUsuario.get('email')?.hasError('email')
-        ">
+    formUsuario.get('email')?.touched &&
+    (formUsuario.get('email')?.hasError('email') || formUsuario.get('email')?.hasError('pattern'))">
         Informe um e-mail válido.
       </p>
 
@@ -79,6 +78,12 @@
           formUsuario.get('nmUsuario')?.hasError('required')
         ">
         Informe o nome.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="
+    formUsuario.get('nmUsuario')?.touched &&
+    formUsuario.get('nmUsuario')?.hasError('pattern')">
+        O nome deve conter apenas letras.
       </p>
 
 

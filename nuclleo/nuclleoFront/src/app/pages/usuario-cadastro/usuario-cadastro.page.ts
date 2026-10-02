@@ -82,8 +82,16 @@ export class UsuarioCadastroPage implements OnInit {
 
     this.formUsuario = this.formBuilder.group(
       {
-        email: ['', Validators.compose([Validators.required, Validators.email])],
-        nmUsuario: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+        email: ['', Validators.compose([
+          Validators.required,
+          Validators.email,
+          Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)
+        ])],
+        nmUsuario: ['', Validators.compose([
+          Validators.required,
+          Validators.minLength(3),
+          Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/)
+        ])],
         senha: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
         confirmarSenha: ['', Validators.required]
       },
@@ -141,7 +149,11 @@ export class UsuarioCadastroPage implements OnInit {
       return;
     }
 
-    if (campoEmail.hasError('required') || campoEmail.hasError('email')) {
+    if (
+      campoEmail.hasError('required') ||
+      campoEmail.hasError('email') ||
+      campoEmail.hasError('pattern')
+    ) {
       return;
     }
 
@@ -156,7 +168,7 @@ export class UsuarioCadastroPage implements OnInit {
     this.usuarioService.verificarEmail(email, null).subscribe({
       next: (existe: boolean) => {
         if (existe) {
-          campoEmail.setErrors({...(campoEmail.errors || {}), emailExistente: true});
+          campoEmail.setErrors({ ...(campoEmail.errors || {}), emailExistente: true });
         } else {
           this.removerErroEmailExistente(campoEmail);
         }

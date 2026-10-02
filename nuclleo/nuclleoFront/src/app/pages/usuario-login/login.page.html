@@ -16,18 +16,28 @@
     </div>
 
     <!-- Formulário -->
-    <form (ngSubmit)="entrar()">
+    <form [formGroup]="formLogin" (ngSubmit)="entrar()">
 
       <!-- Email -->
       <div class="campo-label">
         <label>E-mail</label>
       </div>
       <ion-item lines="none" class="input-item">
-
-        <ion-input type="email" placeholder="E-mail" [(ngModel)]="login.email" name="email" required>
+        <ion-input type="email" placeholder="E-mail" formControlName="email">
         </ion-input>
-
       </ion-item>
+
+      <p class="mensagem-erro" *ngIf="
+        formLogin.get('email')?.touched &&
+        formLogin.get('email')?.hasError('required')">
+        Informe o e-mail.
+      </p>
+
+      <p class="mensagem-erro" *ngIf="formLogin.get('email')?.touched &&(
+        formLogin.get('email')?.hasError('email') ||
+        formLogin.get('email')?.hasError('pattern'))">
+        Informe um e-mail válido.
+      </p>
 
       <!-- Senha -->
       <div class="campo-label">
@@ -35,22 +45,27 @@
       </div>
       <ion-item lines="none" class="input-item">
 
-        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" [(ngModel)]="login.senha"
-          name="password" required>
+        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" formControlName="senha">
         </ion-input>
 
         <!-- OLHINHO -->
         <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
-
           <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
           </ion-icon>
-
         </ion-button>
 
       </ion-item>
 
+      <p class="mensagem-erro" *ngIf="
+        formLogin.get('senha')?.touched &&
+        formLogin.get('senha')?.hasError('required')">
+        Informe a senha.
+      </p>
+
       <!-- Botão Login -->
-      <ion-button expand="block" type="submit" class="btn-login">Entrar</ion-button>
+      <ion-button expand="block" type="submit" class="btn-login" [disabled]="formLogin.invalid">
+        Entrar
+      </ion-button>
 
     </form>
 

@@ -1,8 +1,9 @@
-/* editar-perfil.page.scss */
+/* usuario-alterar.page.scss */
 
 .editar-content {
   --background: #f5f7fb;
 }
+
 
 /* HEADER */
 
@@ -12,6 +13,9 @@ ion-toolbar {
 
   border-bottom: 1px solid #e5e7eb;
 }
+
+
+/* CONTAINER */
 
 .container {
   min-height: 100%;
@@ -23,6 +27,7 @@ ion-toolbar {
 
   margin: 0 auto;
 }
+
 
 /* TOPO */
 
@@ -54,30 +59,9 @@ ion-toolbar {
   margin: 0;
 }
 
-/* LABEL */
-
-.campo-label {
-  margin-bottom: 8px;
-  margin-top: 18px;
-}
-
-.campo-label:first-child {
-  margin-top: 0;
-}
-
-.campo-label label {
-  display: block;
-
-  padding-left: 4px;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  color: #000000;
-}
-
 
 /* FOTO */
+
 .foto-box {
   position: relative;
 
@@ -89,7 +73,6 @@ ion-toolbar {
   cursor: pointer;
 }
 
-/* wrapper que faz o recorte circular da imagem (sem cortar o badge) */
 .foto-circle {
   width: 100%;
   height: 100%;
@@ -114,7 +97,6 @@ ion-toolbar {
   object-fit: cover;
 }
 
-/* quando é o ícone padrão (sem foto), centraliza e não corta */
 .imagem.placeholder {
   width: 82%;
   height: 82%;
@@ -122,9 +104,9 @@ ion-toolbar {
   object-fit: contain;
 }
 
-/* badge de câmera no canto, fora da máscara circular */
 .camera-badge {
   position: absolute;
+
   bottom: 8px;
   right: 8px;
 
@@ -133,7 +115,9 @@ ion-toolbar {
 
   border-radius: 50%;
 
-  background: linear-gradient(90deg, #7c3aed, #a855f7);
+  background: linear-gradient(90deg,
+      #7c3aed,
+      #a855f7);
 
   display: flex;
   align-items: center;
@@ -149,7 +133,6 @@ ion-toolbar {
   font-size: 18px;
 }
 
-/* legenda abaixo da foto */
 .foto-label {
   text-align: center;
 
@@ -161,121 +144,97 @@ ion-toolbar {
   cursor: pointer;
 }
 
-/* INPUTS */
+
+/* LABELS */
+
+.campo-label {
+  margin-bottom: 5px;
+  margin-top: 18px;
+}
+
+.campo-label:first-child {
+  margin-top: 0;
+}
+
+.campo-label label {
+  display: block;
+
+  padding-left: 4px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #000000;
+}
+
+
+/* CONTAINER DO INPUT */
 
 .input-item {
-  --background: transparent;
+  width: 100%;
+  height: 56px;
 
-  --padding-start: 0;
-  --inner-padding-end: 0;
+  display: flex;
+  align-items: center;
 
-  margin-bottom: 18px;
-
-  min-height: 56px;
-
-  border-radius: 14px;
-
-  overflow: hidden;
+  background: #ffffff;
 
   border: 1px solid #d1d5db;
-
-  background: #ffffff;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-/* REMOVE O FUNDO BUGADO INTERNO */
-
-.input-item::part(native) {
-  background: #ffffff;
-
   border-radius: 14px;
 
-  padding-left: 14px;
-  padding-right: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+
+  overflow: hidden;
 }
+
 
 /* INPUT */
 
-ion-input {
-  --color: #111827;
-  --placeholder-color: #9ca3af;
+.campo-input {
+  width: 100%;
+  height: 100%;
+
+  padding: 0 14px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+
+  box-sizing: border-box;
 }
 
-/* BOTÕES */
-
-.acoes {
-  margin-top: 28px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 16px;
-}
-
-/* SALVAR */
-
-.btn-salvar {
-  --background: linear-gradient(90deg,
-      #7c3aed,
-      #a855f7);
-
-  --background-hover: linear-gradient(90deg,
-      #6d28d9,
-      #9333ea);
-
-  --color: #ffffff;
-  --border-radius: 16px;
-  height: 52px;
-  font-weight: 700;
-  font-size: 15px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  overflow: hidden;
-}
-
-/* PARTE INTERNA REAL DO BOTÃO */
-.btn-salvar::part(native) {
-  border-radius: 16px;
-
-  overflow: hidden;
-}
-
-/* REMOVE FUNDO BUGADO */
-.btn-salvar::part(container) {
-  border-radius: 16px;
+.campo-input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
 }
 
 
-/* CANCELAR */
+/* FOCO */
 
-.btn-cancelar {
-  --background: #ffffff;
+.input-item:focus-within {
+  border-color: #7c3aed;
 
-  --color: #111827;
-
-  --border-color: #d1d5db;
-
-  --border-radius: 16px;
-
-  height: 52px;
-
-  font-weight: 700;
-
-  font-size: 15px;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.5px;
-
-  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.15);
 }
 
-.btn-cancelar::part(native) {
-  border-radius: 16px;
 
-  overflow: hidden;
+/* MENSAGENS DE ERRO */
+
+.mensagem-erro {
+  color: #dc2626;
+
+  font-size: 12px;
+
+  margin: 4px 8px 10px;
 }
+
 
 /* ALTERAR SENHA */
 
@@ -307,6 +266,55 @@ ion-input {
   overflow: hidden;
 }
 
+
+/* AÇÕES */
+
+.acoes {
+  margin-top: 28px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+
+/* SALVAR */
+
+.btn-salvar {
+  --background: linear-gradient(90deg,
+      #7c3aed,
+      #a855f7);
+
+  --background-hover: linear-gradient(90deg,
+      #6d28d9,
+      #9333ea);
+
+  --color: #ffffff;
+  --border-radius: 16px;
+
+  height: 52px;
+
+  font-weight: 700;
+  font-size: 15px;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  overflow: hidden;
+}
+
+.btn-salvar::part(native) {
+  border-radius: 16px;
+
+  overflow: hidden;
+}
+
+.btn-salvar::part(container) {
+  border-radius: 16px;
+}
+
+
 /* RESPONSIVIDADE */
 
 @media (min-width: 768px) {
@@ -315,10 +323,4 @@ ion-input {
     padding-top: 50px;
   }
 
-}
-
-.mensagem-erro {
-  color: #dc2626;
-  font-size: 13px;
-  margin: 4px 8px 10px;
 }

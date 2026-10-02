@@ -60,8 +60,6 @@
   --padding-start: 0;
   --inner-padding-end: 0;
 
-  margin-bottom: 18px;
-
   border: 1px solid #424242;
   border-radius: 14px;
 
@@ -285,37 +283,37 @@ ion-item ion-button {
     height: 54px;
   }
 
-.action-sheet-cancel {
-  position: relative !important;
+  .action-sheet-cancel {
+    position: relative !important;
 
-  background: #ffffff !important;
+    background: #ffffff !important;
 
-  font-weight: 700;
-  color: #dc2626 !important;
+    font-weight: 700;
+    color: #dc2626 !important;
 
-  padding-inline-start: 72px !important;
-}
+    padding-inline-start: 72px !important;
+  }
 
-.action-sheet-cancel .action-sheet-button-inner {
-  justify-content: flex-start !important;
-  text-align: left !important;
-}
+  .action-sheet-cancel .action-sheet-button-inner {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
 
-.action-sheet-cancel::before {
-  content: '';
+  .action-sheet-cancel::before {
+    content: '';
 
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
 
-  width: 22px;
-  height: 22px;
+    width: 22px;
+    height: 22px;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-}
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 
   .action-sheet-icon {
     color: #7c3aed !important;
@@ -328,7 +326,7 @@ ion-item ion-button {
 
 /* LABELS */
 .campo-label {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   margin-top: 18px;
 }
 
@@ -349,6 +347,7 @@ ion-item ion-button {
 
 .mensagem-erro {
   color: #dc2626;
-  font-size: 13px;
-  margin: 4px 8px 10px;
+  font-size: 12px;
+  margin-left: 8px;
+  margin-right: 8px;
 }

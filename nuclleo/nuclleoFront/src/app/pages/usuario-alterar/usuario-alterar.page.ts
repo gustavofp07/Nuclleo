@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  IonContent, IonItem, IonInput, IonButton, IonIcon,
+  IonContent, IonButton, IonIcon,
   IonHeader, IonToolbar, IonButtons, IonMenuButton,
   IonTitle, IonLabel, AlertController, ActionSheetController
 } from '@ionic/angular/standalone';
@@ -14,6 +14,7 @@ import { chevronBackOutline, imageOutline, cameraOutline } from 'ionicons/icons'
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-usuario-alterar',
@@ -24,15 +25,14 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
     IonContent,
     CommonModule,
     ReactiveFormsModule,
-    IonItem,
-    IonInput,
     IonButton,
     IonIcon,
     IonHeader,
     IonToolbar,
     IonButtons,
     IonMenuButton,
-    IonTitle
+    IonTitle,
+    NgxMaskDirective
   ]
 })
 export class UsuarioAlterarPage implements OnInit {
@@ -61,11 +61,27 @@ export class UsuarioAlterarPage implements OnInit {
     this.usuario = new UsuarioModel();
 
     this.formUsuario = this.formBuilder.group({
-      email: ['', Validators.compose([Validators.required, Validators.email])],
-      nmUsuario: ['', Validators.required],
-      cpf: [''],
-      cep: ['', Validators.pattern(/^\d{5}-?\d{3}$/)],
-      telefone: ['']
+      email: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)
+      ]],
+
+      nmUsuario: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/)
+      ]],
+
+      cpf: ['', [this.validarCpf]],
+
+      cep: ['', [
+        Validators.pattern(/^\d{8}$/)
+      ]],
+
+      telefone: ['', [
+        Validators.pattern(/^\d{11}$/)
+      ]]
     });
   }
 
@@ -122,7 +138,11 @@ export class UsuarioAlterarPage implements OnInit {
       return;
     }
 
-    if (campoEmail.hasError('required') || campoEmail.hasError('email')) {
+    if (
+      campoEmail.hasError('required') ||
+      campoEmail.hasError('email') ||
+      campoEmail.hasError('pattern')
+    ) {
       return;
     }
 
@@ -260,16 +280,24 @@ export class UsuarioAlterarPage implements OnInit {
 
     this.usuario.email = this.formUsuario.value.email;
     this.usuario.nmUsuario = this.formUsuario.value.nmUsuario;
-    this.usuario.cpf = this.formUsuario.value.cpf;
+
+    this.usuario.cpf = this.formUsuario.value.cpf
+      ? this.formUsuario.value.cpf.replace(/\D/g, '')
+      : '';
+
     this.usuario.cep = this.formUsuario.value.cep
       ? this.formUsuario.value.cep.replace(/\D/g, '')
       : '';
-    this.usuario.telefone = this.formUsuario.value.telefone;
+
+    this.usuario.telefone = this.formUsuario.value.telefone
+      ? this.formUsuario.value.telefone.replace(/\D/g, '')
+      : '';
 
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
       next: (usuario: UsuarioModel) => {
         console.log('atualizou ', usuario);
         this.usuarioService.salvarUsuarioSessao(usuario);
+        this.salvando = false;
         this.router.navigate(['/usuario-perfil']);
       },
       error: async (erro) => {
@@ -363,6 +391,63 @@ export class UsuarioAlterarPage implements OnInit {
         await this.exibirMensagem(mensagem);
       }
     });
+  }
+
+  validarCpf(control: AbstractControl): ValidationErrors | null {
+    const valor = control.value;
+
+    // CPF não é obrigatório
+    if (!valor) {
+      return null;
+    }
+
+    const cpf = String(valor).replace(/\D/g, '');
+
+    // Se começou a preencher, precisa ter exatamente 11 números
+    if (cpf.length !== 11) {
+      return { cpfIncompleto: true };
+    }
+
+    // Elimina CPFs formados pelo mesmo número
+    if (/^(\d)\1{10}$/.test(cpf)) {
+      return { cpfInvalido: true };
+    }
+
+    // Primeiro dígito verificador
+    let soma = 0;
+
+    for (let i = 0; i < 9; i++) {
+      soma += Number(cpf.charAt(i)) * (10 - i);
+    }
+
+    let digito1 = 11 - (soma % 11);
+
+    if (digito1 >= 10) {
+      digito1 = 0;
+    }
+
+    if (digito1 !== Number(cpf.charAt(9))) {
+      return { cpfInvalido: true };
+    }
+
+    // Segundo dígito verificador
+    soma = 0;
+
+    for (let i = 0; i < 10; i++) {
+      soma += Number(cpf.charAt(i)) * (11 - i);
+    }
+
+    let digito2 = 11 - (soma % 11);
+
+    if (digito2 >= 10) {
+      digito2 = 0;
+    }
+
+    if (digito2 !== Number(cpf.charAt(10))) {
+      return { cpfInvalido: true };
+    }
+
+    return null;
   }
 
   async exibirMensagem(mensagem: string) {
