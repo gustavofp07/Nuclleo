@@ -71,7 +71,7 @@ public class UsuarioService {
         usuario.setTelefone(dto.getTelefone());
 
         // o CEP não é obrigatório, mas se for informado, deve ser validado e preenchido
-        if (dto.getCep() != null && dto.getCep().isBlank()) {
+        if (dto.getCep() != null && !dto.getCep().isBlank()) {
             ViaCepResponseDTO endereco = viaCepService.buscarCep(dto.getCep());
             String cepLimpo = dto.getCep().replaceAll("\\D", "");
 
