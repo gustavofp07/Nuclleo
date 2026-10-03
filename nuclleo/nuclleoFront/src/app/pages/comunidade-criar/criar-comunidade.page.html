@@ -41,15 +41,15 @@
 
       <!-- NOME -->
       <div class="campo-label">
-        <label>Nome da comunidade</label>
+        <label for="nmComunidade">Nome da comunidade</label>
       </div>
 
-      <ion-item lines="none" class="input-item">
+      <div class="input-item">
 
-        <ion-input placeholder="Nome da comunidade" formControlName="nmComunidade">
-        </ion-input>
+        <input id="nmComunidade" class="campo-input" type="text" placeholder="Nome da comunidade"
+          formControlName="nmComunidade">
 
-      </ion-item>
+      </div>
 
       <p class="mensagem-erro" *ngIf="
           formComunidade.get('nmComunidade')?.touched &&
@@ -68,42 +68,37 @@
 
       <!-- DESCRIÇÃO -->
       <div class="campo-label">
-        <label>Descrição</label>
+        <label for="descricao">Descrição</label>
       </div>
 
-      <ion-item lines="none" class="input-item">
-
-        <ion-input placeholder="Descrição" formControlName="descricao">
-        </ion-input>
-
-      </ion-item>
+      <div class="textarea-item">
+        <textarea id="descricao" class="campo-textarea" placeholder="Descrição" formControlName="descricao" rows="5">
+        </textarea>
+      </div>
 
       <p class="mensagem-erro" *ngIf="
-          formComunidade.get('descricao')?.touched &&
-          formComunidade.get('descricao')?.hasError('required')
-        ">
+        formComunidade.get('descricao')?.touched &&
+        formComunidade.get('descricao')?.hasError('required')">
         Informe a descrição.
       </p>
 
       <p class="mensagem-erro" *ngIf="
-          formComunidade.get('descricao')?.touched &&
-          formComunidade.get('descricao')?.hasError('minlength')
-        ">
+        formComunidade.get('descricao')?.touched &&
+        formComunidade.get('descricao')?.hasError('minlength')">
         A descrição deve ter no mínimo 3 caracteres.
       </p>
 
-
       <!-- CEP -->
       <div class="campo-label">
-        <label>CEP</label>
+        <label for="cep">CEP</label>
       </div>
 
-      <ion-item lines="none" class="input-item">
+      <div class="input-item">
 
-        <ion-input placeholder="00000-000" formControlName="cep" maxlength="9" inputmode="numeric">
-        </ion-input>
+        <input id="cep" class="campo-input" type="text" placeholder="00000-000" formControlName="cep" mask="00000-000"
+          inputmode="numeric">
 
-      </ion-item>
+      </div>
 
       <p class="mensagem-erro" *ngIf="
           formComunidade.get('cep')?.touched &&
@@ -116,13 +111,12 @@
           formComunidade.get('cep')?.touched &&
           formComunidade.get('cep')?.hasError('pattern')
         ">
-        Informe um CEP válido (formato 00000-000).
+        Informe o CEP completo.
       </p>
 
 
       <!-- BOTÃO -->
       <ion-button expand="block" type="submit" class="btn-criar" [disabled]="formComunidade.invalid || salvando">
-
         {{
         salvando
         ? 'Salvando...'
@@ -130,7 +124,6 @@
         ? 'Salvar alterações'
         : 'Criar comunidade'
         }}
-
       </ion-button>
 
     </form>

@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   IonContent,
-  IonInput,
   IonItem,
   IonButton,
   IonHeader,
@@ -15,7 +14,6 @@ import {
   IonList,
   IonCheckbox,
   IonLabel,
-  IonTextarea,
   ActionSheetController
 } from '@ionic/angular/standalone';
 
@@ -54,16 +52,15 @@ import { ArquivoService } from 'src/app/services/arquivo.service';
     ReactiveFormsModule,
 
     IonContent,
-    IonInput,
     IonItem,
     IonButton,
-    IonTextarea,
 
     IonHeader,
     IonToolbar,
     IonTitle,
     IonButtons,
     IonMenuButton,
+
     IonList,
     IonCheckbox,
     IonLabel
