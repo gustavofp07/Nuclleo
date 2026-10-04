@@ -69,8 +69,6 @@ public class UsuarioService {
 
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        //usuario.setSenha(dto.getSenha());
 
         usuario.setCpf(dto.getCpf());
         usuario.setTelefone(dto.getTelefone());

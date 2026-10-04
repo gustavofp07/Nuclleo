@@ -21,70 +21,74 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+        @Autowired
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> Customizer.withDefaults())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                http
+                                .csrf(csrf -> csrf.disable())
 
-                .authorizeHttpRequests(auth -> auth
+                                .cors(cors -> Customizer.withDefaults())
 
-                        // Swagger
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**")
-                        .permitAll()
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                        // Autenticação — público
-                        .requestMatchers(HttpMethod.POST, "/api/v1/autenticar")
-                        .permitAll()
+                                .authorizeHttpRequests(auth -> auth
 
-                        // Cadastro de usuário — público
-                        .requestMatchers(HttpMethod.POST, "/api/v1/usuarios")
-                        .permitAll()
+                                                .requestMatchers(
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html",
+                                                                "/v3/api-docs/**",
+                                                                "/error")
+                                                .permitAll()
 
-                        // Verificar email — público
-                        .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/verificar-email")
-                        .permitAll()
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                                .permitAll()
 
-                        // WebSocket — público
-                        .requestMatchers("/ws/**")
-                        .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/autenticar")
+                                                .permitAll()
 
-                        // Tudo mais exige autenticação
-                        .anyRequest().authenticated())
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/usuarios")
+                                                .permitAll()
 
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(
-                                (request, response, authException) -> response
-                                        .setStatus(HttpServletResponse.SC_UNAUTHORIZED))
-                        .accessDeniedHandler(
-                                (request, response, accessDeniedException) -> response
-                                        .setStatus(HttpServletResponse.SC_FORBIDDEN)))
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/verificar-email")
+                                                .permitAll()
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                                                .requestMatchers("/ws-chat/**")
+                                                .permitAll()
 
-        return http.build();
-    }
+                                                .anyRequest().authenticated())
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                                .exceptionHandling(exception -> exception
+                                                .authenticationEntryPoint(
+                                                                (request, response, authException) -> response
+                                                                                .setStatus(HttpServletResponse.SC_UNAUTHORIZED))
+                                                .accessDeniedHandler(
+                                                                (request, response, accessDeniedException) -> response
+                                                                                .setStatus(HttpServletResponse.SC_FORBIDDEN)))
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+                                .httpBasic(httpBasic -> httpBasic.disable())
+                                .formLogin(formLogin -> formLogin.disable())
+
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
+
+                return http.build();
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration authenticationConfiguration)
+                        throws Exception {
+
+                return authenticationConfiguration.getAuthenticationManager();
+        }
 }

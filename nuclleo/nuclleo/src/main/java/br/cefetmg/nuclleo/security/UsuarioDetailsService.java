@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
+import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
@@ -19,12 +20,14 @@ public class UsuarioDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
 
         return User.builder()
                 .username(usuario.getEmail())
                 .password(usuario.getSenha())
-                .authorities("USUARIO")
+                .authorities(Collections.emptyList())
+                .disabled(!usuario.isAtivo())
                 .build();
     }
 }
