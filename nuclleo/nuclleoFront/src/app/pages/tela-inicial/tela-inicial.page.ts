@@ -25,6 +25,9 @@ import {
   IonSearchbar
 } from '@ionic/angular/standalone';
 
+import { addIcons } from 'ionicons';
+import { locationOutline, calendarOutline } from 'ionicons/icons';
+
 import { Router } from '@angular/router';
 
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -54,6 +57,7 @@ import { ComunidadeService } from 'src/app/services/comunidade.service';
     IonToolbar,
     IonMenuButton,
     IonButtons,
+    IonIcon,
     CommonModule,
     FormsModule,
     RouterLink,
@@ -88,7 +92,10 @@ export class TelaInicialPage implements OnInit {
   ) {
     this.buscarPorProximidade = false;
     this.pesquisa = "";
-
+    addIcons({
+      locationOutline,
+      calendarOutline
+    });
   }
 
   ngOnInit() {

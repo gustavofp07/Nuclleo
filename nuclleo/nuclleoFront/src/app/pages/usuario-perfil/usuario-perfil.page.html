@@ -133,8 +133,16 @@
             </span>
           </div>
 
-        </div>
+          <div class="validacao" [class.pendente]="!usuario.cep">
+            <ion-icon [name]="usuario.cep ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+            <span *ngIf="usuario.cep">CEP: {{ usuario.cep }}</span>
+            <span *ngIf="!usuario.cep">
+              CEP não informado
+              <a routerLink="/usuario-alterar">(adicionar)</a>
+            </span>
+          </div>
 
+        </div>
       </div>
 
       <!-- AVALIAÇÃO -->

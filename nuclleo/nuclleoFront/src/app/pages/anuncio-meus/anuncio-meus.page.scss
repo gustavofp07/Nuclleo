@@ -263,6 +263,28 @@ ion-toolbar {
 
 /* RESPONSIVO */
 
+/* CELULAR */
+@media (max-width: 600px) {
+
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .lista-anuncios {
+    gap: 12px;
+  }
+
+  .anuncio-card {
+    /* Máximo de 2 anúncios por linha */
+    flex: 0 1 calc(50% - 6px);
+    max-width: none;
+  }
+
+}
+
+
+/* DESKTOP / TABLET */
 @media (min-width: 768px) {
 
   .container {

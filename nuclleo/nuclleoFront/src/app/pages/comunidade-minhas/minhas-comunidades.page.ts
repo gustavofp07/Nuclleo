@@ -31,10 +31,15 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 
+import { addIcons } from 'ionicons';
 import {
-  addIcons
-} from 'ionicons';
-import { add, peopleOutline, settingsOutline, trashOutline } from 'ionicons/icons';
+  add,
+  peopleOutline,
+  settingsOutline,
+  trashOutline,
+  locationOutline,
+  calendarOutline
+} from 'ionicons/icons';
 
 import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -82,7 +87,9 @@ export class MinhasComunidadesPage implements OnInit {
       add,
       peopleOutline,
       settingsOutline,
-      trashOutline
+      trashOutline,
+      locationOutline,
+      calendarOutline
     });
   }
 

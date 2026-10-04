@@ -39,15 +39,40 @@
           <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
 
           <div class="info">
+
+            <!-- TÍTULO + TIPO DE MEMBRO -->
             <div class="titulo-comunidade">
               <h2>{{ comunidade.nmComunidade }}</h2>
-              <span class="admin-badge" *ngIf="usuarioEhAdmin(comunidade)">ADMIN</span>
-              <span class="membro-badge" *ngIf="!usuarioEhAdmin(comunidade)">MEMBRO</span>
+
+              <span class="admin-badge" *ngIf="usuarioEhAdmin(comunidade)">
+                ADMIN
+              </span>
+
+              <span class="membro-badge" *ngIf="!usuarioEhAdmin(comunidade)">
+                MEMBRO
+              </span>
             </div>
-            <p>{{ comunidade.descricao }}</p>
-            <p>{{ comunidade.cep }}</p>
-            <p>{{ comunidade.cidade }}, {{ comunidade.uf }} </p>
-            <p>{{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}</p>
+
+            <!-- DESCRIÇÃO -->
+            <p class="descricao-comunidade">
+              {{ comunidade.descricao }}
+            </p>
+
+            <!-- INFORMAÇÕES -->
+            <div class="comunidade-detalhes">
+
+              <span>
+                <ion-icon name="location-outline"></ion-icon>
+                {{ comunidade.cidade }}, {{ comunidade.uf }}
+              </span>
+
+              <span>
+                <ion-icon name="calendar-outline"></ion-icon>
+                Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
+              </span>
+
+            </div>
+
           </div>
 
         </button>

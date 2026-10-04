@@ -114,11 +114,12 @@ export class UsuarioPerfilPage implements OnInit {
 
   calcularNivelCadastro() {
     const temCpf = !!this.usuario.cpf?.trim();
-    const temTelefone = !!this.usuario.telefone?.trim();
+    //const temTelefone = !!this.usuario.telefone?.trim();
+    const temCep = !!this.usuario.cep?.trim();
 
-    if (temCpf && temTelefone) {
+    if (temCpf && temCep) {
       this.nivelCadastro = 3;
-    } else if (temCpf || temTelefone) {
+    } else if (temCpf || temCep) {
       this.nivelCadastro = 2;
     } else {
       this.nivelCadastro = 1;

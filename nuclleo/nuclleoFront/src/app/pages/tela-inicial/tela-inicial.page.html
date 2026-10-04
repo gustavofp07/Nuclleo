@@ -15,8 +15,7 @@
 
     <div class="section">
 
-      <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisa"
-        (ionInput)="aoPesquisar($event)">
+      <ion-searchbar placeholder="Pesquisar comunidades" [(ngModel)]="pesquisa" (ionInput)="aoPesquisar($event)">
       </ion-searchbar>
 
       <div class="opcao-proximidade">
@@ -36,14 +35,37 @@
         <div class="comunidade-card" *ngFor="let comunidade of comunidades"
           [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
 
-          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" alt="Foto da Comunidade"
-            class="comunidade-foto">
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
 
-          <div class="comunidade-info">
-            <h3 class="titulo-clamp">{{ comunidade.nmComunidade }}</h3>
-            <p class="descricao-clamp">{{ comunidade.descricao }}</p>
-            <p class="comunidade-local">{{ comunidade.cidade }}, {{ comunidade.uf }}</p>
+          <div class="info">
+
+            <!-- TÍTULO -->
+            <div class="titulo-comunidade">
+              <h2>{{ comunidade.nmComunidade }}</h2>
+            </div>
+
+            <!-- DESCRIÇÃO -->
+            <p class="descricao-comunidade">
+              {{ comunidade.descricao }}
+            </p>
+
+            <!-- INFORMAÇÕES -->
+            <div class="comunidade-detalhes">
+
+              <span>
+                <ion-icon name="location-outline"></ion-icon>
+                {{ comunidade.cidade }}, {{ comunidade.uf }}
+              </span>
+
+              <span>
+                <ion-icon name="calendar-outline"></ion-icon>
+                Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
+              </span>
+
+            </div>
+
           </div>
+
         </div>
 
       </div>

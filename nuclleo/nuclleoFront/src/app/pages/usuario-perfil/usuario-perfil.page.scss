@@ -662,3 +662,23 @@ ion-menu ion-item ion-icon {
   font-size: 14px;
   font-weight: 700;
 }
+
+
+
+/* RESPONSIVIDADE DOS ANÚNCIOS */
+
+@media (max-width: 600px) {
+
+  .anuncios-lista {
+    gap: 12px;
+  }
+
+  .anuncio-card {
+    /* Máximo de 2 anúncios por linha */
+    flex: 0 1 calc(50% - 6px);
+
+    /* Permite ocupar toda a metade disponível */
+    max-width: none;
+  }
+
+}
