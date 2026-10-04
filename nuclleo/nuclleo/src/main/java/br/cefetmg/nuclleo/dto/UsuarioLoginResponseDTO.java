@@ -1,8 +1,5 @@
 package br.cefetmg.nuclleo.dto;
 
-import java.sql.Date;
-
-import br.cefetmg.nuclleo.model.Usuario;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,17 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UsuarioLoginResponseDTO {
 
-    private Long cdUsuario;
-    private String nmUsuario;
-    private String ftUsuario;
-    private String email;
-    private Date dtEntrada; // cadastro
+    private String token;
 
-    public UsuarioLoginResponseDTO(Usuario usuario) {
-        this.cdUsuario = usuario.getCdUsuario();
-        this.nmUsuario = usuario.getNmUsuario();
-        this.ftUsuario = usuario.getFtUsuario();
-        this.email = usuario.getEmail();
-        this.dtEntrada = usuario.getDtEntrada();
+    public UsuarioLoginResponseDTO(String token) {
+        this.token = token;
     }
 }

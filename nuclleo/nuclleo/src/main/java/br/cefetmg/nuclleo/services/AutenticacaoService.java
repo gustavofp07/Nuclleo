@@ -1,6 +1,9 @@
 package br.cefetmg.nuclleo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.dto.UsuarioLoginResponseDTO;
@@ -8,27 +11,40 @@ import br.cefetmg.nuclleo.dto.UsuarioLoginResquestDTO;
 import br.cefetmg.nuclleo.exception.UnauthorizedException;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
+import br.cefetmg.nuclleo.security.JwtService;
 
 @Service
 public class AutenticacaoService {
+
     @Autowired
-    private UsuarioRepository repository;   
+    private AuthenticationManager authenticationManager;
 
-    @Transactional
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private JwtService jwtService;
+
     public UsuarioLoginResponseDTO autenticar(UsuarioLoginResquestDTO credenciais) {
-        Usuario usuario = repository.findByEmailAndSenha(credenciais.getEmail(), credenciais.getSenha());
 
-        if (usuario == null) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            credenciais.getEmail(),
+                            credenciais.getSenha()));
+        } catch (AuthenticationException e) {
             throw new UnauthorizedException("Email e/ou senha inválidos");
         }
 
-        //mudar isso futuramente
+        Usuario usuario = usuarioRepository.findByEmail(credenciais.getEmail())
+                .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado."));
+
         if (!usuario.isAtivo()) {
             throw new UnauthorizedException("Usuário inativo");
         }
 
-        return new UsuarioLoginResponseDTO(usuario);
-    }
+        String token = jwtService.gerarToken(usuario);
 
+        return new UsuarioLoginResponseDTO(token);
+    }
 }

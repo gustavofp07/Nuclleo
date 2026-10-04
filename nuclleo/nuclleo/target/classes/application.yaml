@@ -30,3 +30,7 @@ server:
 integrations:
   arquivos:
     base-url: ${ARQUIVOS_API_URL:https://gerenciador-arquivos-7q58.onrender.com}
+
+jwt:
+  secret: nuclleo-chave-secreta-com-pelo-menos-32-caracteres
+  expiration: 86400000

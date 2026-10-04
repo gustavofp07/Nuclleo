@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -27,12 +28,16 @@ public class UsuarioService {
     @Autowired
     private ViaCepService viaCepService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public Usuario inserir(UsuarioRequestDTO dto, MultipartFile foto) {
         Usuario usuario = new Usuario();
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        //usuario.setSenha(dto.getSenha());
 
         usuario.setAtivo(true);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
@@ -64,8 +69,8 @@ public class UsuarioService {
 
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
-        // olhar isso aqui
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        //usuario.setSenha(dto.getSenha());
 
         usuario.setCpf(dto.getCpf());
         usuario.setTelefone(dto.getTelefone());
