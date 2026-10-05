@@ -40,7 +40,6 @@ import { HttpClient } from '@angular/common/http';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
-import { AnuncioService } from 'src/app/services/anuncio.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { TokenService } from 'src/app/services/token.service';
@@ -91,7 +90,6 @@ export class TelaInicialPage implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private http: HttpClient,
-    private anuncioService: AnuncioService,
     private tokenService: TokenService
   ) {
     this.token = new TokenModel();
@@ -119,10 +117,13 @@ export class TelaInicialPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.token = this.tokenService.extrair();
-    let aux = this.tokenService.temToken();
+    console.log('entrou na tela inicial');
+    const possuiSessao = this.tokenService.temToken();
 
-    if (aux == false) {
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+    } else {
+
       this.exibirMensagem("Não há usuário logado.");
       this.router.navigate(['/login']);
       return;
@@ -158,7 +159,6 @@ export class TelaInicialPage implements OnInit {
   }
 
   pesquisarComunidades(termo?: string) {
-    this.token = this.tokenService.extrair();
     this.carregandoComunidades = true;
 
     if (this.buscarPorProximidade === true) {

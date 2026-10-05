@@ -63,28 +63,36 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
+        console.log('Aqui de novo no appComponent');
         const rotaAtual = this.router.url;
 
         this.menuHabilitado = rotaAtual !== '/login' && rotaAtual !== '/cadastro';
 
-        this.carregarNotificacoes();
-        this.conectarNotificacoesTempoReal();
+        if (this.tokenService.temToken()) {
+          console.log('Tem token');
+
+          // Atualiza os dados com o JWT atual
+          this.token = this.tokenService.extrair();
+
+          this.carregarNotificacoes();
+          this.conectarNotificacoesTempoReal();
+
+        } else {
+          console.log('Não tem token');
+          this.totalConversasPendentes = 0;
+
+          this.notificacaoService.desconectar();
+        }
       });
   }
 
   ngOnInit() {
-    this.token = this.tokenService.extrair();
-
     this.notificacaoService.onNotificacaoRecebida().subscribe(evento => {
       if (evento.tipo === 'SOLICITACAO_CONVERSA') {
         this.totalConversasPendentes++;
         this.mostrarToast(evento.mensagem);
       }
     });
-  }
-
-  ionViewWillEnter() {
-    this.token = this.tokenService.extrair();
   }
 
   conectarNotificacoesTempoReal() {
@@ -123,7 +131,7 @@ export class AppComponent implements OnInit {
           i => i.conversaIniciada === true && i.aceito === false
         ).length;
       },
-      error: () => {}
+      error: () => { }
     });
   }
 }

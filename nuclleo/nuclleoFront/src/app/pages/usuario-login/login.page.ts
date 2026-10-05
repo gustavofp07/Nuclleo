@@ -49,7 +49,6 @@ export class LoginPage implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private loginService: LoginService,
-    private usuarioService: UsuarioService,
     private tokenService: TokenService
   ) {
     this.login = new LoginModel();
