@@ -31,7 +31,6 @@ import {
   ValidationErrors
 } from '@angular/forms';
 
-import { UsuarioService } from 'src/app/services/usuario.service';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
@@ -40,6 +39,8 @@ import { AnuncioRequerimentoModel } from 'src/app/model/anuncio-requerimento.mod
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-criar-anuncio',
@@ -86,15 +87,17 @@ export class CriarAnuncioPage {
   previewFoto: string | ArrayBuffer | null = null;
   imagemSelecionada?: File;
 
+  token?: TokenModel;
+
   constructor(
     private formBuilder: FormBuilder,
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
-    private usuarioService: UsuarioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private anuncioComunidadeService: AnuncioComunidadeService,
     private arquivoService: ArquivoService,
     private toastController: ToastController,
+    private tokenService: TokenService,
     private actionSheetController: ActionSheetController,
     private router: Router
   ) {
@@ -178,9 +181,10 @@ export class CriarAnuncioPage {
   }
 
   carregarComunidadesUsuario() {
-    const usuario = this.usuarioService.getUsuarioSessao();
+    this.token = this.tokenService.extrair();
+    
 
-    this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
+    this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario).subscribe({
       next: (relacoes) => {
         this.comunidades = relacoes.map(relacao => relacao.comunidade);
       },
@@ -283,7 +287,7 @@ export class CriarAnuncioPage {
 
     this.salvando = true;
 
-    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
+    this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
     this.anuncio.tipoAnuncio = this.tipo;
 
     if (this.modoEdicao) {
@@ -375,7 +379,7 @@ export class CriarAnuncioPage {
 
   cadastrarVenda() {
     this.anuncio.tipoAnuncio = 'VENDA';
-    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
+    this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
 
     this.anuncioService.cadastrarVenda(
       this.anuncio as AnuncioVendaModel,
@@ -415,7 +419,7 @@ export class CriarAnuncioPage {
 
   cadastrarRequerimento() {
     this.anuncio.tipoAnuncio = 'REQUERIMENTO';
-    this.anuncio.usuarioCria = this.usuarioService.getUsuarioSessao();
+    this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
 
     this.anuncioService.cadastrarRequerimento(
       this.anuncio as AnuncioRequerimentoModel,
@@ -446,10 +450,11 @@ export class CriarAnuncioPage {
           valorMax: (anuncio as AnuncioRequerimentoModel).valorMax
         });
 
-        const usuarioLogado = this.usuarioService.getUsuarioSessao();
+    
 
-        this.usuarioEhDono =
-          this.anuncio.usuarioCria.cdUsuario === usuarioLogado.cdUsuario;
+        const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
+
+        this.usuarioEhDono = this.anuncio.cdUsuarioCria === cdUsuarioLogado;
 
         if (!this.usuarioEhDono) {
           this.exibirMensagem('Você não pode editar este anúncio.');

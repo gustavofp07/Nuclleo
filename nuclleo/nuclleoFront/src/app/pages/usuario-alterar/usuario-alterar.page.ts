@@ -15,6 +15,8 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
 import { NgxMaskDirective } from 'ngx-mask';
+import { TokenService } from 'src/app/services/token.service';
+import { TokenModel } from 'src/app/model/token.model';
 
 @Component({
   selector: 'app-usuario-alterar',
@@ -36,11 +38,13 @@ import { NgxMaskDirective } from 'ngx-mask';
   ]
 })
 export class UsuarioAlterarPage implements OnInit {
+  token?: TokenModel;
+
   usuario: UsuarioModel;
   formUsuario: FormGroup;
   previewFoto: string | ArrayBuffer | null = null;
   imagemSelecionada?: File;
-  senhaOriginal: string = '';
+
   verificandoEmail: boolean = false;
   salvando: boolean = false;
 
@@ -50,7 +54,8 @@ export class UsuarioAlterarPage implements OnInit {
     private usuarioService: UsuarioService,
     private alertController: AlertController,
     private arquivoService: ArquivoService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private tokenService: TokenService,
   ) {
     addIcons({
       chevronBackOutline,
@@ -97,15 +102,15 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    const possuiSessao = this.usuarioService.verificarSessao();
+    const aux = this.tokenService.temToken();
 
-    if (!possuiSessao) {
+    if (!aux) {
       this.router.navigate(['/login']);
       return;
     }
 
-    const usuarioLogado = this.usuarioService.getUsuarioSessao();
-    this.buscarUsuario(usuarioLogado.cdUsuario);
+    this.token = this.tokenService.extrair();
+    this.buscarUsuario(this.token.cdUsuario);
   }
 
   private buscarUsuario(cdUsuario: number) {
@@ -115,7 +120,6 @@ export class UsuarioAlterarPage implements OnInit {
         this.usuario = usuario;
         this.previewFoto = null;
         this.imagemSelecionada = undefined;
-        this.senhaOriginal = usuario.senha;
 
         this.formUsuario.patchValue({
           email: usuario.email,
@@ -295,12 +299,12 @@ export class UsuarioAlterarPage implements OnInit {
 
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
       next: (usuario: UsuarioModel) => {
-        console.log('atualizou ', usuario);
-        this.usuarioService.salvarUsuarioSessao(usuario);
+        //logar o usuário atualizado na sessão
+        this.exibirMensagem('Alterações salvas com sucesso!');
         this.salvando = false;
-        this.router.navigate(['/usuario-perfil']);
+        this.router.navigate(['/login']);
       },
-      error: async (erro) => {
+      error: async (erro: any) => {
         this.salvando = false;
         const mensagem =
           erro.error?.message ||
@@ -344,8 +348,8 @@ export class UsuarioAlterarPage implements OnInit {
           text: 'Confirmar',
           role: 'confirm',
           handler: async (dados) => {
-            if (!dados.senhaAtual || dados.senhaAtual !== this.senhaOriginal) {
-              await this.exibirMensagem('Senha atual incorreta.');
+            if (!dados.senhaAtual) {
+              await this.exibirMensagem('Informe a senha atual.');
               return false;
             }
 
@@ -359,8 +363,7 @@ export class UsuarioAlterarPage implements OnInit {
               return false;
             }
 
-            this.usuario.senha = dados.novaSenha;
-            this.salvarSenha();
+            this.salvarSenha(dados.senhaAtual, dados.novaSenha);
             return true;
           }
         }
@@ -370,7 +373,13 @@ export class UsuarioAlterarPage implements OnInit {
     await alert.present();
   }
 
-  salvarSenha() {
+
+
+  salvarSenha(senhaAtual: string, novaSenha: string) {
+    console.log("Erro aqui.");
+    //criar um EndPoint passando a senha velha e a nova para atualizar.
+
+    /*
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
       next: async (usuario: UsuarioModel) => {
         console.log('senha atualizada ', usuario);
@@ -380,7 +389,7 @@ export class UsuarioAlterarPage implements OnInit {
         await this.exibirMensagem('Senha alterada com sucesso!');
         this.router.navigate(['/usuario-perfil']);
       },
-      error: async (erro) => {
+      error: async (erro: any) => {
         const mensagem =
           erro.error?.message ||
           (typeof erro.error === 'string' ? erro.error : '') ||
@@ -391,7 +400,9 @@ export class UsuarioAlterarPage implements OnInit {
         await this.exibirMensagem(mensagem);
       }
     });
+    */
   }
+
 
   validarCpf(control: AbstractControl): ValidationErrors | null {
     const valor = control.value;

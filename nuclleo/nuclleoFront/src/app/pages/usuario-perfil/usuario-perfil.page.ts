@@ -20,6 +20,8 @@ import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
+import { TokenService } from 'src/app/services/token.service';
+import { TokenModel } from 'src/app/model/token.model';
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -29,6 +31,7 @@ import { AvaliacaoService } from 'src/app/services/avaliacao.service';
   imports: [IonSpinner, IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon, IonMenu, IonList, IonLabel, CommonModule, FormsModule, RouterLink]
 })
 export class UsuarioPerfilPage implements OnInit {
+  token?: TokenModel;
 
   usuario: UsuarioModel;
   anuncios: AnuncioModel[] = [];
@@ -49,6 +52,7 @@ export class UsuarioPerfilPage implements OnInit {
     private anuncioService: AnuncioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private avaliacaoService: AvaliacaoService,
+    private tokenService: TokenService
   ) {
     addIcons({
       home, peopleOutline, chatbubbleOutline, personOutline,
@@ -73,12 +77,12 @@ export class UsuarioPerfilPage implements OnInit {
 
     this.ehPerfilProprio = true;
 
-    let aux = this.usuarioService.verificarSessao();
+    let aux = this.tokenService.temToken();
     if (aux == false) {
       this.router.navigate(['/login']);
     } else {
-      let usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
-      this.carregarUsuarioPorId(usuarioLogado.cdUsuario);
+      const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
+      this.carregarUsuarioPorId(cdUsuarioLogado);
     }
   }
 
@@ -161,9 +165,9 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   validarSenhaEExcluir(senha: string) {
-    const usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
+    this.token = this.tokenService.extrair();
 
-    this.usuarioService.autenticar({ email: usuarioLogado.email, senha }).subscribe({
+    this.usuarioService.autenticar({ email: this.token.email, senha }).subscribe({
       next: () => {
         this.excluir();
       },
@@ -174,13 +178,14 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   excluir() {
-    const usuarioLogado: UsuarioModel = this.usuarioService.getUsuarioSessao();
+    this.token = this.tokenService.extrair();
 
-    this.usuarioComunidadeService.excluirPorUsuario(usuarioLogado.cdUsuario).subscribe({
+    //mudar isso aqui -- certas regras de negócio devem ser feitas no back
+    this.usuarioComunidadeService.excluirPorUsuario(this.token.cdUsuario).subscribe({
       next: () => {
-        this.usuarioService.excluirUsuario(usuarioLogado.cdUsuario).subscribe({
+        this.usuarioService.excluirUsuario().subscribe({
           next: () => {
-            this.usuarioService.limparSessao();
+            this.tokenService.excluir();
             this.router.navigate(['/login']);
           },
           error: () => {

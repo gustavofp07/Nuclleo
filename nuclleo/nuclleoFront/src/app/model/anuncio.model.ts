@@ -7,7 +7,8 @@ export class AnuncioModel {
     ftAnuncio: string;
     tipoAnuncio: string;
     habilitado: boolean;
-    usuarioCria: UsuarioModel;
+    //usuarioCria: UsuarioModel;
+    cdUsuarioCria: number;
     dtCriacao?: Date;
 
     constructor() {
@@ -17,6 +18,7 @@ export class AnuncioModel {
         this.ftAnuncio = '';
         this.tipoAnuncio = '';
         this.habilitado = true;
-        this.usuarioCria = new UsuarioModel();
+        this.cdUsuarioCria = 0;
+        //this.usuarioCria = new UsuarioModel();
     }
 }
