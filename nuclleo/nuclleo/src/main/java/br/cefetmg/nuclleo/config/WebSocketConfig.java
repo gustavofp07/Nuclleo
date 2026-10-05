@@ -24,7 +24,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/ws-chat")
+                .setAllowedOriginPatterns("http://localhost:8100", "http://127.0.0.1:8100", "http://localhost:4200")
+                .withSockJS();
     }
 
     private TaskScheduler heartBeatScheduler() {

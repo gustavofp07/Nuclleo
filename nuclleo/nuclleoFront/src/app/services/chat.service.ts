@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { MensagemModel } from '../model/mensagem.model';
+import { TokenService } from './token.service';
 
 interface DigitandoEvento {
   cdUsuario: number;
@@ -29,7 +30,14 @@ export class ChatService {
   private digitandoEvento = new Subject<DigitandoEvento>();
   private statusInteresseAtualizado = new Subject<StatusInteresseEvento>();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService
+  ) {}
+
+  private getHeaders() {
+    return { headers: this.tokenService.gerarCabecalhoAutenticacao() };
+  }
 
   conectar(cdInteresse: number) {
     if (this.client?.active) {
@@ -112,6 +120,6 @@ export class ChatService {
   }
 
   listarHistorico(cdInteresse: number): Observable<MensagemModel[]> {
-    return this.http.get<MensagemModel[]>(`${this.URL_HTTP}/interesse/${cdInteresse}`);
+    return this.http.get<MensagemModel[]>(`${this.URL_HTTP}/interesse/${cdInteresse}`, this.getHeaders());
   }
 }
