@@ -27,6 +27,8 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { InteresseModel } from 'src/app/model/interesse.model';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 interface MensagemView extends MensagemModel {
   enviando?: boolean;
@@ -52,11 +54,11 @@ interface MensagemView extends MensagemModel {
   ]
 })
 export class ChatPage implements OnInit, OnDestroy {
+  token: TokenModel;
 
   @ViewChild(IonContent) content!: IonContent;
 
   cdInteresse!: number;
-  usuarioLogado: UsuarioModel = new UsuarioModel();
   interesse: InteresseModel | null = null;
 
   mensagens: MensagemView[] = [];
@@ -80,32 +82,33 @@ export class ChatPage implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
-    private usuarioService: UsuarioService,
+    //private usuarioService: UsuarioService,
     private interesseService: InteresseService,
     private ngZone: NgZone,
     private alertController: AlertController,
     private toastController: ToastController,
+    private tokenService: TokenService,
     private router: Router,
   ) {
+    this.token = new TokenModel();
     addIcons({ sendOutline, chatbubbleOutline, flagOutline });
   }
 
   ngOnInit() {
-    this.usuarioLogado = this.usuarioService.getUsuarioSessao();
-    this.cdInteresse = Number(this.activatedRoute.snapshot.paramMap.get('cdInteresse'));
   }
 
   ionViewWillEnter() {
+    const possuiSessao = this.tokenService.temToken();
 
-    const possuiSessao = this.usuarioService.verificarSessao();
-
-    if (!possuiSessao) {
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+    } else {
       this.exibirMensagem('Não há usuário logado.');
       this.router.navigate(['/login']);
       return;
     }
 
-    this.usuarioLogado = this.usuarioService.getUsuarioSessao();
+    this.cdInteresse = Number(this.activatedRoute.snapshot.paramMap.get('cdInteresse'));
 
     if (!this.cdInteresse || isNaN(this.cdInteresse)) {
       this.router.navigate(['/nao-encontrado']);
@@ -129,8 +132,8 @@ export class ChatPage implements OnInit, OnDestroy {
     this.interesseService.buscarPorId(this.cdInteresse).subscribe({
       next: (interesse: InteresseModel) => {
 
-        const souEuOInteressado = interesse.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
-        const souEuOAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+        const souEuOInteressado = interesse.usuario.cdUsuario === this.token.cdUsuario;
+        const souEuOAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.token.cdUsuario;
 
         if (!souEuOInteressado && !souEuOAnunciante) {
           this.router.navigate(['/nao-encontrado']);
@@ -200,7 +203,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
     this.chatService.onDigitando().subscribe((evento) => {
       this.ngZone.run(() => {
-        if (evento.cdUsuario !== this.usuarioLogado.cdUsuario) {
+        if (evento.cdUsuario !== this.token.cdUsuario) {
           this.outroUsuarioDigitando = evento.digitando;
 
           if (evento.digitando) {
@@ -292,8 +295,8 @@ export class ChatPage implements OnInit, OnDestroy {
     const mensagemOtimista: MensagemView = {
       id: Date.now(),
       cdInteresse: this.cdInteresse,
-      cdUsuarioRemetente: this.usuarioLogado.cdUsuario,
-      nomeRemetente: this.usuarioLogado.nmUsuario,
+      cdUsuarioRemetente: this.token.cdUsuario,
+      nomeRemetente: this.token.nmUsuario,
       conteudo: texto,
       dataEnvio: new Date().toISOString(),
       enviando: true
@@ -304,7 +307,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
     this.chatService.enviarMensagem(
       this.cdInteresse,
-      { cdUsuarioRemetente: this.usuarioLogado.cdUsuario, conteudo: texto }
+      { cdUsuarioRemetente: this.token.cdUsuario, conteudo: texto }
     );
 
     this.textoMensagem = '';
@@ -316,7 +319,7 @@ export class ChatPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.chatService.enviarDigitando(this.cdInteresse, this.usuarioLogado.cdUsuario, true);
+    this.chatService.enviarDigitando(this.cdInteresse, this.token.cdUsuario, true);
 
     clearTimeout(this.timeoutDigitando);
     this.timeoutDigitando = setTimeout(() => {
@@ -326,11 +329,11 @@ export class ChatPage implements OnInit, OnDestroy {
 
   pararDigitacao() {
     clearTimeout(this.timeoutDigitando);
-    this.chatService.enviarDigitando(this.cdInteresse, this.usuarioLogado.cdUsuario, false);
+    this.chatService.enviarDigitando(this.cdInteresse, this.token.cdUsuario, false);
   }
 
   ehMinhaMensagem(mensagem: MensagemModel): boolean {
-    return mensagem.cdUsuarioRemetente === this.usuarioLogado.cdUsuario;
+    return mensagem.cdUsuarioRemetente === this.token.cdUsuario;
   }
 
   async rolarParaFinal() {
@@ -436,7 +439,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
   finalizarConversa(ocorreuTransacao: boolean, valor: number | undefined, nota: number) {
     this.interesseService.finalizarConversa(this.cdInteresse, {
-      cdUsuarioSolicitante: this.usuarioLogado.cdUsuario,
+      cdUsuarioSolicitante: this.token.cdUsuario,
       ocorreuTransacao,
       valor,
       notaInteressado: nota
@@ -476,7 +479,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
   avaliarAnunciante(nota: number) {
     this.interesseService.avaliarAnunciante(this.cdInteresse, {
-      cdUsuarioSolicitante: this.usuarioLogado.cdUsuario,
+      cdUsuarioSolicitante: this.token.cdUsuario,
       nota
     }).subscribe({
       next: () => {

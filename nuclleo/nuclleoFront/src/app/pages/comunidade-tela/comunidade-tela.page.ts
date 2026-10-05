@@ -44,6 +44,9 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
 import { ComunidadeEventosService, EventoComunidade } from 'src/app/services/comunidade-eventos.service';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
+import { UsuarioModel } from 'src/app/model/usuario.model';
 
 @Component({
   selector: 'app-comunidade-tela',
@@ -72,6 +75,8 @@ import { ComunidadeEventosService, EventoComunidade } from 'src/app/services/com
   ]
 })
 export class ComunidadePerfilPage implements OnInit, OnDestroy {
+  token: TokenModel;
+  usuarioLogado: UsuarioModel;
 
   @ViewChild('modalMembros') modalMembros!: IonModal;
 
@@ -109,11 +114,14 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private anuncioComunidadeService: AnuncioComunidadeService,
+    private tokenService: TokenService,
     private eventosService: ComunidadeEventosService,
     private alertController: AlertController,
     private toastController: ToastController,
     private ngZone: NgZone,
   ) {
+    this.token = new TokenModel();
+    this.usuarioLogado = new UsuarioModel();
     addIcons({
       calendarOutline,
       peopleOutline,
@@ -132,6 +140,15 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.token = this.tokenService.extrair();
+    const possuiSessao = this.tokenService.temToken();
+
+    if (!possuiSessao) {
+      this.exibirMensagem('Não há usuário logado.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.pararEscutaEventos();
   }
 
@@ -188,12 +205,12 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   private iniciarEscutaEventos() {
     this.pararEscutaEventos();
 
-    const usuario = this.usuarioService.getUsuarioSessao();
-    if (!usuario?.cdUsuario) {
+    this.token = this.tokenService.extrair();
+    if (!this.token.cdUsuario) {
       return;
     }
 
-    this.eventosSub = this.eventosService.conectar(usuario.cdUsuario).subscribe({
+    this.eventosSub = this.eventosService.conectar(this.token.cdUsuario).subscribe({
       next: (evento) => this.tratarEvento(evento)
     });
   }
@@ -232,12 +249,12 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       return;
     }
 
-    const usuario = this.usuarioService.getUsuarioSessao();
-    if (!usuario?.cdUsuario) {
+    this.token = this.tokenService.extrair();
+    if (!this.token.cdUsuario) {
       return;
     }
 
-    this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
+    this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario).subscribe({
       next: (vinculos) => {
         const vinculo = vinculos.find(
           (v) => v.comunidade.cdComunidade === this.comunidade.cdComunidade
@@ -276,15 +293,15 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   }
 
   verificarUsuarioNaComunidade(cdComunidade: number) {
-    const usuario = this.usuarioService.getUsuarioSessao();
+    this.token = this.tokenService.extrair();
 
-    if (!usuario?.cdUsuario) {
+    if (!this.token.cdUsuario) {
       return;
     }
 
     this.carregandoVinculo = true;
 
-    this.usuarioComunidadeService.listarComunidadesPorUsuario(usuario.cdUsuario).subscribe({
+    this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario).subscribe({
       next: (vinculos) => {
         const vinculo = vinculos.find(
           (v) => v.comunidade.cdComunidade === cdComunidade
@@ -308,8 +325,11 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       return;
     }
 
+    this.token = this.tokenService.extrair();
+    this.buscarUsuarioLogado(this.token.cdUsuario);
+
     const usuarioComunidade = new UsuarioComunidadeModel();
-    usuarioComunidade.usuario = this.usuarioService.getUsuarioSessao();
+    usuarioComunidade.usuario = this.usuarioLogado;
     usuarioComunidade.comunidade = this.comunidade;
 
     this.entrandoComunidade = true;
@@ -369,16 +389,14 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       return;
     }
 
-    const usuario = this.usuarioService.getUsuarioSessao();
-
-    if (!usuario?.cdUsuario || !this.comunidade.cdComunidade) {
+    if (!this.token.cdUsuario || !this.comunidade.cdComunidade) {
       return;
     }
 
     this.saindoComunidade = true;
 
     this.usuarioComunidadeService
-      .excluirRelacaoEspecifica(usuario.cdUsuario, this.comunidade.cdComunidade)
+      .excluirRelacaoEspecifica(this.token.cdUsuario, this.comunidade.cdComunidade)
       .subscribe({
         next: () => {
           this.ngZone.run(() => {
@@ -400,8 +418,7 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   }
 
   verificarUsuarioAdmin() {
-    const usuario = this.usuarioService.getUsuarioSessao();
-    return this.comunidade.usuarioCria?.cdUsuario === usuario.cdUsuario;
+    return this.comunidade.usuarioCria?.cdUsuario === this.token.cdUsuario;
   }
 
   async confirmarExclusao() {
@@ -527,7 +544,7 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
 
   // Getter pra saber o cdUsuario de quem está logado
   get cdUsuarioLogado(): number {
-    return this.usuarioService.getUsuarioSessao()?.cdUsuario;
+    return this.token.cdUsuario;
   }
 
   // Esse membro é o dono (admin) da comunidade?
@@ -625,6 +642,17 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
           this.carregarTotalUsuarios(cdComunidade);
         }
       });
+  }
+
+  buscarUsuarioLogado(cdUsuario: number) {
+    this.usuarioService.buscarUsuario(cdUsuario).subscribe({
+      next: (usuario: UsuarioModel) => {
+        this.usuarioLogado = usuario;
+      },
+      error: () => {
+        this.exibirMensagem('Erro ao buscar usuário logado.');
+      }
+    });
   }
 
   async exibirMensagem(msg: string) {

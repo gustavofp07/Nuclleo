@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 
 import {
   IonContent,
@@ -23,6 +23,8 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-anuncio-meus',
@@ -46,7 +48,8 @@ import { AnuncioModel } from 'src/app/model/anuncio.model';
   ]
 })
 export class AnuncioMeusPage implements OnInit {
-  usuario: UsuarioModel;
+  token: TokenModel;
+  
   anuncios: AnuncioModel[];
   carregando: boolean = false;
 
@@ -57,8 +60,11 @@ export class AnuncioMeusPage implements OnInit {
     private anuncioService: AnuncioService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private usuarioService: UsuarioService) {
-    this.usuario = new UsuarioModel();
+    private usuarioService: UsuarioService,
+    private tokenService: TokenService,
+    private router: Router
+  ) {
+    this.token = new TokenModel();
     this.anuncios = [];
     addIcons({
       add,
@@ -69,22 +75,24 @@ export class AnuncioMeusPage implements OnInit {
   }
 
   ngOnInit() {
-    this.usuario = this.usuarioService.getUsuarioSessao();
+  }
+
+  ionViewWillEnter() {
+    const possuiSessao = this.tokenService.temToken();
+
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+    } else {
+      this.router.navigate(['/login']);
+      return;
+    }
 
     this.route.paramMap.subscribe(params => {
       const tipoParam = params.get('tipo');
       this.tipo = tipoParam === 'compra' ? 'compra' : 'venda';
 
-      if (this.usuario) {
-        this.carregarAnuncios();
-      }
-    });
-  }
-
-  ionViewWillEnter() {
-    if (this.usuario) {
       this.carregarAnuncios();
-    }
+    });
   }
 
   get titulo() {
@@ -116,22 +124,22 @@ export class AnuncioMeusPage implements OnInit {
   }
 
   carregarAnuncios() {
-    this.carregando = true; 
+    this.carregando = true;
 
-    this.anuncioService.listarAnunciosPorUsuarioTipo(this.usuario.cdUsuario, this.tipo).subscribe({
+    this.anuncioService.listarAnunciosPorUsuarioTipo(this.token.cdUsuario, this.tipo).subscribe({
       next: (anuncios: AnuncioModel[]) => {
         this.anuncios = anuncios;
-        this.carregando = false; 
+        this.carregando = false;
       },
       error: () => {
-        this.carregando = false; 
+        this.carregando = false;
         this.exibirMensagem('Erro ao carregar seus anúncios');
       }
     });
   }
 
   usuarioEhDono(anuncio: AnuncioModel) {
-    return anuncio.usuarioCria?.cdUsuario === this.usuario.cdUsuario;
+    return anuncio.usuarioCria?.cdUsuario === this.token.cdUsuario;
   }
 
   async exibirMensagem(mensagem: string) {

@@ -26,15 +26,18 @@ export class TransacoesPage implements OnInit {
 
   transacoes: TransacaoModel[] = [];
 
+  outro: UsuarioModel;
+
   constructor(
     private transacaoService: TransacaoService,
-    //private usuarioService: UsuarioService,
+    private usuarioService: UsuarioService,
     private router: Router,
     private toastController: ToastController,
     private tokenService: TokenService,
   ) {
     addIcons({ cashOutline, calendarOutline, personOutline, pricetagOutline });
     this.token = new TokenModel();
+    this.outro = new UsuarioModel();
   }
 
   ngOnInit() { }
@@ -68,24 +71,39 @@ export class TransacoesPage implements OnInit {
     }
   }
 
-  outroUsuario(transacao: TransacaoModel): number {
+  outroUsuario(transacao: TransacaoModel) {
     const anuncioEhVenda = transacao.anuncio.tipoAnuncio === 'VENDA';
+
+    let codigo;
 
     if (anuncioEhVenda) {
       //return this.souComprador(transacao) ? transacao.anuncio.cdUsuarioCria : transacao.usuario.cdUsuario;
       if (this.souComprador(transacao)) {
-        return transacao.anuncio.cdUsuarioCria;
+        codigo = transacao.anuncio.cdUsuarioCria;
       } else {
-        return transacao.usuario.cdUsuario;
+        codigo = transacao.usuario.cdUsuario;
       }
     } else {
       //return this.souComprador(transacao) ? transacao.usuario.cdUsuario : transacao.anuncio.cdUsuarioCria;
       if (this.souComprador(transacao)) {
-        return transacao.usuario.cdUsuario;
+        codigo = transacao.usuario.cdUsuario;
       } else {
-        return transacao.anuncio.cdUsuarioCria;
+        codigo = transacao.anuncio.cdUsuarioCria;
       }
     }
+
+    this.buscarUsuario(codigo);
+  }
+
+  private buscarUsuario(cdUsuario: number) {
+    this.usuarioService.buscarUsuario(cdUsuario).subscribe({
+      next: (usuario: UsuarioModel) => {
+        this.outro = usuario;
+      },
+      error: (erro: any) => {
+        console.log('Erro ao buscar usuário');
+      }
+    });
   }
 
   async exibirMensagem(texto: string) {

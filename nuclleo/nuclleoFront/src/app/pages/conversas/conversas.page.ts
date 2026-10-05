@@ -23,6 +23,8 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
+import { TokenService } from 'src/app/services/token.service';
+import { TokenModel } from 'src/app/model/token.model';
 
 interface ConversaView {
   cdInteresse: number;
@@ -53,8 +55,9 @@ interface ConversaView {
   ]
 })
 export class ConversasPage implements OnInit {
+  token: TokenModel;
 
-  usuarioLogado: UsuarioModel = new UsuarioModel();
+  //usuarioLogado: UsuarioModel = new UsuarioModel();
   conversas: ConversaView[] = [];
   carregando: boolean = false;
 
@@ -68,18 +71,22 @@ export class ConversasPage implements OnInit {
 
   constructor(
     private interesseService: InteresseService,
-    private usuarioService: UsuarioService,
+    //private usuarioService: UsuarioService,
     private alertController: AlertController,
     private toastController: ToastController,
     private router: Router,
+    private tokenService: TokenService
   ) {
+    this.token = new TokenModel();
     addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
   ionViewWillEnter() {
-    const possuiSessao = this.usuarioService.verificarSessao();
+    this.token = this.tokenService.extrair();
+    const possuiSessao = this.tokenService.temToken();
 
     if (!possuiSessao) {
       this.exibirMensagem('Não há usuário logado.');
@@ -87,17 +94,16 @@ export class ConversasPage implements OnInit {
       return;
     }
 
-    this.usuarioLogado = this.usuarioService.getUsuarioSessao();
     this.carregarConversas();
   }
 
   carregarConversas() {
     this.carregando = true;
 
-    this.interesseService.listarPorUsuario(this.usuarioLogado.cdUsuario).subscribe({
+    this.interesseService.listarPorUsuario(this.token.cdUsuario).subscribe({
       next: (comoInteressado) => {
 
-        this.interesseService.listarPorInteressados(this.usuarioLogado.cdUsuario).subscribe({
+        this.interesseService.listarPorInteressados(this.token.cdUsuario).subscribe({
           next: (comoAnunciante) => {
 
             const todos = [...comoInteressado, ...comoAnunciante];
@@ -123,7 +129,7 @@ export class ConversasPage implements OnInit {
   }
 
   mapearConversa(interesse: InteresseModel): ConversaView {
-    const souEuOInteressado = interesse.usuario.cdUsuario === this.usuarioLogado.cdUsuario;
+    const souEuOInteressado = interesse.usuario.cdUsuario === this.token.cdUsuario;
 
     return {
       cdInteresse: interesse.id!,
@@ -159,7 +165,7 @@ export class ConversasPage implements OnInit {
   aceitarConversa(conversa: ConversaView, event: Event) {
     event.stopPropagation();
 
-    this.interesseService.aceitarInteresse(conversa.cdInteresse, this.usuarioLogado.cdUsuario).subscribe({
+    this.interesseService.aceitarInteresse(conversa.cdInteresse, this.token.cdUsuario).subscribe({
       next: () => {
         conversa.aceito = true;
         this.router.navigate(['/chat', conversa.cdInteresse]);
@@ -188,7 +194,7 @@ export class ConversasPage implements OnInit {
   }
 
   recusarConversa(conversa: ConversaView) {
-    this.interesseService.recusarConversa(conversa.cdInteresse, this.usuarioLogado.cdUsuario).subscribe({
+    this.interesseService.recusarConversa(conversa.cdInteresse, this.token.cdUsuario).subscribe({
       next: () => {
         this.conversas = this.conversas.filter(c => c.cdInteresse !== conversa.cdInteresse);
         this.exibirMensagem('Conversa recusada.');

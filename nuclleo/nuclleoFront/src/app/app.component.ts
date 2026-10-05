@@ -22,6 +22,8 @@ import {
 import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { NotificacaoService } from 'src/app/services/notificacao.service';
+import { TokenService } from './services/token.service';
+import { TokenModel } from './model/token.model';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +37,7 @@ import { NotificacaoService } from 'src/app/services/notificacao.service';
   ],
 })
 export class AppComponent implements OnInit {
+  token: TokenModel;
 
   menuHabilitado = true;
   totalConversasPendentes: number = 0;
@@ -42,10 +45,12 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private interesseService: InteresseService,
-    private usuarioService: UsuarioService,
+    //private usuarioService: UsuarioService,
     private notificacaoService: NotificacaoService,
     private toastController: ToastController,
+    private tokenService: TokenService
   ) {
+    this.token = new TokenModel();
 
     addIcons({
       add, calendarOutline, checkmarkCircleOutline, chatbubbleOutline, createOutline,
@@ -68,6 +73,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.token = this.tokenService.extrair();
+
     this.notificacaoService.onNotificacaoRecebida().subscribe(evento => {
       if (evento.tipo === 'SOLICITACAO_CONVERSA') {
         this.totalConversasPendentes++;
@@ -76,16 +83,19 @@ export class AppComponent implements OnInit {
     });
   }
 
+  ionViewWillEnter() {
+    this.token = this.tokenService.extrair();
+  }
+
   conectarNotificacoesTempoReal() {
-    const possuiSessao = this.usuarioService.verificarSessao();
+    const possuiSessao = this.tokenService.temToken();
 
     if (!possuiSessao) {
       this.notificacaoService.desconectar();
       return;
     }
 
-    const usuario = this.usuarioService.getUsuarioSessao();
-    this.notificacaoService.conectar(usuario.cdUsuario);
+    this.notificacaoService.conectar(this.token.cdUsuario);
   }
 
   async mostrarToast(mensagem: string) {
@@ -100,16 +110,14 @@ export class AppComponent implements OnInit {
   }
 
   carregarNotificacoes() {
-    const possuiSessao = this.usuarioService.verificarSessao();
+    const possuiSessao = this.tokenService.temToken();
 
     if (!possuiSessao) {
       this.totalConversasPendentes = 0;
       return;
     }
 
-    const usuario = this.usuarioService.getUsuarioSessao();
-
-    this.interesseService.listarPorInteressados(usuario.cdUsuario).subscribe({
+    this.interesseService.listarPorInteressados(this.token.cdUsuario).subscribe({
       next: (interesses) => {
         this.totalConversasPendentes = interesses.filter(
           i => i.conversaIniciada === true && i.aceito === false

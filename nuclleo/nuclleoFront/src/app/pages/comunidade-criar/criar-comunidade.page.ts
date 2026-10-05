@@ -38,6 +38,8 @@ import {
 } from 'ionicons/icons';
 
 import { NgxMaskDirective } from 'ngx-mask';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 
 @Component({
@@ -63,6 +65,7 @@ import { NgxMaskDirective } from 'ngx-mask';
 })
 
 export class CriarComunidadePage {
+  token: TokenModel;
 
   formComunidade: FormGroup;
 
@@ -82,11 +85,12 @@ export class CriarComunidadePage {
     private toastController: ToastController,
     private activatedRoute: ActivatedRoute,
     private comunidadeService: ComunidadeService,
-    private usuarioService: UsuarioService,
+    //private usuarioService: UsuarioService,
     private arquivoService: ArquivoService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private tokenService: TokenService,
   ) {
-
+    this.token = new TokenModel();
     addIcons({
       cameraOutline,
       imageOutline
@@ -118,6 +122,15 @@ export class CriarComunidadePage {
 
 
   ionViewWillEnter() {
+    const possuiSessao = this.tokenService.temToken();
+
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+    } else {
+      this.router.navigate(['/login']);
+      this.exibirMensagem('Não há usuário logado.');
+      return;
+    }
 
     this.modoEdicao = false;
 
@@ -324,10 +337,7 @@ export class CriarComunidadePage {
       this.formComunidade.value.cep
         .replace(/\D/g, '');
 
-    comunidadeCadastro.cdUsuarioCria =
-      this.usuarioService
-        .getUsuarioSessao()
-        .cdUsuario;
+    comunidadeCadastro.cdUsuarioCria = this.token.cdUsuario;
 
     this.comunidadeService
       .cadastrarComunidade(

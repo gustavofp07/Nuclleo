@@ -27,6 +27,8 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -48,9 +50,9 @@ import { InteresseModel } from 'src/app/model/interesse.model';
   ]
 })
 export class AnuncioTelaPage implements OnInit {
+  token: TokenModel;
 
   anuncio: AnuncioModel = new AnuncioModel();
-  usuarioLogado: UsuarioModel = new UsuarioModel();
   usuarioEhDono: boolean = false;
 
   usuarioJaInteressado: boolean = false;
@@ -64,13 +66,14 @@ export class AnuncioTelaPage implements OnInit {
     private anuncioService: AnuncioService,
     private interesseService: InteresseService,
     private toastController: ToastController,
-    private usuarioService: UsuarioService,
+    private tokenService: TokenService,
     private alertController: AlertController,
     private router: Router,
     private anuncioComunidadeService: AnuncioComunidadeService,
     private location: Location,
     private ngZone: NgZone,
   ) {
+    this.token = new TokenModel();
     addIcons({
       createOutline,
       trashOutline,
@@ -87,6 +90,15 @@ export class AnuncioTelaPage implements OnInit {
   }
 
   ionViewWillEnter() {
+    const possuiSessao = this.tokenService.temToken();
+
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+    } else {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const cdAnuncio = Number(
       this.activatedRoute.snapshot.paramMap.get('cdAnuncio')
     );
@@ -96,9 +108,9 @@ export class AnuncioTelaPage implements OnInit {
     this.anuncioService.buscarAnuncio(cdAnuncio).subscribe({
       next: (anuncio) => {
         this.anuncio = anuncio;
-        this.usuarioLogado = this.usuarioService.getUsuarioSessao();
+
         this.usuarioEhDono =
-          this.anuncio.usuarioCria.cdUsuario === this.usuarioLogado.cdUsuario;
+          this.anuncio.usuarioCria.cdUsuario === this.token.cdUsuario;
 
         if (!this.usuarioEhDono) {
           this.verificarInteresse();
@@ -114,7 +126,7 @@ export class AnuncioTelaPage implements OnInit {
   }
 
   verificarInteresse() {
-    this.interesseService.listarPorUsuario(this.usuarioLogado.cdUsuario).subscribe({
+    this.interesseService.listarPorUsuario(this.token.cdUsuario).subscribe({
       next: (interesses) => {
         const interesse = interesses.find(
           i => i.anuncio.cdAnuncio === this.anuncio.cdAnuncio
@@ -161,7 +173,7 @@ export class AnuncioTelaPage implements OnInit {
     }
 
     const interesse = {
-      cdUsuario: this.usuarioLogado.cdUsuario,
+      cdUsuario: this.token.cdUsuario,
       cdAnuncio: this.anuncio.cdAnuncio
     };
 
@@ -220,7 +232,7 @@ export class AnuncioTelaPage implements OnInit {
 
     this.carregandoInteresse = true;
 
-    this.interesseService.iniciarConversa(this.interesseAtual.id, this.usuarioLogado.cdUsuario).subscribe({
+    this.interesseService.iniciarConversa(this.interesseAtual.id, this.token.cdUsuario).subscribe({
       next: () => {
         this.ngZone.run(() => {
           this.carregandoInteresse = false;
@@ -311,7 +323,7 @@ export class AnuncioTelaPage implements OnInit {
   irParaPerfilAnunciante() {
     const cdAnunciante = this.anuncio.usuarioCria.cdUsuario;
 
-    if (cdAnunciante === this.usuarioLogado.cdUsuario) {
+    if (cdAnunciante === this.token.cdUsuario) {
       this.router.navigate(['/usuario-perfil']);
     } else {
       this.router.navigate(['/usuario-perfil', cdAnunciante]);

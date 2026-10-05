@@ -22,6 +22,8 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
+import { TokenService } from 'src/app/services/token.service';
+import { TokenModel } from 'src/app/model/token.model';
 
 @Component({
   selector: 'app-interesse',
@@ -42,27 +44,31 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
   ]
 })
 export class InteresseMeusPage implements OnInit {
-  usuario: UsuarioModel;
+  token: TokenModel;
+
   interesses: InteresseModel[] = [];
   carregandoInteresses: boolean = true;
 
   constructor(
     private interesseService: InteresseService,
-    private usuarioService: UsuarioService,
+    //private usuarioService: UsuarioService,
     private alertController: AlertController,
     private toastController: ToastController,
     private router: Router,
+    private tokenService: TokenService
   ) {
-    this.usuario = new UsuarioModel();
+    this.token = new TokenModel();
     addIcons({ heartOutline, imageOutline });
   }
 
   ngOnInit() {
-    this.usuario = this.usuarioService.getUsuarioSessao();
+    this.token = this.tokenService.extrair();
+    //this.usuario = this.usuarioService.getUsuarioSessao();
   }
 
   ionViewWillEnter() {
-    const possuiSessao = this.usuarioService.verificarSessao();
+    this.token = this.tokenService.extrair();
+    const possuiSessao = this.tokenService.temToken();
 
     if (!possuiSessao) {
       this.exibirMensagem('Não há usuário logado.');
@@ -70,7 +76,7 @@ export class InteresseMeusPage implements OnInit {
       return;
     }
 
-    this.usuario = this.usuarioService.getUsuarioSessao();
+    //this.usuario = this.usuarioService.getUsuarioSessao();
     this.carregarInteresses();
   }
 
@@ -85,7 +91,7 @@ export class InteresseMeusPage implements OnInit {
   carregarInteresses() {
     this.carregandoInteresses = true;
 
-    this.interesseService.listarPorUsuario(this.usuario.cdUsuario).subscribe({
+    this.interesseService.listarPorUsuario(this.token.cdUsuario).subscribe({
       next: (interesses) => {
         this.interesses = interesses;
         this.carregandoInteresses = false;

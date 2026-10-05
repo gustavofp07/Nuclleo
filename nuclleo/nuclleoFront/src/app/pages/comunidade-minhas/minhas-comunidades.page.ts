@@ -23,6 +23,7 @@ import {
 import { forkJoin } from 'rxjs';
 
 import {
+  Router,
   RouterLink
 } from '@angular/router';
 
@@ -46,6 +47,8 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
+import { TokenModel } from 'src/app/model/token.model';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-minhas-comunidades',
@@ -71,17 +74,20 @@ import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.se
 })
 
 export class MinhasComunidadesPage implements OnInit {
-  usuario: UsuarioModel;
+  token: TokenModel;
+
+  //usuario: UsuarioModel;
   comunidades: ComunidadeModel[];
   carregando: boolean = true;
 
   constructor(
     private comunidadeService: ComunidadeService,
     private alertController: AlertController,
+    private router: Router,
     private toastController: ToastController,
-    private usuarioService: UsuarioService,
+    private tokenService: TokenService,
     private usuarioComunidadeService: UsuarioComunidadeService) {
-    this.usuario = new UsuarioModel();
+    this.token = this.tokenService.extrair();
     this.comunidades = [];
     addIcons({
       add,
@@ -94,25 +100,30 @@ export class MinhasComunidadesPage implements OnInit {
   }
 
   ngOnInit() {
-    this.usuario = this.usuarioService.getUsuarioSessao();
-    if (this.usuario) {
-      this.carregarComunidades();
-    }
   }
 
   ionViewWillEnter() {
-    this.usuario = this.usuarioService.getUsuarioSessao(); // <-- ADICIONADO
-    if (this.usuario) {
-      this.carregarComunidades();
+
+    const possuiSessao = this.tokenService.temToken();
+
+    if (possuiSessao) {
+      this.token = this.tokenService.extrair();
+      //buscar o usuário logado a partir do token
+
+      this.carregarComunidades(this.token.cdUsuario);
+    } else {
+      this.router.navigate(['/login']);
+      return;
     }
+
   }
 
-  carregarComunidades() {
+  private carregarComunidades(cdUsuario: number) {
     this.carregando = true;
 
     forkJoin({
-      vinculos: this.usuarioComunidadeService.listarComunidadesPorUsuario(this.usuario.cdUsuario),
-      criadas: this.comunidadeService.listarComunidadesDoUsuario(this.usuario.cdUsuario)
+      vinculos: this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario),
+      criadas: this.comunidadeService.listarComunidadesDoUsuario(this.token.cdUsuario)
     }).subscribe({
       next: async ({ vinculos, criadas }) => {
         const comunidadesParticipante = vinculos.map(
@@ -148,7 +159,7 @@ export class MinhasComunidadesPage implements OnInit {
   }
 
   usuarioEhAdmin(comunidade: ComunidadeModel) {
-    return comunidade.usuarioCria?.cdUsuario === this.usuario.cdUsuario;
+    return comunidade.usuarioCria?.cdUsuario === this.token.cdUsuario;
   }
 
   async confirmarExclusao(comunidade: ComunidadeModel) {
@@ -184,7 +195,7 @@ export class MinhasComunidadesPage implements OnInit {
       next: async (comunidade: ComunidadeModel) => {
         //console.log("busquei ", comunidades);
         this.exibirMensagem('Comunidade excluída com sucesso');
-        this.carregarComunidades();
+        this.carregarComunidades(this.token.cdUsuario);
       },
       error: async () => {
         //console.log('Erro ao logar');

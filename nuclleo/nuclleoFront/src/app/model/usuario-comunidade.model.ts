@@ -6,6 +6,14 @@ export class UsuarioComunidadeModel {
     usuario: UsuarioModel;
     comunidade: ComunidadeModel;
 
+    //futuramente usar essa implementação
+    /*
+    cdUsuario: number;
+    nmUsuario: string;
+    cdComunidade: number;
+    nmComunidade: string;
+    */
+
     constructor() {
         this.codigo = 0;
         this.usuario = new UsuarioModel();
