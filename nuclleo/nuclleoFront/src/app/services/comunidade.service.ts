@@ -32,7 +32,7 @@ export class ComunidadeService {
       formData.append('foto', foto);
     }
 
-    return this.http.post<ComunidadeModel>(this.API_URL, formData);
+    return this.http.post<ComunidadeModel>(this.API_URL, formData, { headers: this.tokenService.gerarCabecalhoAutenticacao() });
   }
 
   atualizarComunidade(comunidade: ComunidadeModel, foto?: File): Observable<ComunidadeModel> {
@@ -126,7 +126,10 @@ export class ComunidadeService {
     return this.http.post<void>(
       `${this.API_URL}/${cdComunidade}/usuarios/${cdUsuario}/expulsar`,
       null,
-      { params: { cdAdmin } }, 
+      {
+        params: { cdAdmin },
+        headers: this.tokenService.gerarCabecalhoAutenticacao()
+      }
     );
   }
 }

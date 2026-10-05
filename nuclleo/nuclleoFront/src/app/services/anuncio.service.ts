@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import { AnuncioVendaModel } from '../model/anuncio-venda.model';
 import { AnuncioRequerimentoModel } from '../model/anuncio-requerimento.model';
 import { AnuncioModel } from '../model/anuncio.model';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,27 +18,34 @@ export class AnuncioService {
   private readonly API_URL_REQUERIMENTO = 'https://nuclleo.onrender.com/api/v1/anuncios/requerimentos';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private tokenService: TokenService
   ) { }
 
+  private getHeaders() {
+    return { headers: this.tokenService.gerarCabecalhoAutenticacao() };
+  }
 
   cadastrarVenda(anuncio: AnuncioVendaModel, foto?: File): Observable<AnuncioVendaModel> {
     return this.http.post<AnuncioVendaModel>(
       this.API_URL_VENDA,
-      this.montarFormData(anuncio, foto)
+      this.montarFormData(anuncio, foto),
+      this.getHeaders()
     );
   }
 
   cadastrarRequerimento(anuncio: AnuncioRequerimentoModel, foto?: File): Observable<AnuncioRequerimentoModel> {
     return this.http.post<AnuncioRequerimentoModel>(
       this.API_URL_REQUERIMENTO,
-      this.montarFormData(anuncio, foto)
+      this.montarFormData(anuncio, foto),
+      this.getHeaders()
     );
   }
 
   listarAnunciosPorUsuario(cdUsuario: number): Observable<AnuncioModel[]> {
     return this.http.get<AnuncioModel[]>(
-      `${this.API_URL}/usuario/${cdUsuario}`
+      `${this.API_URL}/usuario/${cdUsuario}`,
+      this.getHeaders()
     );
   }
 
@@ -50,32 +58,36 @@ export class AnuncioService {
   }
 
   listarTodos(): Observable<AnuncioModel[]> {
-    return this.http.get<AnuncioModel[]>(this.API_URL);
+    return this.http.get<AnuncioModel[]>(this.API_URL, this.getHeaders());
   }
 
   buscarAnuncio(cdAnuncio: number): Observable<AnuncioModel> {
     return this.http.get<AnuncioModel>(
-      `${this.API_URL}/${cdAnuncio}`
+      `${this.API_URL}/${cdAnuncio}`,
+      this.getHeaders()
     );
   }
 
   excluirAnuncio(cdAnuncio: number): Observable<AnuncioModel> {
     return this.http.delete<AnuncioModel>(
-      `${this.API_URL}/${cdAnuncio}`
+      `${this.API_URL}/${cdAnuncio}`,
+      this.getHeaders()
     );
   }
 
   alterarVenda(anuncio: AnuncioVendaModel, foto?: File): Observable<AnuncioVendaModel> {
     return this.http.put<AnuncioVendaModel>(
       this.API_URL_VENDA,
-      this.montarFormData(anuncio, foto)
+      this.montarFormData(anuncio, foto),
+      this.getHeaders()
     );
   }
 
   alterarRequerimento(anuncio: AnuncioRequerimentoModel, foto?: File): Observable<AnuncioRequerimentoModel> {
     return this.http.put<AnuncioRequerimentoModel>(
       this.API_URL_REQUERIMENTO,
-      this.montarFormData(anuncio, foto)
+      this.montarFormData(anuncio, foto),
+      this.getHeaders()
     );
   }
 
@@ -102,7 +114,7 @@ export class AnuncioService {
 
     formData.append('arquivo', arquivo);
 
-    return this.http.post<any>('https://nuclleo.onrender.com/api/v1/upload', formData);
+    return this.http.post<any>('https://nuclleo.onrender.com/api/v1/upload', formData, this.getHeaders());
   }
 
 }

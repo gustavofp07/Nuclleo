@@ -8,8 +8,34 @@ import { TokenModel } from '../model/token.model';
 export class TokenService {
   private readonly AUTORIZACAO_USUARIO = 'Authorization';
 
-  salvar(token: string): void {
-    localStorage.setItem(this.AUTORIZACAO_USUARIO, JSON.stringify(token));
+  private obterTokenArmazenado(): string {
+    const valorArmazenado = localStorage.getItem(this.AUTORIZACAO_USUARIO);
+
+    if (!valorArmazenado) {
+      return '';
+    }
+
+    try {
+      const valorParseado = JSON.parse(valorArmazenado);
+
+      if (typeof valorParseado === 'string') {
+        return valorParseado;
+      }
+
+      if (valorParseado && typeof valorParseado === 'object') {
+        const tokenString = valorParseado.token ?? valorParseado.accessToken ?? '';
+        return typeof tokenString === 'string' ? tokenString : '';
+      }
+    } catch {
+      return valorArmazenado;
+    }
+
+    return String(valorArmazenado);
+  }
+
+  salvar(token: string | { token?: string; accessToken?: string }): void {
+    const tokenString = typeof token === 'string' ? token : token?.token ?? token?.accessToken ?? '';
+    localStorage.setItem(this.AUTORIZACAO_USUARIO, tokenString);
   }
 
   excluir(): void {
@@ -19,21 +45,27 @@ export class TokenService {
   }
 
   temToken(): boolean {
-    return localStorage.getItem(this.AUTORIZACAO_USUARIO) !== null;
+    return this.obterTokenArmazenado() !== '';
   }
 
   gerarCabecalhoAutenticacao(): HttpHeaders {
-    const token = JSON.parse(localStorage.getItem(this.AUTORIZACAO_USUARIO) || '""');
-    return new HttpHeaders({ Authorization: 'Bearer ' + token });
+    return new HttpHeaders({ Authorization: 'Bearer ' + this.obterTokenArmazenado() });
   }
 
   extrair(): TokenModel {
     const tokenModel = new TokenModel();
     try {
-      const token = JSON.parse(localStorage.getItem(this.AUTORIZACAO_USUARIO) || '""');
-      const tokenBase64 = token.split('.')[1];
-      const tokenJson = atob(tokenBase64);
-      const payload = JSON.parse(tokenJson);
+      const token = this.obterTokenArmazenado();
+      const partes = token.split('.');
+
+      if (partes.length < 2 || !partes[1]) {
+        return tokenModel;
+      }
+
+      const tokenBase64 = partes[1].replace(/-/g, '+').replace(/_/g, '/');
+      const tokenBase64ComPadding = tokenBase64.padEnd(tokenBase64.length + ((4 - (tokenBase64.length % 4)) % 4), '=');
+      const payload = JSON.parse(atob(tokenBase64ComPadding));
+
       tokenModel.cdUsuario = payload.cdUsuario;
       tokenModel.nmUsuario = payload.nmUsuario;
       tokenModel.ftUsuario = payload.ftUsuario;
