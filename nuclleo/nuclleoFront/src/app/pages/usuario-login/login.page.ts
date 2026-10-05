@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-
 import {
   IonContent,
   IonButton,
@@ -16,33 +14,24 @@ import {
   IonIcon,
   ToastController
 } from '@ionic/angular/standalone';
-
 import { Router, RouterLink } from '@angular/router';
-
 import { addIcons } from 'ionicons';
-import {
-  eyeOutline,
-  eyeOffOutline
-} from 'ionicons/icons';
+import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
 
 import { LoginModel } from 'src/app/model/login.model';
 import { LoginService } from 'src/app/services/login.service';
-import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
-import { UsuarioAutenticadoModel } from 'src/app/model/usuario-autenticado.model';
-
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-
     IonContent,
     IonItem,
     IonInput,
@@ -50,7 +39,6 @@ import { UsuarioAutenticadoModel } from 'src/app/model/usuario-autenticado.model
     IonIcon
   ]
 })
-
 export class LoginPage implements OnInit {
   formLogin: FormGroup;
   login: LoginModel;
@@ -61,9 +49,9 @@ export class LoginPage implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private loginService: LoginService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private tokenService: TokenService
   ) {
-
     this.login = new LoginModel();
 
     this.formLogin = this.formBuilder.group({
@@ -72,29 +60,21 @@ export class LoginPage implements OnInit {
         Validators.email,
         Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/)
       ]],
-
       senha: ['', Validators.required]
     });
 
-    addIcons({
-      eyeOutline,
-      eyeOffOutline
-    });
+    addIcons({ eyeOutline, eyeOffOutline });
   }
 
   ngOnInit() {
-    this.usuarioService.limparSessao();
+    this.tokenService.excluir();
   }
 
   ionViewWillEnter() {
-    this.usuarioService.limparSessao();
+    this.tokenService.excluir();
     this.login = new LoginModel();
     this.showPassword = false;
-
-    this.formLogin.reset({
-      email: '',
-      senha: ''
-    });
+    this.formLogin.reset({ email: '', senha: '' });
   }
 
   togglePassword() {
@@ -111,12 +91,9 @@ export class LoginPage implements OnInit {
     this.login.senha = this.formLogin.value.senha;
 
     this.loginService.entrar(this.login).subscribe({
-      next: async (usuario: UsuarioAutenticadoModel) => {
+      next: async (token: string) => {
+        this.tokenService.salvar(token);
         await this.exibirMensagem('Login realizado com sucesso!');
-        console.log(usuario);
-
-        this.usuarioService.salvarUsuarioSessao(usuario);
-
         this.router.navigate(['/tela-inicial']);
       },
       error: async (erro: any) => {
@@ -137,5 +114,4 @@ export class LoginPage implements OnInit {
     });
     toast.present();
   }
-
 }
