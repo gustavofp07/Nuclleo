@@ -90,15 +90,15 @@ export class UsuarioService {
     });
   }
 
+  verificarCEP(cdUsuario: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`, {
+      headers: this.tokenService.gerarCabecalhoAutenticacao()
+    });
+  }
+
   /*
     verificarCPF(cdUsuario: number): Observable<boolean> {
       return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cpf`, {
-        headers: this.tokenService.gerarCabecalhoAutenticacao()
-      });
-    }
-
-    verificarCEP(cdUsuario: number): Observable<boolean> {
-      return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`, {
         headers: this.tokenService.gerarCabecalhoAutenticacao()
       });
     }
