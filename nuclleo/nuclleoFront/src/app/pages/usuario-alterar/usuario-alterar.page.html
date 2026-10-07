@@ -174,9 +174,10 @@
         <label>Senha</label>
       </div>
 
-      <ion-button expand="block" fill="outline" class="btn-alterar-senha" type="button" (click)="abrirAlterarSenha()">
+      <ion-button expand="block" fill="outline" class="btn-alterar-senha" type="button"
+        [disabled]="alterandoSenha || senhaAlterada" (click)="abrirAlterarSenha()">
 
-        Alterar senha
+        {{ alterandoSenha ? 'Carregando...' : 'Alterar senha' }}
       </ion-button>
 
 
@@ -184,7 +185,7 @@
       <div class="acoes">
 
         <ion-button expand="block" class="btn-salvar" type="submit"
-          [disabled]="formUsuario.invalid || verificandoEmail || salvando">
+          [disabled]="formUsuario.invalid || verificandoEmail || salvando || alterandoSenha || senhaAlterada">
 
           {{
           salvando
@@ -196,9 +197,9 @@
 
         </ion-button>
 
-      </div>
+  </div>
 
-    </form>
+  </form>
 
   </div>
 

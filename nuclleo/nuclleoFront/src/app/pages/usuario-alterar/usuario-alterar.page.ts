@@ -47,6 +47,8 @@ export class UsuarioAlterarPage {
 
   verificandoEmail: boolean = false;
   salvando: boolean = false;
+  alterandoSenha: boolean = false;
+  senhaAlterada: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -103,6 +105,9 @@ export class UsuarioAlterarPage {
     }
 
     this.token = this.tokenService.extrair();
+
+    this.alterandoSenha = false;
+    this.senhaAlterada = false;
 
     // Limpa qualquer dado de um usuário anterior (páginas do Ionic ficam em cache)
     this.usuario = new UsuarioModel();
@@ -244,7 +249,7 @@ export class UsuarioAlterarPage {
   }
 
   async confirmarAlteracoes() {
-    if (this.salvando) {
+    if (this.salvando || this.alterandoSenha || this.senhaAlterada) {
       return;
     }
 
@@ -329,6 +334,10 @@ export class UsuarioAlterarPage {
   }
 
   async abrirAlterarSenha() {
+    if (this.alterandoSenha || this.senhaAlterada) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Alterar senha',
       message: 'Informe a senha atual e a nova senha para confirmar a alteração.',
@@ -390,14 +399,24 @@ export class UsuarioAlterarPage {
 
   // Só aqui o usuário é deslogado: depois de trocar a senha com sucesso,
   // precisa entrar de novo com a senha nova.
-  // Precisa do método `alterarSenha` no UsuarioService (e do endpoint no backend).
   salvarSenha(senhaAtual: string, novaSenha: string) {
+    if (this.alterandoSenha) {
+      return;
+    }
+
+    this.alterandoSenha = true;
+
     this.usuarioService.alterarSenha(senhaAtual, novaSenha).subscribe({
       next: async () => {
+        this.alterandoSenha = false;
+        this.senhaAlterada = true;
+
         await this.exibirMensagem('Senha alterada com sucesso! Faça login novamente.');
         this.router.navigate(['/login']);
       },
       error: async (erro: any) => {
+        this.alterandoSenha = false;
+
         const mensagem =
           erro.error?.message ||
           (typeof erro.error === 'string' ? erro.error : '') ||
