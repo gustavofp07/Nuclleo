@@ -1,6 +1,7 @@
 package br.cefetmg.nuclleo.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,5 +15,6 @@ public class UsuarioRequestDTO {
     private String email;
 
     @NotBlank(message = "O campo senha é obrigatório")
+    @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
     private String senha;
 }

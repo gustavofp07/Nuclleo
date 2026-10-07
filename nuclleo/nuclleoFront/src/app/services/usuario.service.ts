@@ -14,15 +14,17 @@ export class UsuarioService {
   private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/usuarios';
   private readonly AUTH_URL = 'https://nuclleo.onrender.com/api/v1/autenticar';
 
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService
+  ) { }
+
+  //público
+  // CORREÇÃO: o campo `senha` estava sem nome ({ email: string;  : string }), o que não compila.
   autenticar(credenciais: { email: string; senha: string }): Observable<any> {
     return this.http.post<any>(this.AUTH_URL, credenciais);
   }
-  constructor(private http: HttpClient,
-    private tokenService: TokenService) {
 
-  }
-
-  //público
   cadastrarUsuario(usuario: UsuarioCadastroDTOModel, foto?: File): Observable<TokenModel> {
     const formData = new FormData();
 
@@ -66,6 +68,16 @@ export class UsuarioService {
     });
   }
 
+  // NOVO: troca a senha do usuário logado.
+  // Segue o mesmo padrão de atualizar/excluirUsuario: o backend identifica
+  // o usuário pelo token, então não precisa mandar o cdUsuario.
+  // Backend: PUT /api/v1/usuarios/senha  com body { senhaAtual, novaSenha }
+  alterarSenha(senhaAtual: string, novaSenha: string): Observable<void> {
+    return this.http.put<void>(`${this.API_URL}/senha`, { senhaAtual, novaSenha }, {
+      headers: this.tokenService.gerarCabecalhoAutenticacao()
+    });
+  }
+
   buscarUsuario(cdUsuario: number): Observable<UsuarioModel> {
     return this.http.get<UsuarioModel>(`${this.API_URL}/${cdUsuario}`, {
       headers: this.tokenService.gerarCabecalhoAutenticacao()
@@ -78,46 +90,17 @@ export class UsuarioService {
     });
   }
 
-
-
-
-
   /*
     verificarCPF(cdUsuario: number): Observable<boolean> {
-      return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cpf`);
+      return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cpf`, {
+        headers: this.tokenService.gerarCabecalhoAutenticacao()
+      });
     }
-  
+
     verificarCEP(cdUsuario: number): Observable<boolean> {
-      return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`);
+      return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`, {
+        headers: this.tokenService.gerarCabecalhoAutenticacao()
+      });
     }
-      
-
-
-
-
-  
-  
-
-  
-
-  
-
-  autenticar(credenciais: { email: string; senha: string }): Observable<any> {
-    return this.http.post<any>(this.AUTH_URL, credenciais);
-  }
-
-  
-
-  verificarCPF(cdUsuario: number): Observable<boolean> {
-    return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cpf`, {
-      headers: this.tokenService.gerarCabecalhoAutenticacao()
-    });
-  }
-
-  verificarCEP(cdUsuario: number): Observable<boolean> {
-    return this.http.get<boolean>(`${this.API_URL}/${cdUsuario}/possui-cep`, {
-      headers: this.tokenService.gerarCabecalhoAutenticacao()
-    });
-  }
-    */
+  */
 }

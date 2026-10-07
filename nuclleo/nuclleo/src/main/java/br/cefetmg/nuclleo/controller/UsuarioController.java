@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.AlterarSenhaRequestDTO;
 import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.dto.VerificarEmailRequestDTO;
 import br.cefetmg.nuclleo.exception.BadRequestException;
@@ -57,6 +59,22 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(usuarioService.alterar(dto, foto));
+    }
+
+    @PutMapping("/senha")
+    @Operation(summary = "Alterar senha do usuário logado")
+    public ResponseEntity<Void> alterarSenha(
+            @Valid @RequestBody AlterarSenhaRequestDTO dto,
+            Authentication authentication) {
+
+        if (authentication == null || authentication.getName() == null) {
+            throw new BadRequestException("Usuário não autenticado.");
+        }
+
+        // o "sub" do JWT é o e-mail do usuário
+        usuarioService.alterarSenha(authentication.getName(), dto.getSenhaAtual(), dto.getNovaSenha());
+
+        return ResponseEntity.noContent().build();
     }
 
     /*
