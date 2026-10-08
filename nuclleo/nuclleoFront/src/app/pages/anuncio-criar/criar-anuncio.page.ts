@@ -380,6 +380,8 @@ export class CriarAnuncioPage {
   cadastrarVenda() {
     this.anuncio.tipoAnuncio = 'VENDA';
     this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
+    // O backend ainda lê o criador de usuarioCria (cdUsuarioCria não existe na entidade)
+    this.anuncio.usuarioCria.cdUsuario = this.anuncio.cdUsuarioCria;
 
     this.anuncioService.cadastrarVenda(
       this.anuncio as AnuncioVendaModel,
@@ -420,6 +422,8 @@ export class CriarAnuncioPage {
   cadastrarRequerimento() {
     this.anuncio.tipoAnuncio = 'REQUERIMENTO';
     this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
+    // O backend ainda lê o criador de usuarioCria (cdUsuarioCria não existe na entidade)
+    this.anuncio.usuarioCria.cdUsuario = this.anuncio.cdUsuarioCria;
 
     this.anuncioService.cadastrarRequerimento(
       this.anuncio as AnuncioRequerimentoModel,
