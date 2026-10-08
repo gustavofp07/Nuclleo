@@ -250,3 +250,53 @@ hr {
     border: none;
     border-top: 1px solid #7c3aed;
 }
+
+/* COMUNIDADES DO ANÚNCIO */
+
+.comunidades-carregando {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.comunidades-carregando ion-spinner {
+  color: #7c3aed;
+}
+
+.sem-comunidades {
+  margin: 0;
+}
+
+.comunidades-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip-comunidade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 14px;
+
+  border: 1px solid #c4b5fd;
+  border-radius: 999px;
+
+  background: #f5f3ff;
+  color: #6d28d9;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.chip-comunidade ion-icon {
+  font-size: 18px;
+  color: #7c3aed;
+}
+
+.chip-comunidade:active {
+  background: #ede9fe;
+}

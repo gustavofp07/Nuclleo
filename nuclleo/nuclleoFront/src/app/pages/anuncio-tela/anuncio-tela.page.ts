@@ -17,7 +17,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline } from 'ionicons/icons';
+import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline, peopleOutline } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
@@ -29,6 +29,8 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
+import { ComunidadeModel } from 'src/app/model/comunidade.model';
+import { AnuncioComunidadeModel } from 'src/app/model/anuncio-comunidade.model';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -61,6 +63,10 @@ export class AnuncioTelaPage implements OnInit {
 
   carregandoAnuncio: boolean = true;
 
+  // Comunidades em que o anúncio foi publicado
+  comunidadesAnuncio: ComunidadeModel[] = [];
+  carregandoComunidades: boolean = false;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private anuncioService: AnuncioService,
@@ -83,6 +89,7 @@ export class AnuncioTelaPage implements OnInit {
       heartDislikeOutline,
       imageOutline,
       calendarOutline,
+      peopleOutline,
     });
   }
 
@@ -104,6 +111,7 @@ export class AnuncioTelaPage implements OnInit {
     );
 
     this.carregandoAnuncio = true;
+    this.comunidadesAnuncio = [];
 
     this.anuncioService.buscarAnuncio(cdAnuncio).subscribe({
       next: (anuncio) => {
@@ -111,6 +119,8 @@ export class AnuncioTelaPage implements OnInit {
 
         this.usuarioEhDono =
           this.anuncio.usuarioCria.cdUsuario === this.token.cdUsuario;
+
+        this.carregarComunidadesDoAnuncio(this.anuncio.cdAnuncio);
 
         if (!this.usuarioEhDono) {
           this.verificarInteresse();
@@ -123,6 +133,28 @@ export class AnuncioTelaPage implements OnInit {
         this.exibirMensagem('Erro ao carregar anúncio.');
       }
     });
+  }
+
+  // Busca as comunidades onde o anúncio foi publicado (não trava o carregamento da tela)
+  carregarComunidadesDoAnuncio(cdAnuncio: number) {
+    this.carregandoComunidades = true;
+
+    this.anuncioComunidadeService.listarRelacoesPorAnuncio(cdAnuncio).subscribe({
+      next: (relacoes: AnuncioComunidadeModel[]) => {
+        this.comunidadesAnuncio = relacoes
+          .map(relacao => relacao.comunidade)
+          .filter(comunidade => !!comunidade);
+        this.carregandoComunidades = false;
+      },
+      error: () => {
+        this.comunidadesAnuncio = [];
+        this.carregandoComunidades = false;
+      }
+    });
+  }
+
+  irParaComunidade(cdComunidade: number) {
+    this.router.navigate(['/comunidade-tela', cdComunidade]);
   }
 
   verificarInteresse() {

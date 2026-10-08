@@ -87,6 +87,27 @@
       </div>
     </div>
 
+    <!-- COMUNIDADES EM QUE O ANÚNCIO FOI PUBLICADO -->
+    <div class="info-box">
+      <h3>Publicado em</h3>
+
+      <div class="comunidades-carregando" *ngIf="carregandoComunidades">
+        <ion-spinner name="dots"></ion-spinner>
+      </div>
+
+      <p class="sem-comunidades" *ngIf="!carregandoComunidades && comunidadesAnuncio.length === 0">
+        Este anúncio não está publicado em nenhuma comunidade.
+      </p>
+
+      <div class="comunidades-lista" *ngIf="!carregandoComunidades && comunidadesAnuncio.length > 0">
+        <button type="button" class="chip-comunidade" *ngFor="let comunidade of comunidadesAnuncio"
+          (click)="irParaComunidade(comunidade.cdComunidade)">
+          <ion-icon name="people-outline"></ion-icon>
+          <span>{{ comunidade.nmComunidade }}</span>
+        </button>
+      </div>
+    </div>
+
     <div class="acoes-anuncio">
 
       <div class="botoes-dono" *ngIf="usuarioEhDono; else botoesVisitante">
