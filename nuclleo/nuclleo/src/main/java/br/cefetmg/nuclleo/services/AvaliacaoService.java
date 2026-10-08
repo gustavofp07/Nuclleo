@@ -101,6 +101,12 @@ public class AvaliacaoService {
         return (float) (soma / avaliacoes.size());
     }
 
+    // Quantidade de avaliações já feitas que o usuário recebeu
+    @Transactional(readOnly = true)
+    public long contarAvaliacoes(Long cdUsuario) {
+        return avaliacaoRepository.countByAvaliadoCdUsuarioAndNotaIsNotNull(cdUsuario);
+    }
+
     // Lista todas as avaliações de uma transação
     @Transactional(readOnly = true)
     public List<Avaliacao> listarPorTransacao(Long cdTransacao) {

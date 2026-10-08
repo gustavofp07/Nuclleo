@@ -19,4 +19,8 @@ export class AvaliacaoService {
   media(cdUsuario: number): Observable<number> {
     return this.http.get<number>(`${this.URL}/media/${cdUsuario}`, this.getHeaders());
   }
+
+  total(cdUsuario: number): Observable<number> {
+    return this.http.get<number>(`${this.URL}/total/${cdUsuario}`, this.getHeaders());
+  }
 }
