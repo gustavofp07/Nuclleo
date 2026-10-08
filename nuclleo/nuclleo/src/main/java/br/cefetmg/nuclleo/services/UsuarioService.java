@@ -1,5 +1,7 @@
 package br.cefetmg.nuclleo.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -208,5 +210,10 @@ public class UsuarioService {
         }
 
         return usuarioRepository.save(usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
     }
 }
