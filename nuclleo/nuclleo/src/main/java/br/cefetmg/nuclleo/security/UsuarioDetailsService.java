@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
-import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
@@ -26,7 +25,7 @@ public class UsuarioDetailsService implements UserDetailsService {
         return User.builder()
                 .username(usuario.getEmail())
                 .password(usuario.getSenha())
-                .authorities(Collections.emptyList())
+                .authorities(usuario.getPerfil().name())
                 .disabled(!usuario.isAtivo())
                 .build();
     }

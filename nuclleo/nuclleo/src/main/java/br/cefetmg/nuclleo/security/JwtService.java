@@ -36,6 +36,7 @@ public class JwtService {
                 .claim("cdUsuario", usuario.getCdUsuario())
                 .claim("nmUsuario", usuario.getNmUsuario())
                 .claim("ftUsuario", usuario.getFtUsuario())
+                .claim("perfil", usuario.getPerfil().name())
                 .issuedAt(agora)
                 .expiration(expiracao)
                 .signWith(getChave())
@@ -49,6 +50,10 @@ public class JwtService {
     public Long getCdUsuario(String token) {
         Number id = getClaims(token).get("cdUsuario", Number.class);
         return id.longValue();
+    }
+
+    public String getPerfil(String token) {
+        return getClaims(token).get("perfil", String.class);
     }
 
     public boolean validarToken(String token) {

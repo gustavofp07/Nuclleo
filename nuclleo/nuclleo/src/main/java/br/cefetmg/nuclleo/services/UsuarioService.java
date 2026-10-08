@@ -14,6 +14,7 @@ import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.DatabaseException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
+import br.cefetmg.nuclleo.model.Perfil;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
@@ -37,10 +38,10 @@ public class UsuarioService {
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        //usuario.setSenha(dto.getSenha());
 
         usuario.setAtivo(true);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
+        usuario.setPerfil(Perfil.USUARIO);
 
         if (foto != null && !foto.isEmpty()) {
             try {
@@ -181,5 +182,31 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         return (usuario.getCpf() != null && !usuario.getCpf().isBlank());
+    }
+
+    // Administrador
+    @Transactional
+    public Usuario inserirAdmin(UsuarioRequestDTO dto, MultipartFile foto) {
+        Usuario usuario = new Usuario();
+        usuario.setNmUsuario(dto.getNmUsuario());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setAtivo(true);
+        usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
+        usuario.setPerfil(Perfil.ADMINISTRADOR);
+
+        if (foto != null && !foto.isEmpty()) {
+            try {
+                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
+                if (arquivo == null || arquivo.getUrl() == null || arquivo.getUrl().isBlank()) {
+                    throw new BusinessException("O serviço de arquivos não retornou a URL da foto.");
+                }
+                usuario.setFtUsuario(arquivo.getUrl());
+            } catch (RestClientException e) {
+                throw new BusinessException("Não foi possível enviar a foto.");
+            }
+        }
+
+        return usuarioRepository.save(usuario);
     }
 }

@@ -72,4 +72,7 @@ public class Usuario {
 
     @Column(name = "ativo")
     private boolean ativo;
+
+    @Column(name = "perfil", nullable = false)
+    private Perfil perfil;
 }

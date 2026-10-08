@@ -29,14 +29,13 @@ public class SecurityConfig {
 
                 http
                                 .csrf(csrf -> csrf.disable())
-
                                 .cors(cors -> Customizer.withDefaults())
-
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(auth -> auth
 
+                                                // Swagger e erros
                                                 .requestMatchers(
                                                                 "/swagger-ui/**",
                                                                 "/swagger-ui.html",
@@ -44,9 +43,11 @@ public class SecurityConfig {
                                                                 "/error")
                                                 .permitAll()
 
+                                                // Preflight CORS
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                                                 .permitAll()
 
+                                                // Endpoints públicos
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/autenticar")
                                                 .permitAll()
 
@@ -56,9 +57,15 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/verificar-email")
                                                 .permitAll()
 
+                                                // WebSocket
                                                 .requestMatchers("/ws-chat/**")
                                                 .permitAll()
 
+                                                // Endpoints exclusivos do ADMINISTRADOR
+                                                .requestMatchers("/api/v1/admin/**")
+                                                .hasAuthority("ADMINISTRADOR")
+
+                                                // Tudo mais exige autenticação (USUARIO ou ADMINISTRADOR)
                                                 .anyRequest().authenticated())
 
                                 .exceptionHandling(exception -> exception
@@ -88,7 +95,6 @@ public class SecurityConfig {
         public AuthenticationManager authenticationManager(
                         AuthenticationConfiguration authenticationConfiguration)
                         throws Exception {
-
                 return authenticationConfiguration.getAuthenticationManager();
         }
 }
