@@ -69,6 +69,13 @@ public class AvaliacaoService {
             throw new IllegalArgumentException("Esta avaliação já foi realizada.");
         }
 
+        // A nova avaliação sobrepõe as anteriores do mesmo avaliador para o mesmo
+        // avaliado: remove as já realizadas para não acumular no total/média.
+        List<Avaliacao> anteriores = avaliacaoRepository
+                .findByAvaliadorCdUsuarioAndAvaliadoCdUsuarioAndNotaIsNotNull(
+                        cdAvaliador, avaliacao.getAvaliado().getCdUsuario());
+        avaliacaoRepository.deleteAll(anteriores);
+
         avaliacao.setNota(nota);
         avaliacao.setDtAvaliacao(new java.sql.Date(System.currentTimeMillis()));
 

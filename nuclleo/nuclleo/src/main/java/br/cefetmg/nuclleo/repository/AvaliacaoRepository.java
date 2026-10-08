@@ -23,6 +23,9 @@ public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
 
     List<Avaliacao> findByAvaliadorCdUsuarioAndAvaliadoCdUsuarioAndNotaIsNull(Long cdAvaliador, Long cdAvaliado);
 
+    // Avaliações já realizadas de um avaliador para um mesmo avaliado
+    List<Avaliacao> findByAvaliadorCdUsuarioAndAvaliadoCdUsuarioAndNotaIsNotNull(Long cdAvaliador, Long cdAvaliado);
+
     // Busca todas as avaliações de uma transação
     List<Avaliacao> findByTransacaoId(Long cdTransacao);
 
