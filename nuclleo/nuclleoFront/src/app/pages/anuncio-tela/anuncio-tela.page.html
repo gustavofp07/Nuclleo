@@ -87,6 +87,68 @@
       </div>
     </div>
 
+    <!-- COMUNIDADES EM QUE O ANÚNCIO ESTÁ DISPONÍVEL -->
+    <div class="info-box" [class.info-box-bloqueio]="!usuarioEhDono && !carregandoComunidades && !acessoLiberado">
+      <h3>Disponível nas comunidades</h3>
+
+      <p class="dica-comunidades" *ngIf="!usuarioEhDono && !carregandoComunidades && comunidadesAnuncio.length > 0">
+        {{ acessoLiberado
+          ? 'Você participa de uma comunidade deste anúncio, então pode interagir com ele.'
+          : 'Entre em uma das comunidades abaixo para poder interagir com este anúncio.' }}
+      </p>
+
+      <div class="comunidades-carregando" *ngIf="carregandoComunidades">
+        <ion-spinner name="dots"></ion-spinner>
+      </div>
+
+      <div class="sem-comunidades" *ngIf="!carregandoComunidades && erroComunidades">
+        <p>Não foi possível carregar as comunidades deste anúncio.</p>
+        <ion-button size="small" fill="outline" (click)="carregarComunidadesDoAnuncio(anuncio.cdAnuncio)">
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Tentar novamente
+        </ion-button>
+      </div>
+
+      <p class="sem-comunidades" *ngIf="!carregandoComunidades && !erroComunidades && comunidadesAnuncio.length === 0">
+        Este anúncio não está publicado em nenhuma comunidade.
+      </p>
+
+      <div class="comunidades-lista" *ngIf="!carregandoComunidades && comunidadesAnuncio.length > 0">
+        <div class="card-comunidade" *ngFor="let comunidade of comunidadesAnuncio"
+          [class.participando]="!usuarioEhDono && participaDe(comunidade)">
+
+          <button type="button" class="card-comunidade-info" (click)="irParaComunidade(comunidade.cdComunidade)">
+            <span class="card-comunidade-foto">
+              <img *ngIf="comunidade.foto" [src]="comunidade.foto" alt="">
+              <ion-icon *ngIf="!comunidade.foto" name="people-outline"></ion-icon>
+            </span>
+            <span class="card-comunidade-textos">
+              <span class="card-comunidade-nome">{{ comunidade.nmComunidade }}</span>
+              <span class="card-comunidade-local" *ngIf="comunidade.cidade && comunidade.uf">
+                {{ comunidade.cidade }}, {{ comunidade.uf }}
+              </span>
+            </span>
+          </button>
+
+          <ng-container *ngIf="!usuarioEhDono">
+            <span class="selo-participando" *ngIf="participaDe(comunidade)">
+              <ion-icon name="checkmark-circle"></ion-icon>
+              Participando
+            </span>
+
+            <ion-button size="small" class="btn-entrar-comunidade" *ngIf="!participaDe(comunidade)"
+              [disabled]="entrandoComunidade !== null" (click)="entrarNaComunidade(comunidade)">
+              <ion-spinner name="dots" *ngIf="entrandoComunidade === comunidade.cdComunidade"></ion-spinner>
+              <ng-container *ngIf="entrandoComunidade !== comunidade.cdComunidade">
+                <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                Entrar
+              </ng-container>
+            </ion-button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
     <div class="acoes-anuncio">
 
       <div class="botoes-dono" *ngIf="usuarioEhDono; else botoesVisitante">
@@ -105,26 +167,34 @@
 
       <ng-template #botoesVisitante>
 
-        <ion-button expand="block" class="btn-contato" *ngIf="!usuarioJaInteressado" (click)="confirmarInteresse()">
-          <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-          Estou interessado
-        </ion-button>
-
-        <div class="botoes-interessado" *ngIf="usuarioJaInteressado">
-
-          <ion-button expand="block" class="btn-chat" [disabled]="carregandoInteresse"
-            (click)="conversarComAnunciante()">
-            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
-            Conversar com o anunciante
-          </ion-button>
-
-          <ion-button expand="block" fill="outline" color="danger" class="btn-remover-interesse"
-            (click)="confirmarInteresse()">
-            <ion-icon name="heart-dislike-outline" slot="start"></ion-icon>
-            Remover interesse
-          </ion-button>
-
+        <div class="acesso-carregando" *ngIf="carregandoComunidades">
+          <ion-spinner name="dots"></ion-spinner>
         </div>
+
+        <ng-container *ngIf="!carregandoComunidades && acessoLiberado">
+
+          <ion-button expand="block" class="btn-contato" *ngIf="!usuarioJaInteressado" (click)="confirmarInteresse()">
+            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+            Estou interessado
+          </ion-button>
+
+          <div class="botoes-interessado" *ngIf="usuarioJaInteressado">
+
+            <ion-button expand="block" class="btn-chat" [disabled]="carregandoInteresse"
+              (click)="conversarComAnunciante()">
+              <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+              Conversar com o anunciante
+            </ion-button>
+
+            <ion-button expand="block" fill="outline" color="danger" class="btn-remover-interesse"
+              (click)="confirmarInteresse()">
+              <ion-icon name="heart-dislike-outline" slot="start"></ion-icon>
+              Remover interesse
+            </ion-button>
+
+          </div>
+
+        </ng-container>
 
       </ng-template>
 

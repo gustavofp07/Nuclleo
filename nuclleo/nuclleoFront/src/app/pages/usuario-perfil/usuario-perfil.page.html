@@ -156,6 +156,13 @@
           </ion-icon>
         </div>
 
+        <p class="avaliacao-total">
+          <ng-container *ngIf="totalAvaliacoes > 0; else semAvaliacoes">
+            {{ totalAvaliacoes }} {{ totalAvaliacoes === 1 ? 'avaliação' : 'avaliações' }}
+          </ng-container>
+          <ng-template #semAvaliacoes>Ainda sem avaliações</ng-template>
+        </p>
+
       </div>
 
       <!-- ANÚNCIOS -->

@@ -139,7 +139,14 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   ngOnInit() {
   }
 
+  // CORREÇÃO: o ngOnDestroy só limpa a escuta em tempo real.
+  // A checagem de sessão foi movida para o ionViewWillEnter.
   ngOnDestroy() {
+    this.pararEscutaEventos();
+  }
+
+  ionViewWillEnter() {
+    // CORREÇÃO: carrega o token e valida a sessão antes de qualquer chamada
     this.token = this.tokenService.extrair();
     const possuiSessao = this.tokenService.temToken();
 
@@ -148,11 +155,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
-
-    this.pararEscutaEventos();
-  }
-
-  ionViewWillEnter() {
 
     const cdComunidade = Number(this.activatedRoute.snapshot.paramMap.get('cdComunidade'));
 
@@ -320,21 +322,34 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     });
   }
 
+  // CORREÇÃO PRINCIPAL: antes, o POST saía com `usuarioLogado` ainda vazio porque o
+  // GET do usuário era assíncrono e não era aguardado (por isso o 500 no 1º clique).
+  // Agora as duas chamadas são encadeadas: o POST só sai depois que o usuário chegou.
   entrarComunidade() {
     if (this.usuarioEntrouNaComunidade || this.entrandoComunidade) {
       return;
     }
 
     this.token = this.tokenService.extrair();
-    this.buscarUsuarioLogado(this.token.cdUsuario);
 
-    const usuarioComunidade = new UsuarioComunidadeModel();
-    usuarioComunidade.usuario = this.usuarioLogado;
-    usuarioComunidade.comunidade = this.comunidade;
+    if (!this.token.cdUsuario) {
+      this.exibirMensagem('Não há usuário logado.');
+      return;
+    }
 
     this.entrandoComunidade = true;
 
-    this.usuarioComunidadeService.cadastrar(usuarioComunidade).subscribe({
+    this.usuarioService.buscarUsuario(this.token.cdUsuario).pipe(
+      switchMap((usuario: UsuarioModel) => {
+        this.usuarioLogado = usuario;
+
+        const usuarioComunidade = new UsuarioComunidadeModel();
+        usuarioComunidade.usuario = usuario;
+        usuarioComunidade.comunidade = this.comunidade;
+
+        return this.usuarioComunidadeService.cadastrar(usuarioComunidade);
+      })
+    ).subscribe({
       next: () => {
         this.usuarioEntrouNaComunidade = true;
         this.entrandoComunidade = false;
@@ -354,7 +369,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
         this.exibirMensagem('Erro ao entrar na comunidade.');
       }
     });
-
   }
 
   async confirmarSaida() {
@@ -642,17 +656,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
           this.carregarTotalUsuarios(cdComunidade);
         }
       });
-  }
-
-  buscarUsuarioLogado(cdUsuario: number) {
-    this.usuarioService.buscarUsuario(cdUsuario).subscribe({
-      next: (usuario: UsuarioModel) => {
-        this.usuarioLogado = usuario;
-      },
-      error: () => {
-        this.exibirMensagem('Erro ao buscar usuário logado.');
-      }
-    });
   }
 
   async exibirMensagem(msg: string) {

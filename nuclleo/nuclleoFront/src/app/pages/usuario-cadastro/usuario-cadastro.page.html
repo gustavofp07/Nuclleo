@@ -117,6 +117,13 @@
         Informe a senha.
       </p>
 
+      <p class="mensagem-erro" *ngIf="
+          formUsuario.get('senha')?.touched &&
+          formUsuario.get('senha')?.hasError('minlength')
+        ">
+        A senha deve ter pelo menos 6 caracteres.
+      </p>
+
 
       <!-- CONFIRMAR SENHA -->
       <div class="campo-label">

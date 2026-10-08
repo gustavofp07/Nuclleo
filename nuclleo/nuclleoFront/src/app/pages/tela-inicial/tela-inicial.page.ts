@@ -80,12 +80,13 @@ export class TelaInicialPage implements OnInit {
 
   carregandoAnuncios: boolean = true;
   carregandoComunidades: boolean = true;
+  verificandoCep: boolean = false;
 
   // Subject para gerenciar a pesquisa de comunidades
   private pesquisaSubject = new Subject<string>();
 
   constructor(
-    //private usuarioService: UsuarioService,
+    private usuarioService: UsuarioService,
     private comunidadeService: ComunidadeService,
     private router: Router,
     private toastController: ToastController,
@@ -153,9 +154,45 @@ export class TelaInicialPage implements OnInit {
   }
 
   alterarBuscaProximidade() {
+    // Desligando o switch: não precisa checar nada
+    if (!this.buscarPorProximidade) {
+      this.aplicarBuscaProximidade();
+      return;
+    }
+
+    // Ligando o switch: só vale se o usuário tiver CEP cadastrado
+    this.verificandoCep = true;
+
+    this.usuarioService.verificarCEP(this.token.cdUsuario).subscribe({
+      next: (possuiCep: boolean) => {
+        this.verificandoCep = false;
+
+        if (!possuiCep) {
+          this.desligarBuscaProximidade('Cadastre um CEP válido no seu perfil para ver comunidades próximas.');
+          return;
+        }
+
+        this.aplicarBuscaProximidade();
+      },
+      error: () => {
+        this.verificandoCep = false;
+        this.desligarBuscaProximidade('Não foi possível verificar seu CEP. Tente novamente.');
+      }
+    });
+  }
+
+  private aplicarBuscaProximidade() {
     localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
 
     this.pesquisarComunidades(this.pesquisa);
+  }
+
+  // Volta o switch para desligado, sem refazer a pesquisa (a lista continua a mesma de antes)
+  private desligarBuscaProximidade(mensagem: string) {
+    this.buscarPorProximidade = false;
+    localStorage.setItem('buscarComunidadesProximas', 'false');
+
+    this.exibirMensagem(mensagem);
   }
 
   pesquisarComunidades(termo?: string) {

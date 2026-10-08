@@ -92,7 +92,7 @@ export class UsuarioCadastroPage implements OnInit {
           Validators.minLength(3),
           Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/)
         ])],
-        senha: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+        senha: ['', Validators.compose([Validators.required, Validators.minLength(6)])],
         confirmarSenha: ['', Validators.required]
       },
       {

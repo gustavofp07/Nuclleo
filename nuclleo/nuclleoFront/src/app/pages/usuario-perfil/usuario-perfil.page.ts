@@ -41,6 +41,7 @@ export class UsuarioPerfilPage implements OnInit {
   carregandoAnuncios: boolean = true;
 
   mediaAvaliacao: number = 0;
+  totalAvaliacoes: number = 0;
   estrelasArray = [1, 2, 3, 4, 5];
 
   constructor(
@@ -110,9 +111,18 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   carregarAvaliacao() {
+    // Zera antes de buscar, para não mostrar o valor do perfil anterior (a página fica em cache)
+    this.mediaAvaliacao = 0;
+    this.totalAvaliacoes = 0;
+
     this.avaliacaoService.media(this.usuario.cdUsuario).subscribe({
       next: (media) => this.mediaAvaliacao = media ?? 0,
       error: () => this.mediaAvaliacao = 0
+    });
+
+    this.avaliacaoService.total(this.usuario.cdUsuario).subscribe({
+      next: (total) => this.totalAvaliacoes = total ?? 0,
+      error: () => this.totalAvaliacoes = 0
     });
   }
 

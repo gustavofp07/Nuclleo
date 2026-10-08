@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonContent, IonButton, IonIcon,
   IonHeader, IonToolbar, IonButtons, IonMenuButton,
-  IonTitle, IonLabel, AlertController, ActionSheetController
+  IonTitle, AlertController, ActionSheetController, ToastController
 } from '@ionic/angular/standalone';
 import { CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
@@ -37,7 +37,7 @@ import { TokenModel } from 'src/app/model/token.model';
     NgxMaskDirective
   ]
 })
-export class UsuarioAlterarPage implements OnInit {
+export class UsuarioAlterarPage {
   token?: TokenModel;
 
   usuario: UsuarioModel;
@@ -47,6 +47,8 @@ export class UsuarioAlterarPage implements OnInit {
 
   verificandoEmail: boolean = false;
   salvando: boolean = false;
+  alterandoSenha: boolean = false;
+  senhaAlterada: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -56,6 +58,7 @@ export class UsuarioAlterarPage implements OnInit {
     private arquivoService: ArquivoService,
     private actionSheetController: ActionSheetController,
     private tokenService: TokenService,
+    private toastController: ToastController,
   ) {
     addIcons({
       chevronBackOutline,
@@ -90,33 +93,40 @@ export class UsuarioAlterarPage implements OnInit {
     });
   }
 
-  ngOnInit() {
-    if (localStorage.getItem('usuarioAutenticado')) {
-      const usuarioLogado: UsuarioModel = JSON.parse(
-        localStorage.getItem('usuarioAutenticado') || ''
-      );
-      this.buscarUsuario(usuarioLogado.cdUsuario);
-    } else {
-      console.log('Não tem nenhum usuário autenticado no momento.');
-    }
-  }
-
+  // CORREÇÃO PRINCIPAL: o ngOnInit foi removido.
+  // Ele lia `usuarioAutenticado` do localStorage (resto do login antigo, que pode
+  // guardar OUTRO usuário) e buscava esse usuário. Como o ionViewWillEnter também
+  // busca, as duas respostas disputavam o formulário e às vezes ganhava a do usuário errado.
+  // Agora a única fonte é o token da sessão atual.
   ionViewWillEnter() {
-    const aux = this.tokenService.temToken();
-
-    if (!aux) {
+    if (!this.tokenService.temToken()) {
       this.router.navigate(['/login']);
       return;
     }
 
     this.token = this.tokenService.extrair();
+
+    this.alterandoSenha = false;
+    this.senhaAlterada = false;
+
+    // Limpa qualquer dado de um usuário anterior (páginas do Ionic ficam em cache)
+    this.usuario = new UsuarioModel();
+    this.formUsuario.reset({
+      email: '',
+      nmUsuario: '',
+      cpf: '',
+      cep: '',
+      telefone: ''
+    });
+    this.previewFoto = null;
+    this.imagemSelecionada = undefined;
+
     this.buscarUsuario(this.token.cdUsuario);
   }
 
   private buscarUsuario(cdUsuario: number) {
     this.usuarioService.buscarUsuario(cdUsuario).subscribe({
       next: (usuario: UsuarioModel) => {
-        console.log('busquei ', usuario);
         this.usuario = usuario;
         this.previewFoto = null;
         this.imagemSelecionada = undefined;
@@ -130,7 +140,7 @@ export class UsuarioAlterarPage implements OnInit {
         });
       },
       error: () => {
-        console.log('Erro ao buscar usuário');
+        this.exibirMensagem('Erro ao buscar os dados do usuário.');
       }
     });
   }
@@ -239,7 +249,7 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   async confirmarAlteracoes() {
-    if (this.salvando) {
+    if (this.salvando || this.alterandoSenha || this.senhaAlterada) {
       return;
     }
 
@@ -251,6 +261,11 @@ export class UsuarioAlterarPage implements OnInit {
     if (this.formUsuario.invalid) {
       this.formUsuario.markAllAsTouched();
       await this.exibirMensagem('Preencha os campos corretamente.');
+      return;
+    }
+
+    if (!this.temAlteracoes()) {
+      await this.exibirToast('Nenhuma alteração para salvar.', 'medium');
       return;
     }
 
@@ -298,11 +313,11 @@ export class UsuarioAlterarPage implements OnInit {
       : '';
 
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
-      next: (usuario: UsuarioModel) => {
-        //logar o usuário atualizado na sessão
-        this.exibirMensagem('Alterações salvas com sucesso!');
+      next: () => {
         this.salvando = false;
-        this.router.navigate(['/login']);
+        // Alterou só os dados do perfil: continua logado e volta para o perfil.
+        this.exibirToast('Alterações salvas com sucesso!');
+        this.router.navigate(['/usuario-perfil']);
       },
       error: async (erro: any) => {
         this.salvando = false;
@@ -319,6 +334,10 @@ export class UsuarioAlterarPage implements OnInit {
   }
 
   async abrirAlterarSenha() {
+    if (this.alterandoSenha || this.senhaAlterada) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: 'Alterar senha',
       message: 'Informe a senha atual e a nova senha para confirmar a alteração.',
@@ -358,6 +377,11 @@ export class UsuarioAlterarPage implements OnInit {
               return false;
             }
 
+            if (dados.novaSenha.length < 6) {
+              await this.exibirMensagem('A nova senha deve ter pelo menos 6 caracteres.');
+              return false;
+            }
+
             if (dados.novaSenha !== dados.confirmarNovaSenha) {
               await this.exibirMensagem('A confirmação não corresponde à nova senha.');
               return false;
@@ -373,36 +397,37 @@ export class UsuarioAlterarPage implements OnInit {
     await alert.present();
   }
 
-
-
+  // Só aqui o usuário é deslogado: depois de trocar a senha com sucesso,
+  // precisa entrar de novo com a senha nova.
   salvarSenha(senhaAtual: string, novaSenha: string) {
-    console.log("Erro aqui.");
-    //criar um EndPoint passando a senha velha e a nova para atualizar.
+    if (this.alterandoSenha) {
+      return;
+    }
 
-    /*
-    this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
-      next: async (usuario: UsuarioModel) => {
-        console.log('senha atualizada ', usuario);
-        this.usuarioService.salvarUsuarioSessao(usuario);
-        this.usuario = usuario;
-        this.senhaOriginal = usuario.senha;
-        await this.exibirMensagem('Senha alterada com sucesso!');
-        this.router.navigate(['/usuario-perfil']);
+    this.alterandoSenha = true;
+
+    this.usuarioService.alterarSenha(senhaAtual, novaSenha).subscribe({
+      next: async () => {
+        this.alterandoSenha = false;
+        this.senhaAlterada = true;
+
+        await this.exibirMensagem('Senha alterada com sucesso! Faça login novamente.');
+        this.router.navigate(['/login']);
       },
       error: async (erro: any) => {
+        this.alterandoSenha = false;
+
         const mensagem =
           erro.error?.message ||
           (typeof erro.error === 'string' ? erro.error : '') ||
           erro.message ||
-          'Erro ao atualizar senha.';
+          'Erro ao alterar senha.';
 
         console.error('Erro! ', mensagem, erro);
         await this.exibirMensagem(mensagem);
       }
     });
-    */
   }
-
 
   validarCpf(control: AbstractControl): ValidationErrors | null {
     const valor = control.value;
@@ -459,6 +484,34 @@ export class UsuarioAlterarPage implements OnInit {
     }
 
     return null;
+  }
+
+  private somenteDigitos(valor: string | null | undefined): string {
+    return (valor ?? '').replace(/\D/g, '');
+  }
+
+  private temAlteracoes(): boolean {
+    const f = this.formUsuario.value;
+
+    return (
+      !!this.imagemSelecionada ||
+      (f.email ?? '') !== (this.usuario.email ?? '') ||
+      (f.nmUsuario ?? '') !== (this.usuario.nmUsuario ?? '') ||
+      this.somenteDigitos(f.cpf) !== this.somenteDigitos(this.usuario.cpf) ||
+      this.somenteDigitos(f.cep) !== this.somenteDigitos(this.usuario.cep) ||
+      this.somenteDigitos(f.telefone) !== this.somenteDigitos(this.usuario.telefone)
+    );
+  }
+
+  async exibirToast(mensagem: string, cor: 'success' | 'medium' = 'success') {
+    const toast = await this.toastController.create({
+      message: mensagem,
+      duration: 2500,
+      position: 'top',
+      color: cor
+    });
+
+    await toast.present();
   }
 
   async exibirMensagem(mensagem: string) {

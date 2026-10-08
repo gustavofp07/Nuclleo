@@ -47,6 +47,12 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacaoService.calcularAvaliacao(cdUsuario));
     }
 
+    // Quantidade de avaliações recebidas por um usuário
+    @GetMapping("/total/{cdUsuario}")
+    public ResponseEntity<Long> total(@PathVariable Long cdUsuario) {
+        return ResponseEntity.ok(avaliacaoService.contarAvaliacoes(cdUsuario));
+    }
+
     // Registra a nota de uma avaliação pendente
     @PatchMapping("/{cdAvaliacao}/nota")
     public ResponseEntity<Avaliacao> avaliar(

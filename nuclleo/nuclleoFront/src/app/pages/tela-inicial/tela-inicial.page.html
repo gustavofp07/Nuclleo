@@ -20,7 +20,8 @@
 
       <div class="opcao-proximidade">
         <span>Mostrar comunidades próximas</span>
-        <ion-toggle [(ngModel)]="buscarPorProximidade" (ionChange)="alterarBuscaProximidade()">
+        <ion-toggle [(ngModel)]="buscarPorProximidade" [disabled]="verificandoCep"
+          (ionChange)="alterarBuscaProximidade()">
         </ion-toggle>
       </div>
 

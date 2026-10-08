@@ -109,6 +109,19 @@ public class UsuarioService {
     }
 
     @Transactional
+    public void alterarSenha(String email, String senhaAtual, String novaSenha) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+            throw new BusinessException("Senha atual incorreta.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
+
+    @Transactional
     public Usuario excluir(Long cdUsuario) {
         Usuario usuario = usuarioRepository.findById(cdUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
