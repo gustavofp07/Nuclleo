@@ -267,36 +267,144 @@ hr {
   margin: 0;
 }
 
+.sem-comunidades p {
+  margin: 0 0 10px;
+}
+
+.dica-comunidades {
+  margin: -4px 0 14px;
+  font-size: 14px;
+}
+
+/* Destaca a caixa quando é preciso entrar numa comunidade para liberar o anúncio */
+.info-box-bloqueio {
+  border: 2px solid #c4b5fd;
+  background: #faf8ff;
+}
+
 .comunidades-lista {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
 }
 
-.chip-comunidade {
-  display: inline-flex;
+.card-comunidade {
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 
-  padding: 9px 14px;
+  padding: 10px 12px;
 
-  border: 1px solid #c4b5fd;
-  border-radius: 999px;
+  border: 1px solid #ddd6fe;
+  border-radius: 16px;
 
-  background: #f5f3ff;
-  color: #6d28d9;
+  background: #ffffff;
+}
 
-  font-size: 14px;
-  font-weight: 600;
+.card-comunidade.participando {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
 
+.card-comunidade-info {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
   cursor: pointer;
 }
 
-.chip-comunidade ion-icon {
-  font-size: 18px;
+.card-comunidade-foto {
+  flex-shrink: 0;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ede9fe;
+}
+
+.card-comunidade-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-comunidade-foto ion-icon {
+  font-size: 24px;
   color: #7c3aed;
 }
 
-.chip-comunidade:active {
-  background: #ede9fe;
+.card-comunidade-textos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card-comunidade-nome {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  word-break: break-word;
+}
+
+.card-comunidade-local {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.selo-participando {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+}
+
+.selo-participando ion-icon {
+  font-size: 18px;
+}
+
+.btn-entrar-comunidade {
+  flex-shrink: 0;
+
+  width: auto !important;
+  min-height: 36px !important;
+
+  --background: linear-gradient(90deg, #7c3aed, #a855f7);
+  --border-radius: 12px;
+}
+
+.btn-entrar-comunidade ion-spinner {
+  width: 20px;
+  height: 20px;
+}
+
+/* ESTADO DE ACESSO */
+
+.acesso-carregando {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.acesso-carregando ion-spinner {
+  color: #7c3aed;
 }

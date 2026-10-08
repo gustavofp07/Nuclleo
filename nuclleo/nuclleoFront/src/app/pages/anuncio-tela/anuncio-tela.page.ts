@@ -15,14 +15,19 @@ import {
 } from '@ionic/angular/standalone';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline, peopleOutline } from 'ionicons/icons';
+import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, lockClosedOutline, checkmarkCircle, logInOutline, refreshOutline } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
+import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { InteresseService } from 'src/app/services/interesse.service';
@@ -66,6 +71,12 @@ export class AnuncioTelaPage implements OnInit {
   // Comunidades em que o anúncio foi publicado
   comunidadesAnuncio: ComunidadeModel[] = [];
   carregandoComunidades: boolean = false;
+  erroComunidades: boolean = false;
+
+  // Comunidades de que o usuário logado participa (usado para liberar a interação)
+  comunidadesDoUsuario: Set<number> = new Set<number>();
+  // Comunidade em que o usuário está entrando agora (spinner no botão)
+  entrandoComunidade: number | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -76,6 +87,8 @@ export class AnuncioTelaPage implements OnInit {
     private alertController: AlertController,
     private router: Router,
     private anuncioComunidadeService: AnuncioComunidadeService,
+    private usuarioComunidadeService: UsuarioComunidadeService,
+    private usuarioService: UsuarioService,
     private location: Location,
     private ngZone: NgZone,
   ) {
@@ -90,6 +103,10 @@ export class AnuncioTelaPage implements OnInit {
       imageOutline,
       calendarOutline,
       peopleOutline,
+      lockClosedOutline,
+      checkmarkCircle,
+      logInOutline,
+      refreshOutline,
     });
   }
 
@@ -112,6 +129,8 @@ export class AnuncioTelaPage implements OnInit {
 
     this.carregandoAnuncio = true;
     this.comunidadesAnuncio = [];
+    this.comunidadesDoUsuario = new Set<number>();
+    this.erroComunidades = false;
 
     this.anuncioService.buscarAnuncio(cdAnuncio).subscribe({
       next: (anuncio) => {
@@ -135,20 +154,86 @@ export class AnuncioTelaPage implements OnInit {
     });
   }
 
-  // Busca as comunidades onde o anúncio foi publicado (não trava o carregamento da tela)
+  // Busca as comunidades onde o anúncio foi publicado e, para visitantes, em quais delas
+  // o usuário já participa. Enquanto isso carrega (ou se der erro) a interação fica bloqueada.
   carregarComunidadesDoAnuncio(cdAnuncio: number) {
     this.carregandoComunidades = true;
+    this.erroComunidades = false;
 
-    this.anuncioComunidadeService.listarRelacoesPorAnuncio(cdAnuncio).subscribe({
-      next: (relacoes: AnuncioComunidadeModel[]) => {
+    forkJoin({
+      relacoes: this.anuncioComunidadeService.listarRelacoesPorAnuncio(cdAnuncio),
+      vinculos: this.usuarioEhDono
+        ? of([] as UsuarioComunidadeModel[])
+        : this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario)
+    }).subscribe({
+      next: ({ relacoes, vinculos }) => {
         this.comunidadesAnuncio = relacoes
           .map(relacao => relacao.comunidade)
           .filter(comunidade => !!comunidade);
+        this.comunidadesDoUsuario = new Set(
+          vinculos.map(v => v.comunidade.cdComunidade)
+        );
         this.carregandoComunidades = false;
       },
       error: () => {
         this.comunidadesAnuncio = [];
+        this.comunidadesDoUsuario = new Set<number>();
+        this.erroComunidades = true;
         this.carregandoComunidades = false;
+      }
+    });
+  }
+
+  // O usuário participa dessa comunidade? (o criador da comunidade conta como participante)
+  participaDe(comunidade: ComunidadeModel): boolean {
+    return this.comunidadesDoUsuario.has(comunidade.cdComunidade)
+      || comunidade.usuarioCria?.cdUsuario === this.token.cdUsuario;
+  }
+
+  // Só interage com o anúncio quem é o dono ou participa de ao menos uma comunidade dele
+  get acessoLiberado(): boolean {
+    if (this.usuarioEhDono) {
+      return true;
+    }
+    return this.comunidadesAnuncio.some(c => this.participaDe(c));
+  }
+
+  // Entra numa comunidade direto da tela do anúncio e libera a interação
+  entrarNaComunidade(comunidade: ComunidadeModel) {
+    if (this.entrandoComunidade !== null || this.participaDe(comunidade)) {
+      return;
+    }
+
+    this.entrandoComunidade = comunidade.cdComunidade;
+
+    this.usuarioService.buscarUsuario(this.token.cdUsuario).pipe(
+      switchMap((usuario: UsuarioModel) => {
+        const usuarioComunidade = new UsuarioComunidadeModel();
+        usuarioComunidade.usuario = usuario;
+        usuarioComunidade.comunidade = comunidade;
+        return this.usuarioComunidadeService.cadastrar(usuarioComunidade);
+      })
+    ).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.comunidadesDoUsuario = new Set(this.comunidadesDoUsuario).add(comunidade.cdComunidade);
+          this.entrandoComunidade = null;
+        });
+        this.exibirMensagem(`Você entrou em ${comunidade.nmComunidade}! Agora pode interagir com o anúncio.`);
+      },
+      error: (erro: HttpErrorResponse) => {
+        this.ngZone.run(() => {
+          if (erro.status === 409) {
+            // já participava (lista desatualizada): só libera
+            this.comunidadesDoUsuario = new Set(this.comunidadesDoUsuario).add(comunidade.cdComunidade);
+          }
+          this.entrandoComunidade = null;
+        });
+        this.exibirMensagem(
+          erro.status === 409
+            ? 'Você já participa dessa comunidade.'
+            : 'Erro ao entrar na comunidade.'
+        );
       }
     });
   }
@@ -200,7 +285,7 @@ export class AnuncioTelaPage implements OnInit {
   }
 
   registrarInteresse() {
-    if (this.carregandoInteresse) {
+    if (this.carregandoInteresse || !this.acessoLiberado) {
       return;
     }
 
@@ -258,7 +343,7 @@ export class AnuncioTelaPage implements OnInit {
 
   // <-- ADICIONADO: agora o botão chama isso em vez de navegar direto pelo routerLink
   conversarComAnunciante() {
-    if (!this.interesseAtual?.id || this.carregandoInteresse) {
+    if (!this.interesseAtual?.id || this.carregandoInteresse || !this.acessoLiberado) {
       return;
     }
 
@@ -328,6 +413,10 @@ export class AnuncioTelaPage implements OnInit {
   }
 
   async confirmarInteresse() {
+    if (!this.acessoLiberado) {
+      return;
+    }
+
     const alert = await this.alertController.create({
       header: this.usuarioJaInteressado ? 'Remover interesse' : 'Confirmar Interesse',
       message: this.usuarioJaInteressado
