@@ -435,7 +435,7 @@ export class CriarAnuncioPage implements OnInit {
 
         const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
 
-        this.usuarioEhDono = this.anuncio.cdUsuarioCria === cdUsuarioLogado;
+        this.usuarioEhDono = this.anuncio.usuarioCria?.cdUsuario === cdUsuarioLogado;
 
         if (!this.usuarioEhDono) {
           this.exibirMensagem('Você não pode editar este anúncio.');
