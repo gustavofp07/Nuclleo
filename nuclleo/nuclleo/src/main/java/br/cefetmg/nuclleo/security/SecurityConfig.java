@@ -57,6 +57,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/verificar-email")
                 .permitAll()
 
+                // Cadastro inicial de administradores (necessário para criação via Insomnia)
+                .requestMatchers(HttpMethod.POST, "/api/v1/admin/usuarios")
+                .permitAll()
+
                 // WebSocket
                 .requestMatchers("/ws-chat/**")
                 .permitAll()
