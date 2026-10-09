@@ -1,0 +1,59 @@
+<ion-content [fullscreen]="true">
+
+  <div class="auth-container">
+
+    <img src="assets/img/logo.png" alt="Logo Nuclleo" class="brand-logo">
+
+    <div class="page-header page-header--center">
+      <span class="eyebrow">Nuclleo</span>
+      <h1>Bem-vindo de volta</h1>
+      <p>Insira seu e-mail e senha para entrar</p>
+    </div>
+
+    <form [formGroup]="formLogin" (ngSubmit)="entrar()" class="card card--accent form-card">
+
+      <label class="form-label" for="login-email">E-mail</label>
+      <div class="form-field">
+        <ion-input id="login-email" type="email" placeholder="voce@email.com" formControlName="email"></ion-input>
+      </div>
+
+      <p class="form-error" *ngIf="formLogin.get('email')?.touched && formLogin.get('email')?.hasError('required')">
+        Informe o e-mail.
+      </p>
+
+      <p class="form-error" *ngIf="formLogin.get('email')?.touched &&
+        (formLogin.get('email')?.hasError('email') || formLogin.get('email')?.hasError('pattern'))">
+        Informe um e-mail válido.
+      </p>
+
+      <label class="form-label" for="login-senha">Senha</label>
+      <div class="form-field">
+        <ion-input id="login-senha" [type]="showPassword ? 'text' : 'password'" placeholder="Sua senha"
+          formControlName="senha"></ion-input>
+
+        <ion-button fill="clear" type="button" (click)="togglePassword()">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </div>
+
+      <p class="form-error" *ngIf="formLogin.get('senha')?.touched && formLogin.get('senha')?.hasError('required')">
+        Informe a senha.
+      </p>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || entrando">
+          {{ entrando ? 'Entrando...' : 'Entrar' }}
+        </ion-button>
+      </div>
+
+    </form>
+
+    <div class="divider">ou</div>
+
+    <p class="ion-text-center">
+      <a routerLink="/usuario-cadastro" class="link">Não possuo uma conta</a>
+    </p>
+
+  </div>
+
+</ion-content>

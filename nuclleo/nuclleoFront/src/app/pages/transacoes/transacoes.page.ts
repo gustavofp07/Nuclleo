@@ -1,51 +1,55 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,
+  IonContent,
+  IonIcon,
+  IonSpinner,
+  ToastController
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cashOutline, calendarOutline, personOutline, pricetagOutline } from 'ionicons/icons';
 
-import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular/standalone';
-
 import { TransacaoModel } from 'src/app/model/transacao.model';
+import { TokenModel } from 'src/app/model/token.model';
 import { TransacaoService } from 'src/app/services/transacao.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
-import { UsuarioModel } from 'src/app/model/usuario.model';
 import { TokenService } from 'src/app/services/token.service';
-import { TokenModel } from 'src/app/model/token.model';
 
 @Component({
   selector: 'app-transacoes',
   templateUrl: './transacoes.page.html',
   styleUrls: ['./transacoes.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonIcon]
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonIcon, IonSpinner]
 })
-export class TransacoesPage implements OnInit {
+export class TransacoesPage {
   token: TokenModel;
-
   transacoes: TransacaoModel[] = [];
+  carregando: boolean = false;
 
-  outro: UsuarioModel;
+  private nomesUsuarios = new Map<number, string>();
 
   constructor(
     private transacaoService: TransacaoService,
     private usuarioService: UsuarioService,
     private router: Router,
     private toastController: ToastController,
-    private tokenService: TokenService,
+    private tokenService: TokenService
   ) {
     addIcons({ cashOutline, calendarOutline, personOutline, pricetagOutline });
     this.token = new TokenModel();
-    this.outro = new UsuarioModel();
   }
 
-  ngOnInit() { }
-
   ionViewWillEnter() {
-    const possuiToken = this.tokenService.temToken();
-
-    if (!possuiToken) {
+    if (!this.tokenService.temToken()) {
       this.exibirMensagem('Não há usuário logado.');
       this.router.navigate(['/login']);
       return;
@@ -56,61 +60,74 @@ export class TransacoesPage implements OnInit {
   }
 
   carregarTransacoes() {
+    this.carregando = true;
+
     this.transacaoService.listarPorUsuario(this.token.cdUsuario).subscribe({
-      next: (dados) => this.transacoes = dados
+      next: (dados) => {
+        this.transacoes = dados;
+        this.carregarNomesUsuarios();
+        this.carregando = false;
+      },
+      error: () => {
+        this.carregando = false;
+        this.exibirMensagem('Erro ao carregar transações.');
+      }
     });
   }
 
   souComprador(transacao: TransacaoModel): boolean {
-    const anuncioEhVenda = transacao.anuncio.tipoAnuncio === 'VENDA';
-
-    if (anuncioEhVenda) {
+    if (transacao.anuncio.tipoAnuncio === 'VENDA') {
       return transacao.usuario.cdUsuario === this.token.cdUsuario;
-    } else {
-      return transacao.anuncio.cdUsuarioCria === this.token.cdUsuario;
-    }
-  }
-
-  outroUsuario(transacao: TransacaoModel) {
-    const anuncioEhVenda = transacao.anuncio.tipoAnuncio === 'VENDA';
-
-    let codigo;
-
-    if (anuncioEhVenda) {
-      //return this.souComprador(transacao) ? transacao.anuncio.cdUsuarioCria : transacao.usuario.cdUsuario;
-      if (this.souComprador(transacao)) {
-        codigo = transacao.anuncio.cdUsuarioCria;
-      } else {
-        codigo = transacao.usuario.cdUsuario;
-      }
-    } else {
-      //return this.souComprador(transacao) ? transacao.usuario.cdUsuario : transacao.anuncio.cdUsuarioCria;
-      if (this.souComprador(transacao)) {
-        codigo = transacao.usuario.cdUsuario;
-      } else {
-        codigo = transacao.anuncio.cdUsuarioCria;
-      }
     }
 
-    this.buscarUsuario(codigo);
+    return this.cdCriadorAnuncio(transacao) === this.token.cdUsuario;
   }
 
-  private buscarUsuario(cdUsuario: number) {
-    this.usuarioService.buscarUsuario(cdUsuario).subscribe({
-      next: (usuario: UsuarioModel) => {
-        this.outro = usuario;
-      },
-      error: (erro: any) => {
-        console.log('Erro ao buscar usuário');
-      }
+  nomeOutroUsuario(transacao: TransacaoModel): string {
+    return this.nomesUsuarios.get(this.cdOutroUsuario(transacao)) ?? '...';
+  }
+
+  private cdCriadorAnuncio(transacao: TransacaoModel): number {
+    return transacao.anuncio.cdUsuarioCria || transacao.anuncio.usuarioCria?.cdUsuario;
+  }
+
+  private cdOutroUsuario(transacao: TransacaoModel): number {
+    const cdCriador = this.cdCriadorAnuncio(transacao);
+    return cdCriador === this.token.cdUsuario ? transacao.usuario.cdUsuario : cdCriador;
+  }
+
+  private carregarNomesUsuarios() {
+    this.transacoes.forEach(transacao => {
+      [transacao.usuario, transacao.anuncio.usuarioCria]
+        .filter(usuario => usuario?.cdUsuario && usuario.nmUsuario)
+        .forEach(usuario => this.nomesUsuarios.set(usuario.cdUsuario, usuario.nmUsuario));
+    });
+
+    const faltantes = [...new Set(this.transacoes.map(t => this.cdOutroUsuario(t)))]
+      .filter(cdUsuario => cdUsuario && !this.nomesUsuarios.has(cdUsuario));
+
+    if (faltantes.length === 0) {
+      return;
+    }
+
+    forkJoin(
+      faltantes.map(cdUsuario =>
+        this.usuarioService.buscarUsuario(cdUsuario).pipe(
+          map(usuario => ({ cdUsuario, nome: usuario.nmUsuario })),
+          catchError(() => of({ cdUsuario, nome: 'Usuário indisponível' }))
+        )
+      )
+    ).subscribe(resultados => {
+      resultados.forEach(({ cdUsuario, nome }) => this.nomesUsuarios.set(cdUsuario, nome));
     });
   }
 
   async exibirMensagem(texto: string) {
     const toast = await this.toastController.create({
       message: texto,
-      duration: 2000
+      duration: 2000,
+      position: 'top'
     });
-    toast.present();
+    await toast.present();
   }
 }

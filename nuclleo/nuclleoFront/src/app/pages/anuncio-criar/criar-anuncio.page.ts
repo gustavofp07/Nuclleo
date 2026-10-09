@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
   IonContent,
   IonItem,
+  IonIcon,
   IonButton,
   IonHeader,
   IonToolbar,
@@ -13,7 +14,6 @@ import {
   ToastController,
   IonList,
   IonCheckbox,
-  IonLabel,
   ActionSheetController
 } from '@ionic/angular/standalone';
 
@@ -45,29 +45,24 @@ import { TokenService } from 'src/app/services/token.service';
 @Component({
   selector: 'app-criar-anuncio',
   templateUrl: './criar-anuncio.page.html',
-  styleUrls: ['./criar-anuncio.page.scss'],
   standalone: true,
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
-
     IonContent,
     IonItem,
+    IonIcon,
     IonButton,
-
     IonHeader,
     IonToolbar,
     IonTitle,
     IonButtons,
     IonMenuButton,
-
     IonList,
-    IonCheckbox,
-    IonLabel
+    IonCheckbox
   ]
 })
-export class CriarAnuncioPage {
+export class CriarAnuncioPage implements OnInit {
   anuncio!: AnuncioModel;
   formAnuncio!: FormGroup;
 
@@ -101,7 +96,6 @@ export class CriarAnuncioPage {
     private actionSheetController: ActionSheetController,
     private router: Router
   ) {
-
     addIcons({
       cameraOutline,
       imageOutline
@@ -112,7 +106,6 @@ export class CriarAnuncioPage {
   }
 
   ngOnInit() {
-
     this.tipo = this.activatedRoute.snapshot.paramMap.get('tipo')?.toUpperCase() || '';
     this.cdAnuncioEdicao = Number(this.activatedRoute.snapshot.paramMap.get('cdAnuncio'));
 
@@ -133,7 +126,6 @@ export class CriarAnuncioPage {
   }
 
   montarFormulario() {
-
     if (this.tipo === 'VENDA') {
 
       this.formAnuncio = this.formBuilder.group({
@@ -141,7 +133,6 @@ export class CriarAnuncioPage {
         descricao: ['', Validators.compose([Validators.required, Validators.maxLength(this.limiteDescricao)])],
         valor: ['', Validators.compose([Validators.required, Validators.min(0.01), Validators.max(1000000)])]
       });
-
     } else {
 
       this.formAnuncio = this.formBuilder.group(
@@ -182,7 +173,6 @@ export class CriarAnuncioPage {
 
   carregarComunidadesUsuario() {
     this.token = this.tokenService.extrair();
-    
 
     this.usuarioComunidadeService.listarComunidadesPorUsuario(this.token.cdUsuario).subscribe({
       next: (relacoes) => {
@@ -264,7 +254,6 @@ export class CriarAnuncioPage {
   }
 
   salvar() {
-
     if (this.salvando) {
       return;
     }
@@ -306,7 +295,6 @@ export class CriarAnuncioPage {
             this.exibirMensagem('Erro ao alterar anúncio.');
           }
         });
-
       } else {
 
         this.anuncioService.alterarRequerimento(
@@ -321,7 +309,6 @@ export class CriarAnuncioPage {
             this.exibirMensagem('Erro ao alterar requerimento.');
           }
         });
-
       }
 
       return;
@@ -332,13 +319,10 @@ export class CriarAnuncioPage {
       } else {
         this.cadastrarRequerimento();
       }
-
     }
-
   }
 
   atualizarComunidadesDoAnuncio() {
-
     this.anuncioComunidadeService
       .excluirRelacoesPorAnuncio(this.anuncio.cdAnuncio)
       .subscribe({
@@ -346,12 +330,10 @@ export class CriarAnuncioPage {
           this.cadastrarRelacoesEdicao();
         },
         error: () => {
-          this.exibirMensagem(
-            'Anúncio alterado, mas erro ao atualizar comunidades.'
-          );
+          this.salvando = false;
+          this.exibirMensagem('Anúncio alterado, mas erro ao atualizar comunidades.');
         }
       });
-
   }
 
   cadastrarRelacoesEdicao() {
@@ -380,7 +362,6 @@ export class CriarAnuncioPage {
   cadastrarVenda() {
     this.anuncio.tipoAnuncio = 'VENDA';
     this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
-    // O backend ainda lê o criador de usuarioCria (cdUsuarioCria não existe na entidade)
     this.anuncio.usuarioCria.cdUsuario = this.anuncio.cdUsuarioCria;
 
     this.anuncioService.cadastrarVenda(
@@ -422,7 +403,6 @@ export class CriarAnuncioPage {
   cadastrarRequerimento() {
     this.anuncio.tipoAnuncio = 'REQUERIMENTO';
     this.anuncio.cdUsuarioCria = this.tokenService.extrair().cdUsuario;
-    // O backend ainda lê o criador de usuarioCria (cdUsuarioCria não existe na entidade)
     this.anuncio.usuarioCria.cdUsuario = this.anuncio.cdUsuarioCria;
 
     this.anuncioService.cadastrarRequerimento(
@@ -440,7 +420,6 @@ export class CriarAnuncioPage {
   }
 
   carregarAnuncioParaEditar() {
-
     this.anuncioService.buscarAnuncio(this.cdAnuncioEdicao).subscribe({
       next: (anuncio) => {
         this.anuncio = anuncio;
@@ -453,8 +432,6 @@ export class CriarAnuncioPage {
           valorMin: (anuncio as AnuncioRequerimentoModel).valorMin,
           valorMax: (anuncio as AnuncioRequerimentoModel).valorMax
         });
-
-    
 
         const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
 
@@ -469,7 +446,6 @@ export class CriarAnuncioPage {
         this.exibirMensagem('Erro ao carregar anúncio.');
       }
     });
-
   }
 
   comunidadeEstaSelecionada(comunidade: ComunidadeModel): boolean {

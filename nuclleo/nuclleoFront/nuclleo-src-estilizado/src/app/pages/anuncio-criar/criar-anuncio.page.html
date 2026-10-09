@@ -1,0 +1,166 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ modoEdicao ? 'Atualizar anúncio' : tipo === 'VENDA' ? 'Anúncio de venda' : 'Anúncio de compra' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <span class="eyebrow">{{ tipo === 'VENDA' ? 'Venda' : 'Compra' }}</span>
+      <h1>{{ modoEdicao ? 'Atualizar anúncio' : tipo === 'VENDA' ? 'Novo anúncio de venda' : 'Novo anúncio de compra' }}</h1>
+      <p>{{ tipo === 'VENDA' ? 'Anuncie um produto ou serviço para venda.' : 'Descreva o que você está procurando.' }}</p>
+    </div>
+
+    <form [formGroup]="formAnuncio" (ngSubmit)="salvar()" class="card form-card">
+
+      <label class="form-label">Foto do anúncio</label>
+      <div class="foto-picker foto-picker--retangular" (click)="selecionarImagem()">
+        <div class="foto-picker__frame">
+          <img [src]="previewFoto || anuncio.ftAnuncio || 'assets/img/anuncioPadrao.png'" alt="Foto do anúncio">
+          <span class="foto-picker__badge">
+            <ion-icon name="camera-outline"></ion-icon>
+          </span>
+        </div>
+      </div>
+
+      <label class="form-label" for="nmAnuncio">Título</label>
+      <div class="form-field">
+        <input id="nmAnuncio" type="text" placeholder="Título do anúncio" formControlName="nmAnuncio"
+          [maxlength]="limiteTitulo">
+      </div>
+
+      <div class="form-counter">{{ formAnuncio.get('nmAnuncio')?.value?.length || 0 }}/{{ limiteTitulo }}</div>
+
+      <p class="form-error" *ngIf="formAnuncio.get('nmAnuncio')?.touched && formAnuncio.get('nmAnuncio')?.hasError('required')">
+        Informe o título.
+      </p>
+
+      <p class="form-error" *ngIf="formAnuncio.get('nmAnuncio')?.touched && formAnuncio.get('nmAnuncio')?.hasError('maxlength')">
+        O título deve ter no máximo {{ limiteTitulo }} caracteres.
+      </p>
+
+      <label class="form-label" for="descricao">Descrição</label>
+      <div class="form-field form-field--textarea">
+        <textarea id="descricao" placeholder="Detalhes, estado de conservação, condições..." formControlName="descricao"
+          [maxlength]="limiteDescricao" rows="5"></textarea>
+      </div>
+
+      <div class="form-counter">{{ formAnuncio.get('descricao')?.value?.length || 0 }}/{{ limiteDescricao }}</div>
+
+      <p class="form-error" *ngIf="formAnuncio.get('descricao')?.touched && formAnuncio.get('descricao')?.hasError('required')">
+        Informe a descrição.
+      </p>
+
+      <p class="form-error" *ngIf="formAnuncio.get('descricao')?.touched && formAnuncio.get('descricao')?.hasError('maxlength')">
+        A descrição deve ter no máximo {{ limiteDescricao }} caracteres.
+      </p>
+
+      <ng-container *ngIf="tipo === 'VENDA'">
+
+        <label class="form-label" for="valor">Preço de venda</label>
+        <div class="form-field">
+          <span class="form-field__prefix">R$</span>
+          <input id="valor" type="number" placeholder="0,00" formControlName="valor" inputmode="decimal" step="0.01"
+            min="0.01" max="1000000">
+        </div>
+
+        <p class="form-error" *ngIf="formAnuncio.get('valor')?.touched && formAnuncio.get('valor')?.hasError('required')">
+          Informe o preço.
+        </p>
+
+        <p class="form-error" *ngIf="formAnuncio.get('valor')?.touched && formAnuncio.get('valor')?.hasError('min')">
+          O preço deve ser maior que zero.
+        </p>
+
+        <p class="form-error" *ngIf="formAnuncio.get('valor')?.touched && formAnuncio.get('valor')?.hasError('max')">
+          O preço não pode ser maior que R$ 1.000.000,00.
+        </p>
+
+      </ng-container>
+
+      <ng-container *ngIf="tipo === 'REQUERIMENTO'">
+
+        <label class="form-label">Faixa de valor desejada</label>
+
+        <div class="form-grid form-grid--2">
+
+          <div>
+            <div class="form-field">
+              <span class="form-field__prefix">R$</span>
+              <input type="number" placeholder="Mínimo" formControlName="valorMin" inputmode="decimal" step="0.01"
+                min="0.01" max="1000000" aria-label="Valor mínimo">
+            </div>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMin')?.touched && formAnuncio.get('valorMin')?.hasError('required')">
+              Informe o valor mínimo.
+            </p>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMin')?.touched && formAnuncio.get('valorMin')?.hasError('min')">
+              O valor mínimo deve ser maior que zero.
+            </p>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMin')?.touched && formAnuncio.get('valorMin')?.hasError('max')">
+              O valor mínimo não pode ser maior que R$ 1.000.000,00.
+            </p>
+          </div>
+
+          <div>
+            <div class="form-field">
+              <span class="form-field__prefix">R$</span>
+              <input type="number" placeholder="Máximo" formControlName="valorMax" inputmode="decimal" step="0.01"
+                min="0.01" max="1000000" aria-label="Valor máximo">
+            </div>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMax')?.touched && formAnuncio.get('valorMax')?.hasError('required')">
+              Informe o valor máximo.
+            </p>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMax')?.touched && formAnuncio.get('valorMax')?.hasError('min')">
+              O valor máximo deve ser maior que zero.
+            </p>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMax')?.touched && formAnuncio.get('valorMax')?.hasError('max')">
+              O valor máximo não pode ser maior que R$ 1.000.000,00.
+            </p>
+
+            <p class="form-error" *ngIf="formAnuncio.get('valorMax')?.touched && formAnuncio.hasError('faixaInvalida')">
+              O valor máximo deve ser maior que o valor mínimo.
+            </p>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <label class="form-label">Comunidades em que o anúncio será visível</label>
+
+      <ion-list *ngIf="comunidades.length > 0" class="check-list">
+        <ion-item *ngFor="let comunidade of comunidades">
+          <ion-checkbox justify="start" labelPlacement="end" [checked]="comunidadeEstaSelecionada(comunidade)"
+            (ionChange)="alterarSelecao(comunidade, $event.detail.checked)">
+            {{ comunidade.nmComunidade }}
+          </ion-checkbox>
+        </ion-item>
+      </ion-list>
+
+      <p class="aviso" *ngIf="comunidades.length === 0">
+        Você ainda não participa de nenhuma comunidade.
+      </p>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="formAnuncio.invalid || salvando">
+          {{ salvando ? 'Salvando...' : modoEdicao ? 'Salvar alterações' : tipo === 'VENDA' ? 'Publicar anúncio de venda' : 'Publicar anúncio de compra' }}
+        </ion-button>
+      </div>
+
+    </form>
+
+  </div>
+
+</ion-content>

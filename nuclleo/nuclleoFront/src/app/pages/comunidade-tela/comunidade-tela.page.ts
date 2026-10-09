@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy, NgZone, ViewChild } from '@angular/core';
+import { Component, OnDestroy, NgZone, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonHeader,
@@ -14,7 +13,6 @@ import {
   IonModal,
   IonList,
   IonItem,
-  IonAvatar,
   IonLabel,
   IonPopover
 } from '@ionic/angular/standalone';
@@ -27,7 +25,11 @@ import {
   trashOutline,
   logOutOutline,
   personRemoveOutline,
-  closeOutline
+  closeOutline,
+  chatbubblesOutline,
+  locationOutline,
+  pricetagOutline,
+  imageOutline
 } from 'ionicons/icons';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -63,18 +65,16 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
     IonIcon,
     IonMenuButton,
     CommonModule,
-    FormsModule,
     RouterLink,
     IonSpinner,
     IonModal,
     IonList,
     IonItem,
-    IonAvatar,
-    IonLabel,
+      IonLabel,
     IonPopover
   ]
 })
-export class ComunidadePerfilPage implements OnInit, OnDestroy {
+export class ComunidadePerfilPage implements OnDestroy {
   token: TokenModel;
   usuarioLogado: UsuarioModel;
 
@@ -93,18 +93,15 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   totalUsuarios: number = 0;
   codigoVinculo: number | null = null;
 
-  // Lista completa de membros e controle de exibição do modal
   membros: UsuarioComunidadeModel[] = [];
   mostrarMembros: boolean = false;
 
-  // Popover da engrenagem (Expulsar / Banir)
   popoverAberto = false;
   eventoPopover: Event | undefined;
   membroSelecionado: UsuarioComunidadeModel | null = null;
 
   anuncios: AnuncioModel[] = [];
 
-  // Escuta em tempo real (SSE)
   private eventosSub?: Subscription;
 
   constructor(
@@ -118,7 +115,7 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     private eventosService: ComunidadeEventosService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private ngZone: NgZone,
+    private ngZone: NgZone
   ) {
     this.token = new TokenModel();
     this.usuarioLogado = new UsuarioModel();
@@ -130,23 +127,21 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       trashOutline,
       logOutOutline,
       personRemoveOutline,
-      closeOutline
+      closeOutline,
+      chatbubblesOutline,
+      locationOutline,
+      pricetagOutline,
+      imageOutline
     });
 
     this.comunidade = new ComunidadeModel();
   }
 
-  ngOnInit() {
-  }
-
-  // CORREÇÃO: o ngOnDestroy só limpa a escuta em tempo real.
-  // A checagem de sessão foi movida para o ionViewWillEnter.
   ngOnDestroy() {
     this.pararEscutaEventos();
   }
 
   ionViewWillEnter() {
-    // CORREÇÃO: carrega o token e valida a sessão antes de qualquer chamada
     this.token = this.tokenService.extrair();
     const possuiSessao = this.tokenService.temToken();
 
@@ -194,15 +189,9 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     });
   }
 
-  // Ao sair da tela (ex.: ir pro perfil de alguém) fecha a conexão em tempo real.
-  // Ao voltar, o ionViewWillEnter reabre e recarrega tudo.
   ionViewWillLeave() {
     this.pararEscutaEventos();
   }
-
-  // =========================================================
-  // TEMPO REAL (expulso / banido)
-  // =========================================================
 
   private iniciarEscutaEventos() {
     this.pararEscutaEventos();
@@ -223,13 +212,11 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
   }
 
   private tratarEvento(evento: EventoComunidade) {
-    // (Re)conectou: se perdeu algum evento durante a queda, revalida o vínculo
     if (evento.tipo === 'CONECTADO') {
       this.revalidarVinculo();
       return;
     }
 
-    // Só importa se for a comunidade que esta tela está mostrando
     if (evento.cdComunidade !== this.comunidade?.cdComunidade) {
       return;
     }
@@ -239,7 +226,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     }
   }
 
-  // Chama o backend "em silêncio" só pra checar se ainda faz parte da comunidade
   private revalidarVinculo() {
     if (
       this.carregandoVinculo ||
@@ -269,7 +255,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     });
   }
 
-  // Tira o usuário da comunidade na hora e volta pra tela "normal" (aba Perfil, sem participar)
   private aplicarRemocao() {
     this.ngZone.run(() => {
       this.mostrarMembros = false;
@@ -281,14 +266,11 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       this.abaSelecionada = 'perfil';
       this.anuncios = [];
 
-      // Atualiza lista/contador de membros
       this.carregarTotalUsuarios(this.comunidade.cdComunidade);
 
       this.exibirMensagem('Você foi removido dessa comunidade.');
     });
   }
-
-  // =========================================================
 
   rotuloTipoAnuncio(tipo: string): string {
     return tipo === 'REQUERIMENTO' ? 'COMPRA' : 'VENDA';
@@ -322,9 +304,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     });
   }
 
-  // CORREÇÃO PRINCIPAL: antes, o POST saía com `usuarioLogado` ainda vazio porque o
-  // GET do usuário era assíncrono e não era aguardado (por isso o 500 no 1º clique).
-  // Agora as duas chamadas são encadeadas: o POST só sai depois que o usuário chegou.
   entrarComunidade() {
     if (this.usuarioEntrouNaComunidade || this.entrandoComunidade) {
       return;
@@ -530,8 +509,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
       next: (vinculos) => {
         const lista = [...vinculos];
 
-        // O dono pode não ter registro em tb_usuario_comunidade;
-        // garante que ele apareça na lista (com o selo ADMIN)
         const dono = this.comunidade.usuarioCria;
         if (dono && !lista.some(v => v.usuario.cdUsuario === dono.cdUsuario)) {
           const vinculoDono = new UsuarioComunidadeModel();
@@ -540,7 +517,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
           lista.unshift(vinculoDono);
         }
 
-        // Dono sempre em primeiro
         lista.sort((a, b) => Number(this.ehDono(b)) - Number(this.ehDono(a)));
 
         this.membros = lista;
@@ -548,7 +524,7 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
         this.carregandoMembros = false;
       },
       error: () => {
-        console.log("Erro ao carregar total de usuários da comunidade.");
+        console.error('Erro ao carregar total de usuários da comunidade.');
         this.totalUsuarios = 0;
         this.membros = [];
         this.carregandoMembros = false;
@@ -556,24 +532,20 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     });
   }
 
-  // Getter pra saber o cdUsuario de quem está logado
   get cdUsuarioLogado(): number {
     return this.token.cdUsuario;
   }
 
-  // Esse membro é o dono (admin) da comunidade?
   ehDono(vinculo: UsuarioComunidadeModel): boolean {
     return vinculo.usuario.cdUsuario === this.comunidade.usuarioCria?.cdUsuario;
   }
 
-  // Só o admin vê a engrenagem, e não em si mesmo
   podeModerar(vinculo: UsuarioComunidadeModel): boolean {
     return this.usuarioEhAdmin
       && !this.ehDono(vinculo)
       && vinculo.usuario.cdUsuario !== this.cdUsuarioLogado;
   }
 
-  // Abre o modal com a lista de membros
   abrirListaMembros() {
     if (this.membros.length === 0) {
       return;
@@ -581,19 +553,15 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     this.mostrarMembros = true;
   }
 
-  // Fecha o modal (chamado pelo botão de fechar e pelo didDismiss do ion-modal)
   fecharListaMembros() {
     this.mostrarMembros = false;
     this.popoverAberto = false;
   }
 
-  // Espera o modal REALMENTE fechar antes de navegar
   async irParaPerfilMembro(cdUsuario: number) {
     await this.modalMembros.dismiss();
     this.router.navigate(['/usuario-perfil', cdUsuario]);
   }
-
-  // ---------- Engrenagem: Expulsar ----------
 
   abrirOpcoes(evento: Event, vinculo: UsuarioComunidadeModel) {
     this.eventoPopover = evento;
@@ -631,7 +599,6 @@ export class ComunidadePerfilPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  // 1) apaga o vínculo (endpoint que você já tinha)  2) avisa o usuário em tempo real
   private expulsarMembro(vinculo: UsuarioComunidadeModel) {
     const cdComunidade = this.comunidade.cdComunidade;
     const cdUsuario = vinculo.usuario.cdUsuario;

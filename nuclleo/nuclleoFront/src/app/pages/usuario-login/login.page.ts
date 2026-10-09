@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -10,7 +10,6 @@ import {
   IonContent,
   IonButton,
   IonInput,
-  IonItem,
   IonIcon,
   ToastController
 } from '@ionic/angular/standalone';
@@ -20,29 +19,27 @@ import { eyeOutline, eyeOffOutline } from 'ionicons/icons';
 
 import { LoginModel } from 'src/app/model/login.model';
 import { LoginService } from 'src/app/services/login.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
     IonContent,
-    IonItem,
     IonInput,
     IonButton,
     IonIcon
   ]
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   formLogin: FormGroup;
   login: LoginModel;
   showPassword: boolean = false;
+  entrando: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -65,14 +62,11 @@ export class LoginPage implements OnInit {
     addIcons({ eyeOutline, eyeOffOutline });
   }
 
-  ngOnInit() {
-    this.tokenService.excluir();
-  }
-
   ionViewWillEnter() {
     this.tokenService.excluir();
     this.login = new LoginModel();
     this.showPassword = false;
+    this.entrando = false;
     this.formLogin.reset({ email: '', senha: '' });
   }
 
@@ -81,6 +75,10 @@ export class LoginPage implements OnInit {
   }
 
   entrar() {
+    if (this.entrando) {
+      return;
+    }
+
     if (this.formLogin.invalid) {
       this.formLogin.markAllAsTouched();
       return;
@@ -88,29 +86,29 @@ export class LoginPage implements OnInit {
 
     this.login.email = this.formLogin.value.email;
     this.login.senha = this.formLogin.value.senha;
+    this.entrando = true;
 
     this.loginService.entrar(this.login).subscribe({
       next: async (token: string) => {
         this.tokenService.salvar(token);
+        this.entrando = false;
         await this.exibirMensagem('Login realizado com sucesso!');
         this.router.navigate(['/tela-inicial']);
       },
       error: async (erro: any) => {
+        this.entrando = false;
         console.error('Erro ao logar:', erro);
-        await this.exibirMensagem('Erro! ' + erro?.error?.message);
+        await this.exibirMensagem(erro?.error?.message || 'Não foi possível entrar. Verifique seus dados.');
       }
     });
-  }
-
-  onGoogleLogin() {
-    console.log('Google Login');
   }
 
   async exibirMensagem(texto: string) {
     const toast = await this.toastController.create({
       message: texto,
-      duration: 2000
+      duration: 2000,
+      position: 'top'
     });
-    toast.present();
+    await toast.present();
   }
 }

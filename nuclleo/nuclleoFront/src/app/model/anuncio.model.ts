@@ -7,17 +7,12 @@ export class AnuncioModel {
     ftAnuncio: string;
     tipoAnuncio: string;
     habilitado: boolean;
-    // e apagar isso aqui
+
     usuarioCria: UsuarioModel;
-    
+
     dtCriacao?: Date;
 
-    //futuramente usar essa estrutura
     cdUsuarioCria: number;
-    /*
-    nomeUsuarioCria: string;
-    fotoUsuarioCria: string | null;
-    */
 
     constructor() {
         this.cdAnuncio = 0;

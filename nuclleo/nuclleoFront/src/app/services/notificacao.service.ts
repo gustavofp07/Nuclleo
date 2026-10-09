@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { environment } from 'src/environments/environment';
 
 export interface NotificacaoEvento {
   tipo: string;
@@ -11,7 +12,7 @@ export interface NotificacaoEvento {
 
 @Injectable({ providedIn: 'root' })
 export class NotificacaoService {
-  private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
+  private readonly URL_WS = `${environment.apiUrl}/ws-chat`;
 
   private client: Client | null = null;
   private cdUsuarioConectado: number | null = null;

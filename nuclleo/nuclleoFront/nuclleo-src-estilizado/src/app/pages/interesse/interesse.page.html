@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Meus interesses</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container page-container--wide">
+
+    <div class="page-header">
+      <span class="eyebrow">Interesses</span>
+      <h1>Meus interesses</h1>
+      <p>Acompanhe os anúncios em que você demonstrou interesse.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="carregandoInteresses">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="lista lista--grid" *ngIf="!carregandoInteresses && interesses.length > 0">
+      <a class="item-card" *ngFor="let interesse of interesses"
+        [routerLink]="['/anuncio-tela', interesse.anuncio.cdAnuncio]">
+
+        <div class="item-card__media">
+          <img *ngIf="interesse.anuncio.ftAnuncio" [src]="interesse.anuncio.ftAnuncio" [alt]="interesse.anuncio.nmAnuncio"
+            (error)="onErroImagem(interesse.anuncio)">
+          <div *ngIf="!interesse.anuncio.ftAnuncio" class="item-card__placeholder">
+            <ion-icon name="image-outline"></ion-icon>
+          </div>
+        </div>
+
+        <div class="item-card__body">
+          <div class="item-card__title">
+            <h2>{{ interesse.anuncio.nmAnuncio }}</h2>
+            <span class="badge" [class.badge--accent]="interesse.anuncio.tipoAnuncio === 'REQUERIMENTO'">
+              {{ rotuloTipoAnuncio(interesse.anuncio.tipoAnuncio) }}
+            </span>
+          </div>
+
+          <p class="preco" *ngIf="interesse.anuncio.tipoAnuncio === 'VENDA'">
+            R$ {{ $any(interesse.anuncio).valor | number:'1.2-2' }}
+          </p>
+
+          <p class="preco" *ngIf="interesse.anuncio.tipoAnuncio === 'REQUERIMENTO'">
+            R$ {{ $any(interesse.anuncio).valorMin | number:'1.2-2' }} – R$ {{ $any(interesse.anuncio).valorMax | number:'1.2-2' }}
+          </p>
+
+          <p class="item-card__desc">{{ interesse.anuncio.descricao }}</p>
+        </div>
+
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregandoInteresses && interesses.length === 0">
+      <ion-icon name="heart-outline"></ion-icon>
+      <h2>Nenhum interesse registrado</h2>
+      <p>Quando você demonstrar interesse em um anúncio, ele vai aparecer aqui.</p>
+    </div>
+
+  </div>
+
+</ion-content>

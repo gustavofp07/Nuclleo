@@ -1,96 +1,24 @@
-.transacoes-content {
-  --background: #f5f7fb;
+.transacao {
+  margin: 0 !important;
 }
 
-.container {
-  max-width: 650px;
-  margin: 0 auto;
-  padding: 24px 20px 80px;
-}
-
-.toolbar {
-  --background: #7d17f1;
-  --color: #ffffff;
-}
-
-.sem-transacoes {
+.transacao__topo {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 60px 20px;
-  color: #9ca3af;
-  text-align: center;
-}
-
-.sem-transacoes ion-icon {
-  font-size: 48px;
-  color: #c4b5fd;
-}
-
-.transacao-card {
-  background: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 20px;
-  padding: 18px;
-  margin-top: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-}
-
-.transacao-topo {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.tipo-badge {
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  background: #fee2e2;
-  color: #b91c1c;
+.transacao__topo .preco--grande {
+  font-size: 22px;
 }
 
-.tipo-badge.compra {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.valor {
-  font-size: 18px;
-  font-weight: 800;
-  color: #111827;
-}
-
-.anuncio-nome {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  font-size: 15px;
-  font-weight: 600;
-  color: #111827;
+.transacao__anuncio {
   margin: 0 0 10px;
-}
-
-.anuncio-nome ion-icon {
-  color: #7c3aed;
+  font-family: var(--nc-font-display);
   font-size: 16px;
-}
-
-.transacao-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
-.transacao-info ion-icon {
-  color: #7c3aed;
-  font-size: 16px;
+  font-weight: 600;
+  color: var(--nc-text);
+  word-break: break-word;
 }

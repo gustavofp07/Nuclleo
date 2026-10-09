@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TransacaoModel } from '../model/transacao.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TransacaoService {
-  private readonly URL = 'https://nuclleo.onrender.com/transacoes';
+  private readonly URL = `${environment.apiUrl}/transacoes`;
 
   constructor(
     private http: HttpClient,

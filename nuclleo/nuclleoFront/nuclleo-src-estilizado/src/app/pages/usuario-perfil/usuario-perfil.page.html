@@ -1,0 +1,172 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <section class="card card--accent perfil-topo">
+
+      <ng-container *ngIf="!carregando; else carregandoPerfil">
+        <div class="perfil-foto">
+          <img [src]="usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" [alt]="usuario.nmUsuario">
+        </div>
+
+        <div class="perfil-dados">
+          <span class="eyebrow">{{ ehPerfilProprio ? 'Seu perfil' : 'Perfil' }}</span>
+          <h1>{{ usuario.nmUsuario }}</h1>
+
+          <div class="perfil-avaliacao">
+            <div class="estrelas">
+              <ion-icon *ngFor="let n of estrelasArray"
+                [name]="n <= mediaAvaliacao ? 'star' : (n - 0.5 <= mediaAvaliacao ? 'star-half' : 'star-outline')">
+              </ion-icon>
+            </div>
+            <strong>{{ mediaAvaliacao | number: '1.1-1' }}</strong>
+            <span>
+              <ng-container *ngIf="totalAvaliacoes > 0; else semAvaliacoes">
+                ({{ totalAvaliacoes }} {{ totalAvaliacoes === 1 ? 'avaliação' : 'avaliações' }})
+              </ng-container>
+              <ng-template #semAvaliacoes>· Ainda sem avaliações</ng-template>
+            </span>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #carregandoPerfil>
+        <div class="perfil-foto perfil-foto--skeleton"></div>
+        <div class="loading-state">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Carregando...</p>
+        </div>
+      </ng-template>
+
+    </section>
+
+    <section class="card">
+      <div class="info-item">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Na Nuclleo desde {{ usuario.dtEntrada | date: 'dd/MM/yyyy' }}</span>
+      </div>
+
+      <div class="info-item">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ usuario.cidade && usuario.uf ? usuario.cidade + ', ' + usuario.uf : 'Sem CEP cadastrado' }}</span>
+      </div>
+
+      <div class="info-item info-item--clicavel" *ngIf="ehPerfilProprio" routerLink="/transacoes">
+        <ion-icon name="cash-outline"></ion-icon>
+        <span>Ver histórico de transações</span>
+        <ion-icon name="chevron-forward-outline" class="seta"></ion-icon>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="nivel-header">
+        <h3>Nível de cadastro</h3>
+        <span class="badge badge--accent">Nível {{ nivelCadastro }} de 3</span>
+      </div>
+
+      <div class="barra-nivel">
+        <div class="barra-nivel__etapa" [class.ativo]="nivelCadastro >= 1"></div>
+        <div class="barra-nivel__etapa" [class.ativo]="nivelCadastro >= 2"></div>
+        <div class="barra-nivel__etapa" [class.ativo]="nivelCadastro >= 3"></div>
+      </div>
+
+      <div class="validacoes" *ngIf="ehPerfilProprio">
+
+        <div class="validacao" [class.pendente]="!usuario.cpf">
+          <ion-icon [name]="usuario.cpf ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+          <span *ngIf="usuario.cpf">CPF: {{ usuario.cpf }}</span>
+          <span *ngIf="!usuario.cpf">CPF não informado <a routerLink="/usuario-alterar" class="link">adicionar</a></span>
+        </div>
+
+        <div class="validacao" [class.pendente]="!usuario.telefone">
+          <ion-icon [name]="usuario.telefone ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+          <span *ngIf="usuario.telefone">Telefone: {{ usuario.telefone }}</span>
+          <span *ngIf="!usuario.telefone">Telefone não informado <a routerLink="/usuario-alterar" class="link">adicionar</a></span>
+        </div>
+
+        <div class="validacao" [class.pendente]="!usuario.cep">
+          <ion-icon [name]="usuario.cep ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
+          <span *ngIf="usuario.cep">CEP: {{ usuario.cep }}</span>
+          <span *ngIf="!usuario.cep">CEP não informado <a routerLink="/usuario-alterar" class="link">adicionar</a></span>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="perfil-acoes" *ngIf="ehPerfilProprio">
+      <ion-button routerLink="/usuario-alterar" expand="block">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Editar perfil
+      </ion-button>
+    </div>
+
+    <section class="perfil-anuncios" *ngIf="!ehPerfilProprio">
+
+      <p class="section-title">Anúncios<span *ngIf="!carregandoAnuncios"> · {{ anuncios.length }}</span></p>
+
+      <div class="loading-state" *ngIf="carregandoAnuncios">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!carregandoAnuncios && anuncios.length === 0">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        <h2>Nenhum anúncio</h2>
+        <p>Este usuário ainda não criou nenhum anúncio.</p>
+      </div>
+
+      <div class="lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
+        <a *ngFor="let anuncio of anuncios" class="item-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+
+          <div class="item-card__media">
+            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="anuncio.nmAnuncio">
+            <div *ngIf="!anuncio.ftAnuncio" class="item-card__placeholder">
+              <ion-icon name="image-outline"></ion-icon>
+            </div>
+          </div>
+
+          <div class="item-card__body">
+            <div class="item-card__title">
+              <h3>{{ anuncio.nmAnuncio }}</h3>
+              <span class="badge" [class.badge--accent]="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+                {{ rotuloTipoAnuncio(anuncio.tipoAnuncio) }}
+              </span>
+            </div>
+
+            <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
+              R$ {{ $any(anuncio).valor | number:'1.2-2' }}
+            </p>
+
+            <p class="preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+              R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} – R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
+            </p>
+
+            <p class="item-card__desc">{{ anuncio.descricao }}</p>
+          </div>
+        </a>
+      </div>
+
+    </section>
+
+    <section class="card card--danger zona-perigo" *ngIf="ehPerfilProprio">
+      <h3>Excluir conta</h3>
+      <p>Ao excluir sua conta, não há como voltar atrás. Essa ação é permanente.</p>
+
+      <ion-button (click)="confirmarExclusao()" class="btn-danger" expand="block">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Excluir perfil
+      </ion-button>
+    </section>
+
+  </div>
+
+</ion-content>

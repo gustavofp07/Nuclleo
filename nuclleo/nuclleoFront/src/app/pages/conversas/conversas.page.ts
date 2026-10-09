@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 import {
   IonContent,
@@ -11,18 +12,16 @@ import {
   IonButtons,
   IonIcon,
   IonButton,
-  IonSpinner
+  IonSpinner,
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 
-import { AlertController, ToastController } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
-import { chatbubblesOutline, checkmarkDoneOutline, closeOutline } from 'ionicons/icons';
+import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
-import { UsuarioModel } from 'src/app/model/usuario.model';
 import { TokenService } from 'src/app/services/token.service';
 import { TokenModel } from 'src/app/model/token.model';
 
@@ -54,10 +53,9 @@ interface ConversaView {
     IonSpinner
   ]
 })
-export class ConversasPage implements OnInit {
+export class ConversasPage {
   token: TokenModel;
 
-  //usuarioLogado: UsuarioModel = new UsuarioModel();
   conversas: ConversaView[] = [];
   carregando: boolean = false;
 
@@ -71,55 +69,42 @@ export class ConversasPage implements OnInit {
 
   constructor(
     private interesseService: InteresseService,
-    //private usuarioService: UsuarioService,
     private alertController: AlertController,
     private toastController: ToastController,
     private router: Router,
     private tokenService: TokenService
   ) {
     this.token = new TokenModel();
-    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline });
-  }
-
-  ngOnInit() {
+    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline });
   }
 
   ionViewWillEnter() {
-    this.token = this.tokenService.extrair();
-    const possuiSessao = this.tokenService.temToken();
-
-    if (!possuiSessao) {
+    if (!this.tokenService.temToken()) {
       this.exibirMensagem('Não há usuário logado.');
       this.router.navigate(['/login']);
       return;
     }
 
+    this.token = this.tokenService.extrair();
     this.carregarConversas();
   }
 
   carregarConversas() {
     this.carregando = true;
 
-    this.interesseService.listarPorUsuario(this.token.cdUsuario).subscribe({
-      next: (comoInteressado) => {
+    forkJoin({
+      comoInteressado: this.interesseService.listarPorUsuario(this.token.cdUsuario),
+      comoAnunciante: this.interesseService.listarPorInteressados(this.token.cdUsuario)
+    }).subscribe({
+      next: ({ comoInteressado, comoAnunciante }) => {
+        const mapa = new Map<number, InteresseModel>();
 
-        this.interesseService.listarPorInteressados(this.token.cdUsuario).subscribe({
-          next: (comoAnunciante) => {
+        [...comoInteressado, ...comoAnunciante]
+          .filter(i => i.conversaIniciada === true)
+          .forEach(i => mapa.set(i.id, i));
 
-            const todos = [...comoInteressado, ...comoAnunciante];
-            const comConversa = todos.filter(i => i.conversaIniciada === true); // <-- MUDOU: filtra pela conversa, não pelo interesse
-
-            const mapa = new Map<number, InteresseModel>();
-            comConversa.forEach(i => mapa.set(i.id!, i));
-
-            this.conversas = Array.from(mapa.values()).map(interesse => this.mapearConversa(interesse));
-            this.carregando = false;
-          },
-          error: () => {
-            this.carregando = false;
-            this.exibirMensagem('Erro ao carregar conversas.');
-          }
-        });
+        this.conversas = Array.from(mapa.values()).map(interesse => this.mapearConversa(interesse));
+        this.carregando = false;
       },
       error: () => {
         this.carregando = false;
@@ -132,7 +117,7 @@ export class ConversasPage implements OnInit {
     const souEuOInteressado = interesse.usuario.cdUsuario === this.token.cdUsuario;
 
     return {
-      cdInteresse: interesse.id!,
+      cdInteresse: interesse.id,
       nomeOutroUsuario: souEuOInteressado
         ? interesse.anuncio.usuarioCria.nmUsuario
         : interesse.usuario.nmUsuario,
@@ -141,8 +126,8 @@ export class ConversasPage implements OnInit {
         : interesse.usuario.ftUsuario,
       nmAnuncio: interesse.anuncio.nmAnuncio,
       finalizado: interesse.finalizado,
-      souAnunciante: !souEuOInteressado, 
-      aceito: interesse.aceito 
+      souAnunciante: !souEuOInteressado,
+      aceito: interesse.aceito
     };
   }
 
@@ -204,7 +189,7 @@ export class ConversasPage implements OnInit {
   }
 
   async exibirMensagem(texto: string) {
-    const toast = await this.toastController.create({ message: texto, duration: 2000 });
-    toast.present();
+    const toast = await this.toastController.create({ message: texto, duration: 2000, position: 'top' });
+    await toast.present();
   }
 }

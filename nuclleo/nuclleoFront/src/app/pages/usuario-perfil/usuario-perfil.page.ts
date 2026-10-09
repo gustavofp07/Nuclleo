@@ -1,38 +1,55 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonSpinner, IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonList, IonIcon, IonLabel, IonMenu } from '@ionic/angular/standalone';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  IonSpinner,
+  IonContent,
+  IonMenuButton,
+  IonButtons,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButton,
+  IonIcon,
+  ToastController,
+  AlertController
+} from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import {
-  home, peopleOutline, chatbubbleOutline, personOutline, createOutline,
-  locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
-  ellipseOutline, star, starHalf, starOutline, cashOutline
+  createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
+  ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
+  pricetagOutline, imageOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
-import { UsuarioService } from 'src/app/services/usuario.service';
-
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ToastController, AlertController } from '@ionic/angular/standalone';
-
 import { AnuncioModel } from 'src/app/model/anuncio.model';
+import { UsuarioService } from 'src/app/services/usuario.service';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 import { TokenService } from 'src/app/services/token.service';
-import { TokenModel } from 'src/app/model/token.model';
 
 @Component({
   selector: 'app-usuario-perfil',
   templateUrl: './usuario-perfil.page.html',
   styleUrls: ['./usuario-perfil.page.scss'],
   standalone: true,
-  imports: [IonSpinner, IonContent, IonMenuButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon, IonMenu, IonList, IonLabel, CommonModule, FormsModule, RouterLink]
+  imports: [
+    CommonModule,
+    RouterLink,
+    IonSpinner,
+    IonContent,
+    IonMenuButton,
+    IonButtons,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButton,
+    IonIcon
+  ]
 })
-export class UsuarioPerfilPage implements OnInit {
-  token?: TokenModel;
-
+export class UsuarioPerfilPage {
   usuario: UsuarioModel;
   anuncios: AnuncioModel[] = [];
   nivelCadastro: number = 1;
@@ -56,35 +73,29 @@ export class UsuarioPerfilPage implements OnInit {
     private tokenService: TokenService
   ) {
     addIcons({
-      home, peopleOutline, chatbubbleOutline, personOutline,
-      createOutline, locationOutline, calendarOutline,
-      checkmarkCircleOutline, trashOutline, ellipseOutline,
-      star, starHalf, starOutline, cashOutline
+      createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
+      ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
+      pricetagOutline, imageOutline
     });
 
     this.usuario = new UsuarioModel();
   }
 
-  ngOnInit() { }
-
   ionViewWillEnter() {
-    const cdUsuarioParam = this.activatedRoute.snapshot.paramMap.get('cdUsuario');
-
-    if (cdUsuarioParam) {
-      this.ehPerfilProprio = false;
-      this.carregarUsuarioPorId(Number(cdUsuarioParam));
+    if (!this.tokenService.temToken()) {
+      this.router.navigate(['/login']);
       return;
     }
 
-    this.ehPerfilProprio = true;
+    const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
+    const cdUsuarioParam = Number(this.activatedRoute.snapshot.paramMap.get('cdUsuario'));
+    const cdUsuario = cdUsuarioParam || cdUsuarioLogado;
 
-    let aux = this.tokenService.temToken();
-    if (aux == false) {
-      this.router.navigate(['/login']);
-    } else {
-      const cdUsuarioLogado = this.tokenService.extrair().cdUsuario;
-      this.carregarUsuarioPorId(cdUsuarioLogado);
-    }
+    this.ehPerfilProprio = cdUsuario === cdUsuarioLogado;
+    this.usuario = new UsuarioModel();
+    this.anuncios = [];
+
+    this.carregarUsuarioPorId(cdUsuario);
   }
 
   rotuloTipoAnuncio(tipo: string): string {
@@ -95,15 +106,18 @@ export class UsuarioPerfilPage implements OnInit {
     this.carregando = true;
 
     this.usuarioService.buscarUsuario(cdUsuario).subscribe({
-      next: async (usuario: UsuarioModel) => {
+      next: (usuario: UsuarioModel) => {
         this.usuario = usuario;
         this.calcularNivelCadastro();
-        this.carregarAnunciosUsuario();
         this.carregarAvaliacao();
+
+        if (!this.ehPerfilProprio) {
+          this.carregarAnunciosUsuario();
+        }
+
         this.carregando = false;
       },
-      error: async () => {
-        console.log('Erro ao buscar usuário.');
+      error: () => {
         this.exibirMensagem('Erro ao carregar perfil.');
         this.carregando = false;
       }
@@ -111,7 +125,6 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   carregarAvaliacao() {
-    // Zera antes de buscar, para não mostrar o valor do perfil anterior (a página fica em cache)
     this.mediaAvaliacao = 0;
     this.totalAvaliacoes = 0;
 
@@ -128,7 +141,6 @@ export class UsuarioPerfilPage implements OnInit {
 
   calcularNivelCadastro() {
     const temCpf = !!this.usuario.cpf?.trim();
-    //const temTelefone = !!this.usuario.telefone?.trim();
     const temCep = !!this.usuario.cep?.trim();
 
     if (temCpf && temCep) {
@@ -175,37 +187,28 @@ export class UsuarioPerfilPage implements OnInit {
   }
 
   validarSenhaEExcluir(senha: string) {
-    this.token = this.tokenService.extrair();
+    const token = this.tokenService.extrair();
 
-    this.usuarioService.autenticar({ email: this.token.email, senha }).subscribe({
-      next: () => {
-        this.excluir();
-      },
-      error: () => {
-        this.exibirMensagem('Senha incorreta.');
-      }
+    this.usuarioService.autenticar({ email: token.email, senha }).subscribe({
+      next: () => this.excluir(),
+      error: () => this.exibirMensagem('Senha incorreta.')
     });
   }
 
   excluir() {
-    this.token = this.tokenService.extrair();
+    const token = this.tokenService.extrair();
 
-    //mudar isso aqui -- certas regras de negócio devem ser feitas no back
-    this.usuarioComunidadeService.excluirPorUsuario(this.token.cdUsuario).subscribe({
+    this.usuarioComunidadeService.excluirPorUsuario(token.cdUsuario).subscribe({
       next: () => {
         this.usuarioService.excluirUsuario().subscribe({
           next: () => {
             this.tokenService.excluir();
             this.router.navigate(['/login']);
           },
-          error: () => {
-            this.exibirMensagem('Erro ao excluir o usuário.');
-          }
+          error: () => this.exibirMensagem('Erro ao excluir o usuário.')
         });
       },
-      error: () => {
-        this.exibirMensagem('Erro ao remover usuário das comunidades.');
-      }
+      error: () => this.exibirMensagem('Erro ao remover usuário das comunidades.')
     });
   }
 
@@ -227,9 +230,9 @@ export class UsuarioPerfilPage implements OnInit {
   async exibirMensagem(texto: string) {
     const toast = await this.toastController.create({
       message: texto,
-      duration: 2000
+      duration: 2000,
+      position: 'top'
     });
-    toast.present();
+    await toast.present();
   }
-
 }

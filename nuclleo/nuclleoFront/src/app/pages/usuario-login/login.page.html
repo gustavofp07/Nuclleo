@@ -1,87 +1,58 @@
-<ion-content [fullscreen]="true" class="login-content">
+<ion-content [fullscreen]="true">
 
-  <div class="container">
+  <div class="auth-container">
 
-    <!-- Logo / Nome -->
-    <div class="brand">
+    <img src="assets/img/logo.png" alt="Logo Nuclleo" class="brand-logo">
 
-      <img src="assets/img/logo.png" alt="Logo Nuclleo" class="logo">
-
+    <div class="page-header page-header--center">
+      <span class="eyebrow">Nuclleo</span>
+      <h1>Bem-vindo de volta</h1>
+      <p>Insira seu e-mail e senha para entrar</p>
     </div>
 
-    <!-- Títulos -->
-    <div class="copy">
-      <h1>Login</h1>
-      <p>Insira seu e-mail e senha</p>
-    </div>
+    <form [formGroup]="formLogin" (ngSubmit)="entrar()" class="card card--accent form-card">
 
-    <!-- Formulário -->
-    <form [formGroup]="formLogin" (ngSubmit)="entrar()">
-
-      <!-- Email -->
-      <div class="campo-label">
-        <label>E-mail</label>
+      <label class="form-label" for="login-email">E-mail</label>
+      <div class="form-field">
+        <ion-input id="login-email" type="email" placeholder="voce@email.com" formControlName="email"></ion-input>
       </div>
-      <ion-item lines="none" class="input-item">
-        <ion-input type="email" placeholder="E-mail" formControlName="email">
-        </ion-input>
-      </ion-item>
 
-      <p class="mensagem-erro" *ngIf="
-        formLogin.get('email')?.touched &&
-        formLogin.get('email')?.hasError('required')">
+      <p class="form-error" *ngIf="formLogin.get('email')?.touched && formLogin.get('email')?.hasError('required')">
         Informe o e-mail.
       </p>
 
-      <p class="mensagem-erro" *ngIf="formLogin.get('email')?.touched &&(
-        formLogin.get('email')?.hasError('email') ||
-        formLogin.get('email')?.hasError('pattern'))">
+      <p class="form-error" *ngIf="formLogin.get('email')?.touched &&
+        (formLogin.get('email')?.hasError('email') || formLogin.get('email')?.hasError('pattern'))">
         Informe um e-mail válido.
       </p>
 
-      <!-- Senha -->
-      <div class="campo-label">
-        <label>Senha</label>
-      </div>
-      <ion-item lines="none" class="input-item">
+      <label class="form-label" for="login-senha">Senha</label>
+      <div class="form-field">
+        <ion-input id="login-senha" [type]="showPassword ? 'text' : 'password'" placeholder="Sua senha"
+          formControlName="senha"></ion-input>
 
-        <ion-input [type]="showPassword ? 'text' : 'password'" placeholder="Senha" formControlName="senha">
-        </ion-input>
-
-        <!-- OLHINHO -->
-        <ion-button fill="clear" slot="end" type="button" (click)="togglePassword()">
-          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'">
-          </ion-icon>
+        <ion-button fill="clear" type="button" (click)="togglePassword()">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
+      </div>
 
-      </ion-item>
-
-      <p class="mensagem-erro" *ngIf="
-        formLogin.get('senha')?.touched &&
-        formLogin.get('senha')?.hasError('required')">
+      <p class="form-error" *ngIf="formLogin.get('senha')?.touched && formLogin.get('senha')?.hasError('required')">
         Informe a senha.
       </p>
 
-      <!-- Botão Login -->
-      <ion-button expand="block" type="submit" class="btn-login" [disabled]="formLogin.invalid">
-        Entrar
-      </ion-button>
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="formLogin.invalid || entrando">
+          {{ entrando ? 'Entrando...' : 'Entrar' }}
+        </ion-button>
+      </div>
 
     </form>
 
-    <!-- Divider -->
-    <div class="divider">
+    <div class="divider">ou</div>
 
-      <div class="divider-line"></div>
-
-      <span>ou</span>
-
-      <div class="divider-line"></div>
-
-    </div>
-
-    <!-- Cadastro -->
-    <a routerLink="/usuario-cadastro" class="register-link">Não possuo uma conta</a>
+    <p class="ion-text-center">
+      <a routerLink="/usuario-cadastro" class="link">Não possuo uma conta</a>
+    </p>
 
   </div>
 

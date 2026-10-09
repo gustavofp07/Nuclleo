@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import {
@@ -10,16 +10,14 @@ import {
   ValidationErrors
 } from '@angular/forms';
 
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   IonContent,
-  IonItem,
   IonInput,
   IonButton,
   IonIcon,
   ToastController,
-  LoadingController,
   ActionSheetController
 } from '@ionic/angular/standalone';
 
@@ -36,26 +34,22 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { ArquivoService } from 'src/app/services/arquivo.service';
 import { UsuarioCadastroDTOModel } from 'src/app/model/usuario-cadastro-dto.model';
 
-
 @Component({
   selector: 'app-usuario-cadastro',
   templateUrl: './usuario-cadastro.page.html',
   styleUrls: ['./usuario-cadastro.page.scss'],
   standalone: true,
-
   imports: [
     CommonModule,
     ReactiveFormsModule,
-
+    RouterLink,
     IonContent,
-    IonItem,
     IonInput,
     IonButton,
     IonIcon
   ]
 })
-
-export class UsuarioCadastroPage implements OnInit {
+export class UsuarioCadastroPage {
   formUsuario: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
@@ -69,7 +63,6 @@ export class UsuarioCadastroPage implements OnInit {
     private router: Router,
     private toastController: ToastController,
     private usuarioService: UsuarioService,
-    private loadingController: LoadingController,
     private arquivoService: ArquivoService,
     private actionSheetController: ActionSheetController
   ) {
@@ -100,8 +93,6 @@ export class UsuarioCadastroPage implements OnInit {
       }
     );
   }
-
-  ngOnInit() { }
 
   ionViewWillEnter() {
     this.previewFoto = null;

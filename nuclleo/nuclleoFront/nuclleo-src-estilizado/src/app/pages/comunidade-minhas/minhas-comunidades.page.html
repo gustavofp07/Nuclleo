@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Minhas comunidades</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container page-container--wide">
+
+    <div class="page-header">
+      <span class="eyebrow">Comunidades</span>
+      <h1>Suas comunidades</h1>
+      <p>Veja as comunidades de que você participa e gerencie as que você criou.</p>
+    </div>
+
+    <div class="acoes-topo">
+      <ion-button routerLink="/criar-comunidade">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Criar comunidade
+      </ion-button>
+    </div>
+
+    <div class="loading-state" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="lista lista--grid" *ngIf="!carregando && comunidades.length > 0">
+      <a class="item-card" *ngFor="let comunidade of comunidades"
+        [routerLink]="['/comunidade-tela', comunidade.cdComunidade]">
+
+        <div class="item-card__media">
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" [alt]="comunidade.nmComunidade">
+        </div>
+
+        <div class="item-card__body">
+          <div class="item-card__title">
+            <h2>{{ comunidade.nmComunidade }}</h2>
+            <span class="badge badge--gradient" *ngIf="usuarioEhAdmin(comunidade)">Admin</span>
+            <span class="badge badge--muted" *ngIf="!usuarioEhAdmin(comunidade)">Membro</span>
+          </div>
+
+          <p class="item-card__desc">{{ comunidade.descricao }}</p>
+
+          <div class="item-card__meta">
+            <span *ngIf="comunidade.cidade">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ comunidade.cidade }}, {{ comunidade.uf }}
+            </span>
+            <span>
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+        </div>
+
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && comunidades.length === 0">
+      <ion-icon name="people-outline"></ion-icon>
+      <h2>Nenhuma comunidade encontrada</h2>
+      <p>Entre em uma comunidade ou crie a sua primeira.</p>
+    </div>
+
+  </div>
+
+</ion-content>

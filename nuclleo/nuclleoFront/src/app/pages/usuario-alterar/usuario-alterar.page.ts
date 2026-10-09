@@ -4,12 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractContro
 import { Router } from '@angular/router';
 import {
   IonContent, IonButton, IonIcon,
-  IonHeader, IonToolbar, IonButtons, IonMenuButton,
+  IonHeader, IonToolbar, IonButtons,
   IonTitle, AlertController, ActionSheetController, ToastController
 } from '@ionic/angular/standalone';
 import { CameraSource } from '@capacitor/camera';
 import { addIcons } from 'ionicons';
-import { chevronBackOutline, imageOutline, cameraOutline } from 'ionicons/icons';
+import { chevronBackOutline, imageOutline, cameraOutline, keyOutline } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -21,7 +21,6 @@ import { TokenModel } from 'src/app/model/token.model';
 @Component({
   selector: 'app-usuario-alterar',
   templateUrl: './usuario-alterar.page.html',
-  styleUrls: ['./usuario-alterar.page.scss'],
   standalone: true,
   imports: [
     IonContent,
@@ -32,7 +31,6 @@ import { TokenModel } from 'src/app/model/token.model';
     IonHeader,
     IonToolbar,
     IonButtons,
-    IonMenuButton,
     IonTitle,
     NgxMaskDirective
   ]
@@ -58,12 +56,13 @@ export class UsuarioAlterarPage {
     private arquivoService: ArquivoService,
     private actionSheetController: ActionSheetController,
     private tokenService: TokenService,
-    private toastController: ToastController,
+    private toastController: ToastController
   ) {
     addIcons({
       chevronBackOutline,
       imageOutline,
-      cameraOutline
+      cameraOutline,
+      keyOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -93,11 +92,6 @@ export class UsuarioAlterarPage {
     });
   }
 
-  // CORREÇÃO PRINCIPAL: o ngOnInit foi removido.
-  // Ele lia `usuarioAutenticado` do localStorage (resto do login antigo, que pode
-  // guardar OUTRO usuário) e buscava esse usuário. Como o ionViewWillEnter também
-  // busca, as duas respostas disputavam o formulário e às vezes ganhava a do usuário errado.
-  // Agora a única fonte é o token da sessão atual.
   ionViewWillEnter() {
     if (!this.tokenService.temToken()) {
       this.router.navigate(['/login']);
@@ -109,7 +103,6 @@ export class UsuarioAlterarPage {
     this.alterandoSenha = false;
     this.senhaAlterada = false;
 
-    // Limpa qualquer dado de um usuário anterior (páginas do Ionic ficam em cache)
     this.usuario = new UsuarioModel();
     this.formUsuario.reset({
       email: '',
@@ -315,7 +308,6 @@ export class UsuarioAlterarPage {
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
       next: () => {
         this.salvando = false;
-        // Alterou só os dados do perfil: continua logado e volta para o perfil.
         this.exibirToast('Alterações salvas com sucesso!');
         this.router.navigate(['/usuario-perfil']);
       },
@@ -397,8 +389,6 @@ export class UsuarioAlterarPage {
     await alert.present();
   }
 
-  // Só aqui o usuário é deslogado: depois de trocar a senha com sucesso,
-  // precisa entrar de novo com a senha nova.
   salvarSenha(senhaAtual: string, novaSenha: string) {
     if (this.alterandoSenha) {
       return;
@@ -432,24 +422,20 @@ export class UsuarioAlterarPage {
   validarCpf(control: AbstractControl): ValidationErrors | null {
     const valor = control.value;
 
-    // CPF não é obrigatório
     if (!valor) {
       return null;
     }
 
     const cpf = String(valor).replace(/\D/g, '');
 
-    // Se começou a preencher, precisa ter exatamente 11 números
     if (cpf.length !== 11) {
       return { cpfIncompleto: true };
     }
 
-    // Elimina CPFs formados pelo mesmo número
     if (/^(\d)\1{10}$/.test(cpf)) {
       return { cpfInvalido: true };
     }
 
-    // Primeiro dígito verificador
     let soma = 0;
 
     for (let i = 0; i < 9; i++) {
@@ -466,7 +452,6 @@ export class UsuarioAlterarPage {
       return { cpfInvalido: true };
     }
 
-    // Segundo dígito verificador
     soma = 0;
 
     for (let i = 0; i < 10; i++) {

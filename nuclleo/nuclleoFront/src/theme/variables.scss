@@ -1,2 +1,143 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+@use 'sass:color';
+
+$nc-bg: #0a0910;
+$nc-text: #eeecf6;
+
+:root {
+  --nc-bg: #0a0910;
+  --nc-bg-elevated: #0f0d17;
+  --nc-surface: #15121f;
+  --nc-surface-2: #1c1829;
+  --nc-surface-3: #252036;
+  --nc-border: rgba(255, 255, 255, 0.07);
+  --nc-border-strong: rgba(255, 255, 255, 0.14);
+
+  --nc-text: #eeecf6;
+  --nc-text-muted: #a19cb8;
+  --nc-text-subtle: #6f6a86;
+
+  --nc-purple: #8b3dff;
+  --nc-purple-rgb: 139, 61, 255;
+  --nc-purple-light: #b48cff;
+  --nc-purple-dark: #5b13b0;
+  --nc-orange: #ff5a1f;
+  --nc-orange-rgb: 255, 90, 31;
+  --nc-orange-light: #ff9a5a;
+  --nc-magenta: #c9409f;
+
+  --nc-danger: #ff4d6a;
+  --nc-danger-rgb: 255, 77, 106;
+  --nc-success: #2fd39a;
+  --nc-success-rgb: 47, 211, 154;
+  --nc-warning: #ffb347;
+
+  --nc-gradient: linear-gradient(135deg, #ff5a1f 0%, #c9409f 50%, #8b3dff 100%);
+  --nc-gradient-hover: linear-gradient(135deg, #ff6e3a 0%, #d655ad 50%, #9a55ff 100%);
+  --nc-gradient-soft: linear-gradient(135deg, rgba(255, 90, 31, 0.14) 0%, rgba(139, 61, 255, 0.14) 100%);
+  --nc-gradient-text: linear-gradient(90deg, #ff7a3d 0%, #d65cb0 50%, #a370ff 100%);
+
+  --nc-radius-xs: 8px;
+  --nc-radius-sm: 10px;
+  --nc-radius: 14px;
+  --nc-radius-lg: 20px;
+  --nc-radius-pill: 999px;
+
+  --nc-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.8);
+  --nc-shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.85);
+  --nc-glow: 0 0 0 1px rgba(var(--nc-purple-rgb), 0.45), 0 10px 30px -10px rgba(var(--nc-purple-rgb), 0.55);
+  --nc-glow-orange: 0 10px 30px -12px rgba(var(--nc-orange-rgb), 0.55);
+
+  --nc-font-display: 'Sora', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --nc-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --nc-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --nc-transition: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --ion-font-family: var(--nc-font-body);
+
+  --ion-background-color: var(--nc-bg);
+  --ion-background-color-rgb: 10, 9, 16;
+  --ion-text-color: var(--nc-text);
+  --ion-text-color-rgb: 238, 236, 246;
+
+
+  --ion-toolbar-background: rgba(12, 10, 19, 0.82);
+  --ion-toolbar-color: var(--nc-text);
+  --ion-toolbar-border-color: var(--nc-border);
+  --ion-item-background: transparent;
+  --ion-item-border-color: var(--nc-border);
+  --ion-card-background: var(--nc-surface);
+  --ion-border-color: var(--nc-border);
+  --ion-placeholder-color: var(--nc-text-subtle);
+  --ion-overlay-background-color: var(--nc-surface-2);
+
+  --ion-color-primary: #8b3dff;
+  --ion-color-primary-rgb: 139, 61, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #7a36e0;
+  --ion-color-primary-tint: #9750ff;
+
+  --ion-color-secondary: #ff5a1f;
+  --ion-color-secondary-rgb: 255, 90, 31;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #e04f1b;
+  --ion-color-secondary-tint: #ff6a35;
+
+  --ion-color-tertiary: #c9409f;
+  --ion-color-tertiary-rgb: 201, 64, 159;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #b1388c;
+  --ion-color-tertiary-tint: #ce53a9;
+
+  --ion-color-success: #2fd39a;
+  --ion-color-success-rgb: 47, 211, 154;
+  --ion-color-success-contrast: #0a0910;
+  --ion-color-success-contrast-rgb: 10, 9, 16;
+  --ion-color-success-shade: #29ba88;
+  --ion-color-success-tint: #44d7a4;
+
+  --ion-color-warning: #ffb347;
+  --ion-color-warning-rgb: 255, 179, 71;
+  --ion-color-warning-contrast: #0a0910;
+  --ion-color-warning-contrast-rgb: 10, 9, 16;
+  --ion-color-warning-shade: #e09e3e;
+  --ion-color-warning-tint: #ffbb59;
+
+  --ion-color-danger: #ff4d6a;
+  --ion-color-danger-rgb: 255, 77, 106;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #e0445d;
+  --ion-color-danger-tint: #ff5f79;
+
+  --ion-color-medium: #a19cb8;
+  --ion-color-medium-rgb: 161, 156, 184;
+  --ion-color-medium-contrast: #0a0910;
+  --ion-color-medium-contrast-rgb: 10, 9, 16;
+  --ion-color-medium-shade: #8e89a2;
+  --ion-color-medium-tint: #aaa6bf;
+
+  --ion-color-light: #252036;
+  --ion-color-light-rgb: 37, 32, 54;
+  --ion-color-light-contrast: #eeecf6;
+  --ion-color-light-contrast-rgb: 238, 236, 246;
+  --ion-color-light-shade: #211c30;
+  --ion-color-light-tint: #3b364a;
+
+  --ion-color-dark: #eeecf6;
+  --ion-color-dark-rgb: 238, 236, 246;
+  --ion-color-dark-contrast: #0a0910;
+  --ion-color-dark-contrast-rgb: 10, 9, 16;
+  --ion-color-dark-shade: #d1cfd8;
+  --ion-color-dark-tint: #f0eef7;
+
+  @for $i from 1 through 19 {
+    $step: $i * 50;
+    --ion-color-step-#{$step}: #{color.mix($nc-text, $nc-bg, $step * 0.1%)};
+    --ion-background-color-step-#{$step}: #{color.mix($nc-text, $nc-bg, $step * 0.1%)};
+    --ion-text-color-step-#{$step}: #{color.mix($nc-bg, $nc-text, $step * 0.1%)};
+  }
+}

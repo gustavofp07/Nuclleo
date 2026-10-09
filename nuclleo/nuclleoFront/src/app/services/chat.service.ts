@@ -5,6 +5,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { MensagemModel } from '../model/mensagem.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 interface DigitandoEvento {
   cdUsuario: number;
@@ -21,8 +22,8 @@ export interface StatusInteresseEvento {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private readonly URL_WS = 'https://nuclleo.onrender.com/ws-chat';
-  private readonly URL_HTTP = 'https://nuclleo.onrender.com/api/v1/mensagens';
+  private readonly URL_WS = `${environment.apiUrl}/ws-chat`;
+  private readonly URL_HTTP = `${environment.apiUrl}/api/v1/mensagens`;
 
   private client: Client | null = null;
   private mensagemRecebida = new Subject<MensagemModel>();

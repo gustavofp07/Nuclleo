@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { Router, RouterLink, NavigationEnd } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import {
-  IonApp, IonRouterOutlet, IonToolbar, IonContent, IonLabel, IonItem,
-  IonList, IonHeader, IonTitle, IonIcon, IonMenu, IonAccordion,
-  IonAccordionGroup, IonBadge, ToastController
+  IonApp, IonRouterOutlet, IonContent, IonLabel, IonItem,
+  IonList, IonIcon, IonMenu, IonAccordion,
+  IonAccordionGroup, ToastController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -20,7 +20,6 @@ import {
 } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import { NotificacaoService } from 'src/app/services/notificacao.service';
 import { TokenService } from './services/token.service';
 import { TokenModel } from './model/token.model';
@@ -31,12 +30,14 @@ import { TokenModel } from './model/token.model';
   standalone: true,
   styleUrls: ['app.component.scss'],
   imports: [
-    CommonModule, RouterLink, IonApp, IonRouterOutlet, IonToolbar, IonContent,
-    IonLabel, IonItem, IonList, IonHeader, IonTitle, IonIcon, IonMenu,
-    IonAccordion, IonAccordionGroup, IonBadge
+    CommonModule, RouterLink, RouterLinkActive, IonApp, IonRouterOutlet, IonContent,
+    IonLabel, IonItem, IonList, IonIcon, IonMenu,
+    IonAccordion, IonAccordionGroup
   ],
 })
 export class AppComponent implements OnInit {
+  private readonly ROTAS_SEM_MENU = ['/login', '/usuario-cadastro'];
+
   token: TokenModel;
 
   menuHabilitado = true;
@@ -45,7 +46,6 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private interesseService: InteresseService,
-    //private usuarioService: UsuarioService,
     private notificacaoService: NotificacaoService,
     private toastController: ToastController,
     private tokenService: TokenService
@@ -63,22 +63,17 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        console.log('Aqui de novo no appComponent');
-        const rotaAtual = this.router.url;
+        const rotaAtual = this.router.url.split('?')[0];
 
-        this.menuHabilitado = rotaAtual !== '/login' && rotaAtual !== '/cadastro';
+        this.menuHabilitado = !this.ROTAS_SEM_MENU.includes(rotaAtual);
 
         if (this.tokenService.temToken()) {
-          console.log('Tem token');
-
-          // Atualiza os dados com o JWT atual
           this.token = this.tokenService.extrair();
 
           this.carregarNotificacoes();
           this.conectarNotificacoesTempoReal();
-
         } else {
-          console.log('Não tem token');
+          this.token = new TokenModel();
           this.totalConversasPendentes = 0;
 
           this.notificacaoService.desconectar();
@@ -96,9 +91,7 @@ export class AppComponent implements OnInit {
   }
 
   conectarNotificacoesTempoReal() {
-    const possuiSessao = this.tokenService.temToken();
-
-    if (!possuiSessao) {
+    if (!this.tokenService.temToken()) {
       this.notificacaoService.desconectar();
       return;
     }
@@ -118,9 +111,7 @@ export class AppComponent implements OnInit {
   }
 
   carregarNotificacoes() {
-    const possuiSessao = this.tokenService.temToken();
-
-    if (!possuiSessao) {
+    if (!this.tokenService.temToken()) {
       this.totalConversasPendentes = 0;
       return;
     }

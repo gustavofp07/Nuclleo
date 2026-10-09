@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { InteresseModel } from '../model/interesse.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InteresseService {
-  private readonly URL = 'https://nuclleo.onrender.com/api/v1/interesses';
+  private readonly URL = `${environment.apiUrl}/api/v1/interesses`;
 
   constructor(
     private http: HttpClient,
@@ -20,7 +21,6 @@ export class InteresseService {
   }
 
   registrarInteresse(interesse: { cdUsuario: number; cdAnuncio: number; }): Observable<InteresseModel> {
-    console.log('Registrando interesse: ', interesse);
     return this.http.post<InteresseModel>(`${this.URL}`, interesse, this.getHeaders());
   }
 

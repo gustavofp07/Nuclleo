@@ -1,21 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArquivoService {
-
-  constructor() { }
-
   public async capturar(
     source: CameraSource = CameraSource.Photos
   ): Promise<File | undefined> {
-
     try {
-
       const camera = await Camera.getPhoto({
         resultType: CameraResultType.Uri,
         source,
@@ -46,9 +39,7 @@ export class ArquivoService {
         nomeArquivo,
         { type: tipo }
       );
-
     } catch (erro) {
-
       console.error(
         'Captura cancelada ou não concluída.',
         erro

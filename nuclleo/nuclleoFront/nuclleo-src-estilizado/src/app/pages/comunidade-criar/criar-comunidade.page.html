@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ modoEdicao ? 'Alterar comunidade' : 'Criar comunidade' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <span class="eyebrow">Comunidade</span>
+      <h1>{{ modoEdicao ? 'Alterar comunidade' : 'Criar nova comunidade' }}</h1>
+      <p>Reúna pessoas da sua região em torno de um interesse em comum.</p>
+    </div>
+
+    <form [formGroup]="formComunidade" (ngSubmit)="salvarComunidade()" class="card form-card">
+
+      <label class="form-label">Imagem da comunidade</label>
+      <div class="foto-picker foto-picker--retangular" (click)="selecionarImagem()">
+        <div class="foto-picker__frame">
+          <img [src]="previewFoto || fotoAtual || 'assets/img/comunidadePadrao.png'" alt="Imagem da comunidade">
+          <span class="foto-picker__badge">
+            <ion-icon name="camera-outline"></ion-icon>
+          </span>
+        </div>
+      </div>
+
+      <label class="form-label" for="nmComunidade">Nome da comunidade</label>
+      <div class="form-field">
+        <input id="nmComunidade" type="text" placeholder="Ex.: Ciclistas de Timóteo" formControlName="nmComunidade">
+      </div>
+
+      <p class="form-error" *ngIf="formComunidade.get('nmComunidade')?.touched && formComunidade.get('nmComunidade')?.hasError('required')">
+        Informe o nome da comunidade.
+      </p>
+
+      <p class="form-error" *ngIf="formComunidade.get('nmComunidade')?.touched && formComunidade.get('nmComunidade')?.hasError('minlength')">
+        O nome deve ter no mínimo 3 caracteres.
+      </p>
+
+      <label class="form-label" for="descricao">Descrição</label>
+      <div class="form-field form-field--textarea">
+        <textarea id="descricao" placeholder="Conte sobre o que é a comunidade" formControlName="descricao" rows="5"></textarea>
+      </div>
+
+      <p class="form-error" *ngIf="formComunidade.get('descricao')?.touched && formComunidade.get('descricao')?.hasError('required')">
+        Informe a descrição.
+      </p>
+
+      <p class="form-error" *ngIf="formComunidade.get('descricao')?.touched && formComunidade.get('descricao')?.hasError('minlength')">
+        A descrição deve ter no mínimo 3 caracteres.
+      </p>
+
+      <label class="form-label" for="cep">CEP</label>
+      <div class="form-field">
+        <input id="cep" type="text" placeholder="00000-000" formControlName="cep" mask="00000-000" inputmode="numeric">
+      </div>
+
+      <p class="form-error" *ngIf="formComunidade.get('cep')?.touched && formComunidade.get('cep')?.hasError('required')">
+        Informe o CEP.
+      </p>
+
+      <p class="form-error" *ngIf="formComunidade.get('cep')?.touched && formComunidade.get('cep')?.hasError('pattern')">
+        Informe o CEP completo.
+      </p>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="formComunidade.invalid || salvando">
+          {{ salvando ? 'Salvando...' : modoEdicao ? 'Salvar alterações' : 'Criar comunidade' }}
+        </ion-button>
+      </div>
+
+    </form>
+
+  </div>
+
+</ion-content>

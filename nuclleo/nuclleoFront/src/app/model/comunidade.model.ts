@@ -13,7 +13,6 @@ export class ComunidadeModel {
     uf: string;
 
     constructor() {
-
         this.cdComunidade = 0;
         this.descricao = '';
         this.nmComunidade = '';

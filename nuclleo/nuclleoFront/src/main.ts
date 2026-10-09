@@ -10,7 +10,6 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
 import { provideEnvironmentNgxMask } from 'ngx-mask';
 
-
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

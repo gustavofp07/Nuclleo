@@ -1,5 +1,5 @@
 export class UsuarioModel {
-    cdUsuario: number;   // opcional (vem do backend)
+    cdUsuario: number;
     nmUsuario: string;
     ftUsuario: string;
     email: string;
@@ -12,7 +12,7 @@ export class UsuarioModel {
     telefone: string;
 
     constructor() {
-        this.cdUsuario = 0;//corrigir aqui e no backend
+        this.cdUsuario = 0;
         this.nmUsuario = '';
         this.ftUsuario = '';
         this.email = '';

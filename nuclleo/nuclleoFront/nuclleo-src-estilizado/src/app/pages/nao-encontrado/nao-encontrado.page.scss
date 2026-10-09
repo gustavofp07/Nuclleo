@@ -1,0 +1,10 @@
+.codigo-erro {
+  display: block;
+  margin-bottom: 12px;
+  font-family: var(--nc-font-display);
+  font-size: 104px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  filter: drop-shadow(0 12px 40px rgba(var(--nc-purple-rgb), 0.45));
+}

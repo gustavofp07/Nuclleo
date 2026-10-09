@@ -1,43 +1,59 @@
 <ion-header>
-  <ion-toolbar class="toolbar">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/usuario-perfil" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>Histórico de transações</ion-title>
+    <ion-title>Transações</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="transacoes-content">
-  <div class="container">
+<ion-content [fullscreen]="true">
 
-    <div *ngIf="transacoes.length === 0" class="sem-transacoes">
+  <div class="page-container">
+
+    <div class="page-header">
+      <span class="eyebrow">Histórico</span>
+      <h1>Suas transações</h1>
+      <p>Compras e vendas concluídas pela Nuclleo.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && transacoes.length === 0">
       <ion-icon name="cash-outline"></ion-icon>
+      <h2>Nenhuma transação</h2>
       <p>Você ainda não tem transações registradas.</p>
     </div>
 
-    <div *ngFor="let transacao of transacoes" class="transacao-card">
-      <div class="transacao-topo">
-        <span class="tipo-badge" [class.compra]="souComprador(transacao)">
-          {{ souComprador(transacao) ? 'Compra' : 'Venda' }}
-        </span>
-        <span class="valor">R$ {{ transacao.valor | number: '1.2-2' }}</span>
-      </div>
+    <div class="lista" *ngIf="!carregando && transacoes.length > 0">
+      <div *ngFor="let transacao of transacoes" class="card transacao">
 
-      <p class="anuncio-nome">
-        <ion-icon name="pricetag-outline"></ion-icon>
-        {{ transacao.anuncio.nmAnuncio }}
-      </p>
+        <div class="transacao__topo">
+          <span class="badge" [class.badge--accent]="souComprador(transacao)">
+            {{ souComprador(transacao) ? 'Compra' : 'Venda' }}
+          </span>
+          <span class="preco preco--grande">R$ {{ transacao.valor | number: '1.2-2' }}</span>
+        </div>
 
-      <div class="transacao-info">
-        <ion-icon name="person-outline"></ion-icon>
-        <span>{{ souComprador(transacao) ? 'Vendedor' : 'Comprador' }}: {{ outro.nmUsuario }}</span>
-      </div>
+        <p class="transacao__anuncio">{{ transacao.anuncio.nmAnuncio }}</p>
 
-      <div class="transacao-info">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <span>{{ transacao.data | date: 'dd/MM/yyyy' }}</span>
+        <div class="item-card__meta">
+          <span>
+            <ion-icon name="person-outline"></ion-icon>
+            {{ souComprador(transacao) ? 'Vendedor' : 'Comprador' }}: {{ nomeOutroUsuario(transacao) }}
+          </span>
+          <span>
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ transacao.data | date: 'dd/MM/yyyy' }}
+          </span>
+        </div>
+
       </div>
     </div>
 
   </div>
+
 </ion-content>

@@ -1,109 +1,91 @@
-<div class="ion-page" id="main-content">
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Conversas</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-header>
-    <ion-toolbar class="toolbar">
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
-      <ion-title>Conversas</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true">
 
-  <ion-content [fullscreen]="true" class="conversas-content">
+  <div class="page-container">
 
-    <div class="container">
-
-      <div class="topo">
-        <h1>Conversas</h1>
-        <p>Suas solicitações de conversa, enviadas e recebidas</p>
-      </div>
-
-      <!-- CARREGANDO -->
-      <div class="loading-state" *ngIf="carregando">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Carregando...</p>
-      </div>
-
-      <ng-container *ngIf="!carregando && conversas.length > 0">
-
-        <!-- SOLICITAÇÕES (pendentes) -->
-        <div class="secao-solicitacoes" *ngIf="solicitacoes.length > 0">
-
-          <h3 class="titulo-secao">Solicitações</h3>
-
-          <div class="lista-conversas">
-
-            <div class="conversa-card" *ngFor="let conversa of solicitacoes"
-              [class.clicavel]="!conversa.souAnunciante"
-              (click)="abrirChat(conversa)">
-
-              <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar-foto">
-              <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
-
-              <div class="info">
-                <h2>{{ conversa.nomeOutroUsuario }}</h2>
-                <p class="anuncio-nome">{{ conversa.nmAnuncio }}</p>
-              </div>
-
-              <!-- Anunciante: mostra ações -->
-              <div class="acoes-solicitacao" *ngIf="conversa.souAnunciante">
-                <ion-button size="small" class="btn-aceitar" (click)="aceitarConversa(conversa, $event)">
-                  <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
-                </ion-button>
-                <ion-button size="small" fill="outline" class="btn-recusar" (click)="confirmarRecusa(conversa, $event)">
-                  <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-                </ion-button>
-              </div>
-
-              <!-- Interessado: só um aviso -->
-              <span class="status-badge pendente" *ngIf="!conversa.souAnunciante">
-                Pendente
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- DIVISÓRIA (só aparece se houver solicitações) -->
-        <div class="divisoria" *ngIf="solicitacoes.length > 0 && conversasAtivas.length > 0"></div>
-
-        <!-- CONVERSAS JÁ EXISTENTES -->
-        <div class="secao-conversas">
-
-          <h3 class="titulo-secao" *ngIf="solicitacoes.length > 0">Conversas</h3>
-
-          <div class="lista-conversas" *ngIf="conversasAtivas.length > 0">
-
-            <div class="conversa-card clicavel" *ngFor="let conversa of conversasAtivas"
-              (click)="abrirChat(conversa)">
-
-              <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar-foto">
-              <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
-
-              <div class="info">
-                <h2>{{ conversa.nomeOutroUsuario }}</h2>
-                <p class="anuncio-nome">{{ conversa.nmAnuncio }}</p>
-              </div>
-
-              <span class="status-badge finalizada" *ngIf="conversa.finalizado">Finalizada</span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </ng-container>
-
-      <div class="empty-state" *ngIf="!carregando && conversas.length === 0">
-        <ion-icon name="chatbubbles-outline"></ion-icon>
-        <h2>Nenhuma conversa ainda</h2>
-        <p>Quando você iniciar ou receber uma solicitação de conversa, ela vai aparecer aqui.</p>
-      </div>
-
+    <div class="page-header">
+      <span class="eyebrow">Mensagens</span>
+      <h1>Conversas</h1>
+      <p>Suas solicitações de conversa, enviadas e recebidas.</p>
     </div>
 
-  </ion-content>
-</div>
+    <div class="loading-state" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <ng-container *ngIf="!carregando && conversas.length > 0">
+
+      <section class="secao" *ngIf="solicitacoes.length > 0">
+        <p class="section-title">Solicitações · {{ solicitacoes.length }}</p>
+
+        <div class="lista">
+          <div class="item-card conversa" *ngFor="let conversa of solicitacoes"
+            [class.conversa--estatica]="conversa.souAnunciante" (click)="abrirChat(conversa)">
+
+            <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
+              [alt]="conversa.nomeOutroUsuario">
+            <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+
+            <div class="item-card__body">
+              <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
+              <p class="conversa__anuncio">{{ conversa.nmAnuncio }}</p>
+            </div>
+
+            <div class="conversa__acoes" *ngIf="conversa.souAnunciante">
+              <ion-button size="small" (click)="aceitarConversa(conversa, $event)" aria-label="Aceitar">
+                <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button size="small" fill="outline" color="danger" (click)="confirmarRecusa(conversa, $event)"
+                aria-label="Recusar">
+                <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+
+            <span class="badge badge--accent" *ngIf="!conversa.souAnunciante">Pendente</span>
+
+          </div>
+        </div>
+      </section>
+
+      <section class="secao" *ngIf="conversasAtivas.length > 0">
+        <p class="section-title">Conversas · {{ conversasAtivas.length }}</p>
+
+        <div class="lista">
+          <div class="item-card conversa" *ngFor="let conversa of conversasAtivas" (click)="abrirChat(conversa)">
+
+            <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
+              [alt]="conversa.nomeOutroUsuario">
+            <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+
+            <div class="item-card__body">
+              <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
+              <p class="conversa__anuncio">{{ conversa.nmAnuncio }}</p>
+            </div>
+
+            <span class="badge badge--muted" *ngIf="conversa.finalizado">Finalizada</span>
+            <ion-icon name="chevron-forward-outline" class="conversa__seta" *ngIf="!conversa.finalizado"></ion-icon>
+
+          </div>
+        </div>
+      </section>
+
+    </ng-container>
+
+    <div class="empty-state" *ngIf="!carregando && conversas.length === 0">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <h2>Nenhuma conversa ainda</h2>
+      <p>Quando você iniciar ou receber uma solicitação de conversa, ela vai aparecer aqui.</p>
+    </div>
+
+  </div>
+
+</ion-content>

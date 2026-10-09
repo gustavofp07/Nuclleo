@@ -1,19 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   IonContent,
-  IonLabel,
-  IonAvatar,
-  IonItem,
-  IonButton,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCard,
-  IonCardHeader,
-  IonList,
   IonHeader,
   IonTitle,
   IonToolbar,
@@ -22,36 +14,30 @@ import {
   IonIcon,
   IonSpinner,
   IonToggle,
-  IonSearchbar
+  IonSearchbar,
+  ToastController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { locationOutline, calendarOutline } from 'ionicons/icons';
+import { locationOutline, calendarOutline, searchOutline } from 'ionicons/icons';
 
-import { Router } from '@angular/router';
-
-import { UsuarioService } from 'src/app/services/usuario.service';
-
-import { ToastController } from '@ionic/angular/standalone';
-
-import { HttpClient } from '@angular/common/http';
-
-//import para a pesquisa de comunidades
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
+import { TokenModel } from 'src/app/model/token.model';
 import { ComunidadeService } from 'src/app/services/comunidade.service';
 import { TokenService } from 'src/app/services/token.service';
-import { TokenModel } from 'src/app/model/token.model';
+import { UsuarioService } from 'src/app/services/usuario.service';
 
 @Component({
   selector: 'app-tela-inicial',
   templateUrl: './tela-inicial.page.html',
   styleUrls: ['./tela-inicial.page.scss'],
   standalone: true,
-
   imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
     IonContent,
     IonHeader,
     IonTitle,
@@ -59,108 +45,66 @@ import { TokenModel } from 'src/app/model/token.model';
     IonMenuButton,
     IonButtons,
     IonIcon,
-    CommonModule,
-    FormsModule,
-    RouterLink,
     IonSpinner,
     IonToggle,
     IonSearchbar
   ]
 })
-
 export class TelaInicialPage implements OnInit {
-  token: TokenModel;
+  private readonly CHAVE_PROXIMIDADE = 'buscarComunidadesProximas';
+  private readonly destroyRef = inject(DestroyRef);
+  private pesquisaSubject = new Subject<string>();
 
+  token: TokenModel;
   comunidades: ComunidadeModel[] = [];
 
-  buscarPorProximidade: boolean;
-  pesquisa: string;
+  buscarPorProximidade: boolean = false;
+  pesquisa: string = '';
 
-  anunciosRecomendados: AnuncioModel[] = [];
-
-  carregandoAnuncios: boolean = true;
   carregandoComunidades: boolean = true;
   verificandoCep: boolean = false;
-
-  // Subject para gerenciar a pesquisa de comunidades
-  private pesquisaSubject = new Subject<string>();
 
   constructor(
     private usuarioService: UsuarioService,
     private comunidadeService: ComunidadeService,
     private router: Router,
     private toastController: ToastController,
-    private http: HttpClient,
     private tokenService: TokenService
   ) {
     this.token = new TokenModel();
-    this.buscarPorProximidade = false;
-    this.pesquisa = "";
-    addIcons({
-      locationOutline,
-      calendarOutline
-    });
+    addIcons({ locationOutline, calendarOutline, searchOutline });
   }
 
   ngOnInit() {
-    //na primeira vez que a tela é carregada, não há preferência de proximidade salva no localStorage
-    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
-
     this.pesquisaSubject
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe((termo: string) => {
-        //this.pesquisa = termo;
-        this.pesquisarComunidades(termo);
-      });
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((termo: string) => this.pesquisarComunidades(termo));
   }
 
   ionViewWillEnter() {
-    console.log('entrou na tela inicial');
-    const possuiSessao = this.tokenService.temToken();
-
-    if (possuiSessao) {
-      this.token = this.tokenService.extrair();
-    } else {
-
-      this.exibirMensagem("Não há usuário logado.");
+    if (!this.tokenService.temToken()) {
+      this.exibirMensagem('Não há usuário logado.');
       this.router.navigate(['/login']);
       return;
     }
 
-    this.carregarPreferenciaProximidade();
+    this.token = this.tokenService.extrair();
+    this.buscarPorProximidade = localStorage.getItem(this.CHAVE_PROXIMIDADE) === 'true';
     this.pesquisa = '';
 
     this.pesquisarComunidades();
   }
 
-  carregarPreferenciaProximidade() {
-    const preferencia = localStorage.getItem('buscarComunidadesProximas');
-
-    if (preferencia === "true") {
-      this.buscarPorProximidade = true;
-    } else if (preferencia === "false") {
-      this.buscarPorProximidade = false;
-    } else {
-      this.exibirMensagem("Erro ao carregar preferência de proximidade.");
-    }
-  }
-
   aoPesquisar(event: any) {
-    const termo = event.detail.value || '';
-    this.pesquisaSubject.next(termo);
+    this.pesquisaSubject.next(event.detail.value || '');
   }
 
   alterarBuscaProximidade() {
-    // Desligando o switch: não precisa checar nada
     if (!this.buscarPorProximidade) {
       this.aplicarBuscaProximidade();
       return;
     }
 
-    // Ligando o switch: só vale se o usuário tiver CEP cadastrado
     this.verificandoCep = true;
 
     this.usuarioService.verificarCEP(this.token.cdUsuario).subscribe({
@@ -182,59 +126,42 @@ export class TelaInicialPage implements OnInit {
   }
 
   private aplicarBuscaProximidade() {
-    localStorage.setItem('buscarComunidadesProximas', String(this.buscarPorProximidade));
-
+    localStorage.setItem(this.CHAVE_PROXIMIDADE, String(this.buscarPorProximidade));
     this.pesquisarComunidades(this.pesquisa);
   }
 
-  // Volta o switch para desligado, sem refazer a pesquisa (a lista continua a mesma de antes)
   private desligarBuscaProximidade(mensagem: string) {
     this.buscarPorProximidade = false;
-    localStorage.setItem('buscarComunidadesProximas', 'false');
-
+    localStorage.setItem(this.CHAVE_PROXIMIDADE, 'false');
     this.exibirMensagem(mensagem);
   }
 
   pesquisarComunidades(termo?: string) {
     this.carregandoComunidades = true;
 
-    if (this.buscarPorProximidade === true) {
-      this.comunidadeService.listarComunidadesProximas(this.token.cdUsuario, termo).subscribe({
-        next: (comunidades: ComunidadeModel[]) => {
-          this.comunidades = comunidades;
-          this.carregandoComunidades = false;
-        },
-        error: (erro: any) => {
-          console.error('Erro ao pesquisar comunidades próximas:', erro);
-          this.carregandoComunidades = false;
-          this.exibirMensagem(erro.error?.message || 'Erro ao pesquisar comunidades.');
-        }
-      });
-    } else {
-      this.comunidadeService.listarComunidades(termo).subscribe({
-        next: (comunidades: ComunidadeModel[]) => {
-          this.comunidades = comunidades;
-          this.carregandoComunidades = false;
-        },
-        error: (erro: any) => {
-          console.error('Erro ao pesquisar comunidades:', erro);
-          this.carregandoComunidades = false;
-          this.exibirMensagem(erro.error?.message || 'Erro ao pesquisar comunidades.');
-        }
-      });
-    }
-  }
+    const busca$ = this.buscarPorProximidade
+      ? this.comunidadeService.listarComunidadesProximas(this.token.cdUsuario, termo)
+      : this.comunidadeService.listarComunidades(termo);
 
-  onErroImagem(anuncio: any) {
-    anuncio.ftAnuncio = null;
+    busca$.subscribe({
+      next: (comunidades: ComunidadeModel[]) => {
+        this.comunidades = comunidades;
+        this.carregandoComunidades = false;
+      },
+      error: (erro: any) => {
+        console.error('Erro ao pesquisar comunidades:', erro);
+        this.carregandoComunidades = false;
+        this.exibirMensagem(erro.error?.message || 'Erro ao pesquisar comunidades.');
+      }
+    });
   }
 
   async exibirMensagem(texto: string) {
-    const toast =
-      await this.toastController.create({
-        message: texto,
-        duration: 3000
-      });
-    toast.present();
+    const toast = await this.toastController.create({
+      message: texto,
+      duration: 3000,
+      position: 'top'
+    });
+    await toast.present();
   }
 }

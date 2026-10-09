@@ -7,12 +7,13 @@ import { AnuncioComunidadeModel } from '../model/anuncio-comunidade.model';
 import { Observable } from 'rxjs';
 import { AnuncioModel } from '../model/anuncio.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnuncioComunidadeService {
-  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/anuncioComunidade';
+  private readonly API_URL = `${environment.apiUrl}/api/v1/anuncioComunidade`;
 
   constructor(
     private http: HttpClient,
@@ -24,7 +25,6 @@ export class AnuncioComunidadeService {
     return { headers: this.tokenService.gerarCabecalhoAutenticacao() };
   }
 
-  //vou mudar isso tudo depois. Chamar um por vez, e não uma lista de relações
   cadastrarRelacoes(relacoes: {
     anuncio: AnuncioModel;
     comunidade: ComunidadeModel;
@@ -35,12 +35,10 @@ export class AnuncioComunidadeService {
   listarAnunciosDaComunidade(
     cdComunidade: number
   ): Observable<AnuncioModel[]> {
-
     return this.http.get<AnuncioModel[]>(
       `${this.API_URL}/comunidade/anuncios?cdComunidade=${cdComunidade}`,
       this.getHeaders()
     );
-
   }
 
   excluirRelacoesPorAnuncio(cdAnuncio: number) {
@@ -56,5 +54,4 @@ export class AnuncioComunidadeService {
       this.getHeaders()
     );
   }
-
 }

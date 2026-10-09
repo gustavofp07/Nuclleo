@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { UsuarioPerfilPage } from './pages/usuario-perfil/usuario-perfil.page';
 
 export const routes: Routes = [
   {
@@ -96,8 +95,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/nao-encontrado/nao-encontrado.page').then( m => m.NaoEncontradoPage)
   },
   {
-    path: '**', // PRECISA SER O ULTIMO ITEM DO ARRAY
+    path: '**',
     redirectTo: 'nao-encontrado'
-  },
-
+  }
 ];

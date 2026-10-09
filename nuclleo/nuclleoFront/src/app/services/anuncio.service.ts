@@ -8,14 +8,15 @@ import { AnuncioVendaModel } from '../model/anuncio-venda.model';
 import { AnuncioRequerimentoModel } from '../model/anuncio-requerimento.model';
 import { AnuncioModel } from '../model/anuncio.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnuncioService {
-  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/anuncios';
-  private readonly API_URL_VENDA = 'https://nuclleo.onrender.com/api/v1/anuncios/vendas';
-  private readonly API_URL_REQUERIMENTO = 'https://nuclleo.onrender.com/api/v1/anuncios/requerimentos';
+  private readonly API_URL = `${environment.apiUrl}/api/v1/anuncios`;
+  private readonly API_URL_VENDA = `${environment.apiUrl}/api/v1/anuncios/vendas`;
+  private readonly API_URL_REQUERIMENTO = `${environment.apiUrl}/api/v1/anuncios/requerimentos`;
 
   constructor(
     private http: HttpClient,
@@ -109,12 +110,10 @@ export class AnuncioService {
   }
 
   uploadImagem(arquivo: File) {
-
     const formData = new FormData();
 
     formData.append('arquivo', arquivo);
 
-    return this.http.post<any>('https://nuclleo.onrender.com/api/v1/upload', formData, this.getHeaders());
+    return this.http.post<any>(`${environment.apiUrl}/api/v1/upload`, formData, this.getHeaders());
   }
-
 }

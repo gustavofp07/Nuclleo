@@ -4,7 +4,6 @@ export class ComunidadeCadastroDTOModel {
         cdUsuarioCria: number;
         cep: string;
 
-    
         constructor() {
             this.descricao = '';
             this.nmComunidade = '';

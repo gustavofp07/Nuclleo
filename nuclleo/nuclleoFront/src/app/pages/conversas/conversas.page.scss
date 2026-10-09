@@ -1,249 +1,53 @@
-.conversas-content {
-  --background: #f5f7fb;
+.secao + .secao {
+  margin-top: 28px;
 }
 
-.toolbar {
-  --background: #7d17f1;
-  --color: #ffffff;
-}
-
-.container {
-  width: 100%;
-  max-width: 700px;
-
-  margin: 0 auto;
-
-  padding: 32px 24px 50px;
-}
-
-.topo {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.topo h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 10px;
-}
-
-.topo p {
-  font-size: 15px;
-  color: #6b7280;
-}
-
-.lista-conversas {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.conversa-card {
-  display: flex;
+.conversa {
   align-items: center;
-
-  gap: 14px;
-
-  width: 100%;
-
-  padding: 16px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-
-  cursor: pointer;
-  text-align: left;
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 14px;
 }
 
-.conversa-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.12);
-}
-
-.avatar-foto {
-  width: 48px;
-  height: 48px;
-
-  border-radius: 50%;
-
-  object-fit: cover;
-
-  flex-shrink: 0;
-}
-
-.avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 48px;
-  height: 48px;
-
-  border-radius: 50%;
-
-  background: #ede9fe;
-  color: #7c3aed;
-
-  font-weight: 700;
-  font-size: 18px;
-  text-transform: uppercase;
-
-  flex-shrink: 0;
-}
-
-.info {
-  flex: 1;
-  min-width: 0;
-}
-
-.info h2 {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111827;
-
-  margin: 0 0 4px;
-}
-
-.anuncio-nome {
-  font-size: 13px;
-  color: #6b7280;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.status-badge {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 10px;
-  white-space: nowrap;
-}
-
-.status-badge.pendente {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-badge.finalizada {
-  background: #e5e7eb;
-  color: #4b5563;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 60px 20px;
-}
-
-.empty-state ion-icon {
-  font-size: 80px;
-  color: #a855f7;
-  margin-bottom: 20px;
-}
-
-.empty-state h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 10px;
-}
-
-.empty-state p {
-  font-size: 15px;
-  color: #6b7280;
-  max-width: 320px;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 60px 20px;
-}
-
-.loading-state ion-spinner {
-  width: 48px;
-  height: 48px;
-
-  color: #7c3aed;
-
-  margin-bottom: 16px;
-}
-
-.loading-state p {
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #6b7280;
-}
-
-.conversa-card {
+.conversa--estatica {
   cursor: default;
 }
 
-.conversa-card.clicavel {
-  cursor: pointer;
+.conversa--estatica:hover {
+  transform: none;
+  background: var(--nc-surface);
+  border-color: rgba(var(--nc-orange-rgb), 0.35);
+  box-shadow: none;
 }
 
-.acoes-solicitacao {
+.conversa__nome {
+  margin: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.conversa__anuncio {
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.conversa__acoes {
   display: flex;
-  gap: 8px;
+  flex-shrink: 0;
+  gap: 6px;
 }
 
-.btn-aceitar {
-  --background: #7c3aed;
-  --background-hover: #6d28d9;
-  --color: #ffffff;
-  --border-radius: 10px;
-  margin: 0;
+.conversa__acoes ion-button {
+  --padding-start: 10px;
+  --padding-end: 10px;
 }
 
-.btn-recusar {
-  --color: #dc2626;
-  --border-color: #dc2626;
-  --border-radius: 10px;
-  margin: 0;
-}
-
-.secao-solicitacoes {
-  margin-bottom: 24px;
-}
-
-.secao-conversas .lista-conversas {
-  margin-top: 0;
-}
-
-.titulo-secao {
-  font-size: 14px;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  margin: 0 0 12px 4px;
-}
-
-.divisoria {
-  height: 1px;
-  background: #e5e7eb;
-
-  margin: 24px 0;
+.conversa__seta {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--nc-text-subtle);
 }

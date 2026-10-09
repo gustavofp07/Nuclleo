@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ titulo }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container page-container--wide">
+
+    <div class="page-header">
+      <span class="eyebrow">{{ tipo === 'venda' ? 'Vender' : 'Comprar' }}</span>
+      <h1>{{ titulo }}</h1>
+      <p>{{ subtitulo }}</p>
+    </div>
+
+    <div class="acoes-topo">
+      <ion-button [routerLink]="rotaCriar">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Criar anúncio
+      </ion-button>
+    </div>
+
+    <div class="loading-state" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="lista lista--grid" *ngIf="!carregando && anuncios.length > 0">
+      <a class="item-card" *ngFor="let anuncio of anuncios" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+
+        <div class="item-card__media">
+          <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="anuncio.nmAnuncio">
+          <div *ngIf="!anuncio.ftAnuncio" class="item-card__placeholder">
+            <ion-icon name="image-outline"></ion-icon>
+          </div>
+        </div>
+
+        <div class="item-card__body">
+          <div class="item-card__title">
+            <h2>{{ anuncio.nmAnuncio }}</h2>
+            <span class="badge badge--danger" *ngIf="!anuncio.habilitado">Inativo</span>
+          </div>
+
+          <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
+            R$ {{ $any(anuncio).valor | number:'1.2-2' }}
+          </p>
+
+          <p class="preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+            R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} – R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
+          </p>
+
+          <p class="item-card__desc">{{ anuncio.descricao }}</p>
+        </div>
+
+      </a>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && anuncios.length === 0">
+      <ion-icon [name]="icone"></ion-icon>
+      <h2>{{ tituloVazio }}</h2>
+      <p>{{ mensagemVazio }}</p>
+    </div>
+
+  </div>
+
+</ion-content>

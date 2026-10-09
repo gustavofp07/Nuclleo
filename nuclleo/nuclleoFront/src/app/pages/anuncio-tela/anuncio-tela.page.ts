@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import {
   IonContent,
@@ -14,17 +14,19 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, lockClosedOutline, checkmarkCircle, logInOutline, refreshOutline } from 'ionicons/icons';
+import {
+  createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartOutline,
+  heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, checkmarkCircle, logInOutline, refreshOutline
+} from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
-import { Router } from '@angular/router';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
@@ -35,7 +37,6 @@ import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
-import { AnuncioComunidadeModel } from 'src/app/model/anuncio-comunidade.model';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -56,7 +57,7 @@ import { AnuncioComunidadeModel } from 'src/app/model/anuncio-comunidade.model';
     IonSpinner
   ]
 })
-export class AnuncioTelaPage implements OnInit {
+export class AnuncioTelaPage {
   token: TokenModel;
 
   anuncio: AnuncioModel = new AnuncioModel();
@@ -68,14 +69,11 @@ export class AnuncioTelaPage implements OnInit {
 
   carregandoAnuncio: boolean = true;
 
-  // Comunidades em que o anúncio foi publicado
   comunidadesAnuncio: ComunidadeModel[] = [];
   carregandoComunidades: boolean = false;
   erroComunidades: boolean = false;
 
-  // Comunidades de que o usuário logado participa (usado para liberar a interação)
   comunidadesDoUsuario: Set<number> = new Set<number>();
-  // Comunidade em que o usuário está entrando agora (spinner no botão)
   entrandoComunidade: number | null = null;
 
   constructor(
@@ -90,7 +88,7 @@ export class AnuncioTelaPage implements OnInit {
     private usuarioComunidadeService: UsuarioComunidadeService,
     private usuarioService: UsuarioService,
     private location: Location,
-    private ngZone: NgZone,
+    private ngZone: NgZone
   ) {
     this.token = new TokenModel();
     addIcons({
@@ -103,14 +101,11 @@ export class AnuncioTelaPage implements OnInit {
       imageOutline,
       calendarOutline,
       peopleOutline,
-      lockClosedOutline,
+      heartOutline,
       checkmarkCircle,
       logInOutline,
-      refreshOutline,
+      refreshOutline
     });
-  }
-
-  ngOnInit() {
   }
 
   ionViewWillEnter() {
@@ -154,8 +149,6 @@ export class AnuncioTelaPage implements OnInit {
     });
   }
 
-  // Busca as comunidades onde o anúncio foi publicado e, para visitantes, em quais delas
-  // o usuário já participa. Enquanto isso carrega (ou se der erro) a interação fica bloqueada.
   carregarComunidadesDoAnuncio(cdAnuncio: number) {
     this.carregandoComunidades = true;
     this.erroComunidades = false;
@@ -184,13 +177,11 @@ export class AnuncioTelaPage implements OnInit {
     });
   }
 
-  // O usuário participa dessa comunidade? (o criador da comunidade conta como participante)
   participaDe(comunidade: ComunidadeModel): boolean {
     return this.comunidadesDoUsuario.has(comunidade.cdComunidade)
       || comunidade.usuarioCria?.cdUsuario === this.token.cdUsuario;
   }
 
-  // Só interage com o anúncio quem é o dono ou participa de ao menos uma comunidade dele
   get acessoLiberado(): boolean {
     if (this.usuarioEhDono) {
       return true;
@@ -198,7 +189,6 @@ export class AnuncioTelaPage implements OnInit {
     return this.comunidadesAnuncio.some(c => this.participaDe(c));
   }
 
-  // Entra numa comunidade direto da tela do anúncio e libera a interação
   entrarNaComunidade(comunidade: ComunidadeModel) {
     if (this.entrandoComunidade !== null || this.participaDe(comunidade)) {
       return;
@@ -224,7 +214,6 @@ export class AnuncioTelaPage implements OnInit {
       error: (erro: HttpErrorResponse) => {
         this.ngZone.run(() => {
           if (erro.status === 409) {
-            // já participava (lista desatualizada): só libera
             this.comunidadesDoUsuario = new Set(this.comunidadesDoUsuario).add(comunidade.cdComunidade);
           }
           this.entrandoComunidade = null;
@@ -341,7 +330,6 @@ export class AnuncioTelaPage implements OnInit {
     });
   }
 
-  // <-- ADICIONADO: agora o botão chama isso em vez de navegar direto pelo routerLink
   conversarComAnunciante() {
     if (!this.interesseAtual?.id || this.carregandoInteresse || !this.acessoLiberado) {
       return;

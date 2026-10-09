@@ -1,519 +1,103 @@
-.perfil-content {
-  --background: #f5f7fb;
+.comunidade-topo {
+  padding: 0;
+  overflow: hidden;
 }
 
-.toolbar {
-  --background: #7d17f1;
-  --color: #ffffff;
-}
-
-.container {
+.comunidade-capa {
   width: 100%;
-  max-width: 650px;
-
-  margin: 0 auto;
-
-  padding: 24px 20px 80px;
+  height: 180px;
+  object-fit: cover;
+  background: var(--nc-surface-2);
+  border-bottom: 1px solid var(--nc-border);
 }
 
-/* CARREGANDO */
-
-.loading-state {
+.comunidade-dados {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 60px 20px;
-}
-
-.loading-state ion-spinner {
-  width: 48px;
-  height: 48px;
-
-  color: #7c3aed;
-
-  margin-bottom: 16px;
-}
-
-.loading-state p {
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #6b7280;
-}
-
-/* TOPO */
-
-.perfil-topo {
-  display: flex;
-  align-items: center;
-
-  gap: 18px;
-
-  margin-top: 18px;
-}
-
-.foto-comunidade {
-  width: 130px;
-  height: 130px;
-
-  border-radius: 20%;
-
-  object-fit: cover;
-
-  border: 4px solid #ffffff;
-
-  background: #e5e7eb;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.dados-comunidade h2 {
-  margin: 0;
-
-  font-size: 28px;
-  font-weight: 700;
-
-  color: #111827;
-}
-
-.dados-comunidade p {
-  margin-top: 6px;
-
-  color: #6b7280;
-}
-
-/* Linha do contador + link "ver lista de membros" */
-
-.membros-toggle {
-  display: flex;
-  align-items: center;
-
   gap: 10px;
-
-  margin-top: 6px;
+  padding: 18px 20px 20px;
 }
 
-.numMembros {
-  color: #6b7280;
+.comunidade-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.comunidade-titulo h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 .ver-membros {
+  align-self: flex-start;
   font-size: 13px;
-  font-weight: 600;
-
-  color: #7c3aed;
-
-  cursor: pointer;
-  text-decoration: none;
 }
 
-.ver-membros:hover {
-  text-decoration: underline;
+.descricao {
+  margin: 0;
+  white-space: pre-line;
+  word-break: break-word;
 }
-
-/* BOXES */
-
-.info-box {
-  background: white;
-
-  color: black;
-  border-radius: 20px;
-
-  padding: 22px;
-
-  margin-top: 24px;
-
-  border: 1px solid #d1d5db;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-}
-
-.info-box h3 {
-  margin-top: 0;
-
-  color: #111827;
-}
-
-.info-box p {
-  color: #4b5563;
-
-  line-height: 1.6;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-
-  gap: 12px;
-
-  margin-bottom: 12px;
-}
-
-.info-item ion-icon {
-  font-size: 22px;
-
-  color: #7c3aed;
-}
-
-/* BOTÃO */
 
 .acoes-comunidade {
-  margin-top: 24px;
-}
-
-.btn-entrar {
-  height: 54px;
-
-  --background: linear-gradient(90deg,
-      #7c3aed,
-      #a855f7);
-
-  --border-radius: 16px;
-
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.5px;
-}
-
-.status-comunidade {
-  margin-top: 24px;
-  padding: 14px 16px;
-
-  border: 1px solid #bbf7d0;
-  border-radius: 16px;
-
-  background: #f0fdf4;
-  color: #166534;
-
-  font-weight: 700;
-  text-align: center;
-}
-
-.admin-acoes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-
-  margin-top: 24px;
-}
-
-.admin-acoes ion-button {
-  min-height: 46px;
-  font-weight: 700;
-}
-
-.abas {
-
-  display: flex;
-
-  margin-top: 10px;
-
-  overflow: hidden;
-
-  border-radius: 16px;
-
-  background: white;
-
-  border: 1px solid #d1d5db;
-
-}
-
-.abas button {
-
-  flex: 1;
-
-  padding: 14px;
-
-  border: none;
-
-  background: white;
-
-  color: #6b7280;
-
-  font-weight: 600;
-
-}
-
-.abas button.ativo {
-
-  background: #7d17f1;
-
-  color: white;
-
-}
-
-.abas button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.anuncios-lista {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 16px;
-
-  justify-content: center;
-  /* centralizado, como pedido */
-
-  margin-top: 16px;
-}
-
-.anuncio-card {
   display: flex;
   flex-direction: column;
-
-  width: 100%;
-  max-width: 200px;
-  flex: 0 1 calc(33.333% - 11px);
-
-  background: white;
-
-  border-radius: 16px;
-
-  border: 1px solid #d1d5db;
-
-  overflow: hidden;
-
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.anuncio-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+.acoes-comunidade .aviso {
+  margin: 0;
 }
 
-.anuncio-imagem {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  position: relative;
-  overflow: hidden;
+.membros-lista {
+  padding: 8px 12px 24px;
 }
 
-.anuncio-imagem-foto {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.anuncio-imagem-placeholder {
-  width: 100%;
-  height: 100%;
-
+.membro {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  border-bottom: 2px solid #7c3aed;
-  background: #f5f3ff;
+  gap: 12px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--nc-border);
 }
 
-.anuncio-imagem-placeholder ion-icon {
-  font-size: 26px;
-  color: #7c3aed;
+.membro .avatar {
+  width: 40px;
+  height: 40px;
 }
 
-.anuncio-info {
-  padding: 12px;
-}
-
-.anuncio-card h3 {
-  margin: 0;
-
-  color: #111827;
-
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.tipo {
-
-  display: inline-block;
-
-  margin-top: 8px;
-
-  margin-bottom: 10px;
-
-  padding: 4px 10px;
-
-  border-radius: 10px;
-
-  background: #ede9fe;
-
-  color: #6d28d9;
-
-  font-size: 12px;
-
-  font-weight: 700;
-
-}
-
-.descAnuncio {
-  color: #4b5563;
-
-  font-size: 14px;
-  line-height: 1.5;
-
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.membro__nome {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
-}
-
-.link-usuario {
-  color: #7c3aed;
-  font-weight: 600;
-  text-decoration: none;
+  font-weight: 500;
+  color: var(--nc-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
   cursor: pointer;
+  transition: color var(--nc-transition);
 }
 
-.link-usuario:hover {
-  text-decoration: underline;
+.membro__nome:hover {
+  color: var(--nc-purple-light);
 }
 
-.btn-sair {
-  --border-radius: 16px;
-  margin-top: 12px;
+.item-perigo {
+  --color: var(--nc-danger);
 }
 
-.anuncio-preco {
-  margin: 6px 0 0;
-
-  color: #6d28d9;
-
-  font-size: 14px;
-  font-weight: 700;
+.item-perigo ion-icon {
+  color: var(--nc-danger);
 }
 
-/* MODAL DE LISTA DE MEMBROS */
-
-/* Centraliza o modal na tela em vez do padrão "sobe de baixo" do Ionic,
-   e limita a largura/altura pra parecer uma caixinha de diálogo */
-.modal-membros {
-  --width: 90%;
-  --max-width: 420px;
-
-  --height: 60vh;
-  --max-height: 80vh;
-
-  --border-radius: 20px;
-
-  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal-toolbar {
-  --background: #7d17f1;
-  --color: #ffffff;
-}
-
-.modal-membros-content {
-  --background: #ffffff;
-  --color: #111827;
-}
-
-.modal-membros-content ion-list {
-  --ion-background-color: #ffffff;
-  background: #ffffff;
-
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.membro-item {
-  --background: #ffffff;
-  --color: #111827;
-  --border-color: #e5e7eb;
-
-  --padding-start: 12px;
-  --inner-padding-end: 8px;
-}
-
-.membro-item ion-label {
-  color: #111827;
-}
-
-.membro-item ion-avatar {
-  width: 42px;
-  height: 42px;
-}
-
-.membro-item ion-avatar img {
-  object-fit: cover;
-}
-
-/* ===== COLE ISSO NO FINAL do comunidade-tela.page.scss ===== */
-
-/* Selo ADMIN roxo na lista de membros */
-.badge-admin {
-  display: inline-block;
-
-  margin-left: 8px;
-  padding: 2px 8px;
-
-  border-radius: 8px;
-
-  background: #7d17f1;
-  color: #ffffff;
-
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-
-  vertical-align: middle;
-}
-
-/* Popover da engrenagem (Expulsar / Banir) */
-.popover-moderacao {
-  --width: 190px;
-  --background: #ffffff;
-  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-}
-
-.popover-moderacao ion-list {
-  padding: 4px 0;
-  background: #ffffff;
-}
-
-.popover-moderacao ion-item {
-  --background: #ffffff;
-  --color: #111827;
-  font-weight: 600;
-}
-
-.popover-moderacao ion-item.opcao-perigo {
-  --color: #dc2626;
-}
-
-
-/* RESPONSIVIDADE DOS ANÚNCIOS */
-
-/* CELULAR */
-@media (max-width: 600px) {
-
-  .anuncios-lista {
-    gap: 12px;
+@media (min-width: 600px) {
+  .comunidade-capa {
+    height: 220px;
   }
-
-  .anuncio-card {
-    /* Máximo de 2 anúncios por linha */
-    flex: 0 1 calc(50% - 6px);
-
-    /* Permite aproveitar toda a metade disponível */
-    max-width: none;
-  }
-
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
+import { Component, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,26 +6,24 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
-  IonTitle,
   IonToolbar,
   IonButtons,
   IonBackButton,
   IonFooter,
-  IonItem,
   IonInput,
   IonButton,
-  IonIcon
+  IonIcon,
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 
 import { addIcons } from 'ionicons';
-import { sendOutline, chatbubbleOutline, flagOutline } from 'ionicons/icons';
+import { send, chatbubbleOutline, flagOutline } from 'ionicons/icons';
 
 import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { MensagemModel } from 'src/app/model/mensagem.model';
-import { UsuarioModel } from 'src/app/model/usuario.model';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
@@ -53,7 +51,7 @@ interface MensagemView extends MensagemModel {
     IonIcon
   ]
 })
-export class ChatPage implements OnInit, OnDestroy {
+export class ChatPage implements OnDestroy {
   token: TokenModel;
 
   @ViewChild(IonContent) content!: IonContent;
@@ -63,6 +61,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
   mensagens: MensagemView[] = [];
   textoMensagem: string = '';
+  readonly limiteMensagem = 500;
   conectado: boolean = false;
   nomeOutroUsuario: string = '';
   fotoOutroUsuario: string | null = null;
@@ -77,36 +76,31 @@ export class ChatPage implements OnInit, OnDestroy {
   private avaliacaoSolicitada = false;
   private encerrando = false;
 
-  private timeoutDigitando: any = null;
+  private timeoutDigitando: ReturnType<typeof setTimeout> | undefined;
+  private inscricoes: Subscription[] = [];
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private chatService: ChatService,
-    //private usuarioService: UsuarioService,
     private interesseService: InteresseService,
     private ngZone: NgZone,
     private alertController: AlertController,
     private toastController: ToastController,
     private tokenService: TokenService,
-    private router: Router,
+    private router: Router
   ) {
     this.token = new TokenModel();
-    addIcons({ sendOutline, chatbubbleOutline, flagOutline });
-  }
-
-  ngOnInit() {
+    addIcons({ send, chatbubbleOutline, flagOutline });
   }
 
   ionViewWillEnter() {
-    const possuiSessao = this.tokenService.temToken();
-
-    if (possuiSessao) {
-      this.token = this.tokenService.extrair();
-    } else {
+    if (!this.tokenService.temToken()) {
       this.exibirMensagem('Não há usuário logado.');
       this.router.navigate(['/login']);
       return;
     }
+
+    this.token = this.tokenService.extrair();
 
     this.cdInteresse = Number(this.activatedRoute.snapshot.paramMap.get('cdInteresse'));
 
@@ -121,17 +115,24 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   ionViewWillLeave() {
-    this.chatService.desconectar();
+    this.encerrarChat();
   }
 
   ngOnDestroy() {
+    this.encerrarChat();
+  }
+
+  private encerrarChat() {
+    clearTimeout(this.timeoutDigitando);
+    this.inscricoes.forEach(inscricao => inscricao.unsubscribe());
+    this.inscricoes = [];
+    this.outroUsuarioDigitando = false;
     this.chatService.desconectar();
   }
 
   carregarInteresse() {
     this.interesseService.buscarPorId(this.cdInteresse).subscribe({
       next: (interesse: InteresseModel) => {
-
         const souEuOInteressado = interesse.usuario.cdUsuario === this.token.cdUsuario;
         const souEuOAnunciante = interesse.anuncio.usuarioCria.cdUsuario === this.token.cdUsuario;
 
@@ -161,7 +162,7 @@ export class ChatPage implements OnInit, OnDestroy {
           finalizado: interesse.finalizado,
           avaliacaoInteressadoFeita: interesse.avaliacaoInteressadoFeita,
           avaliacaoAnuncianteFeita: interesse.avaliacaoAnuncianteFeita,
-          aceito: (interesse as any).aceito,
+          aceito: interesse.aceito,
           conversaIniciada: interesse.conversaIniciada
         });
 
@@ -174,10 +175,11 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   iniciarChat() {
+    this.encerrarChat();
     this.carregarHistorico();
     this.chatService.conectar(this.cdInteresse);
 
-    this.chatService.onMensagemRecebida().subscribe((mensagem) => {
+    this.inscricoes.push(this.chatService.onMensagemRecebida().subscribe((mensagem) => {
       this.ngZone.run(() => {
         const indicePendente = this.mensagens.findIndex(m =>
           m.enviando &&
@@ -193,15 +195,15 @@ export class ChatPage implements OnInit, OnDestroy {
 
         this.rolarParaFinal();
       });
-    });
+    }));
 
-    this.chatService.onStatusConexao().subscribe((status) => {
+    this.inscricoes.push(this.chatService.onStatusConexao().subscribe((status) => {
       this.ngZone.run(() => {
         this.conectado = status;
       });
-    });
+    }));
 
-    this.chatService.onDigitando().subscribe((evento) => {
+    this.inscricoes.push(this.chatService.onDigitando().subscribe((evento) => {
       this.ngZone.run(() => {
         if (evento.cdUsuario !== this.token.cdUsuario) {
           this.outroUsuarioDigitando = evento.digitando;
@@ -211,13 +213,13 @@ export class ChatPage implements OnInit, OnDestroy {
           }
         }
       });
-    });
+    }));
 
-    this.chatService.onStatusInteresseAtualizado().subscribe((status) => {
+    this.inscricoes.push(this.chatService.onStatusInteresseAtualizado().subscribe((status) => {
       this.ngZone.run(() => {
         this.aplicarStatusInteresse(status);
       });
-    });
+    }));
   }
 
   private aplicarStatusInteresse(status: StatusInteresseEvento) {
@@ -288,7 +290,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
     const texto = this.textoMensagem.trim();
 
-    if (!texto || texto.length > 500) {
+    if (!texto || texto.length > this.limiteMensagem) {
       return;
     }
 
@@ -336,10 +338,8 @@ export class ChatPage implements OnInit, OnDestroy {
     return mensagem.cdUsuarioRemetente === this.token.cdUsuario;
   }
 
-  async rolarParaFinal() {
-    setTimeout(() => {
-      this.content?.scrollToBottom(200);
-    }, 100);
+  rolarParaFinal() {
+    setTimeout(() => this.content?.scrollToBottom(200), 100);
   }
 
   async abrirFinalizarConversa() {
@@ -493,7 +493,7 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   async exibirMensagem(texto: string) {
-    const toast = await this.toastController.create({ message: texto, duration: 2500 });
-    toast.present();
+    const toast = await this.toastController.create({ message: texto, duration: 2500, position: 'top' });
+    await toast.present();
   }
 }

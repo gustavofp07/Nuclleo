@@ -1,0 +1,116 @@
+<ion-content [fullscreen]="true">
+
+  <div class="auth-container">
+
+    <div class="page-header page-header--center">
+      <span class="eyebrow">Nova conta</span>
+      <h1>Cadastrar</h1>
+      <p>Crie sua conta na <span class="text-gradient">Nuclleo</span></p>
+    </div>
+
+    <form [formGroup]="formUsuario" (ngSubmit)="salvar()" class="card card--accent form-card">
+
+      <div class="foto-picker" (click)="selecionarImagem()">
+        <div class="foto-picker__frame">
+          <img [src]="previewFoto || 'assets/img/usuarioPadrao.png'" alt="Foto de perfil">
+          <span class="foto-picker__badge">
+            <ion-icon name="camera-outline"></ion-icon>
+          </span>
+        </div>
+        <p class="foto-picker__label">Adicionar foto de perfil</p>
+      </div>
+
+      <label class="form-label" for="cadastro-email">E-mail</label>
+      <div class="form-field">
+        <ion-input id="cadastro-email" type="email" placeholder="voce@email.com" formControlName="email"
+          (ionBlur)="verificarEmail()"></ion-input>
+      </div>
+
+      <p class="form-error" *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.hasError('required')">
+        Informe o e-mail.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('email')?.touched &&
+        (formUsuario.get('email')?.hasError('email') || formUsuario.get('email')?.hasError('pattern'))">
+        Informe um e-mail válido.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('email')?.touched && formUsuario.get('email')?.hasError('emailExistente')">
+        Este e-mail já está cadastrado.
+      </p>
+
+      <label class="form-label" for="cadastro-nome">Nome</label>
+      <div class="form-field">
+        <ion-input id="cadastro-nome" placeholder="Seu nome" formControlName="nmUsuario"></ion-input>
+      </div>
+
+      <p class="form-error" *ngIf="formUsuario.get('nmUsuario')?.touched && formUsuario.get('nmUsuario')?.hasError('required')">
+        Informe o nome.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('nmUsuario')?.touched && formUsuario.get('nmUsuario')?.hasError('minlength')">
+        O nome deve possuir pelo menos 3 caracteres.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('nmUsuario')?.touched && formUsuario.get('nmUsuario')?.hasError('pattern')">
+        O nome deve conter apenas letras.
+      </p>
+
+      <label class="form-label" for="cadastro-senha">Senha</label>
+      <div class="form-field">
+        <ion-input id="cadastro-senha" [type]="showPassword ? 'text' : 'password'" placeholder="Mínimo de 6 caracteres"
+          formControlName="senha"></ion-input>
+
+        <ion-button fill="clear" type="button" (click)="togglePassword()">
+          <ion-icon slot="icon-only" [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </div>
+
+      <p class="form-error" *ngIf="formUsuario.get('senha')?.touched && formUsuario.get('senha')?.hasError('required')">
+        Informe a senha.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('senha')?.touched && formUsuario.get('senha')?.hasError('minlength')">
+        A senha deve ter pelo menos 6 caracteres.
+      </p>
+
+      <label class="form-label" for="cadastro-confirmar">Confirmar senha</label>
+      <div class="form-field">
+        <ion-input id="cadastro-confirmar" [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Repita a senha" formControlName="confirmarSenha"></ion-input>
+
+        <ion-button fill="clear" type="button" (click)="toggleConfirmPassword()">
+          <ion-icon slot="icon-only" [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+      </div>
+
+      <p class="form-error" *ngIf="formUsuario.get('confirmarSenha')?.touched && formUsuario.get('confirmarSenha')?.hasError('required')">
+        Confirme a senha.
+      </p>
+
+      <p class="form-error" *ngIf="formUsuario.get('confirmarSenha')?.touched && formUsuario.hasError('senhasDiferentes')">
+        As senhas não coincidem.
+      </p>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="formUsuario.invalid || verificandoEmail || salvando">
+          {{ salvando ? 'Cadastrando...' : verificandoEmail ? 'Verificando e-mail...' : 'Criar conta' }}
+        </ion-button>
+      </div>
+
+      <p class="termos">
+        Ao continuar, você concorda com os nossos <strong>Termos de Serviço</strong> e com a
+        <strong>Política de Privacidade</strong>.
+      </p>
+
+    </form>
+
+    <div class="divider">ou</div>
+
+    <p class="ion-text-center">
+      <a routerLink="/login" class="link">Já possuo uma conta</a>
+    </p>
+
+  </div>
+
+</ion-content>

@@ -1,45 +1,32 @@
 <ion-header>
-
-  <ion-toolbar class="toolbar">
-
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-
     <ion-title>Comunidade</ion-title>
-
   </ion-toolbar>
-
 </ion-header>
 
-<ion-content [fullscreen]="true" class="perfil-content">
-  <div class="container">
+<ion-content [fullscreen]="true">
 
-    <!-- ABAS -->
+  <div class="page-container">
 
-    <div class="abas">
-
-      <button [class.ativo]="abaSelecionada === 'perfil'" (click)="selecionarAba('perfil')">
+    <div class="tabs">
+      <button type="button" [class.ativo]="abaSelecionada === 'perfil'" (click)="selecionarAba('perfil')">
         Perfil
       </button>
-
-      <button [class.ativo]="abaSelecionada === 'chat'" [disabled]="!usuarioEntrouNaComunidade"
+      <button type="button" [class.ativo]="abaSelecionada === 'chat'" [disabled]="!usuarioEntrouNaComunidade"
         (click)="selecionarAba('chat')">
         Chat
       </button>
-
-      <button [class.ativo]="abaSelecionada === 'anuncios'" [disabled]="!usuarioEntrouNaComunidade"
+      <button type="button" [class.ativo]="abaSelecionada === 'anuncios'" [disabled]="!usuarioEntrouNaComunidade"
         (click)="selecionarAba('anuncios')">
-
         Anúncios
-
       </button>
-
     </div>
 
-    <div *ngIf="abaSelecionada === 'perfil'">
+    <ng-container *ngIf="abaSelecionada === 'perfil'">
 
-      <!-- CARREGANDO -->
       <div class="loading-state" *ngIf="carregandoComunidade || carregandoVinculo || carregandoMembros">
         <ion-spinner name="crescent"></ion-spinner>
         <p>Carregando...</p>
@@ -47,209 +34,189 @@
 
       <ng-container *ngIf="!carregandoComunidade && !carregandoVinculo && !carregandoMembros">
 
-        <!-- TOPO -->
+        <section class="card card--accent comunidade-topo">
 
-        <div class="perfil-topo">
+          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" [alt]="comunidade.nmComunidade"
+            class="comunidade-capa">
 
-          <img [src]="comunidade.foto || 'assets/img/comunidadePadrao.png'" class="foto-comunidade">
-
-          <div class="dados-comunidade">
-
-            <h2>{{ comunidade.nmComunidade }}</h2>
-
-            <p>{{ comunidade.cidade }}{{ comunidade.cidade && comunidade.uf ? ' - ' : '' }}{{ comunidade.uf }}</p>
-
-            <!-- Contador + link clicável que abre o modal de membros -->
-            <div class="membros-toggle">
-              <span class="numMembros">{{ totalUsuarios }} {{ totalUsuarios === 1 ? 'membro' : 'membros' }}</span>
-              <a class="ver-membros" (click)="abrirListaMembros()">
-                ver lista de membros
-              </a>
+          <div class="comunidade-dados">
+            <div class="comunidade-titulo">
+              <h1>{{ comunidade.nmComunidade }}</h1>
+              <span class="badge badge--gradient" *ngIf="usuarioEhAdmin">Admin</span>
+              <span class="badge badge--success" *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">Membro</span>
             </div>
 
+            <div class="item-card__meta">
+              <span *ngIf="comunidade.cidade || comunidade.uf">
+                <ion-icon name="location-outline"></ion-icon>
+                {{ comunidade.cidade }}{{ comunidade.cidade && comunidade.uf ? ' - ' : '' }}{{ comunidade.uf }}
+              </span>
+              <span>
+                <ion-icon name="people-outline"></ion-icon>
+                {{ totalUsuarios }} {{ totalUsuarios === 1 ? 'membro' : 'membros' }}
+              </span>
+            </div>
+
+            <a class="link ver-membros" (click)="abrirListaMembros()">Ver lista de membros</a>
           </div>
 
-        </div>
+        </section>
 
-        <!-- DESCRICAO -->
-
-        <div class="info-box">
+        <section class="card">
           <h3>Descrição</h3>
-          <p>
-            {{ comunidade.descricao }}
-          </p>
-        </div>
+          <p class="descricao">{{ comunidade.descricao }}</p>
+        </section>
 
-        <!-- INFORMACOES -->
-        <div class="info-box">
+        <section class="card">
           <div class="info-item">
             <ion-icon name="calendar-outline"></ion-icon>
-            <span>
-              Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}
-            </span>
+            <span>Criada em {{ comunidade.dtCriacao | date:'dd/MM/yyyy' }}</span>
           </div>
 
           <div class="info-item">
             <ion-icon name="person-outline"></ion-icon>
             <span>
               Criada por
-              <a class="link-usuario" [routerLink]="['/usuario-perfil', comunidade.usuarioCria.cdUsuario]">
+              <a class="link" [routerLink]="['/usuario-perfil', comunidade.usuarioCria.cdUsuario]">
                 {{ comunidade.usuarioCria.nmUsuario }}
               </a>
             </span>
           </div>
-        </div>
+        </section>
 
-        <!-- ACOES ADMIN -->
+        <div class="acoes-comunidade">
 
-        <div class="admin-acoes" *ngIf="usuarioEhAdmin">
+          <div class="btn-group btn-group--row" *ngIf="usuarioEhAdmin">
+            <ion-button expand="block" fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
+              <ion-icon name="settings-outline" slot="start"></ion-icon>
+              Editar comunidade
+            </ion-button>
 
-          <ion-button fill="outline" color="medium" [routerLink]="['/criar-comunidade', comunidade.cdComunidade]">
-            <ion-icon name="settings-outline" slot="start">
-            </ion-icon>
-            Editar comunidade
-          </ion-button>
+            <ion-button expand="block" fill="outline" color="danger" (click)="confirmarExclusao()">
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              Excluir comunidade
+            </ion-button>
+          </div>
 
-          <ion-button fill="outline" color="danger" (click)="confirmarExclusao()">
-            <ion-icon name="trash-outline" slot="start"></ion-icon>
-            Excluir comunidade
-          </ion-button>
-
-        </div>
-
-        <!-- BOTAO ENTRAR / STATUS NO PERFIL -->
-
-        <div class="acoes-comunidade" *ngIf="!usuarioEntrouNaComunidade">
-
-          <ion-button expand="block" class="btn-entrar" [disabled]="entrandoComunidade" (click)="entrarComunidade()">
-
-            <ion-icon name="people-outline" slot="start">
-            </ion-icon>
-
+          <ion-button expand="block" *ngIf="!usuarioEntrouNaComunidade" [disabled]="entrandoComunidade"
+            (click)="entrarComunidade()">
+            <ion-icon name="people-outline" slot="start"></ion-icon>
             {{ entrandoComunidade ? 'Entrando...' : 'Entrar na comunidade' }}
-
           </ion-button>
 
-        </div>
+          <ng-container *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">
+            <p class="aviso">Você participa dessa comunidade.</p>
 
-        <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && !usuarioEhAdmin">
-          Você participa dessa comunidade
+            <ion-button expand="block" fill="outline" color="danger" [disabled]="saindoComunidade"
+              (click)="confirmarSaida()">
+              <ion-icon name="log-out-outline" slot="start"></ion-icon>
+              {{ saindoComunidade ? 'Saindo...' : 'Sair da comunidade' }}
+            </ion-button>
+          </ng-container>
 
-          <ion-button expand="block" fill="outline" color="danger" class="btn-sair" [disabled]="saindoComunidade"
-            (click)="confirmarSaida()">
-            <ion-icon name="log-out-outline" slot="start"></ion-icon>
-            {{ saindoComunidade ? 'Saindo...' : 'Sair da comunidade' }}
-          </ion-button>
-        </div>
+          <p class="aviso aviso--accent" *ngIf="usuarioEhAdmin">Você é o administrador dessa comunidade.</p>
 
-        <div class="status-comunidade" *ngIf="usuarioEntrouNaComunidade && usuarioEhAdmin">
-          Você é o administrador dessa comunidade
         </div>
 
       </ng-container>
 
+    </ng-container>
+
+    <div class="empty-state" *ngIf="abaSelecionada === 'chat'">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <h2>Chat da comunidade</h2>
+      <p>Em breve você poderá conversar com todos os membros por aqui.</p>
     </div>
 
-    <div *ngIf="abaSelecionada === 'chat'">
+    <ng-container *ngIf="abaSelecionada === 'anuncios'">
 
-      <div class="info-box">
-
-        Chat da comunidade
-
-      </div>
-
-    </div>
-
-    <div *ngIf="abaSelecionada === 'anuncios'">
-
-      <!-- CARREGANDO -->
       <div class="loading-state" *ngIf="carregandoAnuncios">
         <ion-spinner name="crescent"></ion-spinner>
         <p>Carregando...</p>
       </div>
 
-      <div *ngIf="!carregandoAnuncios && anuncios.length === 0" class="info-box">
-        Nenhum anúncio encontrado.
+      <div class="empty-state" *ngIf="!carregandoAnuncios && anuncios.length === 0">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        <h2>Nenhum anúncio encontrado</h2>
+        <p>Ainda não há anúncios publicados nesta comunidade.</p>
       </div>
 
-      <div class="anuncios-lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
-        <div *ngFor="let anuncio of anuncios" class="anuncio-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+      <div class="lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
+        <a *ngFor="let anuncio of anuncios" class="item-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
-          <div class="anuncio-imagem">
-            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" class="anuncio-imagem-foto">
-            <div *ngIf="!anuncio.ftAnuncio" class="anuncio-imagem-placeholder">
+          <div class="item-card__media">
+            <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="anuncio.nmAnuncio">
+            <div *ngIf="!anuncio.ftAnuncio" class="item-card__placeholder">
               <ion-icon name="image-outline"></ion-icon>
             </div>
           </div>
 
-          <div class="anuncio-info">
-            <h3>{{ anuncio.nmAnuncio }}</h3>
-            <span class="tipo">{{ rotuloTipoAnuncio(anuncio.tipoAnuncio) }}</span>
+          <div class="item-card__body">
+            <div class="item-card__title">
+              <h3>{{ anuncio.nmAnuncio }}</h3>
+              <span class="badge" [class.badge--accent]="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+                {{ rotuloTipoAnuncio(anuncio.tipoAnuncio) }}
+              </span>
+            </div>
 
-            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
+            <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">
               R$ {{ $any(anuncio).valor | number:'1.2-2' }}
             </p>
 
-            <p class="anuncio-preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
-              R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} - R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
+            <p class="preco" *ngIf="anuncio.tipoAnuncio === 'REQUERIMENTO'">
+              R$ {{ $any(anuncio).valorMin | number:'1.2-2' }} – R$ {{ $any(anuncio).valorMax | number:'1.2-2' }}
             </p>
 
-            <p class="descAnuncio">{{ anuncio.descricao }}</p>
+            <p class="item-card__desc">{{ anuncio.descricao }}</p>
           </div>
 
-        </div>
+        </a>
       </div>
 
-    </div>
+    </ng-container>
 
   </div>
 
-  <!-- MODAL DE LISTA DE MEMBROS -->
-  <ion-modal #modalMembros [isOpen]="mostrarMembros" (didDismiss)="fecharListaMembros()" class="modal-membros">
+  <ion-modal #modalMembros [isOpen]="mostrarMembros" (didDismiss)="fecharListaMembros()">
     <ng-template>
 
       <ion-header>
-        <ion-toolbar class="modal-toolbar">
-          <ion-title>Membros da comunidade</ion-title>
+        <ion-toolbar>
+          <ion-title>Membros</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="fecharListaMembros()">
+            <ion-button (click)="fecharListaMembros()" aria-label="Fechar">
               <ion-icon name="close-outline" slot="icon-only"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="modal-membros-content">
-        <ion-list>
-          <ion-item *ngFor="let vinculo of membros" lines="full" class="membro-item">
+      <ion-content>
+        <div class="membros-lista">
+          <div *ngFor="let vinculo of membros" class="membro">
 
-            <ion-avatar slot="start">
-              <img [src]="vinculo.usuario.ftUsuario || 'assets/img/usuarioPadrao.png'">
-            </ion-avatar>
+            <img [src]="vinculo.usuario.ftUsuario || 'assets/img/usuarioPadrao.png'" class="avatar"
+              [alt]="vinculo.usuario.nmUsuario">
 
-            <ion-label>
-              <a class="link-usuario" (click)="irParaPerfilMembro(vinculo.usuario.cdUsuario)">
-                {{ vinculo.usuario.nmUsuario }}
-              </a>
-              <span class="badge-admin" *ngIf="ehDono(vinculo)">ADMIN</span>
-            </ion-label>
+            <a class="membro__nome" (click)="irParaPerfilMembro(vinculo.usuario.cdUsuario)">
+              {{ vinculo.usuario.nmUsuario }}
+            </a>
 
-            <!-- Engrenagem: só o admin vê, e não no próprio admin -->
-            <ion-button *ngIf="podeModerar(vinculo)" slot="end" fill="clear" color="medium"
-              (click)="abrirOpcoes($event, vinculo)">
+            <span class="badge badge--gradient" *ngIf="ehDono(vinculo)">Admin</span>
+
+            <ion-button *ngIf="podeModerar(vinculo)" fill="clear" size="small" (click)="abrirOpcoes($event, vinculo)"
+              aria-label="Opções do membro">
               <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
             </ion-button>
 
-          </ion-item>
-        </ion-list>
+          </div>
+        </div>
       </ion-content>
 
-      <!-- Abinha com a opção Expulsar -->
-      <ion-popover [isOpen]="popoverAberto" [event]="eventoPopover" (didDismiss)="popoverAberto = false"
-        class="popover-moderacao">
+      <ion-popover [isOpen]="popoverAberto" [event]="eventoPopover" (didDismiss)="popoverAberto = false">
         <ng-template>
           <ion-list lines="none">
-            <ion-item button [detail]="false" (click)="escolherAcao()">
+            <ion-item button [detail]="false" (click)="escolherAcao()" class="item-perigo">
               <ion-icon name="person-remove-outline" slot="start"></ion-icon>
               <ion-label>Expulsar</ion-label>
             </ion-item>

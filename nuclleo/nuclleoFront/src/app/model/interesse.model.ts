@@ -7,8 +7,8 @@ export class InteresseModel {
     anuncio: AnuncioModel;
     dataInteresse: Date;
     finalizado: boolean;
-    aceito: boolean;             
-    conversaIniciada: boolean;  
+    aceito: boolean;
+    conversaIniciada: boolean;
     avaliacaoInteressadoFeita: boolean;
     avaliacaoAnuncianteFeita: boolean;
 

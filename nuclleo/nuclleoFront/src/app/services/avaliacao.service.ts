@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AvaliacaoService {
-  private readonly URL = 'https://nuclleo.onrender.com/avaliacoes';
+  private readonly URL = `${environment.apiUrl}/avaliacoes`;
 
   constructor(
     private http: HttpClient,

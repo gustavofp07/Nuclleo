@@ -5,7 +5,7 @@ export class TransacaoModel {
     id: number;
     valor: number;
     data: Date;
-    usuario: UsuarioModel; // o interessado/comprador
+    usuario: UsuarioModel;
     anuncio: AnuncioModel;
 
     constructor() {

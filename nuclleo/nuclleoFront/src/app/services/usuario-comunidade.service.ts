@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 
 import { UsuarioComunidadeModel } from '../model/usuario-comunidade.model';
 import { TokenService } from './token.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsuarioComunidadeService {
-  private readonly API_URL = 'https://nuclleo.onrender.com/api/v1/usuarioComunidade';
+  private readonly API_URL = `${environment.apiUrl}/api/v1/usuarioComunidade`;
 
   constructor(
     private http: HttpClient,
@@ -52,5 +53,4 @@ export class UsuarioComunidadeService {
     const params = new HttpParams().set('cdComunidade', cdComunidade.toString());
     return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/comunidade`, { params, ...this.getHeaders() });
   }
-
 }
