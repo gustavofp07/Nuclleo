@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,7 +49,8 @@ public class Usuario {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    // WRITE_ONLY: a senha (hash) pode ser recebida em requisições, mas nunca é devolvida nas respostas da API
+    // WRITE_ONLY: a senha (hash) pode ser recebida em requisições, mas nunca é
+    // devolvida nas respostas da API
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "senha")
     private String senha;
@@ -73,6 +76,7 @@ public class Usuario {
     @Column(name = "ativo")
     private boolean ativo;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false)
     private Perfil perfil;
 }

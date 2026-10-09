@@ -15,65 +15,87 @@ RESTART IDENTITY CASCADE;
 
 -- =============================================
 -- USUÁRIOS
--- Senha inicial de todos: 123
--- Depois você pode aplicar BCrypt em todos via UPDATE
+-- Senha inicial de todos: 123456
 -- =============================================
 INSERT INTO tb_usuario
-(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, ativo)
+(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, ativo, perfil)
 VALUES
 (
     'Gustavo Ferreira',
     'https://res.cloudinary.com/uwc2qxgb/image/upload/v1787262577/gerenciador-arquivos/aojbai2iyllycspgn88q.png',
     'gustavo@gmail.com',
-    '$2a$10$ZGqQEkGHix.avZXxaNJehuwJHIgMQqjGneqHFmECLDu3v6Y5XKIY.',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     '2024-01-10',
     '111.111.111-11',
     '35180008',
     'Timóteo',
     'MG',
     '(31) 99999-1111',
-    TRUE
+    TRUE,
+    'USUARIO'
 ),
 (
     'Ana Souza',
     NULL,
     'ana@gmail.com',
-    '$2a$10$ZGqQEkGHix.avZXxaNJehuwJHIgMQqjGneqHFmECLDu3v6Y5XKIY.',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     '2024-02-15',
     '222.222.222-22',
     '35177000',
     'Antônio Dias',
     'MG',
     '(31) 99999-2222',
-    TRUE
+    TRUE,
+    'USUARIO'
 ),
 (
     'Pedro Lima',
     NULL,
     'pedro@gmail.com',
-    '$2a$10$ZGqQEkGHix.avZXxaNJehuwJHIgMQqjGneqHFmECLDu3v6Y5XKIY.',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     '2024-03-20',
     '333.333.333-33',
     '35920000',
     'Nova Era',
     'MG',
     '(31) 99999-3333',
-    TRUE
+    TRUE,
+    'USUARIO'
 ),
 (
     'Julia Mendes',
     NULL,
     'julia@gmail.com',
-    '$2a$10$ZGqQEkGHix.avZXxaNJehuwJHIgMQqjGneqHFmECLDu3v6Y5XKIY.',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     '2024-04-05',
     '444.444.444-44',
     '30140010',
     'Belo Horizonte',
     'MG',
     '(31) 99999-4444',
-    TRUE
+    TRUE,
+    'USUARIO'
 );
 
+INSERT INTO tb_usuario
+(nm_usuario, email, senha, dt_entrada, ativo, perfil)
+VALUES
+(
+    'Gustavo',
+    'gt@gmail.com',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
+    CURRENT_DATE,
+    TRUE,
+    'ADMINISTRADOR'
+),
+(
+    'Emanuel',
+    'manel@gmail.com',
+    '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
+    CURRENT_DATE,
+    TRUE,
+    'ADMINISTRADOR'
+);
 
 -- =============================================
 -- COMUNIDADES
