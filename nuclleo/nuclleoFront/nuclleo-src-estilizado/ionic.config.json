@@ -1,7 +1,0 @@
-{
-  "name": "nuclleoFront",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
