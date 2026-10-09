@@ -22,6 +22,7 @@ import {
 import { InteresseService } from 'src/app/services/interesse.service';
 import { NotificacaoService } from 'src/app/services/notificacao.service';
 import { TokenService } from './services/token.service';
+import { TemaService } from './services/tema.service';
 import { TokenModel } from './model/token.model';
 
 @Component({
@@ -48,8 +49,10 @@ export class AppComponent implements OnInit {
     private interesseService: InteresseService,
     private notificacaoService: NotificacaoService,
     private toastController: ToastController,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private temaService: TemaService
   ) {
+    this.temaService.iniciar();
     this.token = new TokenModel();
 
     addIcons({

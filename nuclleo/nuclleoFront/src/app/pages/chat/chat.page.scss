@@ -159,7 +159,7 @@
 }
 
 ion-footer {
-  background: rgba(12, 10, 19, 0.9);
+  background: var(--nc-toolbar-bg);
   border-top: 1px solid var(--nc-border);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);

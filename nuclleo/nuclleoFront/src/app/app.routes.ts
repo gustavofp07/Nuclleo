@@ -91,6 +91,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/conversas/conversas.page').then( m => m.ConversasPage)
   },
   {
+    path: 'configuracoes',
+    loadComponent: () => import('./pages/configuracoes/configuracoes.page').then(m => m.ConfiguracoesPage)
+  },
+  {
     path: 'nao-encontrado',
     loadComponent: () => import('./pages/nao-encontrado/nao-encontrado.page').then( m => m.NaoEncontradoPage)
   },

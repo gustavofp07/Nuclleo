@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Configurações</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <span class="eyebrow">Preferências</span>
+      <h1>Configurações</h1>
+      <p>Personalize sua experiência na Nuclleo.</p>
+    </div>
+
+    <p class="section-title">Aparência</p>
+
+    <section class="card">
+
+      <div class="opcao-linha">
+        <div class="opcao-linha__icone">
+          <ion-icon [name]="modoClaro ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+        </div>
+        <div class="opcao-linha__texto">
+          <h3>Modo claro</h3>
+          <p>{{ preferencia === 'sistema' ? 'Seguindo o tema do sistema' : 'Deixa o app com fundo claro' }}</p>
+        </div>
+        <ion-toggle [checked]="modoClaro" [disabled]="preferencia === 'sistema'"
+          (ionChange)="alternarModoClaro($event.detail.checked)" aria-label="Modo claro">
+        </ion-toggle>
+      </div>
+
+      <hr class="separator">
+
+      <p class="section-title">Tema</p>
+
+      <div class="temas">
+        <button type="button" *ngFor="let tema of temas" class="tema" [class.ativo]="preferencia === tema.valor"
+          (click)="escolherTema(tema.valor)">
+          <span class="tema__previa" [ngClass]="'tema__previa--' + tema.valor">
+            <span class="tema__barra"></span>
+            <span class="tema__linha"></span>
+            <span class="tema__linha tema__linha--curta"></span>
+          </span>
+          <span class="tema__nome">
+            <ion-icon [name]="tema.icone"></ion-icon>
+            {{ tema.nome }}
+          </span>
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+
+</ion-content>

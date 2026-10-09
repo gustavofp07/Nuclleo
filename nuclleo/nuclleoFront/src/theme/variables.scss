@@ -2,6 +2,8 @@
 
 $nc-bg: #0a0910;
 $nc-text: #eeecf6;
+$nc-bg-claro: #f6f4fb;
+$nc-text-claro: #1a1626;
 
 :root {
   --nc-bg: #0a0910;
@@ -11,6 +13,12 @@ $nc-text: #eeecf6;
   --nc-surface-3: #252036;
   --nc-border: rgba(255, 255, 255, 0.07);
   --nc-border-strong: rgba(255, 255, 255, 0.14);
+
+  --nc-color-scheme: dark;
+  --nc-toolbar-bg: rgba(12, 10, 19, 0.82);
+  --nc-grid-line: rgba(255, 255, 255, 0.022);
+  --nc-hover: rgba(255, 255, 255, 0.05);
+  --nc-card-sheen: rgba(255, 255, 255, 0.025);
 
   --nc-text: #eeecf6;
   --nc-text-muted: #a19cb8;
@@ -61,7 +69,7 @@ $nc-text: #eeecf6;
   --ion-text-color-rgb: 238, 236, 246;
 
 
-  --ion-toolbar-background: rgba(12, 10, 19, 0.82);
+  --ion-toolbar-background: var(--nc-toolbar-bg);
   --ion-toolbar-color: var(--nc-text);
   --ion-toolbar-border-color: var(--nc-border);
   --ion-item-background: transparent;
@@ -139,5 +147,73 @@ $nc-text: #eeecf6;
     --ion-color-step-#{$step}: #{color.mix($nc-text, $nc-bg, $step * 0.1%)};
     --ion-background-color-step-#{$step}: #{color.mix($nc-text, $nc-bg, $step * 0.1%)};
     --ion-text-color-step-#{$step}: #{color.mix($nc-bg, $nc-text, $step * 0.1%)};
+  }
+}
+
+html.tema-claro {
+  --nc-color-scheme: light;
+  --nc-bg: #f6f4fb;
+  --nc-bg-elevated: #ffffff;
+  --nc-surface: #ffffff;
+  --nc-surface-2: #f3f0fa;
+  --nc-surface-3: #e7e2f2;
+  --nc-border: rgba(26, 22, 38, 0.08);
+  --nc-border-strong: rgba(26, 22, 38, 0.16);
+  --nc-toolbar-bg: rgba(255, 255, 255, 0.85);
+  --nc-grid-line: rgba(26, 22, 38, 0.035);
+  --nc-hover: rgba(26, 22, 38, 0.04);
+  --nc-card-sheen: rgba(255, 255, 255, 0);
+
+  --nc-text: #1a1626;
+  --nc-text-muted: #5b5670;
+  --nc-text-subtle: #8a85a0;
+
+  --nc-purple-light: #7a2ff0;
+  --nc-orange-light: #e0480f;
+
+  --nc-success: #13a974;
+  --nc-success-rgb: 19, 169, 116;
+  --nc-danger: #e23552;
+  --nc-danger-rgb: 226, 53, 82;
+  --nc-warning: #e08a12;
+
+  --nc-gradient-text: linear-gradient(90deg, #f0520f 0%, #c43a98 50%, #7a2ff0 100%);
+
+  --nc-shadow: 0 12px 30px -18px rgba(60, 40, 110, 0.35);
+  --nc-shadow-lg: 0 24px 60px -24px rgba(60, 40, 110, 0.4);
+  --nc-glow: 0 0 0 1px rgba(var(--nc-purple-rgb), 0.35), 0 10px 26px -12px rgba(var(--nc-purple-rgb), 0.45);
+
+  --ion-background-color: #f6f4fb;
+  --ion-background-color-rgb: 246, 244, 251;
+  --ion-text-color: #1a1626;
+  --ion-text-color-rgb: 26, 22, 38;
+  --ion-overlay-background-color: #ffffff;
+
+  --ion-color-medium: #5b5670;
+  --ion-color-medium-rgb: 91, 86, 112;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #504c63;
+  --ion-color-medium-tint: #6b677e;
+
+  --ion-color-light: #f3f0fa;
+  --ion-color-light-rgb: 243, 240, 250;
+  --ion-color-light-contrast: #1a1626;
+  --ion-color-light-contrast-rgb: 26, 22, 38;
+  --ion-color-light-shade: #d6d3dc;
+  --ion-color-light-tint: #f4f2fb;
+
+  --ion-color-dark: #1a1626;
+  --ion-color-dark-rgb: 26, 22, 38;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #171321;
+  --ion-color-dark-tint: #312d3c;
+
+  @for $i from 1 through 19 {
+    $step: $i * 50;
+    --ion-color-step-#{$step}: #{color.mix($nc-text-claro, $nc-bg-claro, $step * 0.1%)};
+    --ion-background-color-step-#{$step}: #{color.mix($nc-text-claro, $nc-bg-claro, $step * 0.1%)};
+    --ion-text-color-step-#{$step}: #{color.mix($nc-bg-claro, $nc-text-claro, $step * 0.1%)};
   }
 }

@@ -13,7 +13,7 @@ html,
 body {
   background: var(--nc-bg);
   color: var(--nc-text);
-  color-scheme: dark;
+  color-scheme: var(--nc-color-scheme);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -70,8 +70,8 @@ ion-content {
   --background:
     radial-gradient(900px 420px at 110% -8%, rgba(var(--nc-purple-rgb), 0.16), transparent 60%),
     radial-gradient(700px 360px at -15% -4%, rgba(var(--nc-orange-rgb), 0.1), transparent 60%),
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(var(--nc-grid-line) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--nc-grid-line) 1px, transparent 1px) 0 0 / 32px 32px,
     var(--nc-bg);
   --color: var(--nc-text);
 }
@@ -97,7 +97,7 @@ html ion-header.header-ios::after {
 }
 
 ion-toolbar {
-  --background: rgba(12, 10, 19, 0.82);
+  --background: var(--nc-toolbar-bg);
   --color: var(--nc-text);
   --border-width: 0 !important;
   --min-height: 60px;
@@ -214,7 +214,7 @@ ion-button.button-outline {
   --border-width: 1px;
   --border-color: var(--nc-border-strong);
   --color: var(--nc-text);
-  --background-hover: rgba(255, 255, 255, 0.04);
+  --background-hover: var(--nc-hover);
 }
 
 ion-button.button-outline[color="danger"] {
@@ -400,7 +400,7 @@ ion-button.btn-danger {
 .card {
   position: relative;
   padding: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent), var(--nc-surface);
+  background: linear-gradient(180deg, var(--nc-card-sheen), transparent), var(--nc-surface);
   border: 1px solid var(--nc-border);
   border-radius: var(--nc-radius-lg);
   box-shadow: var(--nc-shadow);
@@ -670,7 +670,7 @@ ion-button.btn-danger {
 
 .badge--muted {
   color: var(--nc-text-muted);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--nc-hover);
   border-color: var(--nc-border-strong);
 }
 
@@ -1067,7 +1067,7 @@ img.avatar {
 
 .tabs button:hover:not(:disabled) {
   color: var(--nc-text);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--nc-hover);
 }
 
 .tabs button.ativo {

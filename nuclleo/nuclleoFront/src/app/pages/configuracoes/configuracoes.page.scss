@@ -1,0 +1,119 @@
+.opcao-linha {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.opcao-linha__icone {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 22px;
+  color: var(--nc-orange-light);
+  background: var(--nc-gradient-soft);
+  border: 1px solid var(--nc-border);
+  border-radius: var(--nc-radius);
+}
+
+.opcao-linha__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.opcao-linha__texto h3 {
+  margin: 0 0 2px;
+}
+
+.opcao-linha__texto p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.temas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tema {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 8px 12px;
+  font: inherit;
+  color: var(--nc-text-muted);
+  background: var(--nc-bg-elevated);
+  border: 1px solid var(--nc-border-strong);
+  border-radius: var(--nc-radius);
+  cursor: pointer;
+  transition: border-color var(--nc-transition), box-shadow var(--nc-transition), color var(--nc-transition);
+}
+
+.tema:hover {
+  border-color: rgba(var(--nc-purple-rgb), 0.5);
+}
+
+.tema.ativo {
+  color: var(--nc-text);
+  border-color: var(--nc-purple);
+  box-shadow: var(--nc-glow);
+}
+
+.tema__previa {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 64px;
+  padding: 8px;
+  overflow: hidden;
+  border-radius: var(--nc-radius-sm);
+}
+
+.tema__previa--escuro {
+  background: #0a0910;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tema__previa--claro {
+  background: #f6f4fb;
+  border: 1px solid rgba(26, 22, 38, 0.1);
+}
+
+.tema__previa--sistema {
+  background: linear-gradient(135deg, #f6f4fb 0 50%, #0a0910 50% 100%);
+  border: 1px solid var(--nc-border-strong);
+}
+
+.tema__barra {
+  width: 60%;
+  height: 8px;
+  border-radius: var(--nc-radius-pill);
+  background: var(--nc-gradient);
+}
+
+.tema__linha {
+  width: 90%;
+  height: 6px;
+  border-radius: var(--nc-radius-pill);
+  background: rgba(139, 61, 255, 0.35);
+}
+
+.tema__linha--curta {
+  width: 50%;
+}
+
+.tema__nome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tema__nome ion-icon {
+  font-size: 15px;
+}

@@ -69,7 +69,7 @@ ion-menu::part(container) {
   --inner-padding-end: 10px;
   --border-radius: var(--nc-radius-sm);
   --color: var(--nc-text-muted);
-  --background-hover: rgba(255, 255, 255, 0.05);
+  --background-hover: var(--nc-hover);
   margin-bottom: 2px;
   font-size: 14px;
   font-weight: 500;
