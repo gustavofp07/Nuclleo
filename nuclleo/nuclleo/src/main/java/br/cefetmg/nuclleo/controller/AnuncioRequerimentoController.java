@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,12 +52,13 @@ public class AnuncioRequerimentoController {
     @Operation(summary = "Atualizar anúncio de requerimento")
     public ResponseEntity<AnuncioRequerimento> alterar(
             @Valid @RequestPart("anuncio") AnuncioRequerimento anuncio,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
         if (anuncio.getCdAnuncio() == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        AnuncioRequerimento objAnuncio = anuncioRequerimentoService.alterar(anuncio, foto);
+        AnuncioRequerimento objAnuncio = anuncioRequerimentoService.alterar(anuncio, foto, authentication.getName());
         return ResponseEntity.ok(objAnuncio);
     }
 
@@ -69,19 +71,19 @@ public class AnuncioRequerimentoController {
 
     @GetMapping("/{cdAnuncio}")
     @Operation(summary = "Buscar anúncio de requerimento por ID")
-    public ResponseEntity<AnuncioRequerimento> getAnuncioById(@PathVariable Long cdAnuncio) {
+    public ResponseEntity<AnuncioRequerimento> getAnuncioById(@PathVariable Long cdAnuncio, Authentication authentication) {
         if (cdAnuncio == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        AnuncioRequerimento anuncio = anuncioRequerimentoService.buscarAnuncioPorId(cdAnuncio);
+        AnuncioRequerimento anuncio = anuncioRequerimentoService.buscarAnuncioPorId(cdAnuncio, authentication.getName());
         return ResponseEntity.ok(anuncio);
     }
 
     @GetMapping("/usuario/{cdUsuario}")
     @Operation(summary = "Listar anúncios de requerimento por usuário")
-    public ResponseEntity<List<AnuncioRequerimento>> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
-        List<AnuncioRequerimento> anuncios = anuncioRequerimentoService.buscarAnunciosPorUsuario(cdUsuario);
+    public ResponseEntity<List<AnuncioRequerimento>> getAnunciosByUsuario(@PathVariable Long cdUsuario, Authentication authentication) {
+        List<AnuncioRequerimento> anuncios = anuncioRequerimentoService.buscarAnunciosPorUsuario(cdUsuario, authentication.getName());
         return ResponseEntity.ok(anuncios);
     }
 

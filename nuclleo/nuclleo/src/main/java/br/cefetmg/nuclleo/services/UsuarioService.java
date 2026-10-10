@@ -3,7 +3,6 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +13,9 @@ import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
 import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
-import br.cefetmg.nuclleo.exception.DatabaseException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Perfil;
+import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
@@ -34,6 +33,9 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ModeracaoService moderacaoService;
+
     @Transactional
     public Usuario inserir(UsuarioRequestDTO dto, MultipartFile foto) {
         Usuario usuario = new Usuario();
@@ -41,7 +43,7 @@ public class UsuarioService {
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
-        usuario.setAtivo(true);
+        usuario.setStatus(Status.ATIVO);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
         usuario.setPerfil(Perfil.USUARIO);
 
@@ -124,18 +126,13 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    /**
+     * O próprio usuário exclui a conta (exclusão lógica: status EXCLUIDO,
+     * e-mail anonimizado e dados pessoais apagados). Veja ModeracaoService.
+     */
     @Transactional
-    public Usuario excluir(Long cdUsuario) {
-        Usuario usuario = usuarioRepository.findById(cdUsuario)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
-
-        try {
-            usuario.setAtivo(false);
-            usuarioRepository.save(usuario);
-            return usuario;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Não foi possível excluir o usuário.");
-        }
+    public Usuario excluir(Long cdUsuario, String emailSolicitante) {
+        return moderacaoService.excluirContaPeloProprioUsuario(cdUsuario, emailSolicitante);
     }
 
     @Transactional(readOnly = true)
@@ -193,7 +190,7 @@ public class UsuarioService {
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        usuario.setAtivo(true);
+        usuario.setStatus(Status.ATIVO);
         usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
         usuario.setPerfil(Perfil.ADMINISTRADOR);
 

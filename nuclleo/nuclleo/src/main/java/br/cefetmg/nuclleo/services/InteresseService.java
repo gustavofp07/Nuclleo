@@ -11,7 +11,9 @@ import br.cefetmg.nuclleo.dto.InteresseStatusDTO;
 import br.cefetmg.nuclleo.dto.TransacaoRequestDTO;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Avaliacao;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.model.Interesse;
+import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Transacao;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.AvaliacaoRepository;
@@ -56,8 +58,18 @@ public class InteresseService {
 
         Anuncio anuncio = anuncioService.buscarPorId(dto.getCdAnuncio());
 
-        if (usuario.getCdUsuario() == anuncio.getUsuarioCria().getCdUsuario()) {
+        // equals (e não ==): comparar Long com == só funciona para números pequenos
+        if (usuario.getCdUsuario().equals(anuncio.getUsuarioCria().getCdUsuario())) {
             throw new IllegalArgumentException("O usuário não pode demonstrar interesse em seu próprio anúncio.");
+        }
+
+        // Não é possível demonstrar interesse em anúncio suspenso/excluído ou de dono indisponível
+        if (anuncio.getStatus() != Status.ATIVO || anuncio.getUsuarioCria().getStatus() != Status.ATIVO) {
+            throw new BusinessException("Este anúncio não está disponível no momento.");
+        }
+
+        if (!usuario.isAtivo()) {
+            throw new BusinessException("Sua conta não está ativa.");
         }
 
         Interesse interesse = new Interesse();

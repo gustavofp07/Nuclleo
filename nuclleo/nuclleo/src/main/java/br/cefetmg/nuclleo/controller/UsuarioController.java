@@ -92,9 +92,10 @@ public class UsuarioController {
      */
 
     @DeleteMapping("/{cdUsuario}")
-    @Operation(summary = "Excluir usuário")
-    public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario) {
-        Usuario objUsuario = usuarioService.excluir(cdUsuario);
+    @Operation(summary = "Excluir a própria conta (exclusão lógica)")
+    public ResponseEntity<Usuario> excluir(@PathVariable Long cdUsuario, Authentication authentication) {
+        //manda o nome para colocar no email, o intuito é tirar email do sistema, assim vai esse email fica disponivel para depois cadastrar outro usuario
+        Usuario objUsuario = usuarioService.excluir(cdUsuario, authentication.getName());
         return ResponseEntity.ok(objUsuario);
     }
 

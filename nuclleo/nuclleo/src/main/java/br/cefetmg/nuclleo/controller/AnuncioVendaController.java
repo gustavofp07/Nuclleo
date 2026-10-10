@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,12 +53,13 @@ public class AnuncioVendaController {
     @Operation(summary = "Atualizar anúncio de venda")
     public ResponseEntity<AnuncioVenda> alterar(
             @Valid @RequestPart("anuncio") AnuncioVenda anuncio,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
         if (anuncio.getCdAnuncio() == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        AnuncioVenda objAnuncio = anuncioVendaService.alterar(anuncio, foto);
+        AnuncioVenda objAnuncio = anuncioVendaService.alterar(anuncio, foto, authentication.getName());
         return ResponseEntity.ok(objAnuncio);
     }
 
@@ -70,16 +72,16 @@ public class AnuncioVendaController {
 
     @GetMapping("/{cdAnuncio}")
     @Operation(summary = "Obter anúncio de venda por ID")
-    public ResponseEntity<AnuncioVenda> getAnuncioById(@PathVariable Long cdAnuncio) {
-        AnuncioVenda anuncio = anuncioVendaService.buscarAnuncioPorId(cdAnuncio);
+    public ResponseEntity<AnuncioVenda> getAnuncioById(@PathVariable Long cdAnuncio, Authentication authentication) {
+        AnuncioVenda anuncio = anuncioVendaService.buscarAnuncioPorId(cdAnuncio, authentication.getName());
         return ResponseEntity.ok(anuncio);
     }
 
     //retorna os anúncios de venda de um usuário
     @GetMapping("/usuario/{cdUsuario}")
     @Operation(summary = "Listar anúncios de venda por usuário")
-    public ResponseEntity<List<AnuncioVenda>> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
-        List<AnuncioVenda> anuncios = anuncioVendaService.buscarAnunciosPorUsuario(cdUsuario);
+    public ResponseEntity<List<AnuncioVenda>> getAnunciosByUsuario(@PathVariable Long cdUsuario, Authentication authentication) {
+        List<AnuncioVenda> anuncios = anuncioVendaService.buscarAnunciosPorUsuario(cdUsuario, authentication.getName());
         return ResponseEntity.ok(anuncios);
     }
 

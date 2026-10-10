@@ -1,7 +1,9 @@
 package br.cefetmg.nuclleo.model;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -31,11 +33,11 @@ public class Usuario {
 
     /*
      * @Id
-     * 
+     *
      * @GeneratedValue
-     * 
+     *
      * @UuidGenerator
-     * 
+     *
      * @Column(name = "cdUsuario", updatable = false)
      * private UUID cdUsuario; // existe o tipo UUID
      */
@@ -73,10 +75,34 @@ public class Usuario {
     @Column(name = "telefone")
     private String telefone;
 
-    @Column(name = "ativo")
-    private boolean ativo;
+    // READ_ONLY: o status aparece nas respostas, mas é ignorado se vier no corpo
+    // de uma requisição. Só o próprio sistema (moderação/exclusão) altera o status.
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false, columnDefinition = "varchar(20) default 'ATIVO' not null")
+    private Status status = Status.ATIVO;
+
+    // Preenchido somente quando status = SUSPENSO
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "suspenso_ate")
+    private LocalDateTime suspensoAte;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false)
     private Perfil perfil;
+
+    /**
+     * Indica se a conta pode ser usada agora.
+     * Uma suspensão cujo prazo já passou conta como ativa, mesmo que a rotina
+     * agendada ainda não tenha atualizado o status no banco.
+     */
+    @JsonIgnore
+    public boolean isAtivo() {
+        if (status == Status.ATIVO) {
+            return true;
+        }
+        return status == Status.SUSPENSO
+                && suspensoAte != null
+                && !suspensoAte.isAfter(LocalDateTime.now());
+    }
 }

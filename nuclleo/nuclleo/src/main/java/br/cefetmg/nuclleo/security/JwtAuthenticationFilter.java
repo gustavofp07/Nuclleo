@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,14 +34,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = recuperarToken(request);
 
         if (token != null && jwtService.validarToken(token)) {
-            String email = jwtService.getEmail(token);
-            UserDetails usuario = usuarioDetailsService.loadUserByUsername(email);
+            try {
+                String email = jwtService.getEmail(token);
+                UserDetails usuario = usuarioDetailsService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            usuario, null, usuario.getAuthorities());
+                // Conta suspensa ou excluída: o token deixa de valer na hora,
+                // mesmo que ainda não tenha expirado. Sem autenticação, a
+                // requisição termina em 401 e o front pode deslogar o usuário.
+                if (usuario.isEnabled()) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    usuario, null, usuario.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (UsernameNotFoundException e) {
+                // O e-mail do token não existe mais (ex.: conta excluída, e-mail
+                // anonimizado). Segue sem autenticar -> 401.
+            }
         }
 
         filterChain.doFilter(request, response);

@@ -40,10 +40,13 @@ public interface AnuncioComunidadeRepository extends JpaRepository<AnuncioComuni
     @Transactional
     AnuncioComunidade deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(Long cdAnuncio, Long cdComunidade);
 
+    // Só traz anúncios ATIVOS cujo dono também está ATIVO
     @Query("""
                 SELECT ac.anuncio
                 FROM AnuncioComunidade ac
                 WHERE ac.comunidade.cdComunidade = :cdComunidade
+                  AND ac.anuncio.status = br.cefetmg.nuclleo.model.Status.ATIVO
+                  AND ac.anuncio.usuarioCria.status = br.cefetmg.nuclleo.model.Status.ATIVO
             """)
     List<Anuncio> findAnunciosByComunidade(
             @Param("cdComunidade") Long cdComunidade);

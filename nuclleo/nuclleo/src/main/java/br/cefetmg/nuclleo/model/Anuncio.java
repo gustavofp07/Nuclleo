@@ -1,8 +1,10 @@
 package br.cefetmg.nuclleo.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,8 +45,17 @@ public class Anuncio {
     @Size(max = 250, message = "A descrição deve ter no máximo 250 caracteres")
     private String descricao;
 
-    @Column(name = "habilitado", columnDefinition = "boolean DEFAULT true")
-    private boolean habilitado = true;
+    // READ_ONLY: o status aparece nas respostas, mas é ignorado se vier no corpo
+    // da requisição (o dono não consegue tirar a própria suspensão pelo PUT).
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false, columnDefinition = "varchar(20) default 'ATIVO' not null")
+    private Status status = Status.ATIVO;
+
+    // Preenchido somente quando status = SUSPENSO
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "suspenso_ate")
+    private LocalDateTime suspensoAte;
 
     public enum TipoAnuncio {
         VENDA, REQUERIMENTO
@@ -60,6 +71,9 @@ public class Anuncio {
     @PrePersist
     protected void aoPersistir() {
         this.dtCriacao = new Date();
+        // todo anúncio novo nasce ativo
+        this.status = Status.ATIVO;
+        this.suspensoAte = null;
     }
 
     @ManyToOne

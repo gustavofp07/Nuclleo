@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,26 +57,26 @@ public class AnuncioController {
 
     @GetMapping("/{cdAnuncio}")     
     @Operation(summary = "Buscar anúncio por id")
-    public ResponseEntity<Anuncio> getAnuncioById(@PathVariable Long cdAnuncio) {
+    public ResponseEntity<Anuncio> getAnuncioById(@PathVariable Long cdAnuncio, Authentication authentication) {
         if (cdAnuncio == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        Anuncio objAnuncio = anuncioService.buscarPorId(cdAnuncio);
+        Anuncio objAnuncio = anuncioService.buscarVisivel(cdAnuncio, authentication.getName());
         return ResponseEntity.ok(objAnuncio);
     }
 
     @GetMapping("/usuario/{cdUsuario}")
     @Operation(summary = "Listar anúncios de um usuário")
-    public ResponseEntity<List<Anuncio>> getAnunciosByUsuario(@PathVariable Long cdUsuario) {
-        List<Anuncio> anuncios = anuncioService.listarAnunciosPorUsuario(cdUsuario);
+    public ResponseEntity<List<Anuncio>> getAnunciosByUsuario(@PathVariable Long cdUsuario, Authentication authentication) {
+        List<Anuncio> anuncios = anuncioService.listarAnunciosPorUsuario(cdUsuario, authentication.getName());
         return ResponseEntity.ok(anuncios);
     }
 
     @DeleteMapping("/{cdAnuncio}")
-    @Operation(summary = "Excluir anúncio")
-    public ResponseEntity<Anuncio> excluir(@PathVariable Long cdAnuncio) {
-        Anuncio anuncio = anuncioService.excluir(cdAnuncio);
+    @Operation(summary = "Excluir anúncio (exclusão lógica, somente o dono)")
+    public ResponseEntity<Anuncio> excluir(@PathVariable Long cdAnuncio, Authentication authentication) {
+        Anuncio anuncio = anuncioService.excluir(cdAnuncio, authentication.getName());
         return ResponseEntity.ok(anuncio);
     }
 }
