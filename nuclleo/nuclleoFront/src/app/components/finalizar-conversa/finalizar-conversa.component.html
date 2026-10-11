@@ -1,0 +1,69 @@
+<ion-modal [isOpen]="aberto" [canDismiss]="!enviandoFinalizacao" (didDismiss)="aoDispensar()"
+  class="modal-finalizar">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="fecharTelaFinalizar()" [disabled]="enviandoFinalizacao">
+            <ion-icon name="chevron-back-outline" slot="start"></ion-icon>
+            Voltar
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Finalizar conversa</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <div class="finalizar">
+
+        <section class="card">
+          <h3>Ocorreu uma transação?</h3>
+          <p class="text-muted finalizar__dica">Vocês chegaram a fechar negócio com {{ nomeOutroUsuario }}?</p>
+
+          <div class="tabs finalizar__opcoes">
+            <button type="button" [class.ativo]="ocorreuTransacao === true" (click)="ocorreuTransacao = true">
+              Sim
+            </button>
+            <button type="button" [class.ativo]="ocorreuTransacao === false" (click)="ocorreuTransacao = false">
+              Não
+            </button>
+          </div>
+
+          <ng-container *ngIf="ocorreuTransacao">
+            <label class="form-label" for="valorTransacao">Valor da transação</label>
+            <div class="form-field">
+              <span class="form-field__prefix">R$</span>
+              <input id="valorTransacao" type="text" placeholder="0,00" inputmode="decimal" [(ngModel)]="valorTransacao"
+                mask="separator.2" thousandSeparator="." decimalMarker="," [outputTransformFn]="paraNumero">
+            </div>
+            <p class="form-error" *ngIf="valorTransacao !== '' && !valorValido">
+              Informe um valor entre R$ 0,01 e R$ 1.000.000,00.
+            </p>
+          </ng-container>
+        </section>
+
+        <section class="card">
+          <h3>Avalie {{ nomeOutroUsuario }}</h3>
+
+          <div class="estrelas-avaliacao" role="radiogroup" aria-label="Nota de 1 a 5 estrelas">
+            <button type="button" *ngFor="let n of estrelas" class="estrela" [class.ativa]="n <= notaAvaliacao"
+              (click)="notaAvaliacao = n" [attr.aria-label]="n + (n === 1 ? ' estrela' : ' estrelas')"
+              [attr.aria-checked]="n === notaAvaliacao" role="radio">
+              <ion-icon [name]="n <= notaAvaliacao ? 'star' : 'star-outline'"></ion-icon>
+            </button>
+          </div>
+
+          <p class="estrelas-rotulo">{{ notaAvaliacao ? rotulosNota[notaAvaliacao] : 'Toque nas estrelas para avaliar' }}</p>
+        </section>
+
+        <ion-button expand="block" class="finalizar__confirmar" [disabled]="!podeConfirmarFinalizacao || enviandoFinalizacao"
+          (click)="confirmarFinalizacao()">
+          {{ enviandoFinalizacao ? 'Finalizando...' : 'Confirmar' }}
+        </ion-button>
+
+      </div>
+    </ion-content>
+
+  </ng-template>
+</ion-modal>

@@ -1,0 +1,52 @@
+.finalizar {
+  padding: 20px 16px 32px;
+}
+
+.finalizar__dica {
+  margin: -6px 0 14px;
+  font-size: 13px;
+}
+
+.finalizar__opcoes {
+  margin-bottom: 16px;
+}
+
+.finalizar .card > .tabs:last-child {
+  margin-bottom: 0;
+}
+
+.estrelas-avaliacao {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.estrela {
+  display: flex;
+  padding: 4px;
+  font-size: 36px;
+  color: var(--nc-text-muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: transform var(--nc-transition), color var(--nc-transition);
+}
+
+.estrela:active {
+  transform: scale(0.9);
+}
+
+.estrela.ativa {
+  color: var(--nc-orange);
+}
+
+.estrelas-rotulo {
+  margin: 8px 0 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--nc-text-muted);
+}
+
+.finalizar__confirmar {
+  margin-top: 20px;
+}

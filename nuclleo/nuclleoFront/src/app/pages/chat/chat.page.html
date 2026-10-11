@@ -18,7 +18,7 @@
     </div>
 
     <ion-buttons slot="end" *ngIf="souAnunciante && !chatFinalizado">
-      <ion-button (click)="abrirFinalizarConversa()" class="btn-finalizar">
+      <ion-button (click)="abrirTelaFinalizar()" class="btn-finalizar">
         <ion-icon name="flag-outline" slot="start"></ion-icon>
         <span class="btn-finalizar__texto">Finalizar</span>
       </ion-button>
@@ -85,3 +85,7 @@
 
   </div>
 </ion-footer>
+
+<app-finalizar-conversa [aberto]="modalFinalizarAberto" [cdInteresse]="cdInteresse"
+  [nomeOutroUsuario]="nomeOutroUsuario" (fechado)="modalFinalizarAberto = false"
+  (finalizada)="aoFinalizarConversa()"></app-finalizar-conversa>

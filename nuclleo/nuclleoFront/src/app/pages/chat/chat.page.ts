@@ -27,6 +27,7 @@ import { MensagemModel } from 'src/app/model/mensagem.model';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
+import { FinalizarConversaComponent } from 'src/app/components/finalizar-conversa/finalizar-conversa.component';
 
 interface MensagemView extends MensagemModel {
   enviando?: boolean;
@@ -48,7 +49,8 @@ interface MensagemView extends MensagemModel {
     IonFooter,
     IonInput,
     IonButton,
-    IonIcon
+    IonIcon,
+    FinalizarConversaComponent
   ]
 })
 export class ChatPage implements OnDestroy {
@@ -72,6 +74,9 @@ export class ChatPage implements OnDestroy {
   aguardandoAvaliacaoOutro: boolean = false;
 
   aguardandoAceite: boolean = false;
+
+  // Tela de finalizar conversa (componente compartilhado com a página de conversas)
+  modalFinalizarAberto: boolean = false;
 
   private avaliacaoSolicitada = false;
   private encerrando = false;
@@ -342,130 +347,13 @@ export class ChatPage implements OnDestroy {
     setTimeout(() => this.content?.scrollToBottom(200), 100);
   }
 
-  async abrirFinalizarConversa() {
-    const alert = await this.alertController.create({
-      header: 'Finalizar conversa',
-      message: 'Deseja mesmo finalizar a conversa?',
-      backdropDismiss: false,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Finalizar',
-          handler: () => this.abrirPerguntaTransacao()
-        }
-      ]
-    });
-
-    await alert.present();
+  abrirTelaFinalizar() {
+    this.modalFinalizarAberto = true;
   }
 
-  async abrirPerguntaTransacao() {
-    const alert = await this.alertController.create({
-      header: 'Finalizar conversa',
-      message: 'Ocorreu uma transação com este usuário?',
-      backdropDismiss: false,
-      buttons: [
-        {
-          text: 'Não',
-          handler: () => this.solicitarAvaliacaoInteressado(false)
-        },
-        {
-          text: 'Sim',
-          handler: () => this.solicitarValorTransacao()
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  /**
-   * Lê um valor digitado no formato brasileiro ("1.240,50", "1240,5", "150").
-   * Ponto é separador de milhar e vírgula é o decimal. Retorna NaN se for inválido.
-   */
-  converterValorBrasileiro(texto: string): number {
-    const limpo = String(texto ?? '').replace(/\s|R\$/g, '');
-
-    if (!/^\d{1,3}(\.\d{3})*(,\d{1,2})?$|^\d+(,\d{1,2})?$/.test(limpo)) {
-      return NaN;
-    }
-
-    return Number(limpo.replace(/\./g, '').replace(',', '.'));
-  }
-
-  async solicitarValorTransacao() {
-    const alert = await this.alertController.create({
-      header: 'Valor da transação',
-      backdropDismiss: false,
-      inputs: [
-        {
-          name: 'valor',
-          type: 'text',
-          placeholder: 'Ex: 1.240,00',
-          attributes: { inputmode: 'decimal' }
-        }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Continuar',
-          handler: (dados) => {
-            const valor = this.converterValorBrasileiro(dados.valor);
-            if (!valor || valor <= 0) {
-              this.exibirMensagem('Informe um valor válido.');
-              return false;
-            }
-            this.solicitarAvaliacaoInteressado(true, valor);
-            return true;
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  async solicitarAvaliacaoInteressado(ocorreuTransacao: boolean, valor?: number) {
-    const alert = await this.alertController.create({
-      header: `Avalie ${this.nomeOutroUsuario}`,
-      subHeader: 'De 1 a 5 estrelas',
-      backdropDismiss: false,
-      inputs: [1, 2, 3, 4, 5].map(n => ({
-        name: 'nota',
-        type: 'radio' as const,
-        label: '⭐'.repeat(n),
-        value: n,
-        checked: n === 5
-      })),
-      buttons: [
-        {
-          text: 'Confirmar',
-          handler: (nota) => this.finalizarConversa(ocorreuTransacao, valor, nota)
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  finalizarConversa(ocorreuTransacao: boolean, valor: number | undefined, nota: number) {
-    this.interesseService.finalizarConversa(this.cdInteresse, {
-      cdUsuarioSolicitante: this.token.cdUsuario,
-      ocorreuTransacao,
-      valor,
-      notaInteressado: nota
-    }).subscribe({
-      next: () => {
-        this.exibirMensagem('Conversa finalizada com sucesso.');
-        this.router.navigate(['/conversas']);
-      },
-      error: (err) => {
-        this.exibirMensagem(err?.error?.message || 'Erro ao finalizar a conversa.');
-      }
-    });
+  aoFinalizarConversa() {
+    this.modalFinalizarAberto = false;
+    this.router.navigate(['/conversas']);
   }
 
   async solicitarAvaliacaoAnunciante() {

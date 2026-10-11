@@ -18,12 +18,13 @@ import {
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline } from 'ionicons/icons';
+import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenService } from 'src/app/services/token.service';
 import { TokenModel } from 'src/app/model/token.model';
+import { FinalizarConversaComponent } from 'src/app/components/finalizar-conversa/finalizar-conversa.component';
 
 interface ConversaView {
   cdInteresse: number;
@@ -50,7 +51,8 @@ interface ConversaView {
     IonButtons,
     IonIcon,
     IonButton,
-    IonSpinner
+    IonSpinner,
+    FinalizarConversaComponent
   ]
 })
 export class ConversasPage {
@@ -58,6 +60,9 @@ export class ConversasPage {
 
   conversas: ConversaView[] = [];
   carregando: boolean = false;
+
+  // Conversa aberta na tela de finalizar (só o anunciante finaliza)
+  conversaFinalizando: ConversaView | null = null;
 
   get solicitacoes(): ConversaView[] {
     return this.conversas.filter(c => !c.aceito && !c.finalizado);
@@ -75,7 +80,7 @@ export class ConversasPage {
     private tokenService: TokenService
   ) {
     this.token = new TokenModel();
-    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline });
+    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline });
   }
 
   ionViewWillEnter() {
@@ -186,6 +191,22 @@ export class ConversasPage {
       },
       error: () => this.exibirMensagem('Erro ao recusar a conversa.')
     });
+  }
+
+  podeFinalizar(conversa: ConversaView): boolean {
+    return conversa.souAnunciante && conversa.aceito && !conversa.finalizado;
+  }
+
+  abrirFinalizar(conversa: ConversaView, event: Event) {
+    event.stopPropagation();
+    this.conversaFinalizando = conversa;
+  }
+
+  aoFinalizarConversa() {
+    if (this.conversaFinalizando) {
+      this.conversaFinalizando.finalizado = true;
+    }
+    this.conversaFinalizando = null;
   }
 
   async exibirMensagem(texto: string) {

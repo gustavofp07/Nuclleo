@@ -72,6 +72,13 @@
             </div>
 
             <span class="badge badge--muted" *ngIf="conversa.finalizado">Finalizada</span>
+
+            <ion-button *ngIf="podeFinalizar(conversa)" size="small" fill="outline" color="medium"
+              class="conversa__finalizar" (click)="abrirFinalizar(conversa, $event)">
+              <ion-icon name="flag-outline" slot="start"></ion-icon>
+              Finalizar
+            </ion-button>
+
             <ion-icon name="chevron-forward-outline" class="conversa__seta" *ngIf="!conversa.finalizado"></ion-icon>
 
           </div>
@@ -87,5 +94,9 @@
     </div>
 
   </div>
+
+  <app-finalizar-conversa [aberto]="!!conversaFinalizando" [cdInteresse]="conversaFinalizando?.cdInteresse!"
+    [nomeOutroUsuario]="conversaFinalizando?.nomeOutroUsuario ?? ''" (fechado)="conversaFinalizando = null"
+    (finalizada)="aoFinalizarConversa()"></app-finalizar-conversa>
 
 </ion-content>
