@@ -93,9 +93,8 @@ public class ModeracaoService {
 
         validarAlvoUsuario(usuario);
         validarDias(dto.getDias());
-        validarMotivoObrigatorio(dto.getMotivo());
 
-        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), usuario, null, admin, dto.getMotivo());
+        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), usuario, null, admin);
 
         LocalDateTime fim = LocalDateTime.now().plusDays(dto.getDias());
 
@@ -106,7 +105,7 @@ public class ModeracaoService {
         usuarioRepository.save(usuario);
 
         Sancao sancao = registrarSancao(TipoAlvo.USUARIO, usuario, null, TipoSancao.SUSPENSAO,
-                dto.getDias(), fim, dto.getMotivo(), admin, denuncia);
+                dto.getDias(), fim, admin, denuncia);
 
         notificar(usuario.getCdUsuario(), "CONTA_SUSPENSA",
                 "Sua conta foi suspensa até " + fim.format(FORMATO_DATA) + ".");
@@ -115,7 +114,7 @@ public class ModeracaoService {
     }
 
     @Transactional
-    public Sancao reativarUsuario(Long cdUsuario, AcaoModeracaoRequestDTO dto, String emailAdmin) {
+    public Sancao reativarUsuario(Long cdUsuario, String emailAdmin) {
         Usuario admin = buscarAdmin(emailAdmin);
         Usuario usuario = buscarUsuario(cdUsuario);
 
@@ -127,9 +126,8 @@ public class ModeracaoService {
         usuario.setSuspensoAte(null);
         usuarioRepository.save(usuario);
 
-        String motivo = dto != null ? dto.getMotivo() : null;
         return registrarSancao(TipoAlvo.USUARIO, usuario, null, TipoSancao.REATIVACAO,
-                null, null, motivo, admin, null);
+                null, null, admin, null);
     }
 
     @Transactional
@@ -138,14 +136,13 @@ public class ModeracaoService {
         Usuario usuario = buscarUsuario(cdUsuario);
 
         validarAlvoUsuario(usuario);
-        validarMotivoObrigatorio(dto != null ? dto.getMotivo() : null);
 
-        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), usuario, null, admin, dto.getMotivo());
+        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), usuario, null, admin);
 
         excluirConta(usuario);
 
         return registrarSancao(TipoAlvo.USUARIO, usuario, null, TipoSancao.EXCLUSAO,
-                null, null, dto.getMotivo(), admin, denuncia);
+                null, null, admin, denuncia);
     }
 
     /** O próprio usuário excluindo a conta dele. */
@@ -207,10 +204,9 @@ public class ModeracaoService {
             throw new BusinessException("Este anúncio já foi excluído.");
         }
         validarDias(dto.getDias());
-        validarMotivoObrigatorio(dto.getMotivo());
 
         Usuario dono = anuncio.getUsuarioCria();
-        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), dono, anuncio, admin, dto.getMotivo());
+        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), dono, anuncio, admin);
 
         LocalDateTime fim = LocalDateTime.now().plusDays(dto.getDias());
 
@@ -221,7 +217,7 @@ public class ModeracaoService {
         anuncioRepository.save(anuncio);
 
         Sancao sancao = registrarSancao(TipoAlvo.ANUNCIO, dono, anuncio, TipoSancao.SUSPENSAO,
-                dto.getDias(), fim, dto.getMotivo(), admin, denuncia);
+                dto.getDias(), fim, admin, denuncia);
 
         notificar(dono.getCdUsuario(), "ANUNCIO_SUSPENSO",
                 "Seu anúncio \"" + anuncio.getNmAnuncio() + "\" foi suspenso até " + fim.format(FORMATO_DATA) + ".");
@@ -230,7 +226,7 @@ public class ModeracaoService {
     }
 
     @Transactional
-    public Sancao reativarAnuncio(Long cdAnuncio, AcaoModeracaoRequestDTO dto, String emailAdmin) {
+    public Sancao reativarAnuncio(Long cdAnuncio, String emailAdmin) {
         Usuario admin = buscarAdmin(emailAdmin);
         Anuncio anuncio = buscarAnuncio(cdAnuncio);
 
@@ -242,9 +238,8 @@ public class ModeracaoService {
         anuncio.setSuspensoAte(null);
         anuncioRepository.save(anuncio);
 
-        String motivo = dto != null ? dto.getMotivo() : null;
         return registrarSancao(TipoAlvo.ANUNCIO, anuncio.getUsuarioCria(), anuncio, TipoSancao.REATIVACAO,
-                null, null, motivo, admin, null);
+                null, null, admin, null);
     }
 
     @Transactional
@@ -255,15 +250,14 @@ public class ModeracaoService {
         if (anuncio.getStatus() == Status.EXCLUIDO) {
             throw new BusinessException("Este anúncio já foi excluído.");
         }
-        validarMotivoObrigatorio(dto != null ? dto.getMotivo() : null);
 
         Usuario dono = anuncio.getUsuarioCria();
-        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), dono, anuncio, admin, dto.getMotivo());
+        Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), dono, anuncio, admin);
 
         excluirAnuncioInterno(anuncio);
 
         Sancao sancao = registrarSancao(TipoAlvo.ANUNCIO, dono, anuncio, TipoSancao.EXCLUSAO,
-                null, null, dto.getMotivo(), admin, denuncia);
+                null, null, admin, denuncia);
 
         notificar(dono.getCdUsuario(), "ANUNCIO_EXCLUIDO",
                 "Seu anúncio \"" + anuncio.getNmAnuncio() + "\" foi removido pela moderação.");
@@ -412,18 +406,12 @@ public class ModeracaoService {
         }
     }
 
-    private void validarMotivoObrigatorio(String motivo) {
-        if (motivo == null || motivo.isBlank()) {
-            throw new BusinessException("Informe o motivo.");
-        }
-    }
-
     /**
      * Se uma denúncia foi informada, confere se ela é sobre o mesmo alvo e,
      * se ainda estiver pendente, marca como PROCEDENTE.
      */
     private Denuncia marcarDenunciaProcedente(Long cdDenuncia, Usuario usuarioAlvo, Anuncio anuncioAlvo,
-            Usuario admin, String observacao) {
+            Usuario admin) {
         if (cdDenuncia == null) {
             return null;
         }
@@ -443,7 +431,6 @@ public class ModeracaoService {
         if (denuncia.getStatus() == StatusDenuncia.PENDENTE) {
             denuncia.setStatus(StatusDenuncia.PROCEDENTE);
             denuncia.setAdminResponsavel(admin);
-            denuncia.setObservacaoAdmin(observacao);
             denuncia.setDtAnalise(LocalDateTime.now());
             denunciaRepository.save(denuncia);
         }
@@ -452,7 +439,7 @@ public class ModeracaoService {
     }
 
     private Sancao registrarSancao(TipoAlvo tipoAlvo, Usuario usuario, Anuncio anuncio, TipoSancao tipo,
-            Integer dias, LocalDateTime dtFim, String motivo, Usuario admin, Denuncia denuncia) {
+            Integer dias, LocalDateTime dtFim, Usuario admin, Denuncia denuncia) {
         Sancao sancao = new Sancao();
         sancao.setTipoAlvo(tipoAlvo);
         sancao.setUsuario(usuario);
@@ -461,7 +448,6 @@ public class ModeracaoService {
         sancao.setDias(dias);
         sancao.setDtInicio(LocalDateTime.now());
         sancao.setDtFim(dtFim);
-        sancao.setMotivo(motivo);
         sancao.setAdmin(admin);
         sancao.setDenuncia(denuncia);
         return sancaoRepository.save(sancao);

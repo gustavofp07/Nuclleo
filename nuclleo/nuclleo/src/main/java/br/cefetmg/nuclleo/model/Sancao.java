@@ -64,9 +64,6 @@ public class Sancao {
     @Column(name = "dt_fim")
     private LocalDateTime dtFim;
 
-    @Column(name = "motivo", length = 500)
-    private String motivo;
-
     @ManyToOne
     @JsonIgnoreProperties({ "senha" })
     @JoinColumn(name = "cd_admin", nullable = false)

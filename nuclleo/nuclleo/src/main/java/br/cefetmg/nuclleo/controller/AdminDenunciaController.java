@@ -1,6 +1,7 @@
 package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.dto.AnalisarDenunciaRequestDTO;
 import br.cefetmg.nuclleo.model.Denuncia;
+import br.cefetmg.nuclleo.dto.DenunciaResponseDTO;
 import br.cefetmg.nuclleo.model.MotivoDenuncia;
 import br.cefetmg.nuclleo.model.StatusDenuncia;
 import br.cefetmg.nuclleo.model.TipoAlvo;
@@ -36,10 +38,11 @@ public class AdminDenunciaController {
     @Autowired
     private DenunciaService denunciaService;
 
-    // Ex.: GET /api/v1/admin/denuncias?status=PENDENTE&motivo=GOLPE_FRAUDE&tipoAlvo=ANUNCIO&page=0&size=20
+    // Ex.: GET
+    // /api/v1/admin/denuncias?status=PENDENTE&motivo=GOLPE_FRAUDE&tipoAlvo=ANUNCIO&page=0&size=20
     @GetMapping("/denuncias")
     @Operation(summary = "Listar denúncias (filtros opcionais, paginado, mais recentes primeiro)")
-    public ResponseEntity<Page<Denuncia>> listar(
+    public ResponseEntity<Page<DenunciaResponseDTO>> listar(
             @RequestParam(required = false) StatusDenuncia status,
             @RequestParam(required = false) MotivoDenuncia motivo,
             @RequestParam(required = false) TipoAlvo tipoAlvo,
@@ -49,33 +52,45 @@ public class AdminDenunciaController {
         int tamanho = Math.min(Math.max(size, 1), 100);
         Page<Denuncia> denuncias = denunciaService.listar(status, motivo, tipoAlvo,
                 PageRequest.of(Math.max(page, 0), tamanho));
-        return ResponseEntity.ok(denuncias);
+
+        Page<DenunciaResponseDTO> denunciasResponse = denuncias.map(DenunciaResponseDTO::new);
+        return ResponseEntity.ok(denunciasResponse);
     }
 
     @GetMapping("/denuncias/{cdDenuncia}")
     @Operation(summary = "Buscar denúncia por id")
-    public ResponseEntity<Denuncia> buscarPorId(@PathVariable Long cdDenuncia) {
-        return ResponseEntity.ok(denunciaService.buscarPorId(cdDenuncia));
+    public ResponseEntity<DenunciaResponseDTO> buscarPorId(@PathVariable Long cdDenuncia) {
+        DenunciaResponseDTO dtoResponse = new DenunciaResponseDTO(denunciaService.buscarPorId(cdDenuncia));
+        return ResponseEntity.ok(dtoResponse);
     }
 
+    // mudar aqui. Fazer um dto de denuncia response
     @GetMapping("/usuarios/{cdUsuario}/denuncias")
     @Operation(summary = "Listar todas as denúncias recebidas por um usuário (inclui as dos anúncios dele)")
-    public ResponseEntity<List<Denuncia>> listarPorUsuario(@PathVariable Long cdUsuario) {
-        return ResponseEntity.ok(denunciaService.listarPorUsuarioDenunciado(cdUsuario));
+    public ResponseEntity<List<DenunciaResponseDTO>> listarPorUsuario(@PathVariable Long cdUsuario) {
+        List<Denuncia> denuncias = denunciaService.listarPorUsuarioDenunciado(cdUsuario);
+        List<DenunciaResponseDTO> dtoResponse = denuncias.stream().map(DenunciaResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @GetMapping("/anuncios/{cdAnuncio}/denuncias")
     @Operation(summary = "Listar denúncias de um anúncio")
-    public ResponseEntity<List<Denuncia>> listarPorAnuncio(@PathVariable Long cdAnuncio) {
-        return ResponseEntity.ok(denunciaService.listarPorAnuncio(cdAnuncio));
+    public ResponseEntity<List<DenunciaResponseDTO>> listarPorAnuncio(@PathVariable Long cdAnuncio) {
+        List<Denuncia> denuncias = denunciaService.listarPorAnuncio(cdAnuncio);
+        List<DenunciaResponseDTO> dtoResponse = denuncias.stream().map(DenunciaResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoResponse);
     }
 
+    // ver a necessidade disso aqui
     @PutMapping("/denuncias/{cdDenuncia}/analisar")
     @Operation(summary = "Marcar denúncia como PROCEDENTE ou IMPROCEDENTE")
-    public ResponseEntity<Denuncia> analisar(@PathVariable Long cdDenuncia,
-            @Valid @RequestBody AnalisarDenunciaRequestDTO dto,
-            Authentication authentication) {
-        return ResponseEntity.ok(denunciaService.analisar(cdDenuncia, dto, authentication.getName()));
+    public ResponseEntity<DenunciaResponseDTO> analisar(@PathVariable Long cdDenuncia,
+            @Valid @RequestBody AnalisarDenunciaRequestDTO dto, Authentication authentication) {
+        Denuncia denuncia = denunciaService.analisar(cdDenuncia, dto, authentication.getName());
+        DenunciaResponseDTO dtoResponse = new DenunciaResponseDTO(denuncia);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @DeleteMapping("/denuncias/{cdDenuncia}")

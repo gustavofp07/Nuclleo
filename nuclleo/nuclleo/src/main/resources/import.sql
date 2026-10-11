@@ -9,7 +9,9 @@ TRUNCATE TABLE
     interesse,
     mensagem,
     transacao,
-    avaliacao
+    avaliacao,
+    tb_denuncia,
+    tb_sancao
 RESTART IDENTITY CASCADE;
 
 
@@ -18,7 +20,7 @@ RESTART IDENTITY CASCADE;
 -- Senha inicial de todos: 123456
 -- =============================================
 INSERT INTO tb_usuario
-(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, ativo, perfil)
+(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, status, perfil)
 VALUES
 (
     'Gustavo Ferreira',
@@ -31,7 +33,7 @@ VALUES
     'Timóteo',
     'MG',
     '(31) 99999-1111',
-    TRUE,
+    'ATIVO',
     'USUARIO'
 ),
 (
@@ -45,7 +47,7 @@ VALUES
     'Antônio Dias',
     'MG',
     '(31) 99999-2222',
-    TRUE,
+    'ATIVO',
     'USUARIO'
 ),
 (
@@ -59,7 +61,7 @@ VALUES
     'Nova Era',
     'MG',
     '(31) 99999-3333',
-    TRUE,
+    'ATIVO',
     'USUARIO'
 ),
 (
@@ -73,19 +75,19 @@ VALUES
     'Belo Horizonte',
     'MG',
     '(31) 99999-4444',
-    TRUE,
+    'ATIVO',
     'USUARIO'
 );
 
 INSERT INTO tb_usuario
-(nm_usuario, email, senha, dt_entrada, ativo, perfil)
+(nm_usuario, email, senha, dt_entrada, status, perfil)
 VALUES
 (
     'Gustavo',
     'gt@gmail.com',
     '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     CURRENT_DATE,
-    TRUE,
+    'ATIVO',
     'ADMINISTRADOR'
 ),
 (
@@ -93,7 +95,7 @@ VALUES
     'manel@gmail.com',
     '$2a$10$WzIFeoOrVt3yaqoBQy1nKeOmaWcKNvGn0sdvY68K7o6ncQeOnXJ7S',
     CURRENT_DATE,
-    TRUE,
+    'ATIVO',
     'ADMINISTRADOR'
 );
 
@@ -239,103 +241,103 @@ VALUES
 -- ANÚNCIOS
 -- =============================================
 INSERT INTO tb_anuncio
-(nm_anuncio, descricao, habilitado, tipo_anuncio, cd_usuario_cria)
+(nm_anuncio, descricao, status, tipo_anuncio, cd_usuario_cria)
 VALUES
 (
     'Notebook Dell Inspiron 15',
     'Notebook Dell Inspiron 15 com processador Intel Core i5, 8 GB de RAM e SSD de 256 GB. Equipamento em bom estado de conservação.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     1
 ),
 (
     'Procuro Headset Gamer com Microfone',
     'Procuro headset gamer com microfone em bom estado, de preferência das marcas HyperX, Logitech ou Redragon.',
-    TRUE,
+    'ATIVO',
     'REQUERIMENTO',
     2
 ),
 (
     'iPhone 13 128 GB Preto',
     'iPhone 13 com 128 GB de armazenamento, cor preta, aparelho conservado e funcionando normalmente.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     3
 ),
 (
     'Procuro Livro Clean Code',
     'Tenho interesse em comprar o livro Clean Code, de Robert C. Martin, novo ou usado em bom estado.',
-    TRUE,
+    'ATIVO',
     'REQUERIMENTO',
     4
 ),
 (
     'Monitor LG 24 Polegadas Full HD',
     'Monitor LG de 24 polegadas, resolução Full HD, entrada HDMI e tela sem riscos.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     2
 ),
 (
     'Teclado Mecânico RGB ABNT2',
     'Teclado mecânico padrão ABNT2, iluminação RGB e switches azuis. Funcionando perfeitamente.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     1
 ),
 (
     'Mouse Logitech G502',
     'Mouse gamer Logitech G502 com fio, sensor de alta precisão e botões programáveis.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     3
 ),
 (
     'SSD Kingston 480 GB SATA',
     'SSD Kingston de 480 GB com conexão SATA. Produto funcionando normalmente e sem erros.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     4
 ),
 (
     'Procuro GTX 1060 ou RX 580',
     'Procuro placa de vídeo GTX 1060 ou RX 580 em bom estado e com funcionamento comprovado.',
-    TRUE,
+    'ATIVO',
     'REQUERIMENTO',
     1
 ),
 (
     'Fone Sony WH-1000XM4',
     'Fone de ouvido Sony WH-1000XM4 com cancelamento de ruído. Pouco utilizado e em ótimo estado.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     2
 ),
 (
     'Procuro Notebook para Estudos',
     'Procuro notebook para estudos e programação, com pelo menos processador Intel Core i5 ou equivalente e 8 GB de RAM.',
-    TRUE,
+    'ATIVO',
     'REQUERIMENTO',
     3
 ),
 (
     'HD Externo Seagate 1 TB',
     'HD externo Seagate de 1 TB, USB 3.0, funcionando normalmente e sem setores defeituosos.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     4
 ),
 (
     'Cadeira Gamer Reclinável',
     'Cadeira gamer preta e vermelha, reclinável, com regulagem de altura e em bom estado de conservação.',
-    TRUE,
+    'ATIVO',
     'VENDA',
     1
 ),
 (
     'Procuro Mesa para Computador',
     'Procuro mesa para computador com pelo menos 1,20 m de largura e espaço suficiente para monitor e gabinete.',
-    TRUE,
+    'ATIVO',
     'REQUERIMENTO',
     2
 );

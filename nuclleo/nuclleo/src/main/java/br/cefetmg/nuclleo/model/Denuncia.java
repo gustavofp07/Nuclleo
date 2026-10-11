@@ -76,9 +76,6 @@ public class Denuncia {
     @JoinColumn(name = "cd_admin_responsavel")
     private Usuario adminResponsavel;
 
-    @Column(name = "observacao_admin", length = 500)
-    private String observacaoAdmin;
-
     @Column(name = "dt_analise")
     private LocalDateTime dtAnalise;
 

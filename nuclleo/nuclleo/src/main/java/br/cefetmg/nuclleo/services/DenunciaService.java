@@ -94,6 +94,7 @@ public class DenunciaService {
 
         denuncia.setAnuncio(anuncio);
         denuncia.setUsuarioDenunciado(dono);
+        
         denuncia.setSnapshotAnuncio("Nome: " + anuncio.getNmAnuncio()
                 + "\nDescrição: " + (anuncio.getDescricao() != null ? anuncio.getDescricao() : ""));
     }
@@ -164,7 +165,6 @@ public class DenunciaService {
         }
 
         denuncia.setStatus(dto.getStatus());
-        denuncia.setObservacaoAdmin(dto.getObservacao());
         denuncia.setAdminResponsavel(admin);
         denuncia.setDtAnalise(LocalDateTime.now());
 

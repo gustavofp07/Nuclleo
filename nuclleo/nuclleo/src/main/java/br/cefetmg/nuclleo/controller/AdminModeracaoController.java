@@ -1,6 +1,7 @@
 package br.cefetmg.nuclleo.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.dto.AcaoModeracaoRequestDTO;
 import br.cefetmg.nuclleo.dto.SuspensaoRequestDTO;
+import br.cefetmg.nuclleo.dto.SancaoResponseDTO;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Sancao;
 import br.cefetmg.nuclleo.services.AnuncioService;
@@ -43,32 +45,38 @@ public class AdminModeracaoController {
 
     @PutMapping("/usuarios/{cdUsuario}/suspender")
     @Operation(summary = "Suspender conta (1 a 7 dias)")
-    public ResponseEntity<Sancao> suspenderUsuario(@PathVariable Long cdUsuario,
+    public ResponseEntity<SancaoResponseDTO> suspenderUsuario(@PathVariable Long cdUsuario,
             @Valid @RequestBody SuspensaoRequestDTO dto,
             Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.suspenderUsuario(cdUsuario, dto, authentication.getName()));
+                Sancao sancao = moderacaoService.suspenderUsuario(cdUsuario, dto, authentication.getName());
+                SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @PutMapping("/usuarios/{cdUsuario}/reativar")
     @Operation(summary = "Reativar conta suspensa antes do prazo")
-    public ResponseEntity<Sancao> reativarUsuario(@PathVariable Long cdUsuario,
-            @Valid @RequestBody(required = false) AcaoModeracaoRequestDTO dto,
-            Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.reativarUsuario(cdUsuario, dto, authentication.getName()));
+    public ResponseEntity<SancaoResponseDTO> reativarUsuario(@PathVariable Long cdUsuario, Authentication authentication) {
+        Sancao sancao = moderacaoService.reativarUsuario(cdUsuario, authentication.getName());
+        SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @PutMapping("/usuarios/{cdUsuario}/excluir")
-    @Operation(summary = "Excluir conta (exclusão lógica definitiva; motivo obrigatório)")
-    public ResponseEntity<Sancao> excluirUsuario(@PathVariable Long cdUsuario,
+    @Operation(summary = "Excluir conta (exclusão lógica definitiva)")
+    public ResponseEntity<SancaoResponseDTO> excluirUsuario(@PathVariable Long cdUsuario,
             @Valid @RequestBody AcaoModeracaoRequestDTO dto,
             Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.excluirUsuarioPeloAdmin(cdUsuario, dto, authentication.getName()));
+        Sancao sancao = moderacaoService.excluirUsuarioPeloAdmin(cdUsuario, dto, authentication.getName());
+        SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @GetMapping("/usuarios/{cdUsuario}/sancoes")
     @Operation(summary = "Histórico de sanções de um usuário (inclui as dos anúncios dele)")
-    public ResponseEntity<List<Sancao>> listarSancoes(@PathVariable Long cdUsuario) {
-        return ResponseEntity.ok(moderacaoService.listarSancoesDoUsuario(cdUsuario));
+    public ResponseEntity<List<SancaoResponseDTO>> listarSancoes(@PathVariable Long cdUsuario) {
+        List<Sancao> sancoes = moderacaoService.listarSancoesDoUsuario(cdUsuario);
+        List<SancaoResponseDTO> dtoResponse = sancoes.stream().map(SancaoResponseDTO::new).collect(Collectors.toList());
+        return ResponseEntity.ok(dtoResponse);
     }
 
     // ===================== ANÚNCIOS =====================
@@ -81,25 +89,29 @@ public class AdminModeracaoController {
 
     @PutMapping("/anuncios/{cdAnuncio}/suspender")
     @Operation(summary = "Suspender anúncio (1 a 7 dias)")
-    public ResponseEntity<Sancao> suspenderAnuncio(@PathVariable Long cdAnuncio,
+    public ResponseEntity<SancaoResponseDTO> suspenderAnuncio(@PathVariable Long cdAnuncio,
             @Valid @RequestBody SuspensaoRequestDTO dto,
             Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.suspenderAnuncio(cdAnuncio, dto, authentication.getName()));
+        Sancao sancao = moderacaoService.suspenderAnuncio(cdAnuncio, dto, authentication.getName());
+        SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @PutMapping("/anuncios/{cdAnuncio}/reativar")
     @Operation(summary = "Reativar anúncio suspenso antes do prazo")
-    public ResponseEntity<Sancao> reativarAnuncio(@PathVariable Long cdAnuncio,
-            @Valid @RequestBody(required = false) AcaoModeracaoRequestDTO dto,
-            Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.reativarAnuncio(cdAnuncio, dto, authentication.getName()));
+    public ResponseEntity<SancaoResponseDTO> reativarAnuncio(@PathVariable Long cdAnuncio, Authentication authentication) {
+        Sancao sancao = moderacaoService.reativarAnuncio(cdAnuncio, authentication.getName());
+        SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 
     @PutMapping("/anuncios/{cdAnuncio}/excluir")
-    @Operation(summary = "Excluir anúncio (exclusão lógica definitiva; motivo obrigatório)")
-    public ResponseEntity<Sancao> excluirAnuncio(@PathVariable Long cdAnuncio,
+    @Operation(summary = "Excluir anúncio (exclusão lógica definitiva)")
+    public ResponseEntity<SancaoResponseDTO> excluirAnuncio(@PathVariable Long cdAnuncio,
             @Valid @RequestBody AcaoModeracaoRequestDTO dto,
             Authentication authentication) {
-        return ResponseEntity.ok(moderacaoService.excluirAnuncioPeloAdmin(cdAnuncio, dto, authentication.getName()));
+        Sancao sancao = moderacaoService.excluirAnuncioPeloAdmin(cdAnuncio, dto, authentication.getName());
+        SancaoResponseDTO dtoResponse = new SancaoResponseDTO(sancao);
+        return ResponseEntity.ok(dtoResponse);
     }
 }
