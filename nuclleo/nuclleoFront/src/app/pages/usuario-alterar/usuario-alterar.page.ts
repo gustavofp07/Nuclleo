@@ -38,6 +38,11 @@ import { TokenModel } from 'src/app/model/token.model';
 export class UsuarioAlterarPage {
   token?: TokenModel;
 
+  // O admin não negocia: CPF, CEP e telefone não se aplicam a ele
+  get ehAdmin(): boolean {
+    return this.token?.perfil === 'ADMINISTRADOR';
+  }
+
   usuario: UsuarioModel;
   formUsuario: FormGroup;
   previewFoto: string | ArrayBuffer | null = null;

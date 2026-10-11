@@ -130,7 +130,7 @@
           <p class="section-title">Histórico de sanções</p>
           <div class="historico__item" *ngFor="let sancao of sancoes">
             <span>{{ rotuloSancao(sancao) }}</span>
-            <span class="text-muted">{{ sancao.dtInicio | date: 'dd/MM/yyyy' }}</span>
+            <span class="text-muted">{{ sancao.dtInicio | date: 'dd/MM/yyyy HH:mm' }}</span>
           </div>
         </div>
       </section>

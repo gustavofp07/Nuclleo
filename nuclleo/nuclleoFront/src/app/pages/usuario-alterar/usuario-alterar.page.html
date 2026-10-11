@@ -66,6 +66,8 @@
         O nome deve conter apenas letras.
       </p>
 
+      <ng-container *ngIf="!ehAdmin">
+
       <div class="form-grid form-grid--2">
 
         <div>
@@ -106,6 +108,8 @@
       <p class="form-error" *ngIf="formUsuario.get('telefone')?.touched && formUsuario.get('telefone')?.hasError('pattern')">
         Informe um celular completo.
       </p>
+
+      </ng-container>
 
       <label class="form-label">Senha</label>
       <ion-button expand="block" fill="outline" type="button" [disabled]="alterandoSenha || senhaAlterada"
