@@ -79,7 +79,21 @@ public class AdminModeracaoController {
         return ResponseEntity.ok(dtoResponse);
     }
 
+    @GetMapping("/sancoes/minhas")
+    @Operation(summary = "Sanções aplicadas pelo administrador logado")
+    public ResponseEntity<List<SancaoResponseDTO>> listarSancoesAplicadas(Authentication authentication) {
+        List<SancaoResponseDTO> dtoResponse = moderacaoService.listarSancoesAplicadas(authentication.getName())
+                .stream().map(SancaoResponseDTO::new).collect(Collectors.toList());
+        return ResponseEntity.ok(dtoResponse);
+    }
+
     // ===================== ANÚNCIOS =====================
+
+    @GetMapping("/usuarios/{cdUsuario}/anuncios")
+    @Operation(summary = "Anúncios de um usuário (qualquer status, menos EXCLUIDO)")
+    public ResponseEntity<List<Anuncio>> listarAnunciosDoUsuario(@PathVariable Long cdUsuario) {
+        return ResponseEntity.ok(anuncioService.listarTodosDoUsuario(cdUsuario));
+    }
 
     @GetMapping("/anuncios/{cdAnuncio}")
     @Operation(summary = "Buscar anúncio por id (qualquer status)")

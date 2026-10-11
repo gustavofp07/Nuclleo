@@ -78,8 +78,10 @@ public class AutenticacaoService {
             return "Email e/ou senha inválidos";
         }
 
-        if (usuario.getStatus() == Status.SUSPENSO && usuario.getSuspensoAte() != null) {
-            return "Sua conta está suspensa até " + usuario.getSuspensoAte().format(FORMATO_DATA) + ".";
+        if (usuario.getStatus() == Status.SUSPENSO) {
+            return usuario.getSuspensoAte() == null
+                    ? "Sua conta foi suspensa permanentemente."
+                    : "Sua conta está suspensa até " + usuario.getSuspensoAte().format(FORMATO_DATA) + ".";
         }
 
         return "Email e/ou senha inválidos";

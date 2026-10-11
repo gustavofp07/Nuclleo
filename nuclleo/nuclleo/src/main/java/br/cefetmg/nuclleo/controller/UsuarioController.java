@@ -52,13 +52,14 @@ public class UsuarioController {
     @Operation(summary = "Atualizar usuário")
     public ResponseEntity<Usuario> alterar(
             @Valid @RequestPart("usuario") Usuario dto,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
 
         if (dto.getCdUsuario() == null) {
             throw new BadRequestException("Id do usuário é obrigatório.");
         }
 
-        return ResponseEntity.ok(usuarioService.alterar(dto, foto));
+        return ResponseEntity.ok(usuarioService.alterar(dto, foto, authentication.getName()));
     }
 
     @PutMapping("/senha")

@@ -76,6 +76,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/usuarios/{cdUsuario}")
                 .hasAnyAuthority("USUARIO", "ADMINISTRADOR")
 
+                // Editar o próprio perfil e a própria senha — USUARIO e ADMINISTRADOR
+                .requestMatchers(HttpMethod.PUT, "/api/v1/usuarios", "/api/v1/usuarios/senha")
+                .hasAnyAuthority("USUARIO", "ADMINISTRADOR")
+
+                // Reputação exibida no perfil — o admin também vê ao abrir um perfil
+                .requestMatchers(HttpMethod.GET, "/avaliacoes/media/{cdUsuario}", "/avaliacoes/total/{cdUsuario}")
+                .hasAnyAuthority("USUARIO", "ADMINISTRADOR")
+
                 // Tudo mais — apenas USUARIO
                 .anyRequest().hasAuthority("USUARIO"))
 

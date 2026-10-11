@@ -25,7 +25,7 @@ import {
 
 import { AdminService } from 'src/app/services/admin.service';
 import { TokenService } from 'src/app/services/token.service';
-import { DenunciaModel, SancaoModel, rotuloMotivo } from 'src/app/model/denuncia.model';
+import { DenunciaModel, SancaoModel, rotuloMotivo, rotuloStatusAlvo, rotuloSancao } from 'src/app/model/denuncia.model';
 
 @Component({
   selector: 'app-admin-denuncia',
@@ -56,6 +56,8 @@ export class AdminDenunciaPage {
   processando: boolean = false;
 
   rotuloMotivo = rotuloMotivo;
+  rotuloStatusAlvo = rotuloStatusAlvo;
+  rotuloSancao = rotuloSancao;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -95,6 +97,10 @@ export class AdminDenunciaPage {
 
   get contaSuspensa(): boolean {
     return this.usuarioDenunciado?.status === 'SUSPENSO';
+  }
+
+  get suspensaoPermanente(): boolean {
+    return this.contaSuspensa && !this.usuarioDenunciado?.suspensoAte;
   }
 
   get anuncioDisponivel(): boolean {
@@ -158,24 +164,55 @@ export class AdminDenunciaPage {
     await alert.present();
   }
 
+  irParaPerfilDenunciado() {
+    this.router.navigate(['/usuario-perfil', this.denuncia.cdUsuarioDenunciado]);
+  }
+
+  // Valor 0 no rádio = permanente (vai para o back como dias = null)
   async escolherDiasSuspensao() {
     const alert = await this.alertController.create({
-      header: 'Suspender conta',
+      header: this.contaSuspensa ? 'Alterar suspensão' : 'Suspender conta',
       subHeader: this.denuncia.nmUsuarioDenunciado,
       message: 'Durante a suspensão o usuário não consegue entrar, os anúncios dele somem e as conversas são encerradas.',
       inputs: [
         { type: 'radio', label: '1 dia', value: 1 },
         { type: 'radio', label: '3 dias', value: 3, checked: true },
-        { type: 'radio', label: '7 dias', value: 7 }
+        { type: 'radio', label: '7 dias', value: 7 },
+        { type: 'radio', label: 'Permanente', value: 0 }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Suspender',
           role: 'destructive',
-          handler: (dias: number) => this.executar(
-            this.adminService.suspenderUsuario(this.denuncia.cdUsuarioDenunciado, dias, this.denuncia.cdDenuncia),
-            `Conta suspensa por ${dias} ${dias === 1 ? 'dia' : 'dias'}.`
+          handler: (dias: number) => {
+            if (dias === 0) {
+              this.confirmarSuspensaoPermanente();
+              return;
+            }
+            this.executar(
+              this.adminService.suspenderUsuario(this.denuncia.cdUsuarioDenunciado, dias, this.denuncia.cdDenuncia),
+              `Conta suspensa por ${dias} ${dias === 1 ? 'dia' : 'dias'}.`
+            );
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async confirmarSuspensaoPermanente() {
+    const alert = await this.alertController.create({
+      header: 'Suspensão permanente',
+      message: `A conta de ${this.denuncia.nmUsuarioDenunciado} fica bloqueada sem data para voltar. Só um administrador pode reativá-la.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Suspender',
+          role: 'destructive',
+          handler: () => this.executar(
+            this.adminService.suspenderUsuario(this.denuncia.cdUsuarioDenunciado, null, this.denuncia.cdDenuncia),
+            'Conta suspensa permanentemente.'
           )
         }
       ]
@@ -271,25 +308,6 @@ export class AdminDenunciaPage {
       case 'PENDENTE': return 'Pendente';
       case 'PROCEDENTE': return 'Procedente';
       default: return 'Descartada';
-    }
-  }
-
-  rotuloStatusAlvo(status: string | undefined): string {
-    switch (status) {
-      case 'ATIVO': return 'Ativo';
-      case 'SUSPENSO': return 'Suspenso';
-      case 'EXCLUIDO': return 'Excluído';
-      default: return '—';
-    }
-  }
-
-  rotuloSancao(sancao: SancaoModel): string {
-    const alvo = sancao.tipoAlvo === 'ANUNCIO' ? `Anúncio "${sancao.nmAnuncio}"` : 'Conta';
-
-    switch (sancao.tipo) {
-      case 'SUSPENSAO': return `${alvo} suspenso por ${sancao.dias} ${sancao.dias === 1 ? 'dia' : 'dias'}`;
-      case 'REATIVACAO': return `${alvo} reativado`;
-      default: return `${alvo} excluído`;
     }
   }
 

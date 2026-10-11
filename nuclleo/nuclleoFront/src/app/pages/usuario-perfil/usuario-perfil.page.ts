@@ -19,8 +19,11 @@ import { addIcons } from 'ionicons';
 import {
   createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
   ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
-  pricetagOutline, imageOutline, flagOutline
+  pricetagOutline, imageOutline, flagOutline, mailOutline, shieldCheckmarkOutline, banOutline,
+  refreshOutline, closeCircleOutline
 } from 'ionicons/icons';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
@@ -30,6 +33,17 @@ import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.se
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 import { TokenService } from 'src/app/services/token.service';
 import { DenunciaService } from 'src/app/services/denuncia.service';
+import { AdminService } from 'src/app/services/admin.service';
+import { DenunciaModel, SancaoModel, rotuloMotivo, rotuloSancao, rotuloStatusAlvo } from 'src/app/model/denuncia.model';
+
+// Uma linha do histórico de moderação do admin (sanção aplicada ou denúncia descartada)
+interface ItemHistoricoModeracao {
+  data: string;
+  texto: string;
+  detalhe: string;
+  icone: string;
+  cdDenuncia: number | null;
+}
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -62,6 +76,14 @@ export class UsuarioPerfilPage {
   totalAvaliacoes: number = 0;
   estrelasArray = [1, 2, 3, 4, 5];
 
+  // Administrador: no próprio perfil vê o histórico de moderação;
+  // no perfil de outra pessoa, só visualiza (não navega para os anúncios)
+  ehAdminLogado: boolean = false;
+  historicoModeracao: ItemHistoricoModeracao[] = [];
+  carregandoHistorico: boolean = false;
+
+  rotuloStatusAlvo = rotuloStatusAlvo;
+
   constructor(
     private usuarioService: UsuarioService,
     private router: Router,
@@ -72,12 +94,14 @@ export class UsuarioPerfilPage {
     private usuarioComunidadeService: UsuarioComunidadeService,
     private avaliacaoService: AvaliacaoService,
     private tokenService: TokenService,
-    private denunciaService: DenunciaService
+    private denunciaService: DenunciaService,
+    private adminService: AdminService
   ) {
     addIcons({
       createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
       ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
-      pricetagOutline, imageOutline, flagOutline
+      pricetagOutline, imageOutline, flagOutline, mailOutline, shieldCheckmarkOutline, banOutline,
+      refreshOutline, closeCircleOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -94,10 +118,16 @@ export class UsuarioPerfilPage {
     const cdUsuario = cdUsuarioParam || cdUsuarioLogado;
 
     this.ehPerfilProprio = cdUsuario === cdUsuarioLogado;
+    this.ehAdminLogado = this.tokenService.isAdmin();
     this.usuario = new UsuarioModel();
     this.anuncios = [];
+    this.historicoModeracao = [];
 
     this.carregarUsuarioPorId(cdUsuario);
+  }
+
+  get perfilAdminProprio(): boolean {
+    return this.ehAdminLogado && this.ehPerfilProprio;
   }
 
   rotuloTipoAnuncio(tipo: string): string {
@@ -111,7 +141,12 @@ export class UsuarioPerfilPage {
       next: (usuario: UsuarioModel) => {
         this.usuario = usuario;
         this.calcularNivelCadastro();
-        this.carregarAvaliacao();
+
+        if (this.perfilAdminProprio) {
+          this.carregarHistoricoModeracao();
+        } else {
+          this.carregarAvaliacao();
+        }
 
         if (!this.ehPerfilProprio) {
           this.carregarAnunciosUsuario();
@@ -218,10 +253,51 @@ export class UsuarioPerfilPage {
     this.denunciaService.abrirFormulario('USUARIO', this.usuario.cdUsuario);
   }
 
+  // Junta as sanções que o admin aplicou e as denúncias que ele descartou, da mais recente para a mais antiga
+  carregarHistoricoModeracao() {
+    this.carregandoHistorico = true;
+
+    forkJoin({
+      sancoes: this.adminService.listarSancoesAplicadasPorMim().pipe(catchError(() => of([] as SancaoModel[]))),
+      descartadas: this.adminService.listarDenunciasDescartadasPorMim().pipe(catchError(() => of([] as DenunciaModel[])))
+    }).subscribe(({ sancoes, descartadas }) => {
+      const itensSancao: ItemHistoricoModeracao[] = sancoes.map(sancao => ({
+        data: sancao.dtInicio,
+        texto: rotuloSancao(sancao),
+        detalhe: sancao.cdDenuncia ? 'A partir de uma denúncia' : 'Ação manual',
+        icone: sancao.tipo === 'REATIVACAO' ? 'refresh-outline' : (sancao.tipo === 'EXCLUSAO' ? 'trash-outline' : 'ban-outline'),
+        cdDenuncia: sancao.cdDenuncia
+      }));
+
+      const itensDescarte: ItemHistoricoModeracao[] = descartadas.map(denuncia => ({
+        data: denuncia.dtAnalise ?? denuncia.dtCriacao,
+        texto: `Denúncia descartada: ${denuncia.tipoAlvo === 'ANUNCIO' ? 'anúncio "' + denuncia.nmAnuncio + '"' : denuncia.nmUsuarioDenunciado}`,
+        detalhe: rotuloMotivo(denuncia.motivo),
+        icone: 'close-circle-outline',
+        cdDenuncia: denuncia.cdDenuncia
+      }));
+
+      this.historicoModeracao = [...itensSancao, ...itensDescarte]
+        .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+      this.carregandoHistorico = false;
+    });
+  }
+
+  abrirDenunciaDoHistorico(item: ItemHistoricoModeracao) {
+    if (item.cdDenuncia) {
+      this.router.navigate(['/admin/denuncia', item.cdDenuncia]);
+    }
+  }
+
   carregarAnunciosUsuario() {
     this.carregandoAnuncios = true;
 
-    this.anuncioService.listarAnunciosPorUsuario(this.usuario.cdUsuario).subscribe({
+    // O admin usa o endpoint dele, que também traz os anúncios suspensos
+    const anuncios$ = this.ehAdminLogado
+      ? this.adminService.listarAnunciosDoUsuario(this.usuario.cdUsuario)
+      : this.anuncioService.listarAnunciosPorUsuario(this.usuario.cdUsuario);
+
+    anuncios$.subscribe({
       next: (dados) => {
         this.anuncios = dados;
         this.carregandoAnuncios = false;

@@ -19,10 +19,25 @@
         </div>
 
         <div class="perfil-dados">
-          <span class="eyebrow">{{ ehPerfilProprio ? 'Seu perfil' : 'Perfil' }}</span>
+          <span class="eyebrow">
+            {{ perfilAdminProprio ? 'Administrador' : (ehPerfilProprio ? 'Seu perfil' : 'Perfil') }}
+          </span>
           <h1>{{ usuario.nmUsuario }}</h1>
 
-          <div class="perfil-avaliacao">
+          <!-- Admin vendo outra pessoa: situação da conta -->
+          <div class="perfil-status" *ngIf="ehAdminLogado && !ehPerfilProprio && usuario.status">
+            <span class="badge"
+              [class.badge--success]="usuario.status === 'ATIVO'"
+              [class.badge--accent]="usuario.status === 'SUSPENSO'"
+              [class.badge--danger]="usuario.status === 'EXCLUIDO'">
+              Conta {{ rotuloStatusAlvo(usuario.status, 'USUARIO') | lowercase }}
+            </span>
+            <span class="text-muted" *ngIf="usuario.status === 'SUSPENSO'">
+              {{ usuario.suspensoAte ? 'até ' + (usuario.suspensoAte | date: 'dd/MM/yyyy HH:mm') : 'permanentemente' }}
+            </span>
+          </div>
+
+          <div class="perfil-avaliacao" *ngIf="!perfilAdminProprio">
             <div class="estrelas">
               <ion-icon *ngFor="let n of estrelasArray"
                 [name]="n <= mediaAvaliacao ? 'star' : (n - 0.5 <= mediaAvaliacao ? 'star-half' : 'star-outline')">
@@ -50,24 +65,29 @@
     </section>
 
     <section class="card">
+      <div class="info-item" *ngIf="perfilAdminProprio">
+        <ion-icon name="mail-outline"></ion-icon>
+        <span>{{ usuario.email }}</span>
+      </div>
+
       <div class="info-item">
         <ion-icon name="calendar-outline"></ion-icon>
         <span>Na Nuclleo desde {{ usuario.dtEntrada | date: 'dd/MM/yyyy' }}</span>
       </div>
 
-      <div class="info-item">
+      <div class="info-item" *ngIf="!perfilAdminProprio">
         <ion-icon name="location-outline"></ion-icon>
         <span>{{ usuario.cidade && usuario.uf ? usuario.cidade + ', ' + usuario.uf : 'Sem CEP cadastrado' }}</span>
       </div>
 
-      <div class="info-item info-item--clicavel" *ngIf="ehPerfilProprio" routerLink="/transacoes">
+      <div class="info-item info-item--clicavel" *ngIf="ehPerfilProprio && !ehAdminLogado" routerLink="/transacoes">
         <ion-icon name="cash-outline"></ion-icon>
         <span>Ver histórico de transações</span>
         <ion-icon name="chevron-forward-outline" class="seta"></ion-icon>
       </div>
     </section>
 
-    <section class="card">
+    <section class="card" *ngIf="!perfilAdminProprio">
       <div class="nivel-header">
         <h3>Nível de cadastro</h3>
         <span class="badge badge--accent">Nível {{ nivelCadastro }} de 3</span>
@@ -105,9 +125,41 @@
     <div class="perfil-acoes" *ngIf="ehPerfilProprio">
       <ion-button routerLink="/usuario-alterar" expand="block">
         <ion-icon name="create-outline" slot="start"></ion-icon>
-        Editar perfil
+        {{ perfilAdminProprio ? 'Editar dados e senha' : 'Editar perfil' }}
       </ion-button>
     </div>
+
+    <!-- Admin: histórico de moderação (sanções aplicadas e denúncias descartadas) -->
+    <section class="perfil-historico" *ngIf="perfilAdminProprio">
+
+      <p class="section-title">
+        Histórico de moderação<span *ngIf="!carregandoHistorico"> · {{ historicoModeracao.length }}</span>
+      </p>
+
+      <div class="loading-state" *ngIf="carregandoHistorico">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!carregandoHistorico && historicoModeracao.length === 0">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <h2>Nenhuma revisão ainda</h2>
+        <p>As sanções que você aplicar e as denúncias que descartar aparecem aqui.</p>
+      </div>
+
+      <div class="card historico-lista" *ngIf="!carregandoHistorico && historicoModeracao.length > 0">
+        <div class="historico-item" *ngFor="let item of historicoModeracao"
+          [class.historico-item--clicavel]="item.cdDenuncia" (click)="abrirDenunciaDoHistorico(item)">
+          <ion-icon [name]="item.icone" class="historico-item__icone"></ion-icon>
+          <div class="historico-item__textos">
+            <span class="historico-item__texto">{{ item.texto }}</span>
+            <span class="historico-item__detalhe">{{ item.detalhe }} · {{ item.data | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <ion-icon *ngIf="item.cdDenuncia" name="chevron-forward-outline" class="historico-item__seta"></ion-icon>
+        </div>
+      </div>
+
+    </section>
 
     <section class="perfil-anuncios" *ngIf="!ehPerfilProprio">
 
@@ -125,7 +177,9 @@
       </div>
 
       <div class="lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
-        <a *ngFor="let anuncio of anuncios" class="item-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+        <!-- Para o admin o card é só visualização: sem link para o anúncio -->
+        <a *ngFor="let anuncio of anuncios" class="item-card" [class.item-card--estatico]="ehAdminLogado"
+          [routerLink]="ehAdminLogado ? null : ['/anuncio-tela', anuncio.cdAnuncio]">
 
           <div class="item-card__media">
             <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="anuncio.nmAnuncio">
@@ -139,6 +193,9 @@
               <h3>{{ anuncio.nmAnuncio }}</h3>
               <span class="badge" [class.badge--accent]="anuncio.tipoAnuncio === 'REQUERIMENTO'">
                 {{ rotuloTipoAnuncio(anuncio.tipoAnuncio) }}
+              </span>
+              <span class="badge badge--danger" *ngIf="ehAdminLogado && $any(anuncio).status === 'SUSPENSO'">
+                Suspenso
               </span>
             </div>
 
@@ -157,14 +214,14 @@
 
     </section>
 
-    <div class="perfil-denunciar" *ngIf="!ehPerfilProprio && !carregando">
+    <div class="perfil-denunciar" *ngIf="!ehPerfilProprio && !ehAdminLogado && !carregando">
       <ion-button expand="block" fill="clear" color="medium" (click)="denunciarUsuario()">
         <ion-icon name="flag-outline" slot="start"></ion-icon>
         Denunciar usuário
       </ion-button>
     </div>
 
-    <section class="card card--danger zona-perigo" *ngIf="ehPerfilProprio">
+    <section class="card card--danger zona-perigo" *ngIf="ehPerfilProprio && !ehAdminLogado">
       <h3>Excluir conta</h3>
       <p>Ao excluir sua conta, não há como voltar atrás. Essa ação é permanente.</p>
 

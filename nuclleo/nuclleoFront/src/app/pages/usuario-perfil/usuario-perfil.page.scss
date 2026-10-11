@@ -183,3 +183,73 @@
 .perfil-denunciar ion-button {
   font-size: 13px;
 }
+
+.perfil-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.item-card--estatico {
+  cursor: default;
+}
+
+.item-card--estatico:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.perfil-historico {
+  margin-top: 24px;
+}
+
+.historico-lista {
+  padding: 4px 16px;
+}
+
+.historico-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.historico-item + .historico-item {
+  border-top: 1px solid var(--nc-border);
+}
+
+.historico-item--clicavel {
+  cursor: pointer;
+}
+
+.historico-item__icone {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--nc-purple-light);
+}
+
+.historico-item__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.historico-item__texto {
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.historico-item__detalhe {
+  font-size: 12px;
+  color: var(--nc-text-muted);
+}
+
+.historico-item__seta {
+  flex-shrink: 0;
+  color: var(--nc-text-muted);
+}

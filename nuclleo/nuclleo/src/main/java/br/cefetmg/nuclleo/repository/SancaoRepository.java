@@ -14,4 +14,7 @@ public interface SancaoRepository extends JpaRepository<Sancao, Long> {
     List<Sancao> findByUsuario_CdUsuarioOrderByDtInicioDesc(Long cdUsuario);
 
     List<Sancao> findByDenuncia_CdDenuncia(Long cdDenuncia);
+
+    // Sanções aplicadas por um administrador
+    List<Sancao> findByAdmin_CdUsuarioOrderByDtInicioDesc(Long cdAdmin);
 }

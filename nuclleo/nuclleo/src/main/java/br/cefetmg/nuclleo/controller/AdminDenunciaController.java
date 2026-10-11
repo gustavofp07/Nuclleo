@@ -57,6 +57,16 @@ public class AdminDenunciaController {
         return ResponseEntity.ok(denunciasResponse);
     }
 
+    // Precisa vir antes de /denuncias/{cdDenuncia} só por legibilidade: o Spring
+    // já prioriza o caminho literal sobre a variável.
+    @GetMapping("/denuncias/descartadas-por-mim")
+    @Operation(summary = "Denúncias descartadas (IMPROCEDENTE) pelo administrador logado")
+    public ResponseEntity<List<DenunciaResponseDTO>> listarDescartadasPorMim(Authentication authentication) {
+        List<DenunciaResponseDTO> dtoResponse = denunciaService.listarDescartadasPor(authentication.getName())
+                .stream().map(DenunciaResponseDTO::new).collect(Collectors.toList());
+        return ResponseEntity.ok(dtoResponse);
+    }
+
     @GetMapping("/denuncias/{cdDenuncia}")
     @Operation(summary = "Buscar denúncia por id")
     public ResponseEntity<DenunciaResponseDTO> buscarPorId(@PathVariable Long cdDenuncia) {

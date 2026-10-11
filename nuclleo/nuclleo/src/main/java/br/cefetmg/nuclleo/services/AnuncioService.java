@@ -66,6 +66,12 @@ public class AnuncioService {
                 .toList();
     }
 
+    /** Visão do administrador: todos os anúncios do usuário, inclusive os suspensos. */
+    @Transactional(readOnly = true)
+    public List<Anuncio> listarTodosDoUsuario(Long cdUsuario) {
+        return anuncioRepository.findByUsuarioCria_CdUsuarioAndStatusNot(cdUsuario, Status.EXCLUIDO);
+    }
+
     /** O dono exclui o próprio anúncio (exclusão lógica). */
     @Transactional
     public Anuncio excluir(Long cdAnuncio, String emailSolicitante) {

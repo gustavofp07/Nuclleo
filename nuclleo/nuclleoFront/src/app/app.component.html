@@ -24,6 +24,12 @@
           </span>
         </ion-item>
 
+        <ion-item button [detail]="false" routerLink="/usuario-perfil" routerLinkActive="ativo"
+          [routerLinkActiveOptions]="{ exact: true }" menuClose>
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-label>Perfil</ion-label>
+        </ion-item>
+
       </ion-list>
 
       <ion-list lines="none" class="menu-lista" *ngIf="!ehAdmin">

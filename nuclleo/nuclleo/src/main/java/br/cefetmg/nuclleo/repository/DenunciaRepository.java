@@ -37,6 +37,9 @@ public interface DenunciaRepository extends JpaRepository<Denuncia, Long> {
 
     List<Denuncia> findByAnuncio_CdAnuncioOrderByDtCriacaoDesc(Long cdAnuncio);
 
+    // Denúncias analisadas por um administrador com um certo resultado (perfil do admin)
+    List<Denuncia> findByAdminResponsavel_CdUsuarioAndStatusOrderByDtAnaliseDesc(Long cdAdmin, StatusDenuncia status);
+
     // Evita denúncia repetida enquanto a anterior ainda está pendente
     boolean existsByDenunciante_CdUsuarioAndAnuncio_CdAnuncioAndStatus(
             Long cdDenunciante, Long cdAnuncio, StatusDenuncia status);

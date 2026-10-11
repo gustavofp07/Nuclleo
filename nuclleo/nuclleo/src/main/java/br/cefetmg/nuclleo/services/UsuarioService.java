@@ -13,6 +13,7 @@ import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
 import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Perfil;
 import br.cefetmg.nuclleo.model.Status;
@@ -68,9 +69,13 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario alterar(Usuario dto, MultipartFile foto) {
+    public Usuario alterar(Usuario dto, MultipartFile foto, String emailSolicitante) {
         Usuario usuario = usuarioRepository.findById(dto.getCdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        if (!usuario.getEmail().equalsIgnoreCase(emailSolicitante)) {
+            throw new ForbiddenException("Você só pode alterar o seu próprio perfil.");
+        }
 
         usuario.setNmUsuario(dto.getNmUsuario());
         usuario.setEmail(dto.getEmail());

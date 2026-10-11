@@ -162,6 +162,14 @@ public class DenunciaService {
         return denunciaRepository.findByAnuncio_CdAnuncioOrderByDtCriacaoDesc(cdAnuncio);
     }
 
+    /** Denúncias que o administrador logado descartou (perfil do admin). */
+    @Transactional(readOnly = true)
+    public List<Denuncia> listarDescartadasPor(String emailAdmin) {
+        Usuario admin = buscarAdmin(emailAdmin);
+        return denunciaRepository.findByAdminResponsavel_CdUsuarioAndStatusOrderByDtAnaliseDesc(
+                admin.getCdUsuario(), StatusDenuncia.IMPROCEDENTE);
+    }
+
     @Transactional
     public Denuncia analisar(Long cdDenuncia, AnalisarDenunciaRequestDTO dto, String emailAdmin) {
         Usuario admin = buscarAdmin(emailAdmin);

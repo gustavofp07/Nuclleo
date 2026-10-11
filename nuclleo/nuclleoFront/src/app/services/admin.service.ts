@@ -58,6 +58,15 @@ export class AdminService {
     return this.http.delete<void>(`${this.API_ADMIN}/denuncias/${cdDenuncia}`, this.getHeaders());
   }
 
+  // Histórico do admin logado (perfil do admin)
+  listarDenunciasDescartadasPorMim(): Observable<DenunciaModel[]> {
+    return this.http.get<DenunciaModel[]>(`${this.API_ADMIN}/denuncias/descartadas-por-mim`, this.getHeaders());
+  }
+
+  listarSancoesAplicadasPorMim(): Observable<SancaoModel[]> {
+    return this.http.get<SancaoModel[]>(`${this.API_ADMIN}/sancoes/minhas`, this.getHeaders());
+  }
+
   // ===================== CONTAS =====================
 
   // O GET comum de usuário também é liberado para o ADMINISTRADOR
@@ -65,10 +74,11 @@ export class AdminService {
     return this.http.get<any>(`${this.API_USUARIOS}/${cdUsuario}`, this.getHeaders());
   }
 
-  suspenderUsuario(cdUsuario: number, dias: number, cdDenuncia: number | null): Observable<SancaoModel> {
+  // dias = null => suspensão permanente (só volta se um admin reativar)
+  suspenderUsuario(cdUsuario: number, dias: number | null, cdDenuncia: number | null): Observable<SancaoModel> {
     return this.http.put<SancaoModel>(
       `${this.API_ADMIN}/usuarios/${cdUsuario}/suspender`,
-      { dias, cdDenuncia },
+      { dias, permanente: dias === null, cdDenuncia },
       this.getHeaders()
     );
   }
@@ -82,6 +92,14 @@ export class AdminService {
   }
 
   // ===================== ANÚNCIOS =====================
+
+  // Todos os anúncios do usuário, inclusive os suspensos
+  listarAnunciosDoUsuario(cdUsuario: number): Observable<(AnuncioModel & { status: string })[]> {
+    return this.http.get<(AnuncioModel & { status: string })[]>(
+      `${this.API_ADMIN}/usuarios/${cdUsuario}/anuncios`,
+      this.getHeaders()
+    );
+  }
 
   buscarAnuncio(cdAnuncio: number): Observable<AnuncioModel & { status: string }> {
     return this.http.get<AnuncioModel & { status: string }>(

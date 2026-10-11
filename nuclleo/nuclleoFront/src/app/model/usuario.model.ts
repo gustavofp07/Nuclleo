@@ -10,6 +10,10 @@ export class UsuarioModel {
     cidade: string;
     uf: string;
     telefone: string;
+    // Preenchidos pelo back-end (somente leitura)
+    perfil?: string;
+    status?: string;
+    suspensoAte?: string | null;
 
     constructor() {
         this.cdUsuario = 0;

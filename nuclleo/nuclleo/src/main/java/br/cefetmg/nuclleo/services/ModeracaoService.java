@@ -42,7 +42,8 @@ import br.cefetmg.nuclleo.repository.UsuarioRepository;
  * suspender, reativar e excluir (exclusão lógica).
  *
  * Regras gerais:
- * - Suspensão: de 1 a 7 dias, escolhidos pelo administrador.
+ * - Suspensão: de 1 a 7 dias, escolhidos pelo administrador. Contas também podem
+ *   ser suspensas permanentemente (suspensoAte = null): só voltam se um admin reativar.
  * - EXCLUIDO é definitivo: nunca mais volta a ATIVO ou SUSPENSO.
  * - Suspender ou excluir apaga todos os interesses e conversas ligados ao alvo.
  * - Administradores não podem ser suspensos nem excluídos pela moderação.
@@ -92,11 +93,16 @@ public class ModeracaoService {
         Usuario usuario = buscarUsuario(cdUsuario);
 
         validarAlvoUsuario(usuario);
-        validarDias(dto.getDias());
+        boolean permanente = dto.isPermanente();
+        if (!permanente) {
+            validarDias(dto.getDias());
+        }
 
         Denuncia denuncia = marcarDenunciaProcedente(dto.getCdDenuncia(), usuario, null, admin);
 
-        LocalDateTime fim = LocalDateTime.now().plusDays(dto.getDias());
+        // Permanente: sem data de fim, então a rotina agendada nunca reativa sozinha
+        LocalDateTime fim = permanente ? null : LocalDateTime.now().plusDays(dto.getDias());
+        Integer dias = permanente ? null : dto.getDias();
 
         limparInteressesDoUsuario(usuario);
 
@@ -105,10 +111,11 @@ public class ModeracaoService {
         usuarioRepository.save(usuario);
 
         Sancao sancao = registrarSancao(TipoAlvo.USUARIO, usuario, null, TipoSancao.SUSPENSAO,
-                dto.getDias(), fim, admin, denuncia);
+                dias, fim, admin, denuncia);
 
-        notificar(usuario.getCdUsuario(), "CONTA_SUSPENSA",
-                "Sua conta foi suspensa até " + fim.format(FORMATO_DATA) + ".");
+        notificar(usuario.getCdUsuario(), "CONTA_SUSPENSA", permanente
+                ? "Sua conta foi suspensa permanentemente."
+                : "Sua conta foi suspensa até " + fim.format(FORMATO_DATA) + ".");
 
         return sancao;
     }
@@ -202,6 +209,9 @@ public class ModeracaoService {
 
         if (anuncio.getStatus() == Status.EXCLUIDO) {
             throw new BusinessException("Este anúncio já foi excluído.");
+        }
+        if (dto.isPermanente()) {
+            throw new BusinessException("Anúncios não têm suspensão permanente. Para isso, exclua o anúncio.");
         }
         validarDias(dto.getDias());
 
@@ -301,6 +311,13 @@ public class ModeracaoService {
     public List<Sancao> listarSancoesDoUsuario(Long cdUsuario) {
         buscarUsuario(cdUsuario);
         return sancaoRepository.findByUsuario_CdUsuarioOrderByDtInicioDesc(cdUsuario);
+    }
+
+    /** Sanções aplicadas pelo administrador logado (perfil do admin). */
+    @Transactional(readOnly = true)
+    public List<Sancao> listarSancoesAplicadas(String emailAdmin) {
+        Usuario admin = buscarAdmin(emailAdmin);
+        return sancaoRepository.findByAdmin_CdUsuarioOrderByDtInicioDesc(admin.getCdUsuario());
     }
 
     // =====================================================================
