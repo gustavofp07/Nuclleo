@@ -66,8 +66,8 @@
         <label class="form-label" for="valor">Preço de venda</label>
         <div class="form-field">
           <span class="form-field__prefix">R$</span>
-          <input id="valor" type="number" placeholder="0,00" formControlName="valor" inputmode="decimal" step="0.01"
-            min="0.01" max="1000000">
+          <input id="valor" type="text" placeholder="0,00" formControlName="valor" inputmode="decimal"
+            mask="separator.2" thousandSeparator="." decimalMarker="," [outputTransformFn]="paraNumero">
         </div>
 
         <p class="form-error" *ngIf="formAnuncio.get('valor')?.touched && formAnuncio.get('valor')?.hasError('required')">
@@ -93,8 +93,9 @@
           <div>
             <div class="form-field">
               <span class="form-field__prefix">R$</span>
-              <input type="number" placeholder="Mínimo" formControlName="valorMin" inputmode="decimal" step="0.01"
-                min="0.01" max="1000000" aria-label="Valor mínimo">
+              <input type="text" placeholder="Mínimo" formControlName="valorMin" inputmode="decimal"
+                mask="separator.2" thousandSeparator="." decimalMarker="," [outputTransformFn]="paraNumero"
+                aria-label="Valor mínimo">
             </div>
 
             <p class="form-error" *ngIf="formAnuncio.get('valorMin')?.touched && formAnuncio.get('valorMin')?.hasError('required')">
@@ -113,8 +114,9 @@
           <div>
             <div class="form-field">
               <span class="form-field__prefix">R$</span>
-              <input type="number" placeholder="Máximo" formControlName="valorMax" inputmode="decimal" step="0.01"
-                min="0.01" max="1000000" aria-label="Valor máximo">
+              <input type="text" placeholder="Máximo" formControlName="valorMax" inputmode="decimal"
+                mask="separator.2" thousandSeparator="." decimalMarker="," [outputTransformFn]="paraNumero"
+                aria-label="Valor máximo">
             </div>
 
             <p class="form-error" *ngIf="formAnuncio.get('valorMax')?.touched && formAnuncio.get('valorMax')?.hasError('required')">

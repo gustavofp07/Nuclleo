@@ -382,6 +382,20 @@ export class ChatPage implements OnDestroy {
     await alert.present();
   }
 
+  /**
+   * Lê um valor digitado no formato brasileiro ("1.240,50", "1240,5", "150").
+   * Ponto é separador de milhar e vírgula é o decimal. Retorna NaN se for inválido.
+   */
+  converterValorBrasileiro(texto: string): number {
+    const limpo = String(texto ?? '').replace(/\s|R\$/g, '');
+
+    if (!/^\d{1,3}(\.\d{3})*(,\d{1,2})?$|^\d+(,\d{1,2})?$/.test(limpo)) {
+      return NaN;
+    }
+
+    return Number(limpo.replace(/\./g, '').replace(',', '.'));
+  }
+
   async solicitarValorTransacao() {
     const alert = await this.alertController.create({
       header: 'Valor da transação',
@@ -389,9 +403,9 @@ export class ChatPage implements OnDestroy {
       inputs: [
         {
           name: 'valor',
-          type: 'number',
-          placeholder: 'Ex: 150.00',
-          min: 0.01
+          type: 'text',
+          placeholder: 'Ex: 1.240,00',
+          attributes: { inputmode: 'decimal' }
         }
       ],
       buttons: [
@@ -399,7 +413,7 @@ export class ChatPage implements OnDestroy {
         {
           text: 'Continuar',
           handler: (dados) => {
-            const valor = Number(dados.valor);
+            const valor = this.converterValorBrasileiro(dados.valor);
             if (!valor || valor <= 0) {
               this.exibirMensagem('Informe um valor válido.');
               return false;

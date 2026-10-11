@@ -41,6 +41,7 @@ import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.se
 import { ArquivoService } from 'src/app/services/arquivo.service';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-criar-anuncio',
@@ -59,12 +60,17 @@ import { TokenService } from 'src/app/services/token.service';
     IonButtons,
     IonMenuButton,
     IonList,
-    IonCheckbox
+    IonCheckbox,
+    NgxMaskDirective
   ]
 })
 export class CriarAnuncioPage implements OnInit {
   anuncio!: AnuncioModel;
   formAnuncio!: FormGroup;
+
+  // A máscara mostra "1.240,50" na tela; o formulário guarda o número 1240.5
+  paraNumero = (valor: string | number | null | undefined) =>
+    valor === '' || valor === null || valor === undefined ? '' : Number(valor);
 
   tipo = '';
   limiteDescricao: number = 250;
