@@ -73,6 +73,11 @@ export class FinalizarConversaComponent implements OnChanges {
 
   private finalizou = false;
 
+  // Consultada pelo Ionic no momento de fechar (e não só quando o valor muda).
+  // Com um booleano no template, o [isOpen]="false" chegava antes do canDismiss
+  // ser atualizado, o fechamento era recusado e a tela travava em "Enviando...".
+  podeFechar = async () => this.finalizou || !this.enviandoFinalizacao;
+
   constructor(
     private interesseService: InteresseService,
     private tokenService: TokenService,
