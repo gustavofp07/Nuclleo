@@ -19,7 +19,7 @@ import {
 import { Subscription } from 'rxjs';
 
 import { addIcons } from 'ionicons';
-import { send, chatbubbleOutline, flagOutline } from 'ionicons/icons';
+import { send, chatbubbleOutline, flagOutline, star } from 'ionicons/icons';
 
 import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service';
 import { InteresseService } from 'src/app/services/interesse.service';
@@ -77,6 +77,8 @@ export class ChatPage implements OnDestroy {
 
   // Tela de finalizar conversa (componente compartilhado com a página de conversas)
   modalFinalizarAberto: boolean = false;
+  // 'finalizar' = anunciante finalizando; 'avaliar' = interessado avaliando o anunciante
+  modoTela: 'finalizar' | 'avaliar' = 'finalizar';
 
   private avaliacaoSolicitada = false;
   private encerrando = false;
@@ -95,7 +97,7 @@ export class ChatPage implements OnDestroy {
     private router: Router
   ) {
     this.token = new TokenModel();
-    addIcons({ send, chatbubbleOutline, flagOutline });
+    addIcons({ send, chatbubbleOutline, flagOutline, star });
   }
 
   ionViewWillEnter() {
@@ -228,8 +230,6 @@ export class ChatPage implements OnDestroy {
   }
 
   private aplicarStatusInteresse(status: StatusInteresseEvento) {
-    const finalizouAgora = status.finalizado && !this.chatFinalizado;
-
     if (!status.conversaIniciada) {
       if (!this.souAnunciante) {
         this.exibirMensagem('O anunciante recusou a solicitação de conversa.');
@@ -265,13 +265,9 @@ export class ChatPage implements OnDestroy {
     if (!this.souAnunciante) {
       this.aguardandoAvaliacaoOutro = false;
 
+      // O alerta já avisa que o anunciante finalizou (sem toast repetindo a mesma coisa)
       if (!this.avaliacaoSolicitada) {
         this.avaliacaoSolicitada = true;
-
-        if (finalizouAgora) {
-          this.exibirMensagem('O anunciante finalizou a conversa.');
-        }
-
         this.solicitarAvaliacaoAnunciante();
       }
     } else {
@@ -348,50 +344,33 @@ export class ChatPage implements OnDestroy {
   }
 
   abrirTelaFinalizar() {
+    this.modoTela = 'finalizar';
     this.modalFinalizarAberto = true;
   }
 
-  aoFinalizarConversa() {
+  abrirTelaAvaliar() {
+    this.modoTela = 'avaliar';
+    this.modalFinalizarAberto = true;
+  }
+
+  aoConcluirTela() {
     this.modalFinalizarAberto = false;
     this.router.navigate(['/conversas']);
   }
 
+  // O alerta avisa que o anunciante finalizou; a avaliação é feita na tela de estrelas
   async solicitarAvaliacaoAnunciante() {
     const alert = await this.alertController.create({
       header: 'Conversa finalizada',
-      subHeader: `Avalie ${this.nomeOutroUsuario} de 1 a 5 estrelas para continuar`,
+      message: `${this.nomeOutroUsuario} finalizou a conversa. Avalie a negociação para concluir.`,
       backdropDismiss: false,
-      inputs: [1, 2, 3, 4, 5].map(n => ({
-        name: 'nota',
-        type: 'radio' as const,
-        label: '⭐'.repeat(n),
-        value: n,
-        checked: n === 5
-      })),
       buttons: [
-        {
-          text: 'Confirmar',
-          handler: (nota) => this.avaliarAnunciante(nota)
-        }
+        { text: 'Depois', role: 'cancel' },
+        { text: 'Avaliar', handler: () => this.abrirTelaAvaliar() }
       ]
     });
 
     await alert.present();
-  }
-
-  avaliarAnunciante(nota: number) {
-    this.interesseService.avaliarAnunciante(this.cdInteresse, {
-      cdUsuarioSolicitante: this.token.cdUsuario,
-      nota
-    }).subscribe({
-      next: () => {
-        this.exibirMensagem('Avaliação enviada. Obrigado!');
-        this.router.navigate(['/conversas']);
-      },
-      error: (err) => {
-        this.exibirMensagem(err?.error?.message || 'Erro ao enviar avaliação.');
-      }
-    });
   }
 
   async exibirMensagem(texto: string) {

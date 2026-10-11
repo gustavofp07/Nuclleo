@@ -10,14 +10,19 @@
             Voltar
           </ion-button>
         </ion-buttons>
-        <ion-title>Finalizar conversa</ion-title>
+        <ion-title>{{ modo === 'avaliar' ? 'Avaliar anunciante' : 'Finalizar conversa' }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
       <div class="finalizar">
 
-        <section class="card">
+        <!-- Interessado: só avalia (a conversa já foi finalizada pelo anunciante) -->
+        <p class="aviso finalizar__aviso" *ngIf="modo === 'avaliar'">
+          {{ nomeOutroUsuario }} finalizou a conversa. Avalie como foi a negociação para concluir.
+        </p>
+
+        <section class="card" *ngIf="modo === 'finalizar'">
           <h3>Ocorreu uma transação?</h3>
           <p class="text-muted finalizar__dica">Você chegou a fechar negócio com {{ nomeOutroUsuario }}?</p>
 
@@ -59,7 +64,7 @@
 
         <ion-button expand="block" class="finalizar__confirmar" [disabled]="!podeConfirmarFinalizacao || enviandoFinalizacao"
           (click)="confirmarFinalizacao()">
-          {{ enviandoFinalizacao ? 'Finalizando...' : 'Confirmar' }}
+          {{ enviandoFinalizacao ? 'Enviando...' : 'Confirmar' }}
         </ion-button>
 
       </div>

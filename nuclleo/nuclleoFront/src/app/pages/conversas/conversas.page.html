@@ -77,7 +77,13 @@
               </a>
             </div>
 
-            <span class="badge badge--muted" *ngIf="conversa.finalizado">Finalizada</span>
+            <span class="badge badge--muted" *ngIf="conversa.finalizado && !podeAvaliar(conversa)">Finalizada</span>
+
+            <ion-button *ngIf="podeAvaliar(conversa)" size="small" class="conversa__finalizar"
+              (click)="abrirAvaliar(conversa, $event)">
+              <ion-icon name="star" slot="start"></ion-icon>
+              Avaliar
+            </ion-button>
 
             <ion-button *ngIf="podeFinalizar(conversa)" size="small" fill="outline" color="medium"
               class="conversa__finalizar" (click)="abrirFinalizar(conversa, $event)">
@@ -101,8 +107,8 @@
 
   </div>
 
-  <app-finalizar-conversa [aberto]="!!conversaFinalizando" [cdInteresse]="conversaFinalizando?.cdInteresse!"
+  <app-finalizar-conversa [aberto]="!!conversaFinalizando" [modo]="modoTela" [cdInteresse]="conversaFinalizando?.cdInteresse!"
     [nomeOutroUsuario]="conversaFinalizando?.nomeOutroUsuario ?? ''" (fechado)="conversaFinalizando = null"
-    (finalizada)="aoFinalizarConversa()"></app-finalizar-conversa>
+    (concluida)="aoConcluirTela()"></app-finalizar-conversa>
 
 </ion-content>

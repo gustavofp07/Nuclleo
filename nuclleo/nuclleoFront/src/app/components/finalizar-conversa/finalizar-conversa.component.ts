@@ -22,11 +22,13 @@ import { InteresseService } from 'src/app/services/interesse.service';
 import { TokenService } from 'src/app/services/token.service';
 
 /**
- * Tela de finalizar conversa (usada no chat e na página de conversas).
- * O anunciante informa se houve transação (e o valor) e avalia o interessado.
+ * Tela de finalizar/avaliar conversa (usada no chat e na página de conversas).
  *
- * Uso: <app-finalizar-conversa [aberto]="..." [cdInteresse]="..." [nomeOutroUsuario]="..."
- *        (fechado)="..." (finalizada)="..."></app-finalizar-conversa>
+ * modo = 'finalizar' -> anunciante: informa se houve transação (e o valor) e avalia o interessado.
+ * modo = 'avaliar'   -> interessado: a conversa já foi finalizada, ele só avalia o anunciante.
+ *
+ * Uso: <app-finalizar-conversa [aberto]="..." [modo]="..." [cdInteresse]="..." [nomeOutroUsuario]="..."
+ *        (fechado)="..." (concluida)="..."></app-finalizar-conversa>
  */
 @Component({
   selector: 'app-finalizar-conversa',
@@ -51,11 +53,12 @@ export class FinalizarConversaComponent implements OnChanges {
   @Input() aberto: boolean = false;
   @Input() cdInteresse!: number;
   @Input() nomeOutroUsuario: string = '';
+  @Input() modo: 'finalizar' | 'avaliar' = 'finalizar';
 
   // Emitido quando a tela fecha sem finalizar (Voltar ou gesto de fechar)
   @Output() fechado = new EventEmitter<void>();
-  // Emitido depois que o back-end confirmou a finalização
-  @Output() finalizada = new EventEmitter<void>();
+  // Emitido depois que o back-end confirmou (finalização ou avaliação)
+  @Output() concluida = new EventEmitter<void>();
 
   ocorreuTransacao: boolean | null = null;
   valorTransacao: number | '' = '';
@@ -95,7 +98,9 @@ export class FinalizarConversaComponent implements OnChanges {
   }
 
   get podeConfirmarFinalizacao(): boolean {
-    if (this.ocorreuTransacao === null || this.notaAvaliacao < 1) return false;
+    if (this.notaAvaliacao < 1) return false;
+    if (this.modo === 'avaliar') return true;
+    if (this.ocorreuTransacao === null) return false;
     return !this.ocorreuTransacao || this.valorValido;
   }
 
@@ -115,6 +120,11 @@ export class FinalizarConversaComponent implements OnChanges {
   // A confirmação vem só no fim, já com o resumo do que será enviado
   async confirmarFinalizacao() {
     if (!this.podeConfirmarFinalizacao || this.enviandoFinalizacao) return;
+
+    if (this.modo === 'avaliar') {
+      await this.confirmarAvaliacao();
+      return;
+    }
 
     const valor = this.ocorreuTransacao ? (this.valorTransacao as number) : undefined;
     const resumoTransacao = valor !== undefined
@@ -139,6 +149,43 @@ export class FinalizarConversaComponent implements OnChanges {
     await alert.present();
   }
 
+  private async confirmarAvaliacao() {
+    const nota = this.notaAvaliacao;
+
+    const alert = await this.alertController.create({
+      header: 'Enviar avaliação',
+      subHeader: `${nota} ${nota === 1 ? 'estrela' : 'estrelas'} · ${this.rotulosNota[nota]}`,
+      message: `Deseja mesmo enviar essa avaliação para ${this.nomeOutroUsuario}? Depois disso não dá para alterar.`,
+      backdropDismiss: false,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Enviar', handler: () => this.avaliarAnunciante(nota) }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private avaliarAnunciante(nota: number) {
+    this.enviandoFinalizacao = true;
+
+    this.interesseService.avaliarAnunciante(this.cdInteresse, {
+      cdUsuarioSolicitante: this.tokenService.extrair().cdUsuario,
+      nota
+    }).subscribe({
+      next: () => {
+        this.enviandoFinalizacao = false;
+        this.finalizou = true;
+        this.exibirMensagem('Avaliação enviada. Obrigado!');
+        this.concluida.emit();
+      },
+      error: (err) => {
+        this.enviandoFinalizacao = false;
+        this.exibirMensagem(err?.error?.message || 'Erro ao enviar avaliação.');
+      }
+    });
+  }
+
   private finalizarConversa(ocorreuTransacao: boolean, valor: number | undefined, nota: number) {
     this.enviandoFinalizacao = true;
 
@@ -152,7 +199,7 @@ export class FinalizarConversaComponent implements OnChanges {
         this.enviandoFinalizacao = false;
         this.finalizou = true;
         this.exibirMensagem('Conversa finalizada com sucesso.');
-        this.finalizada.emit();
+        this.concluida.emit();
       },
       error: (err) => {
         this.enviandoFinalizacao = false;

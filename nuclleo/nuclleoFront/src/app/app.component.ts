@@ -16,7 +16,7 @@ import {
   eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
   locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
   settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
-  pricetagOutline, cartOutline, flagOutline, warningOutline
+  pricetagOutline, cartOutline, flagOutline, warningOutline, star, close
 } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
       eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
       locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
       settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
-      pricetagOutline, cartOutline, flagOutline, warningOutline
+      pricetagOutline, cartOutline, flagOutline, warningOutline, star, close
     });
 
     this.router.events
@@ -106,6 +106,14 @@ export class AppComponent implements OnInit {
           this.mostrarToast(evento.mensagem, 'flag-outline');
           break;
 
+        // O anunciante finalizou: o interessado precisa avaliar para concluir.
+        // Se ele já estiver nesse chat, o próprio chat mostra o alerta.
+        case 'CONVERSA_FINALIZADA':
+          if (this.router.url.split('?')[0] !== `/chat/${evento.cdInteresse}`) {
+            this.mostrarAvisoConversaFinalizada(evento.mensagem, evento.cdInteresse);
+          }
+          break;
+
         // Moderação: a conta foi suspensa e o token deixou de valer
         case 'CONTA_SUSPENSA':
           this.encerrarSessaoSuspensa(evento.mensagem);
@@ -128,6 +136,21 @@ export class AppComponent implements OnInit {
     }
 
     this.notificacaoService.conectar(this.token.cdUsuario, this.ehAdmin);
+  }
+
+  async mostrarAvisoConversaFinalizada(mensagem: string, cdInteresse: number) {
+    const toast = await this.toastController.create({
+      message: mensagem,
+      duration: 8000,
+      position: 'top',
+      color: 'primary',
+      icon: 'star',
+      buttons: [
+        { text: 'Avaliar', handler: () => { this.router.navigate(['/chat', cdInteresse]); } },
+        { icon: 'close', role: 'cancel' }
+      ]
+    });
+    await toast.present();
   }
 
   async encerrarSessaoSuspensa(mensagem: string) {

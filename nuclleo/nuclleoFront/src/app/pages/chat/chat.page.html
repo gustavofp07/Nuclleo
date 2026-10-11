@@ -60,7 +60,14 @@
     <p *ngIf="chatFinalizado" class="aviso">
       Esta conversa foi finalizada.
       <span *ngIf="aguardandoAvaliacaoOutro">Aguardando avaliação do outro usuário.</span>
+      <span *ngIf="!souAnunciante">Falta só a sua avaliação para concluir.</span>
     </p>
+
+    <ion-button *ngIf="chatFinalizado && !souAnunciante" expand="block" class="btn-avaliar"
+      (click)="abrirTelaAvaliar()">
+      <ion-icon name="star" slot="start"></ion-icon>
+      Avaliar {{ nomeOutroUsuario }}
+    </ion-button>
 
     <p *ngIf="!chatFinalizado && aguardandoAceite" class="aviso aviso--accent">
       Aguardando a aprovação da solicitação de chat.
@@ -86,6 +93,6 @@
   </div>
 </ion-footer>
 
-<app-finalizar-conversa [aberto]="modalFinalizarAberto" [cdInteresse]="cdInteresse"
+<app-finalizar-conversa [aberto]="modalFinalizarAberto" [modo]="modoTela" [cdInteresse]="cdInteresse"
   [nomeOutroUsuario]="nomeOutroUsuario" (fechado)="modalFinalizarAberto = false"
-  (finalizada)="aoFinalizarConversa()"></app-finalizar-conversa>
+  (concluida)="aoConcluirTela()"></app-finalizar-conversa>

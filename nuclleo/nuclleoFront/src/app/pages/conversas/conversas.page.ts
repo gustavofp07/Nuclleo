@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 
 import {
   IonContent,
@@ -19,12 +19,13 @@ import {
 
 import { addIcons } from 'ionicons';
 import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline,
-  pricetagOutline } from 'ionicons/icons';
+  pricetagOutline, star } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenService } from 'src/app/services/token.service';
 import { TokenModel } from 'src/app/model/token.model';
+import { NotificacaoService } from 'src/app/services/notificacao.service';
 import { FinalizarConversaComponent } from 'src/app/components/finalizar-conversa/finalizar-conversa.component';
 
 interface ConversaView {
@@ -63,8 +64,11 @@ export class ConversasPage {
   conversas: ConversaView[] = [];
   carregando: boolean = false;
 
-  // Conversa aberta na tela de finalizar (só o anunciante finaliza)
+  // Conversa aberta na tela de estrelas: o anunciante finaliza, o interessado avalia
   conversaFinalizando: ConversaView | null = null;
+  modoTela: 'finalizar' | 'avaliar' = 'finalizar';
+
+  private notificacaoSub?: Subscription;
 
   get solicitacoes(): ConversaView[] {
     return this.conversas.filter(c => !c.aceito && !c.finalizado);
@@ -79,10 +83,11 @@ export class ConversasPage {
     private alertController: AlertController,
     private toastController: ToastController,
     private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private notificacaoService: NotificacaoService
   ) {
     this.token = new TokenModel();
-    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline, pricetagOutline });
+    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline, pricetagOutline, star });
   }
 
   ionViewWillEnter() {
@@ -94,6 +99,18 @@ export class ConversasPage {
 
     this.token = this.tokenService.extrair();
     this.carregarConversas();
+
+    // O anunciante finalizou uma conversa com a tela aberta: atualiza a lista
+    this.notificacaoSub?.unsubscribe();
+    this.notificacaoSub = this.notificacaoService.onNotificacaoRecebida().subscribe(evento => {
+      if (evento.tipo === 'CONVERSA_FINALIZADA') {
+        this.carregarConversas();
+      }
+    });
+  }
+
+  ionViewWillLeave() {
+    this.notificacaoSub?.unsubscribe();
   }
 
   carregarConversas() {
@@ -206,15 +223,33 @@ export class ConversasPage {
     return conversa.souAnunciante && conversa.aceito && !conversa.finalizado;
   }
 
+  // Interessado: o anunciante já finalizou e falta a avaliação dele
+  podeAvaliar(conversa: ConversaView): boolean {
+    return !conversa.souAnunciante && conversa.finalizado;
+  }
+
   abrirFinalizar(conversa: ConversaView, event: Event) {
     event.stopPropagation();
+    this.modoTela = 'finalizar';
     this.conversaFinalizando = conversa;
   }
 
-  aoFinalizarConversa() {
-    if (this.conversaFinalizando) {
-      this.conversaFinalizando.finalizado = true;
+  abrirAvaliar(conversa: ConversaView, event: Event) {
+    event.stopPropagation();
+    this.modoTela = 'avaliar';
+    this.conversaFinalizando = conversa;
+  }
+
+  aoConcluirTela() {
+    const conversa = this.conversaFinalizando;
+
+    if (conversa && this.modoTela === 'finalizar') {
+      conversa.finalizado = true;
+    } else if (conversa) {
+      // Os dois avaliaram: a conversa é concluída e sai da lista
+      this.conversas = this.conversas.filter(c => c.cdInteresse !== conversa.cdInteresse);
     }
+
     this.conversaFinalizando = null;
   }
 

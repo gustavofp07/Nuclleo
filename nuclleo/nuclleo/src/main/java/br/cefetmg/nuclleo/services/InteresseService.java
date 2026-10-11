@@ -125,6 +125,15 @@ public class InteresseService {
         interesseRepository.save(interesse);
 
         notificarStatus(interesse);
+
+        // Avisa o interessado mesmo que ele não esteja com o chat aberto,
+        // para ele avaliar o anunciante e a conversa poder ser concluída
+        messagingTemplate.convertAndSend("/topic/notificacoes/" + interessado.getCdUsuario(),
+                new NotificacaoDTO("CONVERSA_FINALIZADA",
+                        anunciante.getNmUsuario() + " finalizou a conversa sobre \""
+                                + interesse.getAnuncio().getNmAnuncio() + "\". Avalie para concluir.",
+                        interesse.getId()));
+
         excluirSeAmbosAvaliaram(interesse);
     }
 
