@@ -18,7 +18,8 @@ import {
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline } from 'ionicons/icons';
+import { chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline,
+  pricetagOutline } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
 import { InteresseModel } from 'src/app/model/interesse.model';
@@ -30,6 +31,7 @@ interface ConversaView {
   cdInteresse: number;
   nomeOutroUsuario: string;
   fotoOutroUsuario: string | null;
+  cdAnuncio: number;
   nmAnuncio: string;
   finalizado: boolean;
   souAnunciante: boolean;
@@ -80,7 +82,7 @@ export class ConversasPage {
     private tokenService: TokenService
   ) {
     this.token = new TokenModel();
-    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline });
+    addIcons({ chatbubblesOutline, checkmarkDoneOutline, closeOutline, chevronForwardOutline, flagOutline, pricetagOutline });
   }
 
   ionViewWillEnter() {
@@ -129,6 +131,7 @@ export class ConversasPage {
       fotoOutroUsuario: souEuOInteressado
         ? interesse.anuncio.usuarioCria.ftUsuario
         : interesse.usuario.ftUsuario,
+      cdAnuncio: interesse.anuncio.cdAnuncio,
       nmAnuncio: interesse.anuncio.nmAnuncio,
       finalizado: interesse.finalizado,
       souAnunciante: !souEuOInteressado,
@@ -191,6 +194,12 @@ export class ConversasPage {
       },
       error: () => this.exibirMensagem('Erro ao recusar a conversa.')
     });
+  }
+
+  // Abre o anúncio da conversa sem abrir o chat (o card inteiro abre o chat)
+  abrirAnuncio(conversa: ConversaView, event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/anuncio-tela', conversa.cdAnuncio]);
   }
 
   podeFinalizar(conversa: ConversaView): boolean {

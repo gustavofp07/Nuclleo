@@ -28,11 +28,35 @@
 }
 
 .conversa__anuncio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
   margin: 0;
-  overflow: hidden;
   font-size: 13px;
+  color: var(--nc-text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--nc-transition);
+}
+
+.conversa__anuncio span {
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.conversa__anuncio ion-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.conversa__anuncio:hover {
+  color: var(--nc-purple-light);
+}
+
+.conversa__anuncio:hover span {
+  text-decoration: underline;
 }
 
 .conversa__acoes {

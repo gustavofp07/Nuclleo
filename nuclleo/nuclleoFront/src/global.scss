@@ -1065,7 +1065,9 @@ img.avatar {
   transition: color var(--nc-transition), background var(--nc-transition);
 }
 
-.tabs button:hover:not(:disabled) {
+/* O hover só vale para as abas não selecionadas: na selecionada ele trocava
+   o gradiente pelo fundo escuro e deixava só o brilho laranja embaixo */
+.tabs button:hover:not(:disabled):not(.ativo) {
   color: var(--nc-text);
   background: var(--nc-hover);
 }

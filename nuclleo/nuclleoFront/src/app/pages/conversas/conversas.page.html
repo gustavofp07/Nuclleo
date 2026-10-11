@@ -37,7 +37,10 @@
 
             <div class="item-card__body">
               <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
-              <p class="conversa__anuncio">{{ conversa.nmAnuncio }}</p>
+              <a class="conversa__anuncio" (click)="abrirAnuncio(conversa, $event)" title="Ver anúncio">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                <span>{{ conversa.nmAnuncio }}</span>
+              </a>
             </div>
 
             <div class="conversa__acoes" *ngIf="conversa.souAnunciante">
@@ -68,7 +71,10 @@
 
             <div class="item-card__body">
               <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
-              <p class="conversa__anuncio">{{ conversa.nmAnuncio }}</p>
+              <a class="conversa__anuncio" (click)="abrirAnuncio(conversa, $event)" title="Ver anúncio">
+                <ion-icon name="pricetag-outline"></ion-icon>
+                <span>{{ conversa.nmAnuncio }}</span>
+              </a>
             </div>
 
             <span class="badge badge--muted" *ngIf="conversa.finalizado">Finalizada</span>
