@@ -6,11 +6,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.AnalisarDenunciaRequestDTO;
 import br.cefetmg.nuclleo.dto.DenunciaRequestDTO;
+import br.cefetmg.nuclleo.dto.NotificacaoDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ConflictException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
@@ -43,6 +45,9 @@ public class DenunciaService {
     @Autowired
     private SancaoRepository sancaoRepository;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     // =====================================================================
     // USUÁRIO: fazer uma denúncia
     // =====================================================================
@@ -70,7 +75,13 @@ public class DenunciaService {
             preencherAlvoUsuario(denuncia, dto.getCdAlvo(), denunciante);
         }
 
-        return denunciaRepository.save(denuncia);
+        Denuncia denunciaSalva = denunciaRepository.save(denuncia);
+
+        // Avisa em tempo real os administradores conectados (painel de denúncias)
+        messagingTemplate.convertAndSend("/topic/admin/denuncias",
+                new NotificacaoDTO("NOVA_DENUNCIA", "Nova denúncia recebida.", null));
+
+        return denunciaSalva;
     }
 
     private void preencherAlvoAnuncio(Denuncia denuncia, Long cdAnuncio, Usuario denunciante) {

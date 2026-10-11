@@ -19,7 +19,7 @@ import { addIcons } from 'ionicons';
 import {
   createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
   ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
-  pricetagOutline, imageOutline
+  pricetagOutline, imageOutline, flagOutline
 } from 'ionicons/icons';
 
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -29,6 +29,7 @@ import { AnuncioService } from 'src/app/services/anuncio.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 import { TokenService } from 'src/app/services/token.service';
+import { DenunciaService } from 'src/app/services/denuncia.service';
 
 @Component({
   selector: 'app-usuario-perfil',
@@ -70,12 +71,13 @@ export class UsuarioPerfilPage {
     private anuncioService: AnuncioService,
     private usuarioComunidadeService: UsuarioComunidadeService,
     private avaliacaoService: AvaliacaoService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private denunciaService: DenunciaService
   ) {
     addIcons({
       createOutline, locationOutline, calendarOutline, checkmarkCircleOutline, trashOutline,
       ellipseOutline, star, starHalf, starOutline, cashOutline, chevronForwardOutline,
-      pricetagOutline, imageOutline
+      pricetagOutline, imageOutline, flagOutline
     });
 
     this.usuario = new UsuarioModel();
@@ -210,6 +212,10 @@ export class UsuarioPerfilPage {
       },
       error: () => this.exibirMensagem('Erro ao remover usuário das comunidades.')
     });
+  }
+
+  denunciarUsuario() {
+    this.denunciaService.abrirFormulario('USUARIO', this.usuario.cdUsuario);
   }
 
   carregarAnunciosUsuario() {

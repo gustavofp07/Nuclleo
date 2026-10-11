@@ -95,6 +95,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/configuracoes/configuracoes.page').then(m => m.ConfiguracoesPage)
   },
   {
+    path: 'admin/denuncias',
+    loadComponent: () => import('./pages/admin-denuncias/admin-denuncias.page').then(m => m.AdminDenunciasPage)
+  },
+  {
+    path: 'admin/denuncia/:cdDenuncia',
+    loadComponent: () => import('./pages/admin-denuncia/admin-denuncia.page').then(m => m.AdminDenunciaPage)
+  },
+  {
     path: 'nao-encontrado',
     loadComponent: () => import('./pages/nao-encontrado/nao-encontrado.page').then( m => m.NaoEncontradoPage)
   },

@@ -1,2 +1,5 @@
 nuclleo/nuclleoFront/ionic.config.zip 
 nuclleo/nuclleoFront/ionic.config.zip 
+
+# Saída de build do Maven (back-end)
+target/

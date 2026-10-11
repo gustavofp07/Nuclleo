@@ -1,0 +1,80 @@
+export type TipoAlvo = 'ANUNCIO' | 'USUARIO';
+export type StatusDenuncia = 'PENDENTE' | 'PROCEDENTE' | 'IMPROCEDENTE';
+
+export class DenunciaModel {
+    cdDenuncia: number;
+    cdDenunciante: number;
+    nomeDenunciante: string;
+    tipoAlvo: TipoAlvo;
+    cdAnuncio: number | null;
+    nmAnuncio: string | null;
+    cdUsuarioDenunciado: number;
+    nmUsuarioDenunciado: string;
+    motivo: string;
+    descricao: string | null;
+    snapshotAnuncio: string | null;
+    status: StatusDenuncia;
+    dtCriacao: string;
+    cdAdminResponsavel: number | null;
+    nmAdminResponsavel: string | null;
+    dtAnalise: string | null;
+
+    constructor() {
+        this.cdDenuncia = 0;
+        this.cdDenunciante = 0;
+        this.nomeDenunciante = '';
+        this.tipoAlvo = 'ANUNCIO';
+        this.cdAnuncio = null;
+        this.nmAnuncio = null;
+        this.cdUsuarioDenunciado = 0;
+        this.nmUsuarioDenunciado = '';
+        this.motivo = '';
+        this.descricao = null;
+        this.snapshotAnuncio = null;
+        this.status = 'PENDENTE';
+        this.dtCriacao = '';
+        this.cdAdminResponsavel = null;
+        this.nmAdminResponsavel = null;
+        this.dtAnalise = null;
+    }
+}
+
+export interface SancaoModel {
+    cdSancao: number;
+    tipoAlvo: TipoAlvo;
+    cdUsuario: number;
+    nmUsuario: string;
+    cdAnuncio: number | null;
+    nmAnuncio: string | null;
+    tipo: 'SUSPENSAO' | 'REATIVACAO' | 'EXCLUSAO';
+    dias: number | null;
+    dtInicio: string;
+    dtFim: string | null;
+    cdAdmin: number | null;
+    nmAdmin: string | null;
+    cdDenuncia: number | null;
+}
+
+export interface PaginaModel<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    last: boolean;
+}
+
+// Mesma lista do enum MotivoDenuncia do back-end
+export const MOTIVOS_DENUNCIA: { valor: string; rotulo: string }[] = [
+    { valor: 'GOLPE_FRAUDE', rotulo: 'Golpe ou fraude' },
+    { valor: 'PRODUTO_PROIBIDO', rotulo: 'Produto proibido' },
+    { valor: 'INFORMACAO_FALSA', rotulo: 'Informação falsa ou enganosa' },
+    { valor: 'CONTEUDO_OFENSIVO', rotulo: 'Conteúdo ofensivo' },
+    { valor: 'ASSEDIO', rotulo: 'Assédio' },
+    { valor: 'SPAM_DUPLICADO', rotulo: 'Spam ou anúncio duplicado' },
+    { valor: 'PERFIL_FALSO', rotulo: 'Perfil falso' },
+    { valor: 'OUTRO', rotulo: 'Outro' }
+];
+
+export function rotuloMotivo(valor: string): string {
+    return MOTIVOS_DENUNCIA.find(m => m.valor === valor)?.rotulo ?? valor;
+}

@@ -1,0 +1,182 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/denuncias" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Denúncia</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <div class="loading-state loading-state--center" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <ng-container *ngIf="!carregando">
+
+      <!-- Resumo -->
+      <section class="card card--accent">
+        <div class="badges">
+          <span class="badge" [class.badge--accent]="denuncia.tipoAlvo === 'USUARIO'">
+            {{ denuncia.tipoAlvo === 'ANUNCIO' ? 'Anúncio' : 'Usuário' }}
+          </span>
+          <span class="badge"
+            [class.badge--muted]="denuncia.status === 'IMPROCEDENTE'"
+            [class.badge--success]="denuncia.status === 'PROCEDENTE'"
+            [class.badge--danger]="denuncia.status === 'PENDENTE'">
+            {{ rotuloStatusDenuncia() }}
+          </span>
+        </div>
+
+        <h1 class="titulo">{{ rotuloMotivo(denuncia.motivo) }}</h1>
+
+        <div class="info-item">
+          <ion-icon name="flag-outline"></ion-icon>
+          <span>Denunciado por <strong>{{ denuncia.nomeDenunciante }}</strong></span>
+        </div>
+
+        <div class="info-item">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ denuncia.dtCriacao | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <div class="info-item" *ngIf="!pendente && denuncia.nmAdminResponsavel">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>Analisada por {{ denuncia.nmAdminResponsavel }} em {{ denuncia.dtAnalise | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </section>
+
+      <!-- Relato do denunciante -->
+      <section class="card">
+        <h3>Relato do denunciante</h3>
+        <p class="texto-livre" *ngIf="denuncia.descricao">{{ denuncia.descricao }}</p>
+        <p class="text-muted" *ngIf="!denuncia.descricao">O denunciante não escreveu detalhes.</p>
+      </section>
+
+      <!-- Anúncio denunciado -->
+      <section class="card anuncio-card" *ngIf="denuncia.tipoAlvo === 'ANUNCIO'">
+        <div class="card-topo">
+          <h3>Anúncio denunciado</h3>
+          <span class="badge" *ngIf="anuncio"
+            [class.badge--success]="anuncio.status === 'ATIVO'"
+            [class.badge--accent]="anuncio.status === 'SUSPENSO'"
+            [class.badge--danger]="anuncio.status === 'EXCLUIDO'">
+            {{ rotuloStatusAlvo(anuncio.status) }}
+          </span>
+        </div>
+
+        <div class="anuncio-linha">
+          <div class="anuncio-linha__foto">
+            <img *ngIf="anuncio?.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="denuncia.nmAnuncio">
+            <ion-icon *ngIf="!anuncio?.ftAnuncio" name="image-outline"></ion-icon>
+          </div>
+          <div>
+            <strong>{{ denuncia.nmAnuncio }}</strong>
+            <p class="preco" *ngIf="anuncio?.tipoAnuncio === 'VENDA'">R$ {{ anuncio.valor | number:'1.2-2' }}</p>
+            <p class="preco" *ngIf="anuncio?.tipoAnuncio === 'REQUERIMENTO'">
+              R$ {{ anuncio.valorMin | number:'1.2-2' }} – R$ {{ anuncio.valorMax | number:'1.2-2' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="snapshot" *ngIf="denuncia.snapshotAnuncio">
+          <span class="snapshot__rotulo">
+            <ion-icon name="document-text-outline"></ion-icon>
+            Como estava no momento da denúncia
+          </span>
+          <p class="texto-livre">{{ denuncia.snapshotAnuncio }}</p>
+        </div>
+      </section>
+
+      <!-- Usuário denunciado -->
+      <section class="card">
+        <div class="card-topo">
+          <h3>{{ denuncia.tipoAlvo === 'ANUNCIO' ? 'Anunciante' : 'Usuário denunciado' }}</h3>
+          <span class="badge" *ngIf="usuarioDenunciado"
+            [class.badge--success]="contaAtiva"
+            [class.badge--accent]="contaSuspensa"
+            [class.badge--danger]="usuarioDenunciado.status === 'EXCLUIDO'">
+            {{ rotuloStatusAlvo(usuarioDenunciado.status) }}
+          </span>
+        </div>
+
+        <div class="usuario-linha">
+          <img class="avatar" [src]="usuarioDenunciado?.ftUsuario || 'assets/img/usuarioPadrao.png'" alt="">
+          <div>
+            <strong>{{ denuncia.nmUsuarioDenunciado }}</strong>
+            <p class="text-muted" *ngIf="usuarioDenunciado?.email">{{ usuarioDenunciado.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="contaSuspensa && usuarioDenunciado.suspensoAte">
+          <ion-icon name="ban-outline"></ion-icon>
+          <span>Suspensa até {{ usuarioDenunciado.suspensoAte | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <div class="info-item">
+          <ion-icon name="flag-outline"></ion-icon>
+          <span>
+            {{ totalDenunciasRecebidas }} {{ totalDenunciasRecebidas === 1 ? 'denúncia recebida' : 'denúncias recebidas' }}
+            (contando as dos anúncios)
+          </span>
+        </div>
+
+        <div class="historico" *ngIf="sancoes.length > 0">
+          <p class="section-title">Histórico de sanções</p>
+          <div class="historico__item" *ngFor="let sancao of sancoes">
+            <span>{{ rotuloSancao(sancao) }}</span>
+            <span class="text-muted">{{ sancao.dtInicio | date: 'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ações -->
+      <section class="card card--danger acoes">
+        <h3>Ações de moderação</h3>
+
+        <div class="btn-group">
+          <ion-button expand="block" color="danger" *ngIf="denuncia.tipoAlvo === 'ANUNCIO' && anuncioDisponivel"
+            [disabled]="processando" (click)="confirmarExclusaoAnuncio()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Apagar anúncio
+          </ion-button>
+
+          <ion-button expand="block" color="danger" fill="outline" *ngIf="contaAtiva"
+            [disabled]="processando" (click)="escolherDiasSuspensao()">
+            <ion-icon name="ban-outline" slot="start"></ion-icon>
+            Suspender conta {{ denuncia.tipoAlvo === 'ANUNCIO' ? 'do anunciante' : '' }}
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" *ngIf="contaSuspensa"
+            [disabled]="processando" (click)="confirmarReativacao()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Reativar conta
+          </ion-button>
+
+          <ion-button expand="block" fill="outline" color="medium" *ngIf="pendente"
+            [disabled]="processando" (click)="confirmarDescarte()">
+            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+            Descartar denúncia
+          </ion-button>
+
+          <ion-button expand="block" fill="clear" color="medium"
+            [disabled]="processando" (click)="confirmarApagarDenuncia()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Apagar denúncia
+          </ion-button>
+        </div>
+
+        <p class="text-muted dica" *ngIf="pendente">
+          Apagar o anúncio ou suspender a conta marca esta denúncia como procedente automaticamente.
+        </p>
+      </section>
+
+    </ng-container>
+
+  </div>
+
+</ion-content>

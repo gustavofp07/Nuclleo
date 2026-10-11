@@ -12,9 +12,21 @@
         </div>
       </div>
 
-      <p class="section-title menu-secao">Navegação</p>
+      <p class="section-title menu-secao">{{ ehAdmin ? 'Administração' : 'Navegação' }}</p>
 
-      <ion-list lines="none" class="menu-lista">
+      <ion-list lines="none" class="menu-lista" *ngIf="ehAdmin">
+
+        <ion-item button [detail]="false" routerLink="/admin/denuncias" routerLinkActive="ativo" menuClose>
+          <ion-icon name="flag-outline" slot="start"></ion-icon>
+          <ion-label>Denúncias</ion-label>
+          <span *ngIf="totalDenunciasPendentes > 0" class="badge badge--gradient" slot="end">
+            {{ totalDenunciasPendentes }}
+          </span>
+        </ion-item>
+
+      </ion-list>
+
+      <ion-list lines="none" class="menu-lista" *ngIf="!ehAdmin">
 
         <ion-item button [detail]="false" routerLink="/tela-inicial" routerLinkActive="ativo" menuClose>
           <ion-icon name="home-outline" slot="start"></ion-icon>

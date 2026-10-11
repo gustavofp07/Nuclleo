@@ -22,7 +22,8 @@ import { switchMap } from 'rxjs/operators';
 import { addIcons } from 'ionicons';
 import {
   createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartOutline,
-  heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, checkmarkCircle, logInOutline, refreshOutline
+  heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, checkmarkCircle, logInOutline, refreshOutline,
+  flagOutline
 } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
@@ -37,6 +38,7 @@ import { InteresseModel } from 'src/app/model/interesse.model';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
+import { DenunciaService } from 'src/app/services/denuncia.service';
 
 @Component({
   selector: 'app-anuncio-tela',
@@ -88,7 +90,8 @@ export class AnuncioTelaPage {
     private usuarioComunidadeService: UsuarioComunidadeService,
     private usuarioService: UsuarioService,
     private location: Location,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private denunciaService: DenunciaService
   ) {
     this.token = new TokenModel();
     addIcons({
@@ -104,7 +107,8 @@ export class AnuncioTelaPage {
       heartOutline,
       checkmarkCircle,
       logInOutline,
-      refreshOutline
+      refreshOutline,
+      flagOutline
     });
   }
 
@@ -427,6 +431,10 @@ export class AnuncioTelaPage {
     });
 
     await alert.present();
+  }
+
+  denunciarAnuncio() {
+    this.denunciaService.abrirFormulario('ANUNCIO', this.anuncio.cdAnuncio);
   }
 
   irParaPerfilAnunciante() {

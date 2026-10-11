@@ -18,7 +18,7 @@ export class NotificacaoService {
   private cdUsuarioConectado: number | null = null;
   private notificacaoRecebida = new Subject<NotificacaoEvento>();
 
-  conectar(cdUsuario: number) {
+  conectar(cdUsuario: number, admin: boolean = false) {
     if (this.client?.active && this.cdUsuarioConectado === cdUsuario) {
       return;
     }
@@ -26,14 +26,21 @@ export class NotificacaoService {
     this.desconectar();
     this.cdUsuarioConectado = cdUsuario;
 
+    const repassar = (msg: IMessage) => {
+      const evento: NotificacaoEvento = JSON.parse(msg.body);
+      this.notificacaoRecebida.next(evento);
+    };
+
     this.client = new Client({
       webSocketFactory: () => new SockJS(this.URL_WS),
       reconnectDelay: 5000,
       onConnect: () => {
-        this.client!.subscribe(`/topic/notificacoes/${cdUsuario}`, (msg: IMessage) => {
-          const evento: NotificacaoEvento = JSON.parse(msg.body);
-          this.notificacaoRecebida.next(evento);
-        });
+        this.client!.subscribe(`/topic/notificacoes/${cdUsuario}`, repassar);
+
+        // Administradores também recebem o aviso de novas denúncias
+        if (admin) {
+          this.client!.subscribe('/topic/admin/denuncias', repassar);
+        }
       }
     });
 

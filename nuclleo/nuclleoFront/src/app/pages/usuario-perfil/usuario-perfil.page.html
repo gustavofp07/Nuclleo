@@ -157,6 +157,13 @@
 
     </section>
 
+    <div class="perfil-denunciar" *ngIf="!ehPerfilProprio && !carregando">
+      <ion-button expand="block" fill="clear" color="medium" (click)="denunciarUsuario()">
+        <ion-icon name="flag-outline" slot="start"></ion-icon>
+        Denunciar usuário
+      </ion-button>
+    </div>
+
     <section class="card card--danger zona-perigo" *ngIf="ehPerfilProprio">
       <h3>Excluir conta</h3>
       <p>Ao excluir sua conta, não há como voltar atrás. Essa ação é permanente.</p>

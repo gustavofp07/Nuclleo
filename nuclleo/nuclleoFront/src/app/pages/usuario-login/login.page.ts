@@ -93,7 +93,7 @@ export class LoginPage {
         this.tokenService.salvar(token);
         this.entrando = false;
         await this.exibirMensagem('Login realizado com sucesso!');
-        this.router.navigate(['/tela-inicial']);
+        this.router.navigate([this.tokenService.isAdmin() ? '/admin/denuncias' : '/tela-inicial']);
       },
       error: async (erro: any) => {
         this.entrando = false;

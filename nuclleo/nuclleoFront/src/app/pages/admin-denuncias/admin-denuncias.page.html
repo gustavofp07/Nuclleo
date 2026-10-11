@@ -1,0 +1,111 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Denúncias</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-refresher slot="fixed" (ionRefresh)="carregar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-container">
+
+    <div class="page-header">
+      <span class="eyebrow">Moderação</span>
+      <h1>Denúncias</h1>
+      <p>Analise o que os usuários denunciaram e tome uma ação.</p>
+    </div>
+
+    <div class="tabs">
+      <button type="button" [class.ativo]="statusSelecionado === 'PENDENTE'" (click)="selecionarStatus('PENDENTE')">
+        Pendentes
+      </button>
+      <button type="button" [class.ativo]="statusSelecionado === 'PROCEDENTE'" (click)="selecionarStatus('PROCEDENTE')">
+        Procedentes
+      </button>
+      <button type="button" [class.ativo]="statusSelecionado === 'IMPROCEDENTE'"
+        (click)="selecionarStatus('IMPROCEDENTE')">
+        Descartadas
+      </button>
+      <button type="button" [class.ativo]="statusSelecionado === null" (click)="selecionarStatus(null)">
+        Todas
+      </button>
+    </div>
+
+    <div class="filtros">
+      <button type="button" class="filtro" [class.ativo]="tipoAlvoSelecionado === 'ANUNCIO'"
+        (click)="selecionarTipoAlvo('ANUNCIO')">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        Anúncios
+      </button>
+      <button type="button" class="filtro" [class.ativo]="tipoAlvoSelecionado === 'USUARIO'"
+        (click)="selecionarTipoAlvo('USUARIO')">
+        <ion-icon name="person-outline"></ion-icon>
+        Usuários
+      </button>
+      <span class="filtros__total" *ngIf="!carregando">{{ totalDenuncias }} no total</span>
+    </div>
+
+    <div class="loading-state loading-state--center" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!carregando && denuncias.length === 0">
+      <ion-icon name="flag-outline"></ion-icon>
+      <h2>Nenhuma denúncia</h2>
+      <p>{{ statusSelecionado === 'PENDENTE' ? 'Não há denúncias aguardando análise.' : 'Nada por aqui com esses filtros.' }}</p>
+    </div>
+
+    <div class="lista" *ngIf="!carregando && denuncias.length > 0">
+      <a *ngFor="let denuncia of denuncias" class="card card-clicavel denuncia-card"
+        [routerLink]="['/admin/denuncia', denuncia.cdDenuncia]">
+
+        <div class="denuncia-card__topo">
+          <span class="badge" [class.badge--accent]="denuncia.tipoAlvo === 'USUARIO'">
+            {{ denuncia.tipoAlvo === 'ANUNCIO' ? 'Anúncio' : 'Usuário' }}
+          </span>
+          <span class="badge"
+            [class.badge--muted]="denuncia.status === 'IMPROCEDENTE'"
+            [class.badge--success]="denuncia.status === 'PROCEDENTE'"
+            [class.badge--danger]="denuncia.status === 'PENDENTE'">
+            {{ rotuloStatus(denuncia.status) }}
+          </span>
+        </div>
+
+        <h3 class="denuncia-card__titulo">
+          {{ denuncia.tipoAlvo === 'ANUNCIO' ? denuncia.nmAnuncio : denuncia.nmUsuarioDenunciado }}
+        </h3>
+
+        <p class="denuncia-card__motivo">{{ rotuloMotivo(denuncia.motivo) }}</p>
+
+        <div class="denuncia-card__meta">
+          <span>
+            <ion-icon name="person-outline"></ion-icon>
+            {{ denuncia.tipoAlvo === 'ANUNCIO' ? 'Anunciante: ' + denuncia.nmUsuarioDenunciado : 'Denunciado por ' + denuncia.nomeDenunciante }}
+          </span>
+          <span>
+            <ion-icon name="time-outline"></ion-icon>
+            {{ denuncia.dtCriacao | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <ion-icon name="chevron-forward-outline" class="denuncia-card__seta"></ion-icon>
+      </a>
+    </div>
+
+    <div class="carregar-mais" *ngIf="!carregando && !ultimaPagina">
+      <ion-button fill="outline" [disabled]="carregandoMais" (click)="carregarMais()">
+        <ion-spinner name="dots" *ngIf="carregandoMais"></ion-spinner>
+        <span *ngIf="!carregandoMais">Carregar mais</span>
+      </ion-button>
+    </div>
+
+  </div>
+
+</ion-content>
