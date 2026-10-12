@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.dto.MensagemDTO;
 import br.cefetmg.nuclleo.services.MensagemService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -31,5 +34,11 @@ public class MensagemRestController {
 
         List<MensagemDTO> mensagens = mensagemService.listarPorInteresse(cdInteresse);
         return ResponseEntity.ok(mensagens);
+    }
+
+    @DeleteMapping("/{cdMensagem}")
+    @Operation(summary = "Apagar mensagem para todos (somente o remetente; o usuário vem do token)")
+    public ResponseEntity<MensagemDTO> apagar(@PathVariable Long cdMensagem, Authentication authentication) {
+        return ResponseEntity.ok(mensagemService.apagar(cdMensagem, authentication.getName()));
     }
 }

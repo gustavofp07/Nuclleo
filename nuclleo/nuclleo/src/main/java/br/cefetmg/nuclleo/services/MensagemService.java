@@ -4,11 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.MensagemDTO;
 import br.cefetmg.nuclleo.dto.MensagemRequestDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Mensagem;
@@ -27,6 +31,9 @@ public class MensagemService {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public MensagemDTO salvar(Long cdInteresse, MensagemRequestDTO dto) {
         Interesse interesse = interesseService.buscarPorId(cdInteresse);
@@ -53,8 +60,48 @@ public class MensagemService {
         mensagem.setRemetente(remetente);
         mensagem.setConteudo(dto.getConteudo());
 
+        if (dto.getCdMensagemResposta() != null) {
+            Mensagem respondida = mensagemRepository.findById(dto.getCdMensagemResposta())
+                    .orElseThrow(() -> new ResourceNotFoundException("Mensagem respondida não encontrada."));
+
+            if (!respondida.getInteresse().getId().equals(cdInteresse)) {
+                throw new BusinessException("A mensagem respondida não é desta conversa.");
+            }
+            if (respondida.isApagada()) {
+                throw new BusinessException("Não é possível responder uma mensagem apagada.");
+            }
+            mensagem.setRespostaA(respondida);
+        }
+
         Mensagem salva = mensagemRepository.save(mensagem);
         return MensagemDTO.of(salva);
+    }
+
+    /**
+     * "Apagar para todos": só o remetente apaga, e a mensagem vira "Mensagem apagada"
+     * para os dois. Os participantes com o chat aberto são avisados na hora.
+     */
+    @Transactional
+    public MensagemDTO apagar(Long cdMensagem, String emailSolicitante) {
+        Mensagem mensagem = mensagemRepository.findById(cdMensagem)
+                .orElseThrow(() -> new ResourceNotFoundException("Mensagem não encontrada."));
+
+        if (!mensagem.getRemetente().getEmail().equalsIgnoreCase(emailSolicitante)) {
+            throw new ForbiddenException("Você só pode apagar as suas próprias mensagens.");
+        }
+
+        if (mensagem.getInteresse().isFinalizado()) {
+            throw new BusinessException("Não é possível apagar mensagens de uma conversa finalizada.");
+        }
+
+        if (!mensagem.isApagada()) {
+            mensagem.setApagada(true);
+            mensagemRepository.save(mensagem);
+        }
+
+        MensagemDTO dto = MensagemDTO.of(mensagem);
+        messagingTemplate.convertAndSend("/topic/chat/" + mensagem.getInteresse().getId() + "/apagada", dto);
+        return dto;
     }
 
     public List<MensagemDTO> listarPorInteresse(Long cdInteresse) {

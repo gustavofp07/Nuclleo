@@ -13,6 +13,17 @@ public class MensagemRequestDTO {
     @Size(max = 500, message = "A mensagem não pode ter mais que 500 caracteres.")
     private String conteudo;
 
+    // Opcional: id da mensagem que está sendo respondida
+    private Long cdMensagemResposta;
+
+    public Long getCdMensagemResposta() {
+        return cdMensagemResposta;
+    }
+
+    public void setCdMensagemResposta(Long cdMensagemResposta) {
+        this.cdMensagemResposta = cdMensagemResposta;
+    }
+
     public Long getCdUsuarioRemetente() {
         return cdUsuarioRemetente;
     }

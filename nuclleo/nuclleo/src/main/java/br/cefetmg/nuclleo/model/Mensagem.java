@@ -26,6 +26,17 @@ public class Mensagem {
     @Column(nullable = false)
     private LocalDateTime dataEnvio;
 
+    // Mensagem que esta responde (opcional)
+    @ManyToOne
+    @JoinColumn(name = "cd_mensagem_resposta")
+    private Mensagem respostaA;
+
+    // "Apagar para todos": a linha continua no banco (mantém as respostas e serve de
+    // prova numa denúncia), mas o conteúdo deixa de ser enviado para o front.
+    // O default evita erro nas linhas que já existem quando a coluna for criada.
+    @Column(name = "apagada", nullable = false, columnDefinition = "boolean default false not null")
+    private boolean apagada = false;
+
 
 
 
@@ -76,5 +87,21 @@ public class Mensagem {
 
     public void setDataEnvio(LocalDateTime dataEnvio) {
         this.dataEnvio = dataEnvio;
+    }
+
+    public Mensagem getRespostaA() {
+        return respostaA;
+    }
+
+    public void setRespostaA(Mensagem respostaA) {
+        this.respostaA = respostaA;
+    }
+
+    public boolean isApagada() {
+        return apagada;
+    }
+
+    public void setApagada(boolean apagada) {
+        this.apagada = apagada;
     }
 }

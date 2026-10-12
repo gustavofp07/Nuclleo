@@ -13,13 +13,16 @@ import {
   IonInput,
   IonButton,
   IonIcon,
+  ActionSheetController,
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
 import { Subscription } from 'rxjs';
 
 import { addIcons } from 'ionicons';
-import { send, chatbubbleOutline, flagOutline, star } from 'ionicons/icons';
+import {
+  send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close
+} from 'ionicons/icons';
 
 import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service';
 import { InteresseService } from 'src/app/services/interesse.service';
@@ -80,6 +83,11 @@ export class ChatPage implements OnDestroy {
   // 'finalizar' = anunciante finalizando; 'avaliar' = interessado avaliando o anunciante
   modoTela: 'finalizar' | 'avaliar' = 'finalizar';
 
+  // Responder e apagar mensagens
+  respondendoA: MensagemView | null = null;
+  mensagemDestacada: number | null = null;
+  private timeoutDestaque: ReturnType<typeof setTimeout> | undefined;
+
   private avaliacaoSolicitada = false;
   private encerrando = false;
 
@@ -92,12 +100,15 @@ export class ChatPage implements OnDestroy {
     private interesseService: InteresseService,
     private ngZone: NgZone,
     private alertController: AlertController,
+    private actionSheetController: ActionSheetController,
     private toastController: ToastController,
     private tokenService: TokenService,
     private router: Router
   ) {
     this.token = new TokenModel();
-    addIcons({ send, chatbubbleOutline, flagOutline, star });
+    addIcons({
+      send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close
+    });
   }
 
   ionViewWillEnter() {
@@ -204,6 +215,11 @@ export class ChatPage implements OnDestroy {
       });
     }));
 
+    // O outro usuário (ou eu, em outro aparelho) apagou uma mensagem
+    this.inscricoes.push(this.chatService.onMensagemApagada().subscribe((mensagem) => {
+      this.ngZone.run(() => this.marcarComoApagada(mensagem.id!));
+    }));
+
     this.inscricoes.push(this.chatService.onStatusConexao().subscribe((status) => {
       this.ngZone.run(() => {
         this.conectado = status;
@@ -295,6 +311,8 @@ export class ChatPage implements OnDestroy {
       return;
     }
 
+    const respondida = this.respondendoA;
+
     const mensagemOtimista: MensagemView = {
       id: Date.now(),
       cdInteresse: this.cdInteresse,
@@ -302,7 +320,10 @@ export class ChatPage implements OnDestroy {
       nomeRemetente: this.token.nmUsuario,
       conteudo: texto,
       dataEnvio: new Date().toISOString(),
-      enviando: true
+      enviando: true,
+      cdMensagemResposta: respondida?.id ?? null,
+      nomeRemetenteResposta: respondida?.nomeRemetente ?? null,
+      conteudoResposta: respondida?.conteudo ?? null
     };
 
     this.mensagens.push(mensagemOtimista);
@@ -310,11 +331,123 @@ export class ChatPage implements OnDestroy {
 
     this.chatService.enviarMensagem(
       this.cdInteresse,
-      { cdUsuarioRemetente: this.token.cdUsuario, conteudo: texto }
+      { cdUsuarioRemetente: this.token.cdUsuario, conteudo: texto, cdMensagemResposta: respondida?.id ?? null }
     );
 
     this.textoMensagem = '';
+    this.respondendoA = null;
     this.pararDigitacao();
+  }
+
+  // ===================== RESPONDER E APAGAR =====================
+
+  get podeInteragir(): boolean {
+    return !this.chatFinalizado && !this.aguardandoAceite;
+  }
+
+  // Toque na mensagem: abre as opções (responder, copiar, apagar)
+  async abrirAcoes(mensagem: MensagemView) {
+    if (mensagem.enviando || mensagem.apagada) {
+      return;
+    }
+
+    const minha = this.ehMinhaMensagem(mensagem);
+    const botoes: any[] = [];
+
+    if (this.podeInteragir) {
+      botoes.push({ text: 'Responder', icon: 'arrow-undo-outline', handler: () => this.responder(mensagem) });
+    }
+
+    botoes.push({ text: 'Copiar texto', icon: 'copy-outline', handler: () => this.copiar(mensagem) });
+
+    if (minha && this.podeInteragir) {
+      botoes.push({
+        text: 'Apagar para todos',
+        icon: 'trash-outline',
+        role: 'destructive',
+        handler: () => { this.confirmarApagar(mensagem); }
+      });
+    }
+
+    botoes.push({ text: 'Cancelar', role: 'cancel' });
+
+    const actionSheet = await this.actionSheetController.create({ buttons: botoes });
+    await actionSheet.present();
+  }
+
+  responder(mensagem: MensagemView) {
+    this.respondendoA = mensagem;
+  }
+
+  cancelarResposta() {
+    this.respondendoA = null;
+  }
+
+  async copiar(mensagem: MensagemView) {
+    try {
+      await navigator.clipboard.writeText(mensagem.conteudo ?? '');
+      this.exibirMensagem('Mensagem copiada.');
+    } catch {
+      this.exibirMensagem('Não foi possível copiar a mensagem.');
+    }
+  }
+
+  async confirmarApagar(mensagem: MensagemView) {
+    const alert = await this.alertController.create({
+      header: 'Apagar mensagem',
+      message: 'A mensagem será apagada para você e para o outro usuário. No lugar dela vai aparecer "Mensagem apagada".',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Apagar', role: 'destructive', handler: () => this.apagar(mensagem) }
+      ]
+    });
+    await alert.present();
+  }
+
+  apagar(mensagem: MensagemView) {
+    this.chatService.apagarMensagem(mensagem.id!).subscribe({
+      next: () => this.ngZone.run(() => this.marcarComoApagada(mensagem.id!)),
+      error: (erro) => this.exibirMensagem(erro?.error?.message || 'Erro ao apagar a mensagem.')
+    });
+  }
+
+  // Atualiza a mensagem e as respostas que citam ela
+  private marcarComoApagada(cdMensagem: number) {
+    for (const m of this.mensagens) {
+      if (m.id === cdMensagem) {
+        m.apagada = true;
+        m.conteudo = null;
+      }
+      if (m.cdMensagemResposta === cdMensagem) {
+        m.respostaApagada = true;
+        m.conteudoResposta = null;
+      }
+    }
+
+    if (this.respondendoA?.id === cdMensagem) {
+      this.respondendoA = null;
+    }
+  }
+
+  // "Você" quando a mensagem citada é minha; senão, o nome de quem enviou
+  nomeDaCitacao(mensagem: MensagemView): string {
+    const original = this.mensagens.find(m => m.id === mensagem.cdMensagemResposta);
+    if (original && this.ehMinhaMensagem(original)) {
+      return 'Você';
+    }
+    return mensagem.nomeRemetenteResposta ?? '';
+  }
+
+  // Toque na citação: rola até a mensagem original e destaca por um instante
+  irParaMensagem(cdMensagem: number | null | undefined, event: Event) {
+    event.stopPropagation();
+    if (!cdMensagem) return;
+
+    document.getElementById('msg-' + cdMensagem)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    this.mensagemDestacada = cdMensagem;
+    clearTimeout(this.timeoutDestaque);
+    this.timeoutDestaque = setTimeout(() => this.ngZone.run(() => this.mensagemDestacada = null), 1600);
   }
 
   onDigitar() {

@@ -27,6 +27,7 @@ export class ChatService {
 
   private client: Client | null = null;
   private mensagemRecebida = new Subject<MensagemModel>();
+  private mensagemApagada = new Subject<MensagemModel>();
   private statusConexao = new Subject<boolean>();
   private digitandoEvento = new Subject<DigitandoEvento>();
   private statusInteresseAtualizado = new Subject<StatusInteresseEvento>();
@@ -56,6 +57,11 @@ export class ChatService {
           this.mensagemRecebida.next(mensagem);
         });
 
+        this.client!.subscribe(`/topic/chat/${cdInteresse}/apagada`, (msg: IMessage) => {
+          const mensagem: MensagemModel = JSON.parse(msg.body);
+          this.mensagemApagada.next(mensagem);
+        });
+
         this.client!.subscribe(`/topic/chat/${cdInteresse}/digitando`, (msg: IMessage) => {
           const evento: DigitandoEvento = JSON.parse(msg.body);
           this.digitandoEvento.next(evento);
@@ -77,7 +83,8 @@ export class ChatService {
     this.client.activate();
   }
 
-  enviarMensagem(cdInteresse: number, mensagem: { cdUsuarioRemetente: number; conteudo: string }) {
+  enviarMensagem(cdInteresse: number,
+    mensagem: { cdUsuarioRemetente: number; conteudo: string; cdMensagemResposta?: number | null }) {
     if (!this.client?.active) {
       return;
     }
@@ -103,6 +110,10 @@ export class ChatService {
     return this.mensagemRecebida.asObservable();
   }
 
+  onMensagemApagada(): Observable<MensagemModel> {
+    return this.mensagemApagada.asObservable();
+  }
+
   onStatusConexao(): Observable<boolean> {
     return this.statusConexao.asObservable();
   }
@@ -118,6 +129,11 @@ export class ChatService {
   desconectar() {
     this.client?.deactivate();
     this.client = null;
+  }
+
+  // "Apagar para todos": só funciona para mensagens do próprio usuário (o back confere pelo token)
+  apagarMensagem(cdMensagem: number): Observable<MensagemModel> {
+    return this.http.delete<MensagemModel>(`${this.URL_HTTP}/${cdMensagem}`, this.getHeaders());
   }
 
   listarHistorico(cdInteresse: number): Observable<MensagemModel[]> {
