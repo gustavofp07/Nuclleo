@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fundo do app (--nc-bg do tema escuro). Aparece atrás da barra de status e da barra de navegação. -->
+    <color name="nuclleo_fundo">#0A0910</color>
+</resources>
