@@ -34,11 +34,15 @@
 
           <!-- Foto de quem enviou (só na primeira de uma sequência) -->
           <ng-container *ngIf="!ehMinha(mensagem)">
-            <img *ngIf="mostrarRemetente(i) && mensagem.ftRemetente" [src]="mensagem.ftRemetente"
-              class="avatar avatar--sm mensagem__avatar" [alt]="mensagem.nomeRemetente">
-            <div *ngIf="mostrarRemetente(i) && !mensagem.ftRemetente" class="avatar avatar--sm mensagem__avatar">
-              {{ mensagem.nomeRemetente.charAt(0) }}
-            </div>
+            <!-- Toque na foto abre o perfil de quem enviou -->
+            <button type="button" class="mensagem__perfil" *ngIf="mostrarRemetente(i)"
+              (click)="irParaPerfil(mensagem.cdUsuarioRemetente)" [attr.aria-label]="'Ver perfil de ' + mensagem.nomeRemetente">
+              <img *ngIf="mensagem.ftRemetente" [src]="mensagem.ftRemetente"
+                class="avatar avatar--sm mensagem__avatar" [alt]="mensagem.nomeRemetente">
+              <div *ngIf="!mensagem.ftRemetente" class="avatar avatar--sm mensagem__avatar">
+                {{ mensagem.nomeRemetente.charAt(0) }}
+              </div>
+            </button>
             <div *ngIf="!mostrarRemetente(i)" class="mensagem__avatar mensagem__avatar--vazio"></div>
           </ng-container>
 
@@ -46,7 +50,7 @@
             [class.balao--acionavel]="!mensagem.enviando && !mensagem.apagada" (click)="abrirAcoes(mensagem)">
 
             <span class="balao__remetente" *ngIf="mostrarRemetente(i)">
-              {{ mensagem.nomeRemetente }}
+              <a class="balao__nome" (click)="irParaPerfil(mensagem.cdUsuarioRemetente, $event)">{{ mensagem.nomeRemetente }}</a>
               <span class="badge badge--gradient" *ngIf="mensagem.cdUsuarioRemetente === cdCriador">Admin</span>
             </span>
 

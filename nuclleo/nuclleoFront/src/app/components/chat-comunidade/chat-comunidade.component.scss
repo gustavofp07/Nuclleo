@@ -411,3 +411,34 @@
   height: 7px;
   background: var(--nc-purple-light);
 }
+
+// ===== Foto e nome clicáveis (abrem o perfil) =====
+
+.mensagem__perfil {
+  flex-shrink: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--nc-transition);
+}
+
+.mensagem__perfil:active {
+  transform: scale(0.92);
+}
+
+.mensagem__perfil:focus-visible {
+  outline: 2px solid var(--nc-purple-light);
+  outline-offset: 2px;
+}
+
+.balao__nome {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.balao__nome:hover {
+  text-decoration: underline;
+}

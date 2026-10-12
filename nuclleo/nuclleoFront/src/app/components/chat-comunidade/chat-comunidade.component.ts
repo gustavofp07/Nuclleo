@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonButton,
   IonIcon,
@@ -90,7 +91,8 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
     private actionSheetController: ActionSheetController,
     private alertController: AlertController,
     private toastController: ToastController,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router
   ) {
     addIcons({ send, chatbubblesOutline, arrowUndoOutline, trashOutline, copyOutline, banOutline, close, refreshOutline });
   }
@@ -401,6 +403,12 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
   }
 
   // ===================== EXIBIÇÃO =====================
+
+  // Foto ou nome de quem enviou: abre o perfil (sem abrir o menu da mensagem)
+  irParaPerfil(cdUsuario: number, event?: Event) {
+    event?.stopPropagation();
+    this.router.navigate(['/usuario-perfil', cdUsuario]);
+  }
 
   // Em sequência de mensagens da mesma pessoa, nome e foto aparecem só na primeira
   mostrarRemetente(indice: number): boolean {
