@@ -17,13 +17,29 @@ import {
   send, chatbubblesOutline, arrowUndoOutline, trashOutline, copyOutline, banOutline, close, refreshOutline
 } from 'ionicons/icons';
 
-import { ComunidadeChatService } from 'src/app/services/comunidade-chat.service';
+import { ComunidadeChatService, DigitandoComunidadeEvento } from 'src/app/services/comunidade-chat.service';
 import { TokenService } from 'src/app/services/token.service';
 import { MensagemComunidadeModel } from 'src/app/model/mensagem-comunidade.model';
 
 interface MensagemView extends MensagemComunidadeModel {
   enviando?: boolean;
 }
+
+interface PessoaDigitando {
+  cdUsuario: number;
+  nome: string;
+  foto: string | null;
+  timeout: ReturnType<typeof setTimeout>;
+}
+
+// Enquanto a pessoa digita, o aviso é reenviado no máximo a cada 2s (e não a cada tecla)
+const INTERVALO_AVISO_DIGITANDO = 2000;
+// Sem tecla por 3s = parou de digitar
+const PAROU_DE_DIGITAR = 3000;
+// Quem recebe tira a foto se não chegar aviso novo em 5s (ex.: a pessoa fechou o app)
+const EXPIRA_DIGITANDO = 5000;
+// Fotos mostradas lado a lado; o resto vira "+N"
+const MAXIMO_FOTOS_DIGITANDO = 3;
 
 /**
  * Chat em grupo de uma comunidade (aba "Chat" da tela da comunidade).
@@ -56,6 +72,14 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
 
   cdUsuarioLogado: number = 0;
 
+  // Quem está digitando agora (outros membros)
+  digitando: PessoaDigitando[] = [];
+  readonly maximoFotosDigitando = MAXIMO_FOTOS_DIGITANDO;
+
+  private estouDigitando = false;
+  private ultimoAvisoDigitando = 0;
+  private timeoutPareiDeDigitar: ReturnType<typeof setTimeout> | undefined;
+
   private idTemporario = -1;
   private timeoutDestaque: ReturnType<typeof setTimeout> | undefined;
   private inscricoes: Subscription[] = [];
@@ -85,12 +109,18 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
       this.ngZone.run(() => this.marcarComoApagada(mensagem.id));
     }));
 
+    this.inscricoes.push(this.chatService.onDigitando().subscribe(evento => {
+      this.ngZone.run(() => this.atualizarDigitando(evento));
+    }));
+
     this.inscricoes.push(this.chatService.onStatusConexao().subscribe(status => {
       this.ngZone.run(() => this.conectado = status);
     }));
   }
 
   ngOnDestroy() {
+    this.pararDeDigitar();
+    this.digitando.forEach(p => clearTimeout(p.timeout));
     clearTimeout(this.timeoutDestaque);
     this.inscricoes.forEach(i => i.unsubscribe());
     this.inscricoes = [];
@@ -141,6 +171,7 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
     };
 
     this.mensagens.push(pendente);
+    this.pararDeDigitar();
     this.textoMensagem = '';
     this.respondendoA = null;
     this.rolarParaFinal();
@@ -169,11 +200,84 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.removerDigitando(mensagem.cdUsuarioRemetente);
+
     const estavaNoFim = this.estaNoFim();
     this.mensagens.push(mensagem);
     if (estavaNoFim) {
       this.rolarParaFinal();
     }
+  }
+
+  // ===================== DIGITANDO =====================
+
+  aoDigitar() {
+    clearTimeout(this.timeoutPareiDeDigitar);
+
+    if (!this.textoMensagem.trim()) {
+      this.pararDeDigitar();
+      return;
+    }
+
+    const agora = Date.now();
+    if (!this.estouDigitando || agora - this.ultimoAvisoDigitando >= INTERVALO_AVISO_DIGITANDO) {
+      this.estouDigitando = true;
+      this.ultimoAvisoDigitando = agora;
+      this.chatService.enviarDigitando(true);
+    }
+
+    this.timeoutPareiDeDigitar = setTimeout(() => this.pararDeDigitar(), PAROU_DE_DIGITAR);
+  }
+
+  private pararDeDigitar() {
+    clearTimeout(this.timeoutPareiDeDigitar);
+    if (this.estouDigitando) {
+      this.estouDigitando = false;
+      this.chatService.enviarDigitando(false);
+    }
+  }
+
+  private atualizarDigitando(evento: DigitandoComunidadeEvento) {
+    if (evento.cdUsuario === this.cdUsuarioLogado) {
+      return;
+    }
+
+    if (!evento.digitando) {
+      this.removerDigitando(evento.cdUsuario);
+      return;
+    }
+
+    const estavaNoFim = this.estaNoFim();
+    const existente = this.digitando.find(p => p.cdUsuario === evento.cdUsuario);
+    const timeout = setTimeout(
+      () => this.ngZone.run(() => this.removerDigitando(evento.cdUsuario)),
+      EXPIRA_DIGITANDO
+    );
+
+    if (existente) {
+      clearTimeout(existente.timeout);
+      existente.timeout = timeout;
+    } else {
+      this.digitando.push({ cdUsuario: evento.cdUsuario, nome: evento.nmUsuario, foto: evento.ftUsuario, timeout });
+      if (estavaNoFim) {
+        this.rolarParaFinal();
+      }
+    }
+  }
+
+  private removerDigitando(cdUsuario: number) {
+    const pessoa = this.digitando.find(p => p.cdUsuario === cdUsuario);
+    if (pessoa) {
+      clearTimeout(pessoa.timeout);
+      this.digitando = this.digitando.filter(p => p.cdUsuario !== cdUsuario);
+    }
+  }
+
+  get textoDigitando(): string {
+    const nomes = this.digitando.map(p => p.nome.split(' ')[0]);
+    if (nomes.length === 1) return `${nomes[0]} está digitando`;
+    if (nomes.length === 2) return `${nomes[0]} e ${nomes[1]} estão digitando`;
+    return `${nomes.length} pessoas estão digitando`;
   }
 
   private substituirPendente(idPendente: number, salva: MensagemComunidadeModel) {

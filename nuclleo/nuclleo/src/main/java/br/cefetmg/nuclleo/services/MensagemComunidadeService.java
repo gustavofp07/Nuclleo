@@ -118,6 +118,17 @@ public class MensagemComunidadeService {
         return dto;
     }
 
+    /** Usado pelo "digitando": membro ou criador da comunidade pode usar o chat. */
+    @Transactional(readOnly = true)
+    public boolean podeUsarChat(Long cdComunidade, Long cdUsuario) {
+        return comunidadeRepository.findById(cdComunidade)
+                .map(comunidade -> usuarioComunidadeRepository
+                        .existsByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade)
+                        || (comunidade.getUsuarioCria() != null
+                                && comunidade.getUsuarioCria().getCdUsuario().equals(cdUsuario)))
+                .orElse(false);
+    }
+
     /** Usado ao excluir a comunidade: apaga todo o histórico do chat. */
     @Transactional
     public void excluirPorComunidade(Long cdComunidade) {

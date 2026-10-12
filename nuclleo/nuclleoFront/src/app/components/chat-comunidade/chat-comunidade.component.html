@@ -72,6 +72,22 @@
       </ng-container>
     </ng-container>
 
+    <!-- Fotinhas de quem está digitando agora -->
+    <div class="digitando" *ngIf="digitando.length > 0" [attr.aria-label]="textoDigitando" [title]="textoDigitando">
+      <div class="digitando__fotos">
+        <ng-container *ngFor="let pessoa of digitando.slice(0, maximoFotosDigitando)">
+          <img *ngIf="pessoa.foto" [src]="pessoa.foto" class="avatar avatar--sm digitando__foto" [alt]="pessoa.nome">
+          <div *ngIf="!pessoa.foto" class="avatar avatar--sm digitando__foto">{{ pessoa.nome.charAt(0) }}</div>
+        </ng-container>
+        <span class="digitando__mais" *ngIf="digitando.length > maximoFotosDigitando">
+          +{{ digitando.length - maximoFotosDigitando }}
+        </span>
+      </div>
+      <div class="balao digitando__balao">
+        <span class="pontos pontos--digitando"><span></span><span></span><span></span></span>
+      </div>
+    </div>
+
   </div>
 
   <div class="chat-grupo__rodape">
@@ -91,7 +107,8 @@
     <div class="chat-input">
       <div class="form-field">
         <ion-input [(ngModel)]="textoMensagem" placeholder="Mensagem para a comunidade..." [maxlength]="limiteMensagem"
-          (keyup.enter)="enviar()" aria-label="Mensagem" [disabled]="carregando || erroAoCarregar">
+          (keyup.enter)="enviar()" (ionInput)="aoDigitar()" aria-label="Mensagem"
+          [disabled]="carregando || erroAoCarregar">
         </ion-input>
 
         <span class="contador" *ngIf="textoMensagem.length > limiteMensagem - 100"

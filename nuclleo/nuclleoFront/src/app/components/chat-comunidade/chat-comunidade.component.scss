@@ -364,3 +364,50 @@
   height: 46px;
   margin: 0;
 }
+
+// ===== Quem está digitando =====
+
+.digitando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.digitando__fotos {
+  display: flex;
+  align-items: center;
+}
+
+// Fotos sobrepostas, como uma pilha
+.digitando__foto {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+  border: 2px solid var(--nc-surface);
+}
+
+.digitando__foto + .digitando__foto {
+  margin-left: -9px;
+}
+
+.digitando__mais {
+  margin-left: 4px;
+  font-family: var(--nc-font-mono);
+  font-size: 11px;
+  color: var(--nc-text-muted);
+}
+
+.digitando__balao {
+  padding: 10px 12px;
+}
+
+.pontos--digitando {
+  margin-left: 0;
+}
+
+.pontos--digitando span {
+  width: 7px;
+  height: 7px;
+  background: var(--nc-purple-light);
+}
