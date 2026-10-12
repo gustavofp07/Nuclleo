@@ -14,6 +14,7 @@ import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.model.Usuario;
+import br.cefetmg.nuclleo.repository.MensagemComunidadeRepository;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.ComunidadeRepository;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
@@ -38,6 +39,9 @@ public class ComunidadeService {
 
     @Autowired
     private UsuarioComunidadeService usuarioComunidadeService;
+
+    @Autowired
+    private MensagemComunidadeRepository mensagemComunidadeRepository;
 
     @Autowired
     private ArquivoIntegracaoService arquivoIntegracaoService;
@@ -148,6 +152,10 @@ public class ComunidadeService {
         this.anuncioComunidadeRepository.deleteByComunidadeCdComunidade(cdComunidade);
 
         this.usuarioComunidadeService.excluirPorComunidade(cdComunidade);
+
+        // O histórico do chat da comunidade vai junto
+        this.mensagemComunidadeRepository.deleteByComunidade(cdComunidade);
+
         comunidadeRepository.delete(comunidade);
 
         return comunidade;

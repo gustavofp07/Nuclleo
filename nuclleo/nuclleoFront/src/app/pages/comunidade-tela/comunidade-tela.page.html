@@ -122,11 +122,10 @@
 
     </ng-container>
 
-    <div class="empty-state" *ngIf="abaSelecionada === 'chat'">
-      <ion-icon name="chatbubbles-outline"></ion-icon>
-      <h2>Chat da comunidade</h2>
-      <p>Em breve você poderá conversar com todos os membros por aqui.</p>
-    </div>
+    <!-- Chat em grupo: some (e desconecta) quando o usuário sai da aba ou é removido da comunidade -->
+    <app-chat-comunidade *ngIf="abaSelecionada === 'chat' && usuarioEntrouNaComunidade"
+      [cdComunidade]="comunidade.cdComunidade" [cdCriador]="comunidade.usuarioCria.cdUsuario">
+    </app-chat-comunidade>
 
     <ng-container *ngIf="abaSelecionada === 'anuncios'">
 

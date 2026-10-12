@@ -1,0 +1,115 @@
+<section class="chat-grupo">
+
+  <div class="chat-grupo__mensagens" #lista>
+
+    <div class="loading-state loading-state--center" *ngIf="carregando">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando...</p>
+    </div>
+
+    <div class="chat-grupo__vazio" *ngIf="!carregando && erroAoCarregar">
+      <p>Não foi possível carregar o chat.</p>
+      <ion-button size="small" fill="outline" (click)="carregar()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Tentar novamente
+      </ion-button>
+    </div>
+
+    <div class="chat-grupo__vazio" *ngIf="!carregando && !erroAoCarregar && mensagens.length === 0">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <h2>Nenhuma mensagem ainda</h2>
+      <p>Seja o primeiro a falar com os membros da comunidade!</p>
+    </div>
+
+    <ng-container *ngIf="!carregando">
+      <ng-container *ngFor="let mensagem of mensagens; let i = index; trackBy: trackPorId">
+
+        <div class="separador-data" *ngIf="mostrarData(i)">
+          <span>{{ rotuloData(mensagem.dataEnvio) }}</span>
+        </div>
+
+        <div class="mensagem" [class.mensagem--minha]="ehMinha(mensagem)"
+          [class.mensagem--sequencia]="!ehMinha(mensagem) && !mostrarRemetente(i)"
+          [class.mensagem--destaque]="mensagemDestacada === mensagem.id" [attr.data-id]="mensagem.id">
+
+          <!-- Foto de quem enviou (só na primeira de uma sequência) -->
+          <ng-container *ngIf="!ehMinha(mensagem)">
+            <img *ngIf="mostrarRemetente(i) && mensagem.ftRemetente" [src]="mensagem.ftRemetente"
+              class="avatar avatar--sm mensagem__avatar" [alt]="mensagem.nomeRemetente">
+            <div *ngIf="mostrarRemetente(i) && !mensagem.ftRemetente" class="avatar avatar--sm mensagem__avatar">
+              {{ mensagem.nomeRemetente.charAt(0) }}
+            </div>
+            <div *ngIf="!mostrarRemetente(i)" class="mensagem__avatar mensagem__avatar--vazio"></div>
+          </ng-container>
+
+          <div class="balao" [class.balao--enviando]="mensagem.enviando" [class.balao--apagada]="mensagem.apagada"
+            [class.balao--acionavel]="!mensagem.enviando && !mensagem.apagada" (click)="abrirAcoes(mensagem)">
+
+            <span class="balao__remetente" *ngIf="mostrarRemetente(i)">
+              {{ mensagem.nomeRemetente }}
+              <span class="badge badge--gradient" *ngIf="mensagem.cdUsuarioRemetente === cdCriador">Admin</span>
+            </span>
+
+            <button type="button" class="citacao" *ngIf="mensagem.cdMensagemResposta && !mensagem.apagada"
+              (click)="irParaMensagem(mensagem.cdMensagemResposta, $event)">
+              <span class="citacao__nome">{{ nomeDaCitacao(mensagem) }}</span>
+              <span class="citacao__texto" [class.citacao__texto--apagada]="mensagem.respostaApagada">
+                {{ mensagem.respostaApagada ? 'Mensagem apagada' : mensagem.conteudoResposta }}
+              </span>
+            </button>
+
+            <span class="balao__conteudo" *ngIf="!mensagem.apagada">{{ mensagem.conteudo }}</span>
+            <span class="balao__conteudo balao__apagada" *ngIf="mensagem.apagada">
+              <ion-icon name="ban-outline"></ion-icon>
+              {{ ehMinha(mensagem) ? 'Você apagou esta mensagem' : 'Mensagem apagada' }}
+            </span>
+
+            <span class="balao__horario" *ngIf="!mensagem.enviando">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+            <span class="pontos" *ngIf="mensagem.enviando"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+
+      </ng-container>
+    </ng-container>
+
+  </div>
+
+  <div class="chat-grupo__rodape">
+
+    <div class="respondendo" *ngIf="respondendoA">
+      <div class="respondendo__textos">
+        <span class="respondendo__nome">
+          Respondendo {{ ehMinha(respondendoA) ? 'a você mesmo' : 'a ' + respondendoA.nomeRemetente }}
+        </span>
+        <span class="respondendo__texto">{{ respondendoA.conteudo }}</span>
+      </div>
+      <ion-button fill="clear" size="small" color="medium" (click)="respondendoA = null" aria-label="Cancelar resposta">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="chat-input">
+      <div class="form-field">
+        <ion-input [(ngModel)]="textoMensagem" placeholder="Mensagem para a comunidade..." [maxlength]="limiteMensagem"
+          (keyup.enter)="enviar()" aria-label="Mensagem" [disabled]="carregando || erroAoCarregar">
+        </ion-input>
+
+        <span class="contador" *ngIf="textoMensagem.length > limiteMensagem - 100"
+          [class.contador--limite]="textoMensagem.length >= limiteMensagem">
+          {{ textoMensagem.length }}/{{ limiteMensagem }}
+        </span>
+      </div>
+
+      <ion-button class="btn-enviar" (click)="enviar()" [disabled]="!textoMensagem.trim() || carregando"
+        aria-label="Enviar">
+        <ion-icon name="send" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <p class="chat-grupo__status" *ngIf="!conectado && !carregando">
+      <span class="status-dot"></span> Reconectando... novas mensagens podem demorar a aparecer.
+    </p>
+
+  </div>
+
+</section>

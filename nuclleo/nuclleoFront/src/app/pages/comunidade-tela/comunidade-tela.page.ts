@@ -46,6 +46,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { UsuarioComunidadeModel } from 'src/app/model/usuario-comunidade.model';
 import { ComunidadeEventosService, EventoComunidade } from 'src/app/services/comunidade-eventos.service';
+import { ChatComunidadeComponent } from 'src/app/components/chat-comunidade/chat-comunidade.component';
 import { TokenModel } from 'src/app/model/token.model';
 import { TokenService } from 'src/app/services/token.service';
 import { UsuarioModel } from 'src/app/model/usuario.model';
@@ -71,7 +72,8 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
     IonList,
     IonItem,
       IonLabel,
-    IonPopover
+    IonPopover,
+    ChatComunidadeComponent
   ]
 })
 export class ComunidadePerfilPage implements OnDestroy {

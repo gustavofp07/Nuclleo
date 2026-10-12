@@ -1,0 +1,366 @@
+// Mesmo visual do chat privado (pages/chat), adaptado para grupo e para caber na aba da comunidade
+
+.chat-grupo {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 210px);
+  min-height: 380px;
+  overflow: hidden;
+  background:
+    radial-gradient(500px 260px at 100% 0%, rgba(var(--nc-purple-rgb), 0.08), transparent 70%),
+    var(--nc-surface);
+  border: 1px solid var(--nc-border);
+  border-radius: var(--nc-radius-lg);
+}
+
+.chat-grupo__mensagens {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  padding: 16px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chat-grupo__vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto 0;
+  padding: 24px;
+  text-align: center;
+}
+
+.chat-grupo__vazio ion-icon {
+  margin-bottom: 10px;
+  font-size: 36px;
+  color: var(--nc-purple-light);
+}
+
+.chat-grupo__vazio h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chat-grupo__vazio p {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.chat-grupo__rodape {
+  padding: 10px 10px 12px;
+  border-top: 1px solid var(--nc-border);
+  background: var(--nc-surface-2);
+}
+
+.chat-grupo__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 4px 0;
+  font-size: 11px;
+  color: var(--nc-text-muted);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nc-warning);
+}
+
+// ===== Separador de dia =====
+
+.separador-data {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+
+.separador-data span {
+  padding: 3px 10px;
+  font-family: var(--nc-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nc-text-muted);
+  background: var(--nc-surface-2);
+  border: 1px solid var(--nc-border);
+  border-radius: var(--nc-radius-pill);
+}
+
+// ===== Mensagens =====
+
+.mensagem {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.mensagem--minha {
+  justify-content: flex-end;
+}
+
+// Sequência da mesma pessoa: mensagens mais juntas
+.mensagem--sequencia {
+  margin-top: -3px;
+}
+
+.mensagem__avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.mensagem__avatar--vazio {
+  visibility: hidden;
+}
+
+.balao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px 10px;
+  max-width: min(78%, 520px);
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--nc-text);
+  background: var(--nc-surface-2);
+  border: 1px solid var(--nc-border);
+  border-radius: 18px 18px 18px 6px;
+}
+
+.mensagem--minha .balao {
+  color: #fff;
+  background: linear-gradient(135deg, #7a32e8 0%, #a63fb5 100%);
+  border-color: transparent;
+  border-radius: 18px 18px 6px 18px;
+  box-shadow: 0 8px 20px -12px rgba(var(--nc-purple-rgb), 0.8);
+}
+
+.balao--acionavel {
+  cursor: pointer;
+}
+
+.balao--enviando {
+  opacity: 0.65;
+}
+
+.balao--apagada {
+  opacity: 0.7;
+}
+
+.mensagem--minha .balao--apagada {
+  color: var(--nc-text-muted);
+  background: transparent;
+  border: 1px dashed var(--nc-border-strong);
+  box-shadow: none;
+}
+
+.balao__remetente {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nc-purple-light);
+}
+
+.balao__remetente .badge {
+  padding: 1px 6px;
+  font-size: 9px;
+}
+
+.balao__conteudo {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.balao__apagada {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-style: italic;
+}
+
+.balao__horario {
+  margin-left: auto;
+  font-family: var(--nc-font-mono);
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.mensagem--destaque .balao {
+  animation: destaque 1.6s ease;
+}
+
+@keyframes destaque {
+  0%,
+  60% {
+    box-shadow: 0 0 0 3px rgba(var(--nc-orange-rgb), 0.55);
+  }
+
+  100% {
+    box-shadow: none;
+  }
+}
+
+.pontos {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.pontos span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  animation: piscar 1.2s infinite ease-in-out;
+}
+
+.pontos span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pontos span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes piscar {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+// ===== Citação (resposta) =====
+
+.citacao {
+  display: flex;
+  flex-basis: 100%;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 10px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.18);
+  border: 0;
+  border-left: 3px solid var(--nc-orange);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.citacao__nome {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nc-orange-light);
+}
+
+.citacao__texto {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  opacity: 0.85;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+.citacao__texto--apagada {
+  font-style: italic;
+}
+
+// ===== Rodapé: "Respondendo a..." + campo de texto =====
+
+.respondendo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px 8px 12px;
+  margin-bottom: 8px;
+  background: var(--nc-surface);
+  border-left: 3px solid var(--nc-orange);
+  border-radius: var(--nc-radius-sm);
+}
+
+.respondendo__textos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.respondendo__nome {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nc-orange-light);
+}
+
+.respondendo__texto {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--nc-text-muted);
+}
+
+.respondendo ion-button {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-input .form-field {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 14px 0 18px;
+  border-radius: var(--nc-radius-pill);
+}
+
+.chat-input ion-input {
+  min-height: 44px;
+}
+
+.contador {
+  flex-shrink: 0;
+  font-family: var(--nc-font-mono);
+  font-size: 11px;
+  color: var(--nc-text-subtle);
+}
+
+.contador--limite {
+  color: var(--nc-danger);
+}
+
+.btn-enviar {
+  --border-radius: 50%;
+  --padding-start: 0;
+  --padding-end: 0;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  margin: 0;
+}
