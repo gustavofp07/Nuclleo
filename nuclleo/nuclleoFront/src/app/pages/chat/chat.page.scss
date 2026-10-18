@@ -176,6 +176,11 @@ ion-footer {
   text-align: center;
 }
 
+// Espaço entre o aviso e o campo de mensagem logo abaixo
+.chat-rodape .aviso + .chat-input {
+  margin-top: 10px;
+}
+
 .chat-input {
   display: flex;
   align-items: center;
