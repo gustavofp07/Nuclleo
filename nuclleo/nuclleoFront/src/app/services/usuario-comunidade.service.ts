@@ -35,13 +35,6 @@ export class UsuarioComunidadeService {
     return this.http.get<UsuarioComunidadeModel[]>(`${this.API_URL}/usuario`, { params, ...this.getHeaders() });
   }
 
-  excluirPorUsuario(cdUsuario: number) {
-    return this.http.delete<number>(
-      `${this.API_URL}/usuario?cdUsuario=${cdUsuario}`,
-      this.getHeaders()
-    );
-  }
-
   excluirRelacaoEspecifica(cdUsuario: number, cdComunidade: number): Observable<void> {
     const params = new HttpParams()
       .set('cdUsuario', cdUsuario.toString())

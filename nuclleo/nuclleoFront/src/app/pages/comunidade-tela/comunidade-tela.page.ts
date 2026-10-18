@@ -604,13 +604,9 @@ export class ComunidadePerfilPage implements OnDestroy {
   private expulsarMembro(vinculo: UsuarioComunidadeModel) {
     const cdComunidade = this.comunidade.cdComunidade;
     const cdUsuario = vinculo.usuario.cdUsuario;
-    const cdAdmin = this.cdUsuarioLogado;
 
-    this.usuarioComunidadeService
-      .excluirRelacaoEspecifica(cdUsuario, cdComunidade)
-      .pipe(
-        switchMap(() => this.comunidadeService.expulsarMembro(cdComunidade, cdUsuario, cdAdmin))
-      )
+    // O back remove o vínculo e avisa o membro numa chamada só
+    this.comunidadeService.expulsarMembro(cdComunidade, cdUsuario)
       .subscribe({
         next: () => {
           this.ngZone.run(() => {

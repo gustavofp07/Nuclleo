@@ -58,20 +58,23 @@ public class ComunidadeController {
     public ResponseEntity<Comunidade> alterar(
             @PathVariable Long cdComunidade,
             @Valid @RequestPart("comunidade") Comunidade comunidade,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
 
         if (cdComunidade == null) {
             throw new BadRequestException("Id é obrigatório");
         }
 
-        Comunidade objComunidade = comunidadeService.alterar(cdComunidade, comunidade, foto);
+        // Só o dono altera (conferido pelo token)
+        Comunidade objComunidade = comunidadeService.alterar(cdComunidade, comunidade, foto, authentication.getName());
         return ResponseEntity.ok(objComunidade);
     }
 
     @DeleteMapping("/{cdComunidade}")
     @Operation(summary = "Excluir comunidade")
-    public ResponseEntity<Comunidade> excluir(@PathVariable Long cdComunidade) {
-        Comunidade objComunidade = comunidadeService.excluir(cdComunidade);
+    public ResponseEntity<Comunidade> excluir(@PathVariable Long cdComunidade, Authentication authentication) {
+        // Só o dono exclui (conferido pelo token)
+        Comunidade objComunidade = comunidadeService.excluir(cdComunidade, authentication.getName());
         return ResponseEntity.ok(objComunidade);
     }
 
@@ -123,15 +126,15 @@ public class ComunidadeController {
         return ResponseEntity.ok(comunidadeService.listarComunidadesProximas(cdUsuario, termo));
     }
 
-    // Avisa em tempo real o membro expulso (o vínculo é apagado pelo endpoint de usuário-comunidade)
+    // Remove o membro e avisa ele em tempo real. Quem expulsa vem do token (só o dono pode)
     @PostMapping("/{cdComunidade}/usuarios/{cdUsuario}/expulsar")
     @Operation(summary = "Expulsar membro da comunidade (avisa o membro em tempo real)")
     public ResponseEntity<Void> expulsarMembro(
             @PathVariable Long cdComunidade,
             @PathVariable Long cdUsuario,
-            @RequestParam Long cdAdmin) {
+            Authentication authentication) {
 
-        comunidadeService.expulsarMembro(cdComunidade, cdUsuario, cdAdmin);
+        comunidadeService.expulsarMembro(cdComunidade, cdUsuario, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

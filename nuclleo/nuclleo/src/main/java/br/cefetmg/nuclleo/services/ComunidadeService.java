@@ -11,6 +11,7 @@ import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
 import br.cefetmg.nuclleo.dto.ComunidadeRequestDTO;
 import br.cefetmg.nuclleo.dto.ViaCepResponseDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.model.Usuario;
@@ -106,11 +107,22 @@ public class ComunidadeService {
         return objComunidade;
     }
 
+    // O dono é sempre conferido pelo e-mail do token, nunca por um código vindo da requisição
+    private static boolean ehDono(Comunidade comunidade, String email) {
+        return email != null
+                && comunidade.getUsuarioCria() != null
+                && email.equalsIgnoreCase(comunidade.getUsuarioCria().getEmail());
+    }
+
     @Transactional
-    public Comunidade alterar(Long cdComunidade, Comunidade comunidade, MultipartFile foto) {
+    public Comunidade alterar(Long cdComunidade, Comunidade comunidade, MultipartFile foto, String emailSolicitante) {
 
         Comunidade objComunidade = comunidadeRepository.findById(cdComunidade)
                 .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
+
+        if (!ehDono(objComunidade, emailSolicitante)) {
+            throw new ForbiddenException("Você só pode alterar as suas próprias comunidades.");
+        }
 
         objComunidade.setNmComunidade(comunidade.getNmComunidade());
         objComunidade.setDescricao(comunidade.getDescricao());
@@ -141,6 +153,20 @@ public class ComunidadeService {
         return comunidadeRepository.save(objComunidade);
     }
 
+    /** Exclusão pedida pelo usuário: só o dono pode excluir. */
+    @Transactional
+    public Comunidade excluir(Long cdComunidade, String emailSolicitante) {
+        Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
+
+        if (!ehDono(comunidade, emailSolicitante)) {
+            throw new ForbiddenException("Você só pode excluir as suas próprias comunidades.");
+        }
+
+        return excluir(cdComunidade);
+    }
+
+    /** Exclusão sem conferir o dono: usada pela moderação (exclusão de conta e banimento permanente). */
     @Transactional
     public Comunidade excluir(Long cdComunidade) {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
@@ -222,22 +248,39 @@ public class ComunidadeService {
      * tempo real. O vínculo em si é apagado pelo endpoint de usuário-comunidade
      * que o front já chama antes deste.
      */
-    @Transactional(readOnly = true)
-    public void expulsarMembro(Long cdComunidade, Long cdUsuario, Long cdAdmin) {
+    // Só o dono da comunidade (conferido pelo token) expulsa; o vínculo é apagado aqui mesmo
+    @Transactional
+    public void expulsarMembro(Long cdComunidade, Long cdUsuario, String emailSolicitante) {
         Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
                 .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
 
-        Long cdDono = comunidade.getUsuarioCria().getCdUsuario();
-
-        if (!cdDono.equals(cdAdmin)) {
-            throw new BusinessException("Apenas o administrador pode expulsar membros.");
+        if (!ehDono(comunidade, emailSolicitante)) {
+            throw new ForbiddenException("Apenas o administrador da comunidade pode expulsar membros.");
         }
 
-        if (cdDono.equals(cdUsuario)) {
+        if (comunidade.getUsuarioCria().getCdUsuario().equals(cdUsuario)) {
             throw new BusinessException("O administrador não pode ser removido da própria comunidade.");
         }
 
+        usuarioComunidadeService.excluirRelacaoEspecifica(cdUsuario, cdComunidade);
         comunidadeEventosService.notificar(cdUsuario, "EXPULSO", cdComunidade);
+    }
+
+    // Tirar um membro da comunidade: só o próprio membro (saindo) ou o dono
+    @Transactional
+    public void removerMembro(Long cdComunidade, Long cdUsuario, String emailSolicitante) {
+        Comunidade comunidade = comunidadeRepository.findById(cdComunidade)
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
+
+        Usuario solicitante = usuarioRepository.findByEmail(emailSolicitante)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        boolean ehOProprio = solicitante.getCdUsuario().equals(cdUsuario);
+        if (!ehOProprio && !ehDono(comunidade, emailSolicitante)) {
+            throw new ForbiddenException("Você não pode remover outro membro desta comunidade.");
+        }
+
+        usuarioComunidadeService.excluirRelacaoEspecifica(cdUsuario, cdComunidade);
     }
 
     private void ordenarPorProximidade(

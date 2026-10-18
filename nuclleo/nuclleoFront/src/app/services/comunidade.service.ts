@@ -79,14 +79,12 @@ export class ComunidadeService {
     return this.http.delete<ComunidadeModel>(`${this.API_URL}/${cdComunidade}`, this.getHeaders());
   }
 
-  expulsarMembro(cdComunidade: number, cdUsuario: number, cdAdmin: number): Observable<void> {
+  // O back confere pelo token se quem expulsa é o dono, remove o vínculo e avisa o membro
+  expulsarMembro(cdComunidade: number, cdUsuario: number): Observable<void> {
     return this.http.post<void>(
       `${this.API_URL}/${cdComunidade}/usuarios/${cdUsuario}/expulsar`,
       null,
-      {
-        params: { cdAdmin },
-        ...this.getHeaders()
-      }
+      this.getHeaders()
     );
   }
 }

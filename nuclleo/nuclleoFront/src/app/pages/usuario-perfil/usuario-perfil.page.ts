@@ -29,7 +29,6 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { AnuncioService } from 'src/app/services/anuncio.service';
-import { UsuarioComunidadeService } from 'src/app/services/usuario-comunidade.service';
 import { AvaliacaoService } from 'src/app/services/avaliacao.service';
 import { TokenService } from 'src/app/services/token.service';
 import { DenunciaService } from 'src/app/services/denuncia.service';
@@ -91,7 +90,6 @@ export class UsuarioPerfilPage {
     private toastController: ToastController,
     private alertController: AlertController,
     private anuncioService: AnuncioService,
-    private usuarioComunidadeService: UsuarioComunidadeService,
     private avaliacaoService: AvaliacaoService,
     private tokenService: TokenService,
     private denunciaService: DenunciaService,
@@ -232,20 +230,14 @@ export class UsuarioPerfilPage {
     });
   }
 
+  // O back já tira o usuário das comunidades ao excluir a conta
   excluir() {
-    const token = this.tokenService.extrair();
-
-    this.usuarioComunidadeService.excluirPorUsuario(token.cdUsuario).subscribe({
+    this.usuarioService.excluirUsuario().subscribe({
       next: () => {
-        this.usuarioService.excluirUsuario().subscribe({
-          next: () => {
-            this.tokenService.excluir();
-            this.router.navigate(['/login']);
-          },
-          error: () => this.exibirMensagem('Erro ao excluir o usuário.')
-        });
+        this.tokenService.excluir();
+        this.router.navigate(['/login']);
       },
-      error: () => this.exibirMensagem('Erro ao remover usuário das comunidades.')
+      error: () => this.exibirMensagem('Erro ao excluir o usuário.')
     });
   }
 

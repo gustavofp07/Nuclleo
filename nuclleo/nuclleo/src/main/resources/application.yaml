@@ -32,5 +32,6 @@ integrations:
     base-url: ${ARQUIVOS_API_URL:https://gerenciador-arquivos-7q58.onrender.com}
 
 jwt:
-  secret: nuclleo-chave-secreta-com-pelo-menos-32-caracteres
+  # Em produção, defina a variável de ambiente JWT_SECRET; o valor depois do ":" é só para rodar local
+  secret: ${JWT_SECRET:nuclleo-chave-secreta-com-pelo-menos-32-caracteres}
   expiration: 86400000
