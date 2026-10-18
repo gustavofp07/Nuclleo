@@ -171,7 +171,7 @@ public class ModeracaoService {
      * - os interesses que o usuário fez em anúncios de outros são apagados;
      * - o e-mail é trocado por um valor único e inválido, liberando o e-mail
      *   original para um novo cadastro no futuro;
-     * - dados pessoais (CPF, telefone, foto) são apagados e a senha é invalidada.
+     * - dados pessoais (CPF, foto) são apagados e a senha é invalidada.
      * Nome, transações e avaliações continuam existindo para manter o histórico.
      */
     private void excluirConta(Usuario usuario) {
@@ -192,7 +192,6 @@ public class ModeracaoService {
         usuario.setSuspensoAte(null);
         usuario.setEmail("excluido_" + usuario.getCdUsuario() + "@nuclleo.invalid");
         usuario.setCpf(null);
-        usuario.setTelefone(null);
         usuario.setFtUsuario(null);
         usuario.setSenha(passwordEncoder.encode(UUID.randomUUID().toString()));
         usuarioRepository.save(usuario);

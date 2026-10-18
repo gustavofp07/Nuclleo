@@ -81,7 +81,6 @@ public class UsuarioService {
         usuario.setEmail(dto.getEmail());
 
         usuario.setCpf(dto.getCpf());
-        usuario.setTelefone(dto.getTelefone());
 
         // o CEP não é obrigatório, mas se for informado, deve ser validado e preenchido
         if (dto.getCep() != null && !dto.getCep().isBlank()) {
@@ -169,6 +168,22 @@ public class UsuarioService {
             // estamos verificando um usuário existente
             return usuarioRepository.existsByEmailAndCdUsuarioNot(email, cdUsuario);
         }
+    }
+
+    // Cadastro completo = CPF e CEP preenchidos. Só assim dá para criar anúncio ou comunidade
+    @Transactional(readOnly = true)
+    public Usuario exigirCadastroCompleto(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        boolean temCpf = usuario.getCpf() != null && !usuario.getCpf().isBlank();
+        boolean temCep = usuario.getCep() != null && !usuario.getCep().isBlank();
+
+        if (!temCpf || !temCep) {
+            throw new BusinessException("Complete seu cadastro (CPF e CEP) para criar anúncios e comunidades.");
+        }
+
+        return usuario;
     }
 
     @Transactional(readOnly = true)

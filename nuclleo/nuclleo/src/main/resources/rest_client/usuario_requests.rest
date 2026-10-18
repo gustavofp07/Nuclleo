@@ -27,6 +27,5 @@ content-type: application/json
     "senha": "123",
     "dtEntrada": null,
     "cpf": "111",
-    "cep": null,
-    "telefone": null
+    "cep": null
 }

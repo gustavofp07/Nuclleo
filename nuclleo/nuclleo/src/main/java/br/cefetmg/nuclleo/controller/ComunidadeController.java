@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import br.cefetmg.nuclleo.dto.ComunidadeRequestDTO;
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.Comunidade;
 import br.cefetmg.nuclleo.services.ComunidadeService;
+import br.cefetmg.nuclleo.services.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -35,10 +37,17 @@ public class ComunidadeController {
     @Autowired
     private ComunidadeService comunidadeService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar comunidade")
     public ResponseEntity<Comunidade> inserir(@Valid @RequestPart("comunidade") ComunidadeRequestDTO dto,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
+
+        // Só cria comunidade quem tem o cadastro completo, e sempre em nome de quem está logado
+        dto.setCdUsuarioCria(usuarioService.exigirCadastroCompleto(authentication.getName()).getCdUsuario());
 
         Comunidade objComunidade = comunidadeService.inserir(dto, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objComunidade);

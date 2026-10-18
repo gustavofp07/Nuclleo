@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter 
+@Getter
+@Setter
 @NoArgsConstructor
 public class ComunidadeRequestDTO {
     @NotBlank(message = "O nome da comunidade é obrigatório.")

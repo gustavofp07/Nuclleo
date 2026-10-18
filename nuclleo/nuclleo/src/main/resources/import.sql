@@ -1,3 +1,6 @@
+-- O usuário não tem mais telefone: remove a coluna antiga do banco
+ALTER TABLE tb_usuario DROP COLUMN IF EXISTS telefone;
+
 TRUNCATE TABLE
     tb_usuario,
     tb_comunidade,
@@ -20,7 +23,7 @@ RESTART IDENTITY CASCADE;
 -- Senha inicial de todos: 123456
 -- =============================================
 INSERT INTO tb_usuario
-(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, telefone, status, perfil)
+(nm_usuario, ft_usuario, email, senha, dt_entrada, cpf, cep, cidade, uf, status, perfil)
 VALUES
 (
     'Gustavo Ferreira',
@@ -32,7 +35,6 @@ VALUES
     '35180008',
     'Timóteo',
     'MG',
-    '(31) 99999-1111',
     'ATIVO',
     'USUARIO'
 ),
@@ -46,7 +48,6 @@ VALUES
     '35177000',
     'Antônio Dias',
     'MG',
-    '(31) 99999-2222',
     'ATIVO',
     'USUARIO'
 ),
@@ -60,7 +61,6 @@ VALUES
     '35920000',
     'Nova Era',
     'MG',
-    '(31) 99999-3333',
     'ATIVO',
     'USUARIO'
 ),
@@ -74,7 +74,6 @@ VALUES
     '30140010',
     'Belo Horizonte',
     'MG',
-    '(31) 99999-4444',
     'ATIVO',
     'USUARIO'
 );

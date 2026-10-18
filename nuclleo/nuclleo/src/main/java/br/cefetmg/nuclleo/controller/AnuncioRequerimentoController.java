@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.cefetmg.nuclleo.exception.BadRequestException;
 import br.cefetmg.nuclleo.model.AnuncioRequerimento;
 import br.cefetmg.nuclleo.services.AnuncioRequerimentoService;
+import br.cefetmg.nuclleo.services.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,16 +34,23 @@ public class AnuncioRequerimentoController {
     @Autowired
     private AnuncioRequerimentoService anuncioRequerimentoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     //não vou colocar o delete aqui, pois o anuncio é delelatdo pelo id, não precisa de um endpoint específico pra isso.
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Cadastrar anúncio de requerimento")
     public ResponseEntity<AnuncioRequerimento> inserir(
             @Valid @RequestPart("anuncio") AnuncioRequerimento anuncio,
-            @RequestPart(value = "foto", required = false) MultipartFile foto) {
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            Authentication authentication) {
         if (anuncio.getCdAnuncio() != null) { // gambiarra. Tem q tirar isso
             anuncio.setCdAnuncio(null);
         }
+
+        // Só cria anúncio quem tem o cadastro completo, e sempre em nome de quem está logado
+        anuncio.setUsuarioCria(usuarioService.exigirCadastroCompleto(authentication.getName()));
 
         AnuncioRequerimento objAnuncio = anuncioRequerimentoService.inserir(anuncio, foto);
         return ResponseEntity.status(HttpStatus.CREATED).body(objAnuncio);

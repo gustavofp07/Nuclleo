@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { cadastroCompletoGuard } from './guards/cadastro-completo.guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,7 @@ export const routes: Routes = [
   },
   {
     path: 'criar-comunidade',
+    canActivate: [cadastroCompletoGuard],
     loadComponent: () => import('./pages/comunidade-criar/criar-comunidade.page').then(m => m.CriarComunidadePage)
   },
   {
@@ -44,6 +46,7 @@ export const routes: Routes = [
   },
   {
     path: 'criar-anuncio/:tipo',
+    canActivate: [cadastroCompletoGuard],
     loadComponent: () => import('./pages/anuncio-criar/criar-anuncio.page').then(m => m.CriarAnuncioPage)
   },
   {

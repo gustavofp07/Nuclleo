@@ -38,7 +38,7 @@ import { TokenModel } from 'src/app/model/token.model';
 export class UsuarioAlterarPage {
   token?: TokenModel;
 
-  // O admin não negocia: CPF, CEP e telefone não se aplicam a ele
+  // O admin não negocia: CPF e CEP não se aplicam a ele
   get ehAdmin(): boolean {
     return this.token?.perfil === 'ADMINISTRADOR';
   }
@@ -89,10 +89,6 @@ export class UsuarioAlterarPage {
 
       cep: ['', [
         Validators.pattern(/^\d{8}$/)
-      ]],
-
-      telefone: ['', [
-        Validators.pattern(/^\d{11}$/)
       ]]
     });
   }
@@ -113,8 +109,7 @@ export class UsuarioAlterarPage {
       email: '',
       nmUsuario: '',
       cpf: '',
-      cep: '',
-      telefone: ''
+      cep: ''
     });
     this.previewFoto = null;
     this.imagemSelecionada = undefined;
@@ -133,8 +128,7 @@ export class UsuarioAlterarPage {
           email: usuario.email,
           nmUsuario: usuario.nmUsuario,
           cpf: usuario.cpf || '',
-          cep: usuario.cep || '',
-          telefone: usuario.telefone || ''
+          cep: usuario.cep || ''
         });
       },
       error: () => {
@@ -304,10 +298,6 @@ export class UsuarioAlterarPage {
 
     this.usuario.cep = this.formUsuario.value.cep
       ? this.formUsuario.value.cep.replace(/\D/g, '')
-      : '';
-
-    this.usuario.telefone = this.formUsuario.value.telefone
-      ? this.formUsuario.value.telefone.replace(/\D/g, '')
       : '';
 
     this.usuarioService.atualizar(this.usuario, this.imagemSelecionada).subscribe({
@@ -488,8 +478,7 @@ export class UsuarioAlterarPage {
       (f.email ?? '') !== (this.usuario.email ?? '') ||
       (f.nmUsuario ?? '') !== (this.usuario.nmUsuario ?? '') ||
       this.somenteDigitos(f.cpf) !== this.somenteDigitos(this.usuario.cpf) ||
-      this.somenteDigitos(f.cep) !== this.somenteDigitos(this.usuario.cep) ||
-      this.somenteDigitos(f.telefone) !== this.somenteDigitos(this.usuario.telefone)
+      this.somenteDigitos(f.cep) !== this.somenteDigitos(this.usuario.cep)
     );
   }
 

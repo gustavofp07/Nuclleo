@@ -40,7 +40,6 @@ content-type: application/json
       "senha": null,
       "dtEntrada": null,
       "cpf": null,
-      "cep": null,
-      "telefone": null
+      "cep": null
     }
   }

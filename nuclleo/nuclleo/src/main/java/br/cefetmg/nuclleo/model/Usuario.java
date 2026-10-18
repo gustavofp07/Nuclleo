@@ -72,9 +72,6 @@ public class Usuario {
     @Column(name = "uf", length = 2)
     private String uf;
 
-    @Column(name = "telefone")
-    private String telefone;
-
     // READ_ONLY: o status aparece nas respostas, mas é ignorado se vier no corpo
     // de uma requisição. Só o próprio sistema (moderação/exclusão) altera o status.
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

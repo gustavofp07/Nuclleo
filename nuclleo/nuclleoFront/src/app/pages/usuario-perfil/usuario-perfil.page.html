@@ -107,12 +107,6 @@
           <span *ngIf="!usuario.cpf">CPF não informado <a routerLink="/usuario-alterar" class="link">adicionar</a></span>
         </div>
 
-        <div class="validacao" [class.pendente]="!usuario.telefone">
-          <ion-icon [name]="usuario.telefone ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
-          <span *ngIf="usuario.telefone">Telefone: {{ usuario.telefone }}</span>
-          <span *ngIf="!usuario.telefone">Telefone não informado <a routerLink="/usuario-alterar" class="link">adicionar</a></span>
-        </div>
-
         <div class="validacao" [class.pendente]="!usuario.cep">
           <ion-icon [name]="usuario.cep ? 'checkmark-circle-outline' : 'ellipse-outline'"></ion-icon>
           <span *ngIf="usuario.cep">CEP: {{ usuario.cep }}</span>

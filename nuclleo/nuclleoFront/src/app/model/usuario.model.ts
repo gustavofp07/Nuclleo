@@ -9,7 +9,6 @@ export class UsuarioModel {
     cep: string;
     cidade: string;
     uf: string;
-    telefone: string;
     // Preenchidos pelo back-end (somente leitura)
     perfil?: string;
     status?: string;
@@ -26,6 +25,5 @@ export class UsuarioModel {
         this.cep = '';
         this.cidade = '';
         this.uf = '';
-        this.telefone = '';
     }
 }

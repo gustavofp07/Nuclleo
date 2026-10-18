@@ -99,16 +99,6 @@
 
       </div>
 
-      <label class="form-label" for="telefone">Telefone</label>
-      <div class="form-field">
-        <input id="telefone" type="text" placeholder="(00) 00000-0000" formControlName="telefone"
-          mask="(00) 00000-0000" inputmode="tel">
-      </div>
-
-      <p class="form-error" *ngIf="formUsuario.get('telefone')?.touched && formUsuario.get('telefone')?.hasError('pattern')">
-        Informe um celular completo.
-      </p>
-
       </ng-container>
 
       <label class="form-label">Senha</label>
