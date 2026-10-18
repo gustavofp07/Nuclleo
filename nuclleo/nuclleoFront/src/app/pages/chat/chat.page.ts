@@ -21,7 +21,8 @@ import { Subscription } from 'rxjs';
 
 import { addIcons } from 'ionicons';
 import {
-  send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close
+  send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close,
+  checkmarkDoneOutline, closeOutline
 } from 'ionicons/icons';
 
 import { ChatService, StatusInteresseEvento } from 'src/app/services/chat.service';
@@ -76,7 +77,12 @@ export class ChatPage implements OnDestroy {
   chatFinalizado: boolean = false;
   aguardandoAvaliacaoOutro: boolean = false;
 
+  // Interessado: a solicitação ainda não foi aceita (pode deixar algumas mensagens de antemão)
   aguardandoAceite: boolean = false;
+  // Anunciante: recebeu a solicitação e decide no próprio chat se aceita ou não
+  decidindoSolicitacao: boolean = false;
+  respondendoSolicitacao: boolean = false;
+  readonly limiteMensagensPendentes = 5; // mesmo limite do backend
 
   // Tela de finalizar conversa (componente compartilhado com a página de conversas)
   modalFinalizarAberto: boolean = false;
@@ -107,7 +113,8 @@ export class ChatPage implements OnDestroy {
   ) {
     this.token = new TokenModel();
     addIcons({
-      send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close
+      send, chatbubbleOutline, flagOutline, star, arrowUndoOutline, trashOutline, copyOutline, banOutline, close,
+      checkmarkDoneOutline, closeOutline
     });
   }
 
@@ -256,6 +263,7 @@ export class ChatPage implements OnDestroy {
 
     const aceiteRecebidoAgora = status.aceito && this.aguardandoAceite;
     this.aguardandoAceite = !this.souAnunciante && !status.aceito;
+    this.decidindoSolicitacao = this.souAnunciante && !status.aceito;
 
     if (aceiteRecebidoAgora) {
       this.exibirMensagem('Sua solicitação de chat foi aceita!');
@@ -301,7 +309,7 @@ export class ChatPage implements OnDestroy {
   }
 
   enviar() {
-    if (this.chatFinalizado || this.aguardandoAceite) {
+    if (!this.podeEscrever) {
       return;
     }
 
@@ -341,8 +349,67 @@ export class ChatPage implements OnDestroy {
 
   // ===================== RESPONDER E APAGAR =====================
 
+  // Antes do aceite, só o interessado escreve, e até o limite de mensagens
+  get podeEscrever(): boolean {
+    if (this.chatFinalizado || this.decidindoSolicitacao) {
+      return false;
+    }
+    return !this.aguardandoAceite || this.mensagensPendentesRestantes > 0;
+  }
+
+  get mensagensPendentesRestantes(): number {
+    return Math.max(0, this.limiteMensagensPendentes - this.mensagens.length);
+  }
+
   get podeInteragir(): boolean {
-    return !this.chatFinalizado && !this.aguardandoAceite;
+    return this.podeEscrever;
+  }
+
+  // ===================== SOLICITAÇÃO (anunciante) =====================
+
+  aceitarSolicitacao() {
+    if (this.respondendoSolicitacao) return;
+    this.respondendoSolicitacao = true;
+
+    this.interesseService.aceitarInteresse(this.cdInteresse, this.token.cdUsuario).subscribe({
+      next: () => this.ngZone.run(() => {
+        this.respondendoSolicitacao = false;
+        this.decidindoSolicitacao = false;
+        this.exibirMensagem('Solicitação aceita. Agora vocês podem conversar!');
+      }),
+      error: (erro) => this.ngZone.run(() => {
+        this.respondendoSolicitacao = false;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao aceitar a solicitação.');
+      })
+    });
+  }
+
+  async confirmarRecusa() {
+    const alert = await this.alertController.create({
+      header: 'Recusar conversa',
+      message: `Deseja realmente recusar a conversa com ${this.nomeOutroUsuario}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Recusar', role: 'destructive', handler: () => this.recusarSolicitacao() }
+      ]
+    });
+    await alert.present();
+  }
+
+  recusarSolicitacao() {
+    this.respondendoSolicitacao = true;
+
+    this.interesseService.recusarConversa(this.cdInteresse, this.token.cdUsuario).subscribe({
+      next: () => this.ngZone.run(() => {
+        this.respondendoSolicitacao = false;
+        this.exibirMensagem('Conversa recusada.');
+        this.router.navigate(['/conversas']);
+      }),
+      error: (erro) => this.ngZone.run(() => {
+        this.respondendoSolicitacao = false;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao recusar a conversa.');
+      })
+    });
   }
 
   // Toque na mensagem: abre as opções (responder, copiar, apagar)
@@ -360,7 +427,7 @@ export class ChatPage implements OnDestroy {
 
     botoes.push({ text: 'Copiar texto', icon: 'copy-outline', handler: () => this.copiar(mensagem) });
 
-    if (minha && this.podeInteragir) {
+    if (minha && !this.chatFinalizado) {
       botoes.push({
         text: 'Apagar para todos',
         icon: 'trash-outline',
@@ -451,7 +518,7 @@ export class ChatPage implements OnDestroy {
   }
 
   onDigitar() {
-    if (this.chatFinalizado || this.aguardandoAceite) {
+    if (!this.podeEscrever) {
       return;
     }
 

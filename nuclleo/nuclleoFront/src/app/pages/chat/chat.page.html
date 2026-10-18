@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <ion-buttons slot="end" *ngIf="souAnunciante && !chatFinalizado">
+    <ion-buttons slot="end" *ngIf="souAnunciante && !chatFinalizado && !decidindoSolicitacao">
       <ion-button (click)="abrirTelaFinalizar()" class="btn-finalizar">
         <ion-icon name="flag-outline" slot="start"></ion-icon>
         <span class="btn-finalizar__texto">Finalizar</span>
@@ -33,7 +33,9 @@
     <div *ngIf="mensagens.length === 0" class="empty-state">
       <ion-icon name="chatbubble-outline"></ion-icon>
       <h2>Nenhuma mensagem ainda</h2>
-      <p>Diga oi e comece a negociação!</p>
+      <p *ngIf="decidindoSolicitacao">{{ nomeOutroUsuario }} não deixou nenhuma mensagem.</p>
+      <p *ngIf="aguardandoAceite">Deixe uma mensagem para o anunciante enquanto ele não aceita a solicitação.</p>
+      <p *ngIf="!decidindoSolicitacao && !aguardandoAceite">Diga oi e comece a negociação!</p>
     </div>
 
     <div *ngFor="let mensagem of mensagens" class="mensagem" [class.mensagem--minha]="ehMinhaMensagem(mensagem)"
@@ -87,7 +89,30 @@
 
     <p *ngIf="!chatFinalizado && aguardandoAceite" class="aviso aviso--accent">
       Aguardando a aprovação da solicitação de chat.
+      <span *ngIf="mensagensPendentesRestantes > 0">
+        Você ainda pode deixar {{ mensagensPendentesRestantes }}
+        {{ mensagensPendentesRestantes === 1 ? 'mensagem' : 'mensagens' }}.
+      </span>
+      <span *ngIf="mensagensPendentesRestantes === 0">Você já deixou o máximo de mensagens.</span>
     </p>
+
+    <!-- Anunciante: decide a solicitação depois de ler o que o interessado mandou -->
+    <div class="solicitacao" *ngIf="!chatFinalizado && decidindoSolicitacao">
+      <p class="solicitacao__texto">
+        <strong>{{ nomeOutroUsuario }}</strong> quer conversar sobre
+        <strong>{{ interesse?.anuncio?.nmAnuncio }}</strong>. Aceitar a solicitação?
+      </p>
+      <div class="solicitacao__acoes">
+        <ion-button fill="outline" color="danger" [disabled]="respondendoSolicitacao" (click)="confirmarRecusa()">
+          <ion-icon name="close-outline" slot="start"></ion-icon>
+          Recusar
+        </ion-button>
+        <ion-button [disabled]="respondendoSolicitacao" (click)="aceitarSolicitacao()">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          Aceitar
+        </ion-button>
+      </div>
+    </div>
 
     <div class="respondendo" *ngIf="respondendoA && podeInteragir">
       <div class="respondendo__textos">
@@ -101,7 +126,7 @@
       </ion-button>
     </div>
 
-    <div class="chat-input" *ngIf="!chatFinalizado && !aguardandoAceite">
+    <div class="chat-input" *ngIf="podeEscrever">
       <div class="form-field">
         <ion-input [(ngModel)]="textoMensagem" placeholder="Digite sua mensagem..." [maxlength]="limiteMensagem"
           (ionInput)="onDigitar()" (keyup.enter)="enviar()" aria-label="Mensagem">

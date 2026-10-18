@@ -13,6 +13,8 @@ public interface MensagemRepository extends JpaRepository<Mensagem, Long> {
 
     List<Mensagem> findByInteresseIdOrderByDataEnvioAsc(Long cdInteresse);
 
+    long countByInteresseId(Long cdInteresse);
+
     // Apaga todas as mensagens da conversa num único DELETE. Com as respostas
     // apontando para outras mensagens, apagar uma por uma poderia esbarrar na
     // chave estrangeira; num comando só, o banco confere tudo no final.

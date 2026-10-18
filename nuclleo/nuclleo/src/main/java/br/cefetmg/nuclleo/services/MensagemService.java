@@ -23,6 +23,9 @@ import br.cefetmg.nuclleo.repository.MensagemRepository;
 @Service
 public class MensagemService {
 
+    // Quantas mensagens o interessado pode deixar antes de o anunciante aceitar a solicitação
+    public static final int LIMITE_MENSAGENS_PENDENTES = 5;
+
     @Autowired
     private MensagemRepository mensagemRepository;
 
@@ -53,6 +56,20 @@ public class MensagemService {
         // Conta suspensa/excluída ou anúncio indisponível: o chat fica bloqueado
         if (!anunciante.isAtivo() || !interessado.isAtivo() || anuncio.getStatus() != Status.ATIVO) {
             throw new BusinessException("Esta conversa não está mais disponível.");
+        }
+
+        if (!interesse.isConversaIniciada()) {
+            throw new BusinessException("A conversa ainda não foi iniciada.");
+        }
+
+        // Solicitação pendente: só o interessado escreve, e só algumas mensagens de antemão
+        if (!interesse.isAceito()) {
+            if (!remetente.getCdUsuario().equals(interessado.getCdUsuario())) {
+                throw new BusinessException("Aceite a solicitação de conversa antes de responder.");
+            }
+            if (mensagemRepository.countByInteresseId(cdInteresse) >= LIMITE_MENSAGENS_PENDENTES) {
+                throw new BusinessException("Aguarde o anunciante aceitar a solicitação para enviar mais mensagens.");
+            }
         }
 
         Mensagem mensagem = new Mensagem();

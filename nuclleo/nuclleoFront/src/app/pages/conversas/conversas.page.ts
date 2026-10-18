@@ -30,6 +30,7 @@ import { FinalizarConversaComponent } from 'src/app/components/finalizar-convers
 
 interface ConversaView {
   cdInteresse: number;
+  cdOutroUsuario: number;
   nomeOutroUsuario: string;
   fotoOutroUsuario: string | null;
   cdAnuncio: number;
@@ -142,6 +143,9 @@ export class ConversasPage {
 
     return {
       cdInteresse: interesse.id,
+      cdOutroUsuario: souEuOInteressado
+        ? interesse.anuncio.usuarioCria.cdUsuario
+        : interesse.usuario.cdUsuario,
       nomeOutroUsuario: souEuOInteressado
         ? interesse.anuncio.usuarioCria.nmUsuario
         : interesse.usuario.nmUsuario,
@@ -156,11 +160,8 @@ export class ConversasPage {
     };
   }
 
+  // Solicitação recebida também abre o chat: o anunciante lê as mensagens e decide lá
   abrirChat(conversa: ConversaView) {
-    if (conversa.souAnunciante && !conversa.aceito) {
-      return;
-    }
-
     this.interesseService.buscarPorId(conversa.cdInteresse).subscribe({
       next: () => {
         this.router.navigate(['/chat', conversa.cdInteresse]);
@@ -211,6 +212,12 @@ export class ConversasPage {
       },
       error: () => this.exibirMensagem('Erro ao recusar a conversa.')
     });
+  }
+
+  // Foto ou nome do outro usuário: abre o perfil dele (sem abrir o chat)
+  abrirPerfil(conversa: ConversaView, event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/usuario-perfil', conversa.cdOutroUsuario]);
   }
 
   // Abre o anúncio da conversa sem abrir o chat (o card inteiro abre o chat)

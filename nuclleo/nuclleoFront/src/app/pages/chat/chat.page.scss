@@ -223,6 +223,35 @@ ion-footer {
   margin-top: 10px;
 }
 
+// ===== Solicitação de conversa (anunciante decide no chat) =====
+
+.solicitacao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.solicitacao__texto {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--nc-text-muted);
+}
+
+.solicitacao__texto strong {
+  color: var(--nc-text);
+}
+
+.solicitacao__acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.solicitacao__acoes ion-button {
+  flex: 1;
+  margin: 0;
+}
+
 // ===== Responder e apagar mensagens =====
 
 .balao--acionavel {

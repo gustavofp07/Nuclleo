@@ -28,15 +28,20 @@
         <p class="section-title">Solicitações · {{ solicitacoes.length }}</p>
 
         <div class="lista">
-          <div class="item-card conversa" *ngFor="let conversa of solicitacoes"
-            [class.conversa--estatica]="conversa.souAnunciante" (click)="abrirChat(conversa)">
+          <div class="item-card conversa" *ngFor="let conversa of solicitacoes" (click)="abrirChat(conversa)">
 
-            <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
-              [alt]="conversa.nomeOutroUsuario">
-            <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+            <!-- Foto e nome abrem o perfil do outro usuário -->
+            <button type="button" class="conversa__perfil" (click)="abrirPerfil(conversa, $event)"
+              [attr.aria-label]="'Ver perfil de ' + conversa.nomeOutroUsuario">
+              <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
+                [alt]="conversa.nomeOutroUsuario">
+              <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+            </button>
 
             <div class="item-card__body">
-              <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
+              <h3 class="conversa__nome">
+                <a (click)="abrirPerfil(conversa, $event)" title="Ver perfil">{{ conversa.nomeOutroUsuario }}</a>
+              </h3>
               <a class="conversa__anuncio" (click)="abrirAnuncio(conversa, $event)" title="Ver anúncio">
                 <ion-icon name="pricetag-outline"></ion-icon>
                 <span>{{ conversa.nmAnuncio }}</span>
@@ -65,12 +70,18 @@
         <div class="lista">
           <div class="item-card conversa" *ngFor="let conversa of conversasAtivas" (click)="abrirChat(conversa)">
 
-            <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
-              [alt]="conversa.nomeOutroUsuario">
-            <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+            <!-- Foto e nome abrem o perfil do outro usuário -->
+            <button type="button" class="conversa__perfil" (click)="abrirPerfil(conversa, $event)"
+              [attr.aria-label]="'Ver perfil de ' + conversa.nomeOutroUsuario">
+              <img *ngIf="conversa.fotoOutroUsuario" [src]="conversa.fotoOutroUsuario" class="avatar"
+                [alt]="conversa.nomeOutroUsuario">
+              <div *ngIf="!conversa.fotoOutroUsuario" class="avatar">{{ conversa.nomeOutroUsuario.charAt(0) }}</div>
+            </button>
 
             <div class="item-card__body">
-              <h3 class="conversa__nome">{{ conversa.nomeOutroUsuario }}</h3>
+              <h3 class="conversa__nome">
+                <a (click)="abrirPerfil(conversa, $event)" title="Ver perfil">{{ conversa.nomeOutroUsuario }}</a>
+              </h3>
               <a class="conversa__anuncio" (click)="abrirAnuncio(conversa, $event)" title="Ver anúncio">
                 <ion-icon name="pricetag-outline"></ion-icon>
                 <span>{{ conversa.nmAnuncio }}</span>

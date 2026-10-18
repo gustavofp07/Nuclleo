@@ -220,6 +220,9 @@ public class InteresseService {
         interesse.setAceito(false);
         interesseRepository.save(interesse);
 
+        // As mensagens deixadas na solicitação não ficam para uma próxima
+        mensagemRepository.deleteByInteresseId(interesse.getId());
+
         notificarStatus(interesse);
     }
 

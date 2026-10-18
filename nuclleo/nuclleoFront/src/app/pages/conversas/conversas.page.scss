@@ -7,15 +7,29 @@
   padding: 14px;
 }
 
-.conversa--estatica {
-  cursor: default;
+.conversa__perfil {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: opacity var(--nc-transition);
 }
 
-.conversa--estatica:hover {
-  transform: none;
-  background: var(--nc-surface);
-  border-color: rgba(var(--nc-orange-rgb), 0.35);
-  box-shadow: none;
+.conversa__perfil:hover {
+  opacity: 0.85;
+}
+
+.conversa__nome a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.conversa__nome a:hover {
+  color: var(--nc-purple-light);
+  text-decoration: underline;
 }
 
 .conversa__nome {
