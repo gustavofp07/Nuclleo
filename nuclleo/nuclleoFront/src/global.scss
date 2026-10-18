@@ -1245,13 +1245,33 @@ ion-modal ion-content {
   }
 }
 
+.page-header-linha {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page-header-linha .page-header {
+  margin-bottom: 0;
+}
+
 .acoes-topo {
   display: flex;
-  justify-content: flex-end;
-  margin: -8px 0 20px;
+  flex-shrink: 0;
+}
+
+.acoes-topo ion-button {
+  margin: 0;
 }
 
 @media (max-width: 599px) {
+  .page-header-linha {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .acoes-topo ion-button {
     width: 100%;
   }

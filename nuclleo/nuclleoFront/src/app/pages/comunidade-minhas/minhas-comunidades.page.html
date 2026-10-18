@@ -11,17 +11,20 @@
 
   <div class="page-container page-container--wide">
 
-    <div class="page-header">
-      <span class="eyebrow">Comunidades</span>
-      <h1>Suas comunidades</h1>
-      <p>Veja as comunidades de que você participa e gerencie as que você criou.</p>
-    </div>
+    <!-- Título à esquerda e botão de criar à direita (no celular, um embaixo do outro) -->
+    <div class="page-header-linha">
+      <div class="page-header">
+        <span class="eyebrow">Comunidades</span>
+        <h1>Suas comunidades</h1>
+        <p>Veja as comunidades de que você participa e gerencie as que você criou.</p>
+      </div>
 
-    <div class="acoes-topo">
-      <ion-button routerLink="/criar-comunidade">
-        <ion-icon name="add" slot="start"></ion-icon>
-        Criar comunidade
-      </ion-button>
+      <div class="acoes-topo">
+        <ion-button routerLink="/criar-comunidade">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Criar comunidade
+        </ion-button>
+      </div>
     </div>
 
     <div class="loading-state" *ngIf="carregando">
