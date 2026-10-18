@@ -36,6 +36,8 @@ import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
 import br.cefetmg.nuclleo.repository.SancaoRepository;
 import br.cefetmg.nuclleo.repository.UsuarioRepository;
+import br.cefetmg.nuclleo.model.Comunidade;
+import br.cefetmg.nuclleo.repository.ComunidadeRepository;
 
 /**
  * Concentra todas as mudanças de status de contas e anúncios:
@@ -83,6 +85,15 @@ public class ModeracaoService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ComunidadeRepository comunidadeRepository;
+
+    @Autowired
+    private ComunidadeService comunidadeService;
+
+    @Autowired
+    private UsuarioComunidadeService usuarioComunidadeService;
+
     // =====================================================================
     // CONTA DE USUÁRIO
     // =====================================================================
@@ -105,6 +116,13 @@ public class ModeracaoService {
         Integer dias = permanente ? null : dto.getDias();
 
         limparInteressesDoUsuario(usuario);
+
+        // Banimento permanente: as comunidades dele são apagadas e ele sai das comunidades
+        // de outros usuários. Na suspensão por tempo, tudo isso fica como está
+        if (permanente) {
+            excluirComunidadesDoUsuario(usuario);
+            usuarioComunidadeService.excluirPorUsuario(usuario.getCdUsuario());
+        }
 
         usuario.setStatus(Status.SUSPENSO);
         usuario.setSuspensoAte(fim);
@@ -169,6 +187,9 @@ public class ModeracaoService {
      * Exclusão lógica da conta:
      * - todos os anúncios da conta passam para EXCLUIDO (com a limpeza de interesses);
      * - os interesses que o usuário fez em anúncios de outros são apagados;
+     * - as comunidades que ele criou são apagadas; os anúncios de outros usuários
+     *   que estavam nelas só perdem o vínculo (continuam ativos);
+     * - ele deixa de ser membro das comunidades de outros usuários;
      * - o e-mail é trocado por um valor único e inválido, liberando o e-mail
      *   original para um novo cadastro no futuro;
      * - dados pessoais (CPF, foto) são apagados e a senha é invalidada.
@@ -188,6 +209,9 @@ public class ModeracaoService {
 
         limparInteressesDoUsuario(usuario);
 
+        excluirComunidadesDoUsuario(usuario);
+        usuarioComunidadeService.excluirPorUsuario(usuario.getCdUsuario());
+
         usuario.setStatus(Status.EXCLUIDO);
         usuario.setSuspensoAte(null);
         usuario.setEmail("excluido_" + usuario.getCdUsuario() + "@nuclleo.invalid");
@@ -195,6 +219,15 @@ public class ModeracaoService {
         usuario.setFtUsuario(null);
         usuario.setSenha(passwordEncoder.encode(UUID.randomUUID().toString()));
         usuarioRepository.save(usuario);
+    }
+
+    // Apaga as comunidades que o usuário criou (vínculos com anúncios, membros e chat vão junto).
+    // Os anúncios que estavam nelas só perdem o vínculo, sem serem inativados.
+    private void excluirComunidadesDoUsuario(Usuario usuario) {
+        List<Comunidade> comunidades = comunidadeRepository.findByUsuarioCria_CdUsuario(usuario.getCdUsuario());
+        for (Comunidade comunidade : comunidades) {
+            comunidadeService.excluir(comunidade.getCdComunidade());
+        }
     }
 
     // =====================================================================

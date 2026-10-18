@@ -63,6 +63,12 @@ public class InteresseService {
             throw new IllegalArgumentException("O usuário não pode demonstrar interesse em seu próprio anúncio.");
         }
 
+        // Dono suspenso (por tempo ou permanente): avisa que a conta dele está inativa
+        if (anuncio.getUsuarioCria().getStatus() == Status.SUSPENSO) {
+            throw new BusinessException(
+                    "A conta do anunciante está inativa no momento. Não é possível registrar interesse neste anúncio.");
+        }
+
         // Não é possível demonstrar interesse em anúncio suspenso/excluído ou de dono indisponível
         if (anuncio.getStatus() != Status.ATIVO || anuncio.getUsuarioCria().getStatus() != Status.ATIVO) {
             throw new BusinessException("Este anúncio não está disponível no momento.");
