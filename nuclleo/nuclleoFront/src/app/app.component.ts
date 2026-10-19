@@ -16,7 +16,8 @@ import {
   eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
   locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
   settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
-  pricetagOutline, cartOutline, flagOutline, warningOutline, star, close
+  pricetagOutline, cartOutline, flagOutline, warningOutline, star, close,
+  chatbubblesOutline, closeCircleOutline
 } from 'ionicons/icons';
 
 import { InteresseService } from 'src/app/services/interesse.service';
@@ -65,7 +66,8 @@ export class AppComponent implements OnInit {
       eyeOffOutline, eyeOutline, heartOutline, home, homeOutline, imageOutline,
       locationOutline, logOutOutline, mailOutline, personOutline, peopleOutline,
       settingsOutline, trashOutline, chevronBackOutline, megaphoneOutline,
-      pricetagOutline, cartOutline, flagOutline, warningOutline, star, close
+      pricetagOutline, cartOutline, flagOutline, warningOutline, star, close,
+      chatbubblesOutline, closeCircleOutline
     });
 
     this.router.events
@@ -111,6 +113,17 @@ export class AppComponent implements OnInit {
         case 'CONVERSA_FINALIZADA':
           if (this.router.url.split('?')[0] !== `/chat/${evento.cdInteresse}`) {
             this.mostrarAvisoConversaFinalizada(evento.mensagem, evento.cdInteresse);
+          }
+          break;
+
+        // O anunciante respondeu a solicitação. Se o interessado já estiver nesse chat,
+        // o próprio chat mostra o aviso (e, na recusa, volta para as conversas)
+        case 'SOLICITACAO_ACEITA':
+        case 'SOLICITACAO_RECUSADA':
+          if (this.router.url.split('?')[0] !== `/chat/${evento.cdInteresse}`) {
+            const aceita = evento.tipo === 'SOLICITACAO_ACEITA';
+            this.mostrarToast(evento.mensagem, aceita ? 'chatbubbles-outline' : 'close-circle-outline',
+              aceita ? 'success' : 'medium', 4000);
           }
           break;
 

@@ -101,10 +101,10 @@ export class ConversasPage {
     this.token = this.tokenService.extrair();
     this.carregarConversas();
 
-    // O anunciante finalizou uma conversa com a tela aberta: atualiza a lista
+    // O anunciante finalizou, aceitou ou recusou uma conversa com a tela aberta: atualiza a lista
     this.notificacaoSub?.unsubscribe();
     this.notificacaoSub = this.notificacaoService.onNotificacaoRecebida().subscribe(evento => {
-      if (evento.tipo === 'CONVERSA_FINALIZADA') {
+      if (['CONVERSA_FINALIZADA', 'SOLICITACAO_ACEITA', 'SOLICITACAO_RECUSADA'].includes(evento.tipo)) {
         this.carregarConversas();
       }
     });

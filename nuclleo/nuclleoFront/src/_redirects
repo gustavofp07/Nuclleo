@@ -1,0 +1,2 @@
+# Netlify: o app é uma SPA, então qualquer rota (ex.: /comunidade-tela/14) devolve o index.html
+/*    /index.html   200

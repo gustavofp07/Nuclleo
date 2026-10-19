@@ -230,6 +230,8 @@ public class InteresseService {
         mensagemRepository.deleteByInteresseId(interesse.getId());
 
         notificarStatus(interesse);
+        notificarInteressado(interesse, "SOLICITACAO_RECUSADA",
+                "Sua solicitação de conversa sobre \"" + interesse.getAnuncio().getNmAnuncio() + "\" foi recusada.");
     }
 
     private void excluirSeAmbosAvaliaram(Interesse interesse) {
@@ -257,6 +259,16 @@ public class InteresseService {
         interesseRepository.save(interesse);
 
         notificarStatus(interesse);
+        notificarInteressado(interesse, "SOLICITACAO_ACEITA",
+                anunciante.getNmUsuario() + " aceitou sua solicitação de conversa sobre \""
+                        + interesse.getAnuncio().getNmAnuncio() + "\".");
+    }
+
+    // O status acima só chega a quem está com o chat aberto; a notificação chega
+    // ao interessado em qualquer tela do app
+    private void notificarInteressado(Interesse interesse, String tipo, String mensagem) {
+        messagingTemplate.convertAndSend("/topic/notificacoes/" + interesse.getUsuario().getCdUsuario(),
+                new NotificacaoDTO(tipo, mensagem, interesse.getId()));
     }
 
     @Transactional

@@ -1,0 +1,11 @@
+# Deploy do front-end no Netlify (usado quando o site está ligado ao repositório do GitHub)
+[build]
+  base = "nuclleo/nuclleoFront"
+  command = "npm run build"
+  publish = "www"
+
+# SPA: qualquer rota (ex.: /comunidade-tela/14) devolve o index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
