@@ -19,7 +19,9 @@ public class CorsConfig {
             "http://localhost",
             "capacitor://localhost",
             "https://nuclleo.onrender.com",
-            "https://*.onrender.com"
+            "https://*.onrender.com",
+            "https://sensational-swan-0e366a.netlify.app",
+            "https://*--sensational-swan-0e366a.netlify.app"
     );
 
     @Bean
