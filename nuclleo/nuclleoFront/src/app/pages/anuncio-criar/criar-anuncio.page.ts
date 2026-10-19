@@ -73,7 +73,7 @@ export class CriarAnuncioPage implements OnInit {
     valor === '' || valor === null || valor === undefined ? '' : Number(valor);
 
   tipo = '';
-  limiteDescricao: number = 250;
+  limiteDescricao: number = 2500;
   limiteTitulo: number = 80;
 
   usuarioEhDono: boolean = false;

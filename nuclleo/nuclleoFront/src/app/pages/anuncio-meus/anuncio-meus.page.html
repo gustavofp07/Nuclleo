@@ -45,7 +45,10 @@
         <div class="item-card__body">
           <div class="item-card__title">
             <h2>{{ anuncio.nmAnuncio }}</h2>
-            <span class="badge badge--danger" *ngIf="!anuncio.habilitado">Inativo</span>
+            <span class="badge badge--danger" *ngIf="anuncio.status === 'SUSPENSO'"
+              [title]="anuncio.suspensoAte ? 'Suspenso até ' + (anuncio.suspensoAte | date: 'dd/MM/yyyy HH:mm') : 'Suspenso'">
+              Suspenso
+            </span>
           </div>
 
           <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">

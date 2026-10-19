@@ -87,7 +87,10 @@ export class TokenService {
     const tokenBase64ComPadding = tokenBase64.padEnd(
       tokenBase64.length + ((4 - (tokenBase64.length % 4)) % 4), '='
     );
-    return JSON.parse(atob(tokenBase64ComPadding));
+    // atob devolve os bytes crus; o JSON do token é UTF-8, então decodifica
+    // para não estragar acentos (senão "José" vira "JosÃ©")
+    const bytes = Uint8Array.from(atob(tokenBase64ComPadding), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder('utf-8').decode(bytes));
   }
 
   isAdmin(): boolean {

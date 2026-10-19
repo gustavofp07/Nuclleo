@@ -6,7 +6,9 @@ export class AnuncioModel {
     descricao: string;
     ftAnuncio: string;
     tipoAnuncio: string;
-    habilitado: boolean;
+    // Preenchidos pelo back-end (somente leitura). O dono também vê os seus anúncios suspensos
+    status?: 'ATIVO' | 'SUSPENSO' | 'EXCLUIDO';
+    suspensoAte?: string | null;
 
     usuarioCria: UsuarioModel;
 
@@ -20,7 +22,6 @@ export class AnuncioModel {
         this.descricao = '';
         this.ftAnuncio = '';
         this.tipoAnuncio = '';
-        this.habilitado = true;
         this.cdUsuarioCria = 0;
         this.usuarioCria = new UsuarioModel();
     }

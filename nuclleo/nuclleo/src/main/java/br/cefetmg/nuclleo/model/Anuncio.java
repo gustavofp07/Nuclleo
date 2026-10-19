@@ -42,7 +42,7 @@ public class Anuncio {
     private String nmAnuncio;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
-    @Size(max = 250, message = "A descrição deve ter no máximo 250 caracteres")
+    @Size(max = 2500, message = "A descrição deve ter no máximo 2500 caracteres")
     private String descricao;
 
     // READ_ONLY: o status aparece nas respostas, mas é ignorado se vier no corpo
