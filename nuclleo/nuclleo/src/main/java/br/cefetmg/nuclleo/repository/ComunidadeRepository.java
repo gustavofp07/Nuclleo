@@ -13,6 +13,8 @@ public interface ComunidadeRepository
 
     List<Comunidade> findByUsuarioCria_CdUsuario(Long cdUsuario);
 
+    boolean existsByCdComunidadeAndUsuarioCria_CdUsuario(Long cdComunidade, Long cdUsuario);
+
     List<Comunidade> findByCepStartingWith(String inicioCep);
 
     List<Comunidade> findByNmComunidadeContainingIgnoreCaseOrDescricaoContainingIgnoreCase(String nmComunidade,

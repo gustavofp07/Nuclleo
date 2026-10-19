@@ -89,6 +89,9 @@ export class ComunidadePerfilPage implements OnDestroy {
   carregandoVinculo = true;
   carregandoComunidade = true;
   carregandoAnuncios = true;
+  carregandoMaisAnuncios = false;
+  paginaAnuncios = 0;
+  ultimaPaginaAnuncios = true;
   carregandoMembros = true;
   entrandoComunidade = false;
   saindoComunidade = false;
@@ -485,14 +488,16 @@ export class ComunidadePerfilPage implements OnDestroy {
     }
 
     this.carregandoAnuncios = true;
+    this.paginaAnuncios = 0;
 
     this.anuncioComunidadeService
       .listarAnunciosDaComunidade(
         this.comunidade.cdComunidade
       )
       .subscribe({
-        next: (dados) => {
-          this.anuncios = dados;
+        next: (pagina) => {
+          this.anuncios = pagina.content;
+          this.ultimaPaginaAnuncios = pagina.last;
           this.carregandoAnuncios = false;
         },
 
@@ -504,6 +509,29 @@ export class ComunidadePerfilPage implements OnDestroy {
         }
       });
 
+  }
+
+  carregarMaisAnuncios() {
+    if (this.carregandoMaisAnuncios || this.ultimaPaginaAnuncios) {
+      return;
+    }
+
+    this.carregandoMaisAnuncios = true;
+
+    this.anuncioComunidadeService
+      .listarAnunciosDaComunidade(this.comunidade.cdComunidade, this.paginaAnuncios + 1)
+      .subscribe({
+        next: (pagina) => {
+          this.paginaAnuncios = pagina.number;
+          this.anuncios = [...this.anuncios, ...pagina.content];
+          this.ultimaPaginaAnuncios = pagina.last;
+          this.carregandoMaisAnuncios = false;
+        },
+        error: () => {
+          this.carregandoMaisAnuncios = false;
+          this.exibirMensagem('Erro ao carregar mais anúncios.');
+        }
+      });
   }
 
   carregarTotalUsuarios(cdComunidade: number) {

@@ -3,6 +3,8 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,6 +148,12 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+    }
+
+    @Transactional(readOnly = true)
     public boolean verificarEmail(String email) {
         if (email == null || email.isBlank()) {
             return false;
@@ -230,7 +238,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
+    public Page<Usuario> listarTodos(Pageable pagina) {
+        return usuarioRepository.findAll(pagina);
     }
 }

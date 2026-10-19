@@ -1,8 +1,10 @@
 package br.cefetmg.nuclleo.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.cefetmg.nuclleo.dto.Paginacao;
 import br.cefetmg.nuclleo.dto.UsuarioRequestDTO;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.services.UsuarioService;
@@ -41,8 +45,11 @@ public class AdminController {
     }
 
     @GetMapping("/usuarios")
-    @Operation(summary = "Listar todos os usuários")
-    public ResponseEntity<List<Usuario>> listarTodos() {
-        return ResponseEntity.ok(usuarioService.listarTodos());
+    @Operation(summary = "Listar os usuários, em páginas (por nome)")
+    public ResponseEntity<Page<Usuario>> listarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pagina = PageRequest.of(Math.max(page, 0), Paginacao.limitar(size), Sort.by("nmUsuario"));
+        return ResponseEntity.ok(usuarioService.listarTodos(pagina));
     }
 }

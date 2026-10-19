@@ -61,6 +61,8 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
   @ViewChild('lista') lista?: ElementRef<HTMLDivElement>;
 
   mensagens: MensagemView[] = [];
+  temMensagensAnteriores = false;
+  carregandoAnteriores = false;
   textoMensagem: string = '';
   readonly limiteMensagem = 500;
 
@@ -136,6 +138,7 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
     this.chatService.listar(this.cdComunidade).subscribe({
       next: (mensagens) => {
         this.mensagens = mensagens;
+        this.temMensagensAnteriores = mensagens.length === ComunidadeChatService.TAMANHO_PAGINA;
         this.carregando = false;
         this.rolarParaFinal(false);
       },
@@ -143,6 +146,27 @@ export class ChatComunidadeComponent implements OnInit, OnDestroy {
         this.carregando = false;
         this.erroAoCarregar = true;
       }
+    });
+  }
+
+  // O histórico vem em páginas: primeiro as mais recentes, e as antigas sob demanda
+  carregarAnteriores() {
+    const primeira = this.mensagens.find(m => m.id);
+    if (!primeira || this.carregandoAnteriores) {
+      return;
+    }
+
+    this.carregandoAnteriores = true;
+    this.chatService.listar(this.cdComunidade, primeira.id).subscribe({
+      next: (anteriores) => {
+        this.mensagens = [...anteriores, ...this.mensagens];
+        this.temMensagensAnteriores = anteriores.length === ComunidadeChatService.TAMANHO_PAGINA;
+        this.carregandoAnteriores = false;
+        // Mantém na tela a mensagem que estava no topo
+        setTimeout(() => this.lista?.nativeElement
+          .querySelector<HTMLElement>(`[data-id="${primeira.id}"]`)?.scrollIntoView());
+      },
+      error: () => this.carregandoAnteriores = false
     });
   }
 

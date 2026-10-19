@@ -55,13 +55,7 @@ export interface SancaoModel {
     cdDenuncia: number | null;
 }
 
-export interface PaginaModel<T> {
-    content: T[];
-    totalElements: number;
-    totalPages: number;
-    number: number;
-    last: boolean;
-}
+export type { PaginaModel } from './pagina.model';
 
 // Mesma lista do enum MotivoDenuncia do back-end
 export const MOTIVOS_DENUNCIA: { valor: string; rotulo: string }[] = [

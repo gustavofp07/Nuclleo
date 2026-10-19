@@ -175,8 +175,8 @@ export class UsuarioPerfilPage {
   }
 
   calcularNivelCadastro() {
-    const temCpf = !!this.usuario.cpf?.trim();
-    const temCep = !!this.usuario.cep?.trim();
+    const temCpf = this.usuario.possuiCpf ?? !!this.usuario.cpf?.trim();
+    const temCep = this.usuario.possuiCep ?? !!this.usuario.cep?.trim();
 
     if (temCpf && temCep) {
       this.nivelCadastro = 3;

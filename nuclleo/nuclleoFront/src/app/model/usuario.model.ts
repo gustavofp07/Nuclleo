@@ -13,6 +13,10 @@ export class UsuarioModel {
     perfil?: string;
     status?: string;
     suspensoAte?: string | null;
+    // CPF, CEP e e-mail só vêm preenchidos no próprio perfil (ou para o admin);
+    // para os outros usuários o back manda só se eles existem
+    possuiCpf?: boolean;
+    possuiCep?: boolean;
 
     constructor() {
         this.cdUsuario = 0;

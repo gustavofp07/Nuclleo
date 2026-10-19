@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.dto.MensagemComunidadeDTO;
@@ -32,10 +33,13 @@ public class MensagemComunidadeController {
     private MensagemComunidadeService mensagemService;
 
     @GetMapping("/{cdComunidade}/mensagens")
-    @Operation(summary = "Listar as mensagens mais recentes do chat (somente membros)")
+    @Operation(summary = "Histórico do chat em páginas (somente membros). "
+            + "Sem 'antesDe' traz as mais recentes; com 'antesDe' traz as anteriores àquela mensagem.")
     public ResponseEntity<List<MensagemComunidadeDTO>> listar(@PathVariable Long cdComunidade,
+            @RequestParam(required = false) Long antesDe,
+            @RequestParam(defaultValue = "50") int limite,
             Authentication authentication) {
-        return ResponseEntity.ok(mensagemService.listar(cdComunidade, authentication.getName()));
+        return ResponseEntity.ok(mensagemService.listar(cdComunidade, authentication.getName(), antesDe, limite));
     }
 
     @PostMapping("/{cdComunidade}/mensagens")

@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import br.cefetmg.nuclleo.security.DadoPessoalSerializer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,6 +51,9 @@ public class Usuario {
     @Column(name = "ft_usuario", length = 1000)
     private String ftUsuario;
 
+    // E-mail, CPF e CEP são dados pessoais: só o próprio usuário e o admin
+    // recebem o valor nas respostas (ver DadoPessoalSerializer)
+    @JsonSerialize(using = DadoPessoalSerializer.class)
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -60,9 +66,11 @@ public class Usuario {
     @Column(name = "dt_entrada")
     private Date dtEntrada; // cadastro
 
+    @JsonSerialize(using = DadoPessoalSerializer.class)
     @Column(name = "cpf")
     private String cpf;
 
+    @JsonSerialize(using = DadoPessoalSerializer.class)
     @Column(name = "cep")
     private String cep;
 
@@ -87,6 +95,18 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false)
     private Perfil perfil;
+
+    // O CPF e o CEP ficam escondidos para os outros, mas o perfil público ainda
+    // mostra o nível de cadastro; por isso só se expõe SE eles foram preenchidos.
+    @JsonProperty(value = "possuiCpf", access = JsonProperty.Access.READ_ONLY)
+    public boolean possuiCpf() {
+        return cpf != null && !cpf.isBlank();
+    }
+
+    @JsonProperty(value = "possuiCep", access = JsonProperty.Access.READ_ONLY)
+    public boolean possuiCep() {
+        return cep != null && !cep.isBlank();
+    }
 
     /**
      * Indica se a conta pode ser usada agora.

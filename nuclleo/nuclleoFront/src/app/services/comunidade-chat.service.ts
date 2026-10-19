@@ -22,6 +22,8 @@ export interface DigitandoComunidadeEvento {
  */
 @Injectable({ providedIn: 'root' })
 export class ComunidadeChatService {
+  static readonly TAMANHO_PAGINA = 50;
+
   private readonly URL_WS = `${environment.apiUrl}/ws-chat`;
   private readonly URL_HTTP = `${environment.apiUrl}/api/v1/comunidades`;
 
@@ -41,8 +43,15 @@ export class ComunidadeChatService {
     return { headers: this.tokenService.gerarCabecalhoAutenticacao() };
   }
 
-  listar(cdComunidade: number): Observable<MensagemComunidadeModel[]> {
-    return this.http.get<MensagemComunidadeModel[]>(`${this.URL_HTTP}/${cdComunidade}/mensagens`, this.getHeaders());
+  // Histórico em páginas: sem "antesDe" vêm as mais recentes; com ele, as anteriores àquela mensagem
+  listar(cdComunidade: number, antesDe?: number, limite = ComunidadeChatService.TAMANHO_PAGINA)
+    : Observable<MensagemComunidadeModel[]> {
+    const params: Record<string, number> = { limite };
+    if (antesDe) {
+      params['antesDe'] = antesDe;
+    }
+    return this.http.get<MensagemComunidadeModel[]>(`${this.URL_HTTP}/${cdComunidade}/mensagens`,
+      { ...this.getHeaders(), params });
   }
 
   enviar(cdComunidade: number, conteudo: string, cdMensagemResposta: number | null): Observable<MensagemComunidadeModel> {

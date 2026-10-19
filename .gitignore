@@ -3,3 +3,9 @@ nuclleo/nuclleoFront/ionic.config.zip
 
 # Saída de build do Maven (back-end)
 target/
+
+# Variáveis de ambiente locais (senhas do banco, JWT_SECRET)
+.env
+
+# Cópias compactadas do projeto (o histórico já fica no git)
+*.zip

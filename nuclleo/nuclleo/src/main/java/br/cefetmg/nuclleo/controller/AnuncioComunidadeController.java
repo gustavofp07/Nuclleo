@@ -3,6 +3,9 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.cefetmg.nuclleo.dto.Paginacao;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.AnuncioComunidade;
 import br.cefetmg.nuclleo.services.AnuncioComunidadeService;
@@ -43,10 +47,12 @@ public class AnuncioComunidadeController {
     }
 
     @GetMapping("/comunidade/anuncios")
-    @Operation(summary = "Listar anúncios de uma comunidade")
-    public ResponseEntity<List<Anuncio>> listarAnunciosDaComunidade(@RequestParam Long cdComunidade) {
-        List<Anuncio> anuncios = anuncioComunidadeService.listarAnunciosDaComunidade(cdComunidade);
-        return ResponseEntity.ok(anuncios);
+    @Operation(summary = "Listar anúncios de uma comunidade, em páginas (os mais novos primeiro)")
+    public ResponseEntity<Page<Anuncio>> listarAnunciosDaComunidade(@RequestParam Long cdComunidade,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pagina = PageRequest.of(Math.max(page, 0), Paginacao.limitar(size));
+        return ResponseEntity.ok(anuncioComunidadeService.listarAnunciosDaComunidade(cdComunidade, pagina));
     }
 
     @GetMapping("")

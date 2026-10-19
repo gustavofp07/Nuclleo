@@ -3,20 +3,22 @@ package br.cefetmg.nuclleo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.cefetmg.nuclleo.dto.TransacaoRequestDTO;
 import br.cefetmg.nuclleo.model.Transacao;
 import br.cefetmg.nuclleo.services.TransacaoService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+/**
+ * Transações são só de leitura pela API: elas nascem quando o anunciante finaliza
+ * a conversa (InteresseService.finalizarConversa) e cada um só vê as suas.
+ */
 @RestController
 @RequestMapping("/transacoes")
 @CrossOrigin(origins = "*")
@@ -25,45 +27,21 @@ public class TransacaoController {
     @Autowired
     private TransacaoService transacaoService;
 
-    @PostMapping("")
-    public void inserir(@RequestBody TransacaoRequestDTO dto) {
-        if (dto.getValor() <= 0) {
-            throw new IllegalArgumentException("O valor da transação deve ser maior que zero.");
-        }
-
-        if (dto.getCdUsuario() == null) {
-            throw new IllegalArgumentException("O ID do usuário não pode ser nulo.");
-        }
-
-        if (dto.getCdAnuncio() == null) {
-            throw new IllegalArgumentException("O ID do anúncio não pode ser nulo.");
-        }
-
-        transacaoService.inserir(dto);
-    }
-
-    @GetMapping("")
-    public List<Transacao> listarTodos() {
-        return transacaoService.listarTodos();
-    }
-
     @GetMapping("/{id}")
-    public Transacao buscarPorId(@PathVariable Long id) {
-        return transacaoService.buscarPorId(id);
+    @Operation(summary = "Buscar transação (somente quem participou dela)")
+    public Transacao buscarPorId(@PathVariable Long id, Authentication authentication) {
+        return transacaoService.buscarPorId(id, authentication.getName());
     }
 
     @GetMapping("/usuario/{id}")
-    public List<Transacao> listarPorUsuario(@PathVariable Long id) {
-        return transacaoService.listarPorUsuarioEnvolvido(id);
+    @Operation(summary = "Listar as transações do usuário logado")
+    public List<Transacao> listarPorUsuario(@PathVariable Long id, Authentication authentication) {
+        return transacaoService.listarPorUsuarioEnvolvido(id, authentication.getName());
     }
 
     @GetMapping("/anuncio/{id}")
-    public List<Transacao> listarPorAnuncio(@PathVariable Long id) {
-        return transacaoService.listarPorAnuncio(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public void excluir(@PathVariable Long id) {
-        transacaoService.excluir(id);
+    @Operation(summary = "Listar as transações de um anúncio (somente o dono do anúncio)")
+    public List<Transacao> listarPorAnuncio(@PathVariable Long id, Authentication authentication) {
+        return transacaoService.listarPorAnuncio(id, authentication.getName());
     }
 }

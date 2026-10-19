@@ -22,6 +22,8 @@ export interface StatusInteresseEvento {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
+  static readonly TAMANHO_PAGINA = 50;
+
   private readonly URL_WS = `${environment.apiUrl}/ws-chat`;
   private readonly URL_HTTP = `${environment.apiUrl}/api/v1/mensagens`;
 
@@ -48,6 +50,10 @@ export class ChatService {
 
     this.client = new Client({
       webSocketFactory: () => new SockJS(this.URL_WS),
+      // O back exige o token no CONNECT e só deixa os participantes ouvirem a conversa
+      connectHeaders: {
+        Authorization: this.tokenService.gerarCabecalhoAutenticacao().get('Authorization') ?? ''
+      },
       reconnectDelay: 5000,
       onConnect: () => {
         this.statusConexao.next(true);
@@ -83,8 +89,9 @@ export class ChatService {
     this.client.activate();
   }
 
+  // O remetente não vai na mensagem: o back usa o usuário autenticado na conexão
   enviarMensagem(cdInteresse: number,
-    mensagem: { cdUsuarioRemetente: number; conteudo: string; cdMensagemResposta?: number | null }) {
+    mensagem: { conteudo: string; cdMensagemResposta?: number | null }) {
     if (!this.client?.active) {
       return;
     }
@@ -95,14 +102,14 @@ export class ChatService {
     });
   }
 
-  enviarDigitando(cdInteresse: number, cdUsuario: number, digitando: boolean) {
+  enviarDigitando(cdInteresse: number, digitando: boolean) {
     if (!this.client?.active) {
       return;
     }
 
     this.client.publish({
       destination: `/app/chat/${cdInteresse}/digitando`,
-      body: JSON.stringify({ cdUsuario, digitando })
+      body: JSON.stringify({ digitando })
     });
   }
 
@@ -136,7 +143,12 @@ export class ChatService {
     return this.http.delete<MensagemModel>(`${this.URL_HTTP}/${cdMensagem}`, this.getHeaders());
   }
 
-  listarHistorico(cdInteresse: number): Observable<MensagemModel[]> {
-    return this.http.get<MensagemModel[]>(`${this.URL_HTTP}/interesse/${cdInteresse}`, this.getHeaders());
+  // Histórico em páginas: sem "antesDe" vêm as mais recentes; com ele, as anteriores àquela mensagem
+  listarHistorico(cdInteresse: number, antesDe?: number, limite = ChatService.TAMANHO_PAGINA): Observable<MensagemModel[]> {
+    const params: Record<string, number> = { limite };
+    if (antesDe) {
+      params['antesDe'] = antesDe;
+    }
+    return this.http.get<MensagemModel[]>(`${this.URL_HTTP}/interesse/${cdInteresse}`, { ...this.getHeaders(), params });
   }
 }

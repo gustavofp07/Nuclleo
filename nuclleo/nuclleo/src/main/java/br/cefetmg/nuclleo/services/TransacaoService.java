@@ -7,10 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.TransacaoRequestDTO;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Transacao;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.TransacaoRepository;
+import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
 @Service
 public class TransacaoService {
@@ -19,6 +22,9 @@ public class TransacaoService {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private AnuncioService anuncioService;
@@ -56,29 +62,40 @@ public class TransacaoService {
         return transacao;
     }
 
+    /** Só quem comprou/vendeu (interessado ou dono do anúncio) vê a transação. */
     @Transactional(readOnly = true)
-    public Transacao buscarPorId(Long id) {
-        return transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
-    }
-
-    public List<Transacao> listarPorUsuarioEnvolvido(Long id) {
-        return transacaoRepository.findByUsuarioCdUsuarioOrAnuncioUsuarioCriaCdUsuarioOrderByDataDesc(id, id);
-    }
-
-    public List<Transacao> listarPorAnuncio(Long id) {
-        return transacaoRepository.findByAnuncioCdAnuncio(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Transacao> listarTodos() {
-        return transacaoRepository.findAll();
-    }
-
-    @Transactional
-    public void excluir(Long id) {
+    public Transacao buscarPorId(Long id, String emailSolicitante) {
         Transacao transacao = transacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada. Id: " + id));
-        transacaoRepository.delete(transacao);
+                .orElseThrow(() -> new ResourceNotFoundException("Transação não encontrada."));
+
+        Long cdSolicitante = buscarSolicitante(emailSolicitante).getCdUsuario();
+        boolean participante = transacao.getUsuario().getCdUsuario().equals(cdSolicitante)
+                || transacao.getAnuncio().getUsuarioCria().getCdUsuario().equals(cdSolicitante);
+        if (!participante) {
+            throw new ForbiddenException("Você não participou desta transação.");
+        }
+        return transacao;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Transacao> listarPorUsuarioEnvolvido(Long cdUsuario, String emailSolicitante) {
+        if (!buscarSolicitante(emailSolicitante).getCdUsuario().equals(cdUsuario)) {
+            throw new ForbiddenException("Você só pode ver as suas próprias transações.");
+        }
+        return transacaoRepository.findByUsuarioCdUsuarioOrAnuncioUsuarioCriaCdUsuarioOrderByDataDesc(cdUsuario, cdUsuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Transacao> listarPorAnuncio(Long cdAnuncio, String emailSolicitante) {
+        Anuncio anuncio = anuncioService.buscarPorId(cdAnuncio);
+        if (!anuncio.getUsuarioCria().getCdUsuario().equals(buscarSolicitante(emailSolicitante).getCdUsuario())) {
+            throw new ForbiddenException("Só o dono do anúncio vê as transações dele.");
+        }
+        return transacaoRepository.findByAnuncioCdAnuncio(cdAnuncio);
+    }
+
+    private Usuario buscarSolicitante(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 }

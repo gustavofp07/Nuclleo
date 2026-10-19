@@ -3,6 +3,7 @@ import { Subject, Observable } from 'rxjs';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from 'src/environments/environment';
+import { TokenService } from './token.service';
 
 export interface NotificacaoEvento {
   tipo: string;
@@ -17,6 +18,8 @@ export class NotificacaoService {
   private client: Client | null = null;
   private cdUsuarioConectado: number | null = null;
   private notificacaoRecebida = new Subject<NotificacaoEvento>();
+
+  constructor(private tokenService: TokenService) { }
 
   conectar(cdUsuario: number, admin: boolean = false) {
     if (this.client?.active && this.cdUsuarioConectado === cdUsuario) {
@@ -33,6 +36,11 @@ export class NotificacaoService {
 
     this.client = new Client({
       webSocketFactory: () => new SockJS(this.URL_WS),
+      // O back exige o token e só entrega as notificações do próprio usuário
+      // (e o canal de denúncias só para administradores)
+      connectHeaders: {
+        Authorization: this.tokenService.gerarCabecalhoAutenticacao().get('Authorization') ?? ''
+      },
       reconnectDelay: 5000,
       onConnect: () => {
         this.client!.subscribe(`/topic/notificacoes/${cdUsuario}`, repassar);

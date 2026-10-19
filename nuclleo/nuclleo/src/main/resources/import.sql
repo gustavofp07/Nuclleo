@@ -1,3 +1,15 @@
+-- =====================================================================
+-- DADOS DE TESTE - SOMENTE PARA BANCO DE DESENVOLVIMENTO
+--
+-- ATENÇÃO: este script começa com TRUNCATE em todas as tabelas, ou seja,
+-- APAGA TODOS OS DADOS antes de inserir os usuários de teste.
+-- Nunca rode no banco de produção.
+--
+-- Com ddl-auto: update (o padrão do projeto) o Hibernate NÃO executa este
+-- arquivo sozinho; ele só roda se alguém executar à mão ou trocar o
+-- ddl-auto para create/create-drop.
+-- =====================================================================
+
 -- O usuário não tem mais telefone: remove a coluna antiga do banco
 ALTER TABLE tb_usuario DROP COLUMN IF EXISTS telefone;
 

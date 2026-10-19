@@ -66,6 +66,8 @@ export class ChatPage implements OnDestroy {
   interesse: InteresseModel | null = null;
 
   mensagens: MensagemView[] = [];
+  temMensagensAnteriores = false;
+  carregandoAnteriores = false;
   textoMensagem: string = '';
   readonly limiteMensagem = 500;
   conectado: boolean = false;
@@ -299,12 +301,33 @@ export class ChatPage implements OnDestroy {
     }
   }
 
+  // O histórico vem em páginas: primeiro as mais recentes, e as antigas sob demanda
   carregarHistorico() {
     this.chatService.listarHistorico(this.cdInteresse).subscribe({
       next: (mensagens) => {
         this.mensagens = mensagens;
+        this.temMensagensAnteriores = mensagens.length === ChatService.TAMANHO_PAGINA;
         this.rolarParaFinal();
       }
+    });
+  }
+
+  carregarAnteriores() {
+    const primeira = this.mensagens.find(m => m.id);
+    if (!primeira || this.carregandoAnteriores) {
+      return;
+    }
+
+    this.carregandoAnteriores = true;
+    this.chatService.listarHistorico(this.cdInteresse, primeira.id).subscribe({
+      next: (anteriores) => {
+        this.mensagens = [...anteriores, ...this.mensagens];
+        this.temMensagensAnteriores = anteriores.length === ChatService.TAMANHO_PAGINA;
+        this.carregandoAnteriores = false;
+        // Mantém na tela a mensagem que estava no topo
+        setTimeout(() => document.getElementById('msg-' + primeira.id)?.scrollIntoView());
+      },
+      error: () => this.carregandoAnteriores = false
     });
   }
 
@@ -339,7 +362,7 @@ export class ChatPage implements OnDestroy {
 
     this.chatService.enviarMensagem(
       this.cdInteresse,
-      { cdUsuarioRemetente: this.token.cdUsuario, conteudo: texto, cdMensagemResposta: respondida?.id ?? null }
+      { conteudo: texto, cdMensagemResposta: respondida?.id ?? null }
     );
 
     this.textoMensagem = '';
@@ -522,7 +545,7 @@ export class ChatPage implements OnDestroy {
       return;
     }
 
-    this.chatService.enviarDigitando(this.cdInteresse, this.token.cdUsuario, true);
+    this.chatService.enviarDigitando(this.cdInteresse, true);
 
     clearTimeout(this.timeoutDigitando);
     this.timeoutDigitando = setTimeout(() => {
@@ -532,7 +555,7 @@ export class ChatPage implements OnDestroy {
 
   pararDigitacao() {
     clearTimeout(this.timeoutDigitando);
-    this.chatService.enviarDigitando(this.cdInteresse, this.token.cdUsuario, false);
+    this.chatService.enviarDigitando(this.cdInteresse, false);
   }
 
   ehMinhaMensagem(mensagem: MensagemModel): boolean {

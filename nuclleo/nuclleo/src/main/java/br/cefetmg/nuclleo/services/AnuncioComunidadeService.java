@@ -3,6 +3,8 @@ package br.cefetmg.nuclleo.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +28,8 @@ public class AnuncioComunidadeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Anuncio> listarAnunciosDaComunidade(Long cdComunidade) {
-        return repository.findAnunciosByComunidade(cdComunidade);
+    public Page<Anuncio> listarAnunciosDaComunidade(Long cdComunidade, Pageable pagina) {
+        return repository.findAnunciosByComunidade(cdComunidade, pagina);
     }
 
     @Transactional(readOnly = true)

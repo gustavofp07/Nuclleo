@@ -9,6 +9,8 @@ import { AnuncioModel } from '../model/anuncio.model';
 import { TokenService } from './token.service';
 import { environment } from 'src/environments/environment';
 
+import { PaginaModel, paraPagina } from '../model/pagina.model';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,13 +34,16 @@ export class AnuncioComunidadeService {
     return this.http.post<AnuncioComunidadeModel[]>(`${this.API_URL}/relacoes`, relacoes, this.getHeaders());
   }
 
+  // Paginado: os mais novos primeiro
   listarAnunciosDaComunidade(
-    cdComunidade: number
-  ): Observable<AnuncioModel[]> {
-    return this.http.get<AnuncioModel[]>(
-      `${this.API_URL}/comunidade/anuncios?cdComunidade=${cdComunidade}`,
-      this.getHeaders()
-    );
+    cdComunidade: number,
+    page = 0,
+    size = 20
+  ): Observable<PaginaModel<AnuncioModel>> {
+    return this.http.get<any>(
+      `${this.API_URL}/comunidade/anuncios`,
+      { ...this.getHeaders(), params: { cdComunidade, page, size } }
+    ).pipe(paraPagina<AnuncioModel>());
   }
 
   excluirRelacoesPorAnuncio(cdAnuncio: number) {

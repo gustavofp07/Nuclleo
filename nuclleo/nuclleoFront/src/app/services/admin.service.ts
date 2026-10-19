@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 
 import { TokenService } from './token.service';
 import { environment } from 'src/environments/environment';
-import { DenunciaModel, PaginaModel, SancaoModel, StatusDenuncia, TipoAlvo } from '../model/denuncia.model';
+import { DenunciaModel, SancaoModel, StatusDenuncia, TipoAlvo } from '../model/denuncia.model';
+import { PaginaModel, paraPagina } from '../model/pagina.model';
 import { AnuncioModel } from '../model/anuncio.model';
 
 @Injectable({
@@ -32,10 +33,10 @@ export class AdminService {
     if (status) params = params.set('status', status);
     if (tipoAlvo) params = params.set('tipoAlvo', tipoAlvo);
 
-    return this.http.get<PaginaModel<DenunciaModel>>(
+    return this.http.get<any>(
       `${this.API_ADMIN}/denuncias`,
       { ...this.getHeaders(), params }
-    );
+    ).pipe(paraPagina<DenunciaModel>());
   }
 
   buscarDenuncia(cdDenuncia: number): Observable<DenunciaModel> {

@@ -30,6 +30,12 @@
 
   <div class="chat-wrapper">
 
+    <div class="carregar-anteriores" *ngIf="temMensagensAnteriores">
+      <ion-button fill="clear" size="small" (click)="carregarAnteriores()" [disabled]="carregandoAnteriores">
+        {{ carregandoAnteriores ? 'Carregando...' : 'Carregar mensagens anteriores' }}
+      </ion-button>
+    </div>
+
     <div *ngIf="mensagens.length === 0" class="empty-state">
       <ion-icon name="chatbubble-outline"></ion-icon>
       <h2>Nenhuma mensagem ainda</h2>

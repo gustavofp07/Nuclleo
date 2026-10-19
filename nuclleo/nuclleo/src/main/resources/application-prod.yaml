@@ -1,0 +1,23 @@
+# Profile de produção (Render). Ativado pelo Dockerfile: SPRING_PROFILES_ACTIVE=prod
+# Só sobrescreve o que muda em relação ao application.yaml.
+
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+server:
+  error:
+    # As mensagens de erro são escritas para o usuário (ex.: "A nota deve ser entre 1 e 5."),
+    # então continuam indo; o que não pode vazar é o stack trace e os detalhes internos.
+    include-message: always
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+jwt:
+  # Sem valor padrão: se a variável JWT_SECRET não estiver definida, a aplicação nem sobe
+  # (melhor do que rodar com a chave pública que está no código)
+  secret: ${JWT_SECRET}

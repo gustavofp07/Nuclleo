@@ -45,6 +45,18 @@ export class TokenService {
     return this.obterTokenArmazenado() !== '';
   }
 
+  // Tem token e ele ainda não expirou (o "exp" do JWT é em segundos)
+  estaAutenticado(): boolean {
+    if (!this.temToken()) return false;
+
+    try {
+      const exp = this.lerPayload()?.exp;
+      return typeof exp !== 'number' || exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
   gerarCabecalhoAutenticacao(): HttpHeaders {
     return new HttpHeaders({ Authorization: 'Bearer ' + this.obterTokenArmazenado() });
   }
@@ -52,16 +64,8 @@ export class TokenService {
   extrair(): TokenModel {
     const tokenModel = new TokenModel();
     try {
-      const token = this.obterTokenArmazenado();
-      const partes = token.split('.');
-
-      if (partes.length < 2 || !partes[1]) return tokenModel;
-
-      const tokenBase64 = partes[1].replace(/-/g, '+').replace(/_/g, '/');
-      const tokenBase64ComPadding = tokenBase64.padEnd(
-        tokenBase64.length + ((4 - (tokenBase64.length % 4)) % 4), '='
-      );
-      const payload = JSON.parse(atob(tokenBase64ComPadding));
+      const payload = this.lerPayload();
+      if (!payload) return tokenModel;
 
       tokenModel.cdUsuario = payload.cdUsuario;
       tokenModel.nmUsuario = payload.nmUsuario;
@@ -72,6 +76,18 @@ export class TokenService {
       console.error('Erro ao extrair token JWT', error);
     }
     return tokenModel;
+  }
+
+  private lerPayload(): any {
+    const partes = this.obterTokenArmazenado().split('.');
+
+    if (partes.length < 2 || !partes[1]) return null;
+
+    const tokenBase64 = partes[1].replace(/-/g, '+').replace(/_/g, '/');
+    const tokenBase64ComPadding = tokenBase64.padEnd(
+      tokenBase64.length + ((4 - (tokenBase64.length % 4)) % 4), '='
+    );
+    return JSON.parse(atob(tokenBase64ComPadding));
   }
 
   isAdmin(): boolean {

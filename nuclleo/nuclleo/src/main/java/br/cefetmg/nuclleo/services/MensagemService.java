@@ -1,15 +1,20 @@
 package br.cefetmg.nuclleo.services;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.MensagemDTO;
 import br.cefetmg.nuclleo.dto.MensagemRequestDTO;
+import br.cefetmg.nuclleo.dto.Paginacao;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
@@ -18,6 +23,7 @@ import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Mensagem;
 import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Usuario;
+import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
 
 @Service
@@ -33,14 +39,17 @@ public class MensagemService {
     private InteresseService interesseService;
 
     @Autowired
+    private InteresseRepository interesseRepository;
+
+    @Autowired
     private UsuarioService usuarioService;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    public MensagemDTO salvar(Long cdInteresse, MensagemRequestDTO dto) {
+    public MensagemDTO salvar(Long cdInteresse, Long cdRemetente, MensagemRequestDTO dto) {
         Interesse interesse = interesseService.buscarPorId(cdInteresse);
-        Usuario remetente = usuarioService.buscarPorId(dto.getCdUsuarioRemetente());
+        Usuario remetente = usuarioService.buscarPorId(cdRemetente);
 
         Anuncio anuncio = interesse.getAnuncio();
         Usuario anunciante = anuncio.getUsuarioCria();
@@ -121,8 +130,24 @@ public class MensagemService {
         return dto;
     }
 
-    public List<MensagemDTO> listarPorInteresse(Long cdInteresse) {
-        List<Mensagem> mensagens = mensagemRepository.findByInteresseIdOrderByDataEnvioAsc(cdInteresse);
+    /**
+     * Histórico da conversa, só para os dois participantes. Vem em páginas:
+     * sem "antesDe", as mensagens mais recentes; com "antesDe", as anteriores a ela.
+     * Sempre em ordem cronológica.
+     */
+    @Transactional(readOnly = true)
+    public List<MensagemDTO> listarPorInteresse(Long cdInteresse, String emailSolicitante, Long antesDe, int limite) {
+        Usuario solicitante = usuarioService.buscarPorEmail(emailSolicitante);
+        if (!interesseRepository.participaDaConversa(cdInteresse, solicitante.getCdUsuario())) {
+            throw new ForbiddenException("Você não participa desta conversa.");
+        }
+
+        Pageable pagina = PageRequest.of(0, Paginacao.limitar(limite));
+        List<Mensagem> mensagens = new ArrayList<>(antesDe == null
+                ? mensagemRepository.findByInteresseIdOrderByIdDesc(cdInteresse, pagina)
+                : mensagemRepository.findByInteresseIdAndIdLessThanOrderByIdDesc(cdInteresse, antesDe, pagina));
+        Collections.reverse(mensagens);
+
         return mensagens.stream().map(MensagemDTO::of).collect(Collectors.toList());
     }
 }

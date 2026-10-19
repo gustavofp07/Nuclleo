@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.dto.MensagemDTO;
@@ -27,13 +28,14 @@ public class MensagemRestController {
     private MensagemService mensagemService;
 
     @GetMapping("/interesse/{cdInteresse}")
-    public ResponseEntity<List<MensagemDTO>> listarPorInteresse(@PathVariable Long cdInteresse) {
-        if (cdInteresse == null) {
-            throw new IllegalArgumentException("O campo código do interesse é obrigatório.");
-        }
-
-        List<MensagemDTO> mensagens = mensagemService.listarPorInteresse(cdInteresse);
-        return ResponseEntity.ok(mensagens);
+    @Operation(summary = "Histórico da conversa em páginas (somente participantes). "
+            + "Sem 'antesDe' traz as mais recentes; com 'antesDe' traz as anteriores àquela mensagem.")
+    public ResponseEntity<List<MensagemDTO>> listarPorInteresse(@PathVariable Long cdInteresse,
+            @RequestParam(required = false) Long antesDe,
+            @RequestParam(defaultValue = "50") int limite,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                mensagemService.listarPorInteresse(cdInteresse, authentication.getName(), antesDe, limite));
     }
 
     @DeleteMapping("/{cdMensagem}")

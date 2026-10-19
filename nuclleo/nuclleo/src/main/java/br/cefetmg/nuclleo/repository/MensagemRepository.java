@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,10 @@ import br.cefetmg.nuclleo.model.Mensagem;
 
 public interface MensagemRepository extends JpaRepository<Mensagem, Long> {
 
-    List<Mensagem> findByInteresseIdOrderByDataEnvioAsc(Long cdInteresse);
+    // Histórico paginado: as mais recentes primeiro (o service inverte para exibir)
+    List<Mensagem> findByInteresseIdOrderByIdDesc(Long cdInteresse, Pageable pagina);
+
+    List<Mensagem> findByInteresseIdAndIdLessThanOrderByIdDesc(Long cdInteresse, Long antesDe, Pageable pagina);
 
     long countByInteresseId(Long cdInteresse);
 

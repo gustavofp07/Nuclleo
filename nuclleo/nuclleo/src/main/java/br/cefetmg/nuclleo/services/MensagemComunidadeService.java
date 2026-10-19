@@ -1,14 +1,18 @@
 package br.cefetmg.nuclleo.services;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.MensagemComunidadeDTO;
+import br.cefetmg.nuclleo.dto.Paginacao;
 import br.cefetmg.nuclleo.dto.MensagemComunidadeRequestDTO;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
@@ -53,13 +57,15 @@ public class MensagemComunidadeService {
     private SimpMessagingTemplate messagingTemplate;
 
     @Transactional(readOnly = true)
-    public List<MensagemComunidadeDTO> listar(Long cdComunidade, String emailSolicitante) {
+    public List<MensagemComunidadeDTO> listar(Long cdComunidade, String emailSolicitante, Long antesDe, int limite) {
         Comunidade comunidade = buscarComunidade(cdComunidade);
         Usuario usuario = buscarUsuario(emailSolicitante);
         validarMembro(comunidade, usuario);
 
-        List<MensagemComunidade> recentes = mensagemRepository
-                .findTop200ByComunidadeCdComunidadeOrderByDataEnvioDesc(cdComunidade);
+        Pageable pagina = PageRequest.of(0, Paginacao.limitar(limite));
+        List<MensagemComunidade> recentes = new ArrayList<>(antesDe == null
+                ? mensagemRepository.findByComunidadeCdComunidadeOrderByIdDesc(cdComunidade, pagina)
+                : mensagemRepository.findByComunidadeCdComunidadeAndIdLessThanOrderByIdDesc(cdComunidade, antesDe, pagina));
         Collections.reverse(recentes);
 
         return recentes.stream().map(MensagemComunidadeDTO::new).toList();
@@ -116,17 +122,6 @@ public class MensagemComunidadeService {
         messagingTemplate.convertAndSend(
                 "/topic/comunidade/" + mensagem.getComunidade().getCdComunidade() + "/apagada", dto);
         return dto;
-    }
-
-    /** Usado pelo "digitando": membro ou criador da comunidade pode usar o chat. */
-    @Transactional(readOnly = true)
-    public boolean podeUsarChat(Long cdComunidade, Long cdUsuario) {
-        return comunidadeRepository.findById(cdComunidade)
-                .map(comunidade -> usuarioComunidadeRepository
-                        .existsByUsuarioCdUsuarioAndComunidadeCdComunidade(cdUsuario, cdComunidade)
-                        || (comunidade.getUsuarioCria() != null
-                                && comunidade.getUsuarioCria().getCdUsuario().equals(cdUsuario)))
-                .orElse(false);
     }
 
     /** Usado ao excluir a comunidade: apaga todo o histórico do chat. */

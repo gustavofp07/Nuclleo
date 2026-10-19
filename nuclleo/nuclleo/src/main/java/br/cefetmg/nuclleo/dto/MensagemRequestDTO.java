@@ -1,13 +1,11 @@
 package br.cefetmg.nuclleo.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class MensagemRequestDTO {
 
-    @NotNull(message = "O campo código do usuário remetente é obrigatório.")
-    private Long cdUsuarioRemetente;
+    // O remetente não vem aqui: é o usuário autenticado na conexão do WebSocket
 
     @NotBlank(message = "O conteúdo da mensagem não pode ser vazio.")
     @Size(max = 500, message = "A mensagem não pode ter mais que 500 caracteres.")
@@ -22,14 +20,6 @@ public class MensagemRequestDTO {
 
     public void setCdMensagemResposta(Long cdMensagemResposta) {
         this.cdMensagemResposta = cdMensagemResposta;
-    }
-
-    public Long getCdUsuarioRemetente() {
-        return cdUsuarioRemetente;
-    }
-
-    public void setCdUsuarioRemetente(Long cdUsuarioRemetente) {
-        this.cdUsuarioRemetente = cdUsuarioRemetente;
     }
 
     public String getConteudo() {

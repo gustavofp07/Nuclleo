@@ -2,6 +2,7 @@ package br.cefetmg.nuclleo.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,8 +14,11 @@ import br.cefetmg.nuclleo.model.MensagemComunidade;
 @Repository
 public interface MensagemComunidadeRepository extends JpaRepository<MensagemComunidade, Long> {
 
-    // As mais recentes primeiro (o service inverte para exibir em ordem cronológica)
-    List<MensagemComunidade> findTop200ByComunidadeCdComunidadeOrderByDataEnvioDesc(Long cdComunidade);
+    // Histórico paginado: as mais recentes primeiro (o service inverte para exibir)
+    List<MensagemComunidade> findByComunidadeCdComunidadeOrderByIdDesc(Long cdComunidade, Pageable pagina);
+
+    List<MensagemComunidade> findByComunidadeCdComunidadeAndIdLessThanOrderByIdDesc(Long cdComunidade,
+            Long antesDe, Pageable pagina);
 
     // Um único DELETE: as respostas apontam para outras mensagens da mesma comunidade
     @Modifying

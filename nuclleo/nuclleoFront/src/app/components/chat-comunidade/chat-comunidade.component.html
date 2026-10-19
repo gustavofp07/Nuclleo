@@ -22,6 +22,12 @@
     </div>
 
     <ng-container *ngIf="!carregando">
+      <div class="carregar-anteriores" *ngIf="temMensagensAnteriores">
+        <ion-button fill="clear" size="small" (click)="carregarAnteriores()" [disabled]="carregandoAnteriores">
+          {{ carregandoAnteriores ? 'Carregando...' : 'Carregar mensagens anteriores' }}
+        </ion-button>
+      </div>
+
       <ng-container *ngFor="let mensagem of mensagens; let i = index; trackBy: trackPorId">
 
         <div class="separador-data" *ngIf="mostrarData(i)">

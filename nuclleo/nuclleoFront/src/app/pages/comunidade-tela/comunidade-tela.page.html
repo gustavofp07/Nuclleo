@@ -172,6 +172,13 @@
         </a>
       </div>
 
+      <div class="carregar-mais" *ngIf="!carregandoAnuncios && !ultimaPaginaAnuncios">
+        <ion-button fill="outline" [disabled]="carregandoMaisAnuncios" (click)="carregarMaisAnuncios()">
+          <ion-spinner name="dots" *ngIf="carregandoMaisAnuncios"></ion-spinner>
+          <span *ngIf="!carregandoMaisAnuncios">Carregar mais</span>
+        </ion-button>
+      </div>
+
     </ng-container>
 
   </div>
