@@ -21,7 +21,6 @@ import { chevronBackOutline, star, starOutline } from 'ionicons/icons';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioService } from 'src/app/services/anuncio.service';
 import { InteresseService } from 'src/app/services/interesse.service';
-import { TokenService } from 'src/app/services/token.service';
 
 /**
  * Tela de finalizar/avaliar conversa (usada no chat e na página de conversas).
@@ -84,7 +83,6 @@ export class FinalizarConversaComponent implements OnChanges {
   constructor(
     private interesseService: InteresseService,
     private anuncioService: AnuncioService,
-    private tokenService: TokenService,
     private alertController: AlertController,
     private toastController: ToastController
   ) {
@@ -178,10 +176,7 @@ export class FinalizarConversaComponent implements OnChanges {
   private avaliarAnunciante(nota: number) {
     this.enviandoFinalizacao = true;
 
-    this.interesseService.avaliarAnunciante(this.cdInteresse, {
-      cdUsuarioSolicitante: this.tokenService.extrair().cdUsuario,
-      nota
-    }).subscribe({
+    this.interesseService.avaliarAnunciante(this.cdInteresse, { nota }).subscribe({
       next: () => {
         this.enviandoFinalizacao = false;
         this.finalizou = true;
@@ -199,7 +194,6 @@ export class FinalizarConversaComponent implements OnChanges {
     this.enviandoFinalizacao = true;
 
     this.interesseService.finalizarConversa(this.cdInteresse, {
-      cdUsuarioSolicitante: this.tokenService.extrair().cdUsuario,
       ocorreuTransacao,
       valor,
       notaInteressado: nota

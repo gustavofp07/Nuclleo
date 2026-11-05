@@ -13,17 +13,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import br.cefetmg.nuclleo.Fixtures;
 import br.cefetmg.nuclleo.dto.InteresseRequestDTO;
 import br.cefetmg.nuclleo.exception.ConflictException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.InteresseRepository;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class InteresseServiceTest {
 
     @Mock
@@ -35,6 +39,9 @@ class InteresseServiceTest {
     @Mock
     private AnuncioService anuncioService;
 
+    @Mock
+    private br.cefetmg.nuclleo.repository.MensagemRepository mensagemRepository;
+
     @InjectMocks
     private InteresseService interesseService;
 
@@ -45,7 +52,6 @@ class InteresseServiceTest {
 
     @BeforeEach
     void montar() {
-        ReflectionTestUtils.setField(dto, "cdUsuario", 2L);
         ReflectionTestUtils.setField(dto, "cdAnuncio", 10L);
         when(usuarioService.buscarPorId(2L)).thenReturn(interessado);
         when(anuncioService.buscarPorId(10L)).thenReturn(anuncio);
@@ -57,14 +63,27 @@ class InteresseServiceTest {
         Interesse salvo = new Interesse();
         when(interesseRepository.save(any(Interesse.class))).thenReturn(salvo);
 
-        assertSame(salvo, interesseService.inserir(dto));
+        assertSame(salvo, interesseService.inserir(dto, 2L));
+        verify(usuarioService).buscarPorId(2L);
     }
 
     @Test
     void naoRegistraOMesmoInteresseDuasVezes() {
         when(interesseRepository.existsByUsuarioCdUsuarioAndAnuncioCdAnuncio(2L, 10L)).thenReturn(true);
 
-        assertThrows(ConflictException.class, () -> interesseService.inserir(dto));
+        assertThrows(ConflictException.class, () -> interesseService.inserir(dto, 2L));
         verify(interesseRepository, never()).save(any());
+    }
+
+    @Test
+    void soQuemRegistrouRemoveOInteresse() {
+        Interesse interesse = Fixtures.interesse(5, interessado, anuncio);
+        when(interesseRepository.findById(5L)).thenReturn(java.util.Optional.of(interesse));
+
+        assertThrows(ForbiddenException.class, () -> interesseService.excluir(5L, dono.getCdUsuario()));
+        verify(interesseRepository, never()).delete(any());
+
+        interesseService.excluir(5L, interessado.getCdUsuario());
+        verify(interesseRepository).delete(interesse);
     }
 }

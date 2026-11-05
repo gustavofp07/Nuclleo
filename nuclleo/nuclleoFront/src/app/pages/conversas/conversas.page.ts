@@ -176,7 +176,7 @@ export class ConversasPage {
   aceitarConversa(conversa: ConversaView, event: Event) {
     event.stopPropagation();
 
-    this.interesseService.aceitarInteresse(conversa.cdInteresse, this.token.cdUsuario).subscribe({
+    this.interesseService.aceitarInteresse(conversa.cdInteresse).subscribe({
       next: () => {
         conversa.aceito = true;
         this.router.navigate(['/chat', conversa.cdInteresse]);
@@ -205,7 +205,7 @@ export class ConversasPage {
   }
 
   recusarConversa(conversa: ConversaView) {
-    this.interesseService.recusarConversa(conversa.cdInteresse, this.token.cdUsuario).subscribe({
+    this.interesseService.recusarConversa(conversa.cdInteresse).subscribe({
       next: () => {
         this.conversas = this.conversas.filter(c => c.cdInteresse !== conversa.cdInteresse);
         this.exibirMensagem('Conversa recusada.');

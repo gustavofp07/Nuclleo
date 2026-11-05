@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.cefetmg.nuclleo.model.Avaliacao;
 import br.cefetmg.nuclleo.services.AvaliacaoService;
+import br.cefetmg.nuclleo.services.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -23,6 +25,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AvaliacaoController {
     @Autowired
     private AvaliacaoService avaliacaoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     // Lista avaliações pendentes de um usuário
     @GetMapping("/pendentes/{cdUsuario}")
@@ -53,12 +58,13 @@ public class AvaliacaoController {
         return ResponseEntity.ok(avaliacaoService.contarAvaliacoes(cdUsuario));
     }
 
-    // Registra a nota de uma avaliação pendente
+    // Registra a nota de uma avaliação pendente. Quem avalia é o usuário do token
     @PatchMapping("/{cdAvaliacao}/nota")
     public ResponseEntity<Avaliacao> avaliar(
             @PathVariable Long cdAvaliacao,
-            @RequestParam Long cdAvaliador,
-            @RequestParam Integer nota) {
+            @RequestParam Integer nota,
+            Authentication authentication) {
+        Long cdAvaliador = usuarioService.buscarPorEmail(authentication.getName()).getCdUsuario();
         return ResponseEntity.ok(avaliacaoService.avaliar(cdAvaliacao, cdAvaliador, nota));
     }
 }

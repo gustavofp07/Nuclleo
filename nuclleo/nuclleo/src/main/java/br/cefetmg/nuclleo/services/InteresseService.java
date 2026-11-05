@@ -13,6 +13,7 @@ import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Avaliacao;
 import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ConflictException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Transacao;
@@ -53,9 +54,9 @@ public class InteresseService {
     private SimpMessagingTemplate messagingTemplate;
 
     @Transactional
-    public Interesse inserir(InteresseRequestDTO dto) {
+    public Interesse inserir(InteresseRequestDTO dto, Long cdUsuarioSolicitante) {
 
-        Usuario usuario = usuarioService.buscarPorId(dto.getCdUsuario());
+        Usuario usuario = usuarioService.buscarPorId(cdUsuarioSolicitante);
 
         Anuncio anuncio = anuncioService.buscarPorId(dto.getCdAnuncio());
 
@@ -279,9 +280,14 @@ public class InteresseService {
     }
 
     @Transactional
-    public void excluir(Long id) {
+    public void excluir(Long id, Long cdUsuarioSolicitante) {
         Interesse interesse = interesseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Interesse não encontrado. Id: " + id));
+
+        if (!interesse.getUsuario().getCdUsuario().equals(cdUsuarioSolicitante)) {
+            throw new ForbiddenException("Só quem registrou o interesse pode removê-lo.");
+        }
+
         mensagemRepository.deleteByInteresseId(interesse.getId());
         interesseRepository.delete(interesse);
     }

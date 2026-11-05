@@ -7,6 +7,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Status;
@@ -100,7 +101,18 @@ public class AnuncioService {
         return moderacaoService.reativarAnuncioPeloDono(cdAnuncio, emailSolicitante);
     }
 
-    // ===== Regras de visibilidade (usadas também pelos services de venda e requerimento) =====
+    // ===== Regras comuns (usadas também pelos services de venda e requerimento) =====
+
+    // Na criação e na edição, e não como anotação na entidade: anúncios antigos fora
+    // da regra ainda precisam poder mudar de status (suspensão, desativação...)
+    public static void validarTituloEDescricao(Anuncio anuncio) {
+        if (anuncio.getNmAnuncio() == null || anuncio.getNmAnuncio().isBlank()) {
+            throw new BusinessException("O título do anúncio é obrigatório.");
+        }
+        if (anuncio.getDescricao() == null || anuncio.getDescricao().isBlank()) {
+            throw new BusinessException("A descrição do anúncio é obrigatória.");
+        }
+    }
 
     public static boolean ehDono(Anuncio anuncio, String email) {
         return email != null

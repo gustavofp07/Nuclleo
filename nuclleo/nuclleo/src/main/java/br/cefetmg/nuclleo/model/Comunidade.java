@@ -65,6 +65,6 @@ public class Comunidade {
 
     @ManyToOne
     @JsonIgnoreProperties({ "senha" })
-    @JoinColumn(name = "cd_usuario_cria", referencedColumnName = "cd_usuario", foreignKey = @ForeignKey(name = "fk_usuario_criador"))
+    @JoinColumn(name = "cd_usuario_cria", referencedColumnName = "cd_usuario", foreignKey = @ForeignKey(name = "fk_comunidade_usuario_criador"))
     private Usuario usuarioCria;
 }

@@ -20,7 +20,7 @@ export class InteresseService {
     return { headers: this.tokenService.gerarCabecalhoAutenticacao() };
   }
 
-  registrarInteresse(interesse: { cdUsuario: number; cdAnuncio: number; }): Observable<InteresseModel> {
+  registrarInteresse(interesse: { cdAnuncio: number; }): Observable<InteresseModel> {
     return this.http.post<InteresseModel>(`${this.URL}`, interesse, this.getHeaders());
   }
 
@@ -40,23 +40,23 @@ export class InteresseService {
     return this.http.delete<void>(`${this.URL}/excluir/${codigo}`, this.getHeaders());
   }
 
-  finalizarConversa(id: number, dados: { cdUsuarioSolicitante: number; ocorreuTransacao: boolean; valor?: number; notaInteressado: number; }): Observable<void> {
+  finalizarConversa(id: number, dados: { ocorreuTransacao: boolean; valor?: number; notaInteressado: number; }): Observable<void> {
     return this.http.put<void>(`${this.URL}/${id}/finalizar`, dados, this.getHeaders());
   }
 
-  aceitarInteresse(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> {
-    return this.http.put<void>(`${this.URL}/${cdInteresse}/aceitar`, { cdUsuarioSolicitante }, this.getHeaders());
+  aceitarInteresse(cdInteresse: number): Observable<void> {
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/aceitar`, null, this.getHeaders());
   }
 
-  iniciarConversa(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> {
-    return this.http.put<void>(`${this.URL}/${cdInteresse}/iniciar-conversa`, { cdUsuarioSolicitante }, this.getHeaders());
+  iniciarConversa(cdInteresse: number): Observable<void> {
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/iniciar-conversa`, null, this.getHeaders());
   }
 
-  recusarConversa(cdInteresse: number, cdUsuarioSolicitante: number): Observable<void> {
-    return this.http.put<void>(`${this.URL}/${cdInteresse}/recusar-conversa`, { cdUsuarioSolicitante }, this.getHeaders());
+  recusarConversa(cdInteresse: number): Observable<void> {
+    return this.http.put<void>(`${this.URL}/${cdInteresse}/recusar-conversa`, null, this.getHeaders());
   }
 
-  avaliarAnunciante(id: number, dados: { cdUsuarioSolicitante: number; nota: number; }): Observable<void> {
+  avaliarAnunciante(id: number, dados: { nota: number; }): Observable<void> {
     return this.http.put<void>(`${this.URL}/${id}/avaliar-anunciante`, dados, this.getHeaders());
   }
 }

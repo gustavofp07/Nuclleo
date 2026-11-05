@@ -1,5 +1,6 @@
 package br.cefetmg.nuclleo.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.AnuncioRequerimento;
@@ -25,12 +27,15 @@ public class AnuncioRequerimentoService {
 
     @Transactional
     public AnuncioRequerimento inserir(AnuncioRequerimento anuncio, MultipartFile foto) {
+        validar(anuncio);
         aplicarFoto(anuncio, foto);
         return anuncioRequerimentoRepository.save(anuncio); // o status ATIVO é definido no @PrePersist
     }
 
     @Transactional
     public AnuncioRequerimento alterar(AnuncioRequerimento anuncio, MultipartFile foto, String emailSolicitante) {
+        validar(anuncio);
+
         AnuncioRequerimento existente = anuncioRequerimentoRepository.findById(anuncio.getCdAnuncio())
                 .orElseThrow(() -> new ResourceNotFoundException("Anúncio de requerimento não encontrado."));
 
@@ -82,6 +87,23 @@ public class AnuncioRequerimentoService {
         return anuncios.stream()
                 .filter(a -> a.getStatus() == Status.ATIVO && a.getUsuarioCria().getStatus() == Status.ATIVO)
                 .toList();
+    }
+
+    private void validar(AnuncioRequerimento anuncio) {
+        AnuncioService.validarTituloEDescricao(anuncio);
+
+        BigDecimal minimo = anuncio.getValorMin();
+        BigDecimal maximo = anuncio.getValorMax();
+
+        if (minimo == null || maximo == null) {
+            throw new BusinessException("Os preços mínimo e máximo são obrigatórios.");
+        }
+        if (minimo.signum() <= 0) {
+            throw new BusinessException("O preço mínimo deve ser maior que zero.");
+        }
+        if (maximo.compareTo(minimo) <= 0) {
+            throw new BusinessException("O preço máximo deve ser maior que o mínimo.");
+        }
     }
 
     private void aplicarFoto(AnuncioRequerimento anuncio, MultipartFile foto) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.nuclleo.dto.ArquivoResponseDTO;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.AnuncioVenda;
@@ -25,12 +26,15 @@ public class AnuncioVendaService {
 
     @Transactional
     public AnuncioVenda inserir(AnuncioVenda anuncio, MultipartFile foto) {
+        validar(anuncio);
         aplicarFoto(anuncio, foto);
         return anuncioVendaRepository.save(anuncio); // o status ATIVO é definido no @PrePersist
     }
 
     @Transactional
     public AnuncioVenda alterar(AnuncioVenda anuncio, MultipartFile foto, String emailSolicitante) {
+        validar(anuncio);
+
         AnuncioVenda existente = anuncioVendaRepository.findById(anuncio.getCdAnuncio())
                 .orElseThrow(() -> new ResourceNotFoundException("Anúncio de venda não encontrado."));
 
@@ -82,6 +86,14 @@ public class AnuncioVendaService {
         return anuncios.stream()
                 .filter(a -> a.getStatus() == Status.ATIVO && a.getUsuarioCria().getStatus() == Status.ATIVO)
                 .toList();
+    }
+
+    private void validar(AnuncioVenda anuncio) {
+        AnuncioService.validarTituloEDescricao(anuncio);
+
+        if (anuncio.getValor() <= 0) {
+            throw new BusinessException("O preço deve ser maior que zero.");
+        }
     }
 
     private void aplicarFoto(AnuncioVenda anuncio, MultipartFile foto) {

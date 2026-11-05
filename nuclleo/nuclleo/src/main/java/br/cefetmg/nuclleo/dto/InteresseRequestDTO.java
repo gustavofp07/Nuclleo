@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InteresseRequestDTO {
 
-    @NotNull(message = "O campo usuario é obrigatório")
-    private Long cdUsuario;
-
     @NotNull(message = "O campo anuncio é obrigatório")
     private Long cdAnuncio;
 }

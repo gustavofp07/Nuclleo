@@ -394,7 +394,7 @@ export class ChatPage implements OnDestroy {
     if (this.respondendoSolicitacao) return;
     this.respondendoSolicitacao = true;
 
-    this.interesseService.aceitarInteresse(this.cdInteresse, this.token.cdUsuario).subscribe({
+    this.interesseService.aceitarInteresse(this.cdInteresse).subscribe({
       next: () => this.ngZone.run(() => {
         this.respondendoSolicitacao = false;
         this.decidindoSolicitacao = false;
@@ -422,7 +422,7 @@ export class ChatPage implements OnDestroy {
   recusarSolicitacao() {
     this.respondendoSolicitacao = true;
 
-    this.interesseService.recusarConversa(this.cdInteresse, this.token.cdUsuario).subscribe({
+    this.interesseService.recusarConversa(this.cdInteresse).subscribe({
       next: () => this.ngZone.run(() => {
         this.respondendoSolicitacao = false;
         this.exibirMensagem('Conversa recusada.');

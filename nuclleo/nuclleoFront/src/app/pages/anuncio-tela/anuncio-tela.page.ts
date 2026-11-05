@@ -316,7 +316,6 @@ export class AnuncioTelaPage {
     }
 
     const interesse = {
-      cdUsuario: this.token.cdUsuario,
       cdAnuncio: this.anuncio.cdAnuncio
     };
 
@@ -374,7 +373,7 @@ export class AnuncioTelaPage {
 
     this.carregandoInteresse = true;
 
-    this.interesseService.iniciarConversa(this.interesseAtual.id, this.token.cdUsuario).subscribe({
+    this.interesseService.iniciarConversa(this.interesseAtual.id).subscribe({
       next: () => {
         this.ngZone.run(() => {
           this.carregandoInteresse = false;
