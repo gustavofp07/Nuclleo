@@ -58,42 +58,43 @@ public class InteresseController {
     }
 
     @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<Interesse>> listarPorUsuario(@PathVariable Long id) {
+    public ResponseEntity<List<Interesse>> listarPorUsuario(@PathVariable Long id, Authentication authentication) {
         if (id == null) {
             throw new IllegalArgumentException("O campo id é obrigatório.");
         }
 
-        List<Interesse> interesses = interesseService.listarPorUsuario(id);
+        List<Interesse> interesses = interesseService.listarPorUsuario(id, cdLogado(authentication));
         return ResponseEntity.ok(interesses);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Interesse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<Interesse> buscarPorId(@PathVariable Long id, Authentication authentication) {
         if (id == null) {
             throw new IllegalArgumentException("O campo id é obrigatório.");
         }
 
-        Interesse interesse = interesseService.buscarPorId(id);
+        Interesse interesse = interesseService.buscarVisivel(id, cdLogado(authentication));
         return ResponseEntity.ok(interesse);
     }
 
     @GetMapping("/anuncio/{id}")
-    public ResponseEntity<List<Interesse>> listarPorAnuncio(@PathVariable Long id) {
+    public ResponseEntity<List<Interesse>> listarPorAnuncio(@PathVariable Long id, Authentication authentication) {
         if (id == null) {
             throw new IllegalArgumentException("O campo id é obrigatório.");
         }
 
-        List<Interesse> interesses = interesseService.listarPorAnuncio(id);
+        List<Interesse> interesses = interesseService.listarPorAnuncio(id, cdLogado(authentication));
         return ResponseEntity.ok(interesses);
     }
 
     @GetMapping("/interessados/{cdUsuario}")
-    public ResponseEntity<List<Interesse>> listarPorInteressados(@PathVariable Long cdUsuario) {
+    public ResponseEntity<List<Interesse>> listarPorInteressados(@PathVariable Long cdUsuario,
+            Authentication authentication) {
         if (cdUsuario == null) {
             throw new IllegalArgumentException("O campo código do usuário é obrigatório.");
         }
 
-        List<Interesse> interesses = interesseService.listarPorInteressados(cdUsuario);
+        List<Interesse> interesses = interesseService.listarPorInteressados(cdUsuario, cdLogado(authentication));
         return ResponseEntity.ok(interesses);
     }
 

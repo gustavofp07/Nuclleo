@@ -298,18 +298,43 @@ public class InteresseService {
                 .orElseThrow(() -> new RuntimeException("Interesse não encontrado. Id: " + id));
     }
 
+    /** Só os dois lados da conversa (interessado e anunciante) veem o interesse. */
     @Transactional(readOnly = true)
-    public List<Interesse> listarPorUsuario(Long id) {
+    public Interesse buscarVisivel(Long id, Long cdUsuarioSolicitante) {
+        Interesse interesse = buscarPorId(id);
+
+        boolean participante = interesse.getUsuario().getCdUsuario().equals(cdUsuarioSolicitante)
+                || interesse.getAnuncio().getUsuarioCria().getCdUsuario().equals(cdUsuarioSolicitante);
+        if (!participante) {
+            throw new ForbiddenException("Você não participa desta conversa.");
+        }
+        return interesse;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Interesse> listarPorUsuario(Long id, Long cdUsuarioSolicitante) {
+        exigirProprioUsuario(id, cdUsuarioSolicitante);
         return interesseRepository.findByUsuarioCdUsuario(id);
     }
 
     @Transactional(readOnly = true)
-    public List<Interesse> listarPorAnuncio(Long id) {
+    public List<Interesse> listarPorAnuncio(Long id, Long cdUsuarioSolicitante) {
+        Anuncio anuncio = anuncioService.buscarPorId(id);
+        if (!anuncio.getUsuarioCria().getCdUsuario().equals(cdUsuarioSolicitante)) {
+            throw new ForbiddenException("Só o dono do anúncio vê os interessados nele.");
+        }
         return interesseRepository.findByAnuncioCdAnuncio(id);
     }
 
     @Transactional(readOnly = true)
-    public List<Interesse> listarPorInteressados(Long cdUsuario) {
+    public List<Interesse> listarPorInteressados(Long cdUsuario, Long cdUsuarioSolicitante) {
+        exigirProprioUsuario(cdUsuario, cdUsuarioSolicitante);
         return interesseRepository.findByAnuncioUsuarioCriaCdUsuario(cdUsuario);
+    }
+
+    private void exigirProprioUsuario(Long cdUsuario, Long cdUsuarioSolicitante) {
+        if (!cdUsuario.equals(cdUsuarioSolicitante)) {
+            throw new ForbiddenException("Você só pode ver os seus próprios interesses.");
+        }
     }
 }

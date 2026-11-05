@@ -76,6 +76,36 @@ class InteresseServiceTest {
     }
 
     @Test
+    void soOsDoisLadosDaConversaVeemOInteresse() {
+        Interesse interesse = Fixtures.interesse(5, interessado, anuncio);
+        when(interesseRepository.findById(5L)).thenReturn(java.util.Optional.of(interesse));
+
+        assertSame(interesse, interesseService.buscarVisivel(5L, interessado.getCdUsuario()));
+        assertSame(interesse, interesseService.buscarVisivel(5L, dono.getCdUsuario()));
+        assertThrows(ForbiddenException.class, () -> interesseService.buscarVisivel(5L, 99L));
+    }
+
+    @Test
+    void ninguemListaOsInteressesDeOutroUsuario() {
+        assertThrows(ForbiddenException.class, () -> interesseService.listarPorUsuario(2L, 99L));
+        assertThrows(ForbiddenException.class, () -> interesseService.listarPorInteressados(1L, 99L));
+        verify(interesseRepository, never()).findByUsuarioCdUsuario(any());
+        verify(interesseRepository, never()).findByAnuncioUsuarioCriaCdUsuario(any());
+
+        interesseService.listarPorUsuario(2L, 2L);
+        verify(interesseRepository).findByUsuarioCdUsuario(2L);
+    }
+
+    @Test
+    void soODonoListaOsInteressadosNoAnuncio() {
+        assertThrows(ForbiddenException.class, () -> interesseService.listarPorAnuncio(10L, 2L));
+        verify(interesseRepository, never()).findByAnuncioCdAnuncio(any());
+
+        interesseService.listarPorAnuncio(10L, 1L);
+        verify(interesseRepository).findByAnuncioCdAnuncio(10L);
+    }
+
+    @Test
     void soQuemRegistrouRemoveOInteresse() {
         Interesse interesse = Fixtures.interesse(5, interessado, anuncio);
         when(interesseRepository.findById(5L)).thenReturn(java.util.Optional.of(interesse));
