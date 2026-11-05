@@ -21,6 +21,7 @@ import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Mensagem;
+import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.InteresseRepository;
 import br.cefetmg.nuclleo.repository.MensagemRepository;
@@ -64,6 +65,25 @@ class MensagemServiceTest {
         when(mensagemRepository.save(any(Mensagem.class))).thenAnswer(i -> i.getArgument(0));
 
         assertEquals(2L, mensagemService.salvar(5L, 2L, texto("oi")).getCdUsuarioRemetente());
+    }
+
+    @Test
+    void anuncioDesativadoNaoBloqueiaAConversa() {
+        interesse.getAnuncio().setStatus(Status.INATIVO);
+        when(interesseService.buscarPorId(5L)).thenReturn(interesse);
+        when(usuarioService.buscarPorId(2L)).thenReturn(interessado);
+        when(mensagemRepository.save(any(Mensagem.class))).thenAnswer(i -> i.getArgument(0));
+
+        assertEquals(2L, mensagemService.salvar(5L, 2L, texto("oi")).getCdUsuarioRemetente());
+    }
+
+    @Test
+    void anuncioSuspensoBloqueiaAConversa() {
+        interesse.getAnuncio().setStatus(Status.SUSPENSO);
+        when(interesseService.buscarPorId(5L)).thenReturn(interesse);
+        when(usuarioService.buscarPorId(2L)).thenReturn(interessado);
+
+        assertThrows(BusinessException.class, () -> mensagemService.salvar(5L, 2L, texto("oi")));
     }
 
     @Test

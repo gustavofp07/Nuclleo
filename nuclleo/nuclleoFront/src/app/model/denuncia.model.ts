@@ -76,6 +76,7 @@ export function rotuloStatusAlvo(status: string | undefined, tipoAlvo: TipoAlvo)
     switch (status) {
         case 'ATIVO': return `Ativ${a}`;
         case 'SUSPENSO': return `Suspens${a}`;
+        case 'INATIVO': return `Desativad${a}`;
         case 'EXCLUIDO': return `Excluíd${a}`;
         default: return '—';
     }

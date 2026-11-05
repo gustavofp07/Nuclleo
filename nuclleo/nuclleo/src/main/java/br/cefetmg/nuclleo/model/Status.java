@@ -5,11 +5,13 @@ package br.cefetmg.nuclleo.model;
  *
  * ATIVO     -> visível e utilizável normalmente.
  * SUSPENSO  -> bloqueado temporariamente (até a data em "suspensoAte").
+ * INATIVO   -> só para anúncios: desativado pelo dono, que pode reativar quando quiser.
  * EXCLUIDO  -> excluído de forma lógica. É um estado FINAL:
  *              depois de EXCLUIDO, nunca mais volta a ATIVO ou SUSPENSO.
  */
 public enum Status {
     ATIVO,
     SUSPENSO,
+    INATIVO,
     EXCLUIDO
 }

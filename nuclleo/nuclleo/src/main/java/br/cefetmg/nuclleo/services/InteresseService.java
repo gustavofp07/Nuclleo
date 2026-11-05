@@ -12,6 +12,7 @@ import br.cefetmg.nuclleo.dto.TransacaoRequestDTO;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Avaliacao;
 import br.cefetmg.nuclleo.exception.BusinessException;
+import br.cefetmg.nuclleo.exception.ConflictException;
 import br.cefetmg.nuclleo.model.Interesse;
 import br.cefetmg.nuclleo.model.Status;
 import br.cefetmg.nuclleo.model.Transacao;
@@ -76,6 +77,11 @@ public class InteresseService {
 
         if (!usuario.isAtivo()) {
             throw new BusinessException("Sua conta não está ativa.");
+        }
+
+        if (interesseRepository.existsByUsuarioCdUsuarioAndAnuncioCdAnuncio(usuario.getCdUsuario(),
+                anuncio.getCdAnuncio())) {
+            throw new ConflictException("Você já demonstrou interesse neste anúncio.");
         }
 
         Interesse interesse = new Interesse();

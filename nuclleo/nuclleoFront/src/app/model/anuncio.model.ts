@@ -7,8 +7,10 @@ export class AnuncioModel {
     ftAnuncio: string;
     tipoAnuncio: string;
     // Preenchidos pelo back-end (somente leitura). O dono também vê os seus anúncios suspensos
-    status?: 'ATIVO' | 'SUSPENSO' | 'EXCLUIDO';
+    status?: 'ATIVO' | 'SUSPENSO' | 'INATIVO' | 'EXCLUIDO';
     suspensoAte?: string | null;
+    // Vem só nas listagens de anúncios da comunidade
+    totalInteressados?: number;
 
     usuarioCria: UsuarioModel;
 

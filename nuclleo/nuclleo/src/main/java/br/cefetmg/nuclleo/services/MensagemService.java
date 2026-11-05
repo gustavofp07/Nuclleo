@@ -62,8 +62,10 @@ public class MensagemService {
             throw new BusinessException("O remetente não participa desta conversa.");
         }
 
-        // Conta suspensa/excluída ou anúncio indisponível: o chat fica bloqueado
-        if (!anunciante.isAtivo() || !interessado.isAtivo() || anuncio.getStatus() != Status.ATIVO) {
+        // Conta suspensa/excluída ou anúncio indisponível: o chat fica bloqueado.
+        // Anúncio desativado pelo dono não bloqueia: só deixa de receber novos interessados
+        boolean anuncioDisponivel = anuncio.getStatus() == Status.ATIVO || anuncio.getStatus() == Status.INATIVO;
+        if (!anunciante.isAtivo() || !interessado.isAtivo() || !anuncioDisponivel) {
             throw new BusinessException("Esta conversa não está mais disponível.");
         }
 

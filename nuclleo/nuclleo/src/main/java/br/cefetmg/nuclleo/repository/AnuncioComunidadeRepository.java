@@ -42,13 +42,26 @@ public interface AnuncioComunidadeRepository extends JpaRepository<AnuncioComuni
     @Transactional
     AnuncioComunidade deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(Long cdAnuncio, Long cdComunidade);
 
-    // Só traz anúncios ATIVOS cujo dono também está ATIVO, os mais novos primeiro
+    // Quais anúncios do usuário estão publicados em pelo menos uma comunidade
+    @Query("""
+                SELECT DISTINCT ac.anuncio.cdAnuncio
+                FROM AnuncioComunidade ac
+                WHERE ac.anuncio.usuarioCria.cdUsuario = :cdUsuario
+            """)
+    List<Long> findCdAnunciosPublicadosDoUsuario(@Param("cdUsuario") Long cdUsuario);
+
+    // Só traz anúncios ATIVOS cujo dono também está ATIVO, os mais novos primeiro.
+    // tipos e busca nunca são nulos: o PostgreSQL não aceita parâmetro nulo em "IS NULL"
+    // (sem filtro, vão todos os tipos e o padrão "%%"). Na busca, "!" é o caractere de escape.
     @Query(value = """
                 SELECT ac.anuncio
                 FROM AnuncioComunidade ac
                 WHERE ac.comunidade.cdComunidade = :cdComunidade
                   AND ac.anuncio.status = br.cefetmg.nuclleo.model.Status.ATIVO
                   AND ac.anuncio.usuarioCria.status = br.cefetmg.nuclleo.model.Status.ATIVO
+                  AND ac.anuncio.tipoAnuncio IN :tipos
+                  AND (LOWER(ac.anuncio.nmAnuncio) LIKE :busca ESCAPE '!'
+                       OR LOWER(ac.anuncio.descricao) LIKE :busca ESCAPE '!')
                 ORDER BY ac.anuncio.cdAnuncio DESC
             """, countQuery = """
                 SELECT COUNT(ac)
@@ -56,7 +69,13 @@ public interface AnuncioComunidadeRepository extends JpaRepository<AnuncioComuni
                 WHERE ac.comunidade.cdComunidade = :cdComunidade
                   AND ac.anuncio.status = br.cefetmg.nuclleo.model.Status.ATIVO
                   AND ac.anuncio.usuarioCria.status = br.cefetmg.nuclleo.model.Status.ATIVO
+                  AND ac.anuncio.tipoAnuncio IN :tipos
+                  AND (LOWER(ac.anuncio.nmAnuncio) LIKE :busca ESCAPE '!'
+                       OR LOWER(ac.anuncio.descricao) LIKE :busca ESCAPE '!')
             """)
     Page<Anuncio> findAnunciosByComunidade(
-            @Param("cdComunidade") Long cdComunidade, Pageable pagina);
+            @Param("cdComunidade") Long cdComunidade,
+            @Param("tipos") List<Anuncio.TipoAnuncio> tipos,
+            @Param("busca") String busca,
+            Pageable pagina);
 }

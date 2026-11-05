@@ -76,6 +76,14 @@ export class AnuncioService {
     );
   }
 
+  desativarAnuncio(cdAnuncio: number): Observable<AnuncioModel> {
+    return this.http.put<AnuncioModel>(`${this.API_URL}/${cdAnuncio}/desativar`, null, this.getHeaders());
+  }
+
+  reativarAnuncio(cdAnuncio: number): Observable<AnuncioModel> {
+    return this.http.put<AnuncioModel>(`${this.API_URL}/${cdAnuncio}/reativar`, null, this.getHeaders());
+  }
+
   alterarVenda(anuncio: AnuncioVendaModel, foto?: File): Observable<AnuncioVendaModel> {
     return this.http.put<AnuncioVendaModel>(
       this.API_URL_VENDA,

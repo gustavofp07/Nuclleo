@@ -47,12 +47,22 @@ public class AnuncioComunidadeController {
     }
 
     @GetMapping("/comunidade/anuncios")
-    @Operation(summary = "Listar anúncios de uma comunidade, em páginas (os mais novos primeiro)")
+    @Operation(summary = "Listar anúncios de uma comunidade, em páginas (os mais novos primeiro), com busca por texto e filtro por tipo")
     public ResponseEntity<Page<Anuncio>> listarAnunciosDaComunidade(@RequestParam Long cdComunidade,
+            @RequestParam(required = false) String busca,
+            @RequestParam(required = false) Anuncio.TipoAnuncio tipo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pagina = PageRequest.of(Math.max(page, 0), Paginacao.limitar(size));
-        return ResponseEntity.ok(anuncioComunidadeService.listarAnunciosDaComunidade(cdComunidade, pagina));
+        return ResponseEntity.ok(anuncioComunidadeService.listarAnunciosDaComunidade(cdComunidade, busca, tipo, pagina));
+    }
+
+    @GetMapping("/comunidade/anuncios/populares")
+    @Operation(summary = "Listar os anúncios com mais pessoas interessadas na comunidade")
+    public ResponseEntity<List<Anuncio>> listarPopularesDaComunidade(@RequestParam Long cdComunidade,
+            @RequestParam(defaultValue = "5") int limite) {
+        return ResponseEntity.ok(
+                anuncioComunidadeService.listarPopularesDaComunidade(cdComunidade, Paginacao.limitar(limite)));
     }
 
     @GetMapping("")

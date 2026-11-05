@@ -1,4 +1,5 @@
 import { Component, OnDestroy, NgZone, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
@@ -14,7 +15,8 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonPopover
+  IonPopover,
+  IonSearchbar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -29,15 +31,16 @@ import {
   chatbubblesOutline,
   locationOutline,
   pricetagOutline,
-  imageOutline
+  imageOutline,
+  heartOutline
 } from 'ionicons/icons';
 
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { AnuncioModel } from 'src/app/model/anuncio.model';
 import { AnuncioComunidadeService } from 'src/app/services/anuncio-comunidade.service';
 import { ComunidadeModel } from 'src/app/model/comunidade.model';
@@ -73,6 +76,7 @@ import { UsuarioModel } from 'src/app/model/usuario.model';
     IonItem,
       IonLabel,
     IonPopover,
+    IonSearchbar,
     ChatComunidadeComponent
   ]
 })
@@ -106,8 +110,14 @@ export class ComunidadePerfilPage implements OnDestroy {
   membroSelecionado: UsuarioComunidadeModel | null = null;
 
   anuncios: AnuncioModel[] = [];
+  anunciosPopulares: AnuncioModel[] = [];
+  pesquisaAnuncios: string = '';
+  tipoAnuncioFiltro: 'VENDA' | 'REQUERIMENTO' | null = null;
 
   private eventosSub?: Subscription;
+  // A resposta de um filtro antigo não pode sobrescrever a do filtro atual
+  private listagemSub?: Subscription;
+  private pesquisaSubject = new Subject<void>();
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -136,10 +146,15 @@ export class ComunidadePerfilPage implements OnDestroy {
       chatbubblesOutline,
       locationOutline,
       pricetagOutline,
-      imageOutline
+      imageOutline,
+      heartOutline
     });
 
     this.comunidade = new ComunidadeModel();
+
+    this.pesquisaSubject
+      .pipe(debounceTime(400), takeUntilDestroyed())
+      .subscribe(() => this.carregarAnuncios());
   }
 
   ngOnDestroy() {
@@ -165,7 +180,11 @@ export class ComunidadePerfilPage implements OnDestroy {
     this.carregandoComunidade = true;
     this.carregandoAnuncios = true;
     this.carregandoMembros = true;
+    this.listagemSub?.unsubscribe();
     this.anuncios = [];
+    this.anunciosPopulares = [];
+    this.pesquisaAnuncios = '';
+    this.tipoAnuncioFiltro = null;
 
     this.membros = [];
     this.mostrarMembros = false;
@@ -270,6 +289,7 @@ export class ComunidadePerfilPage implements OnDestroy {
       this.codigoVinculo = null;
       this.abaSelecionada = 'perfil';
       this.anuncios = [];
+      this.anunciosPopulares = [];
 
       this.carregarTotalUsuarios(this.comunidade.cdComunidade);
 
@@ -477,9 +497,46 @@ export class ComunidadePerfilPage implements OnDestroy {
     ) {
 
       this.carregarAnuncios();
+      this.carregarAnunciosPopulares();
 
     }
 
+  }
+
+  get filtrandoAnuncios(): boolean {
+    return !!this.pesquisaAnuncios.trim() || !!this.tipoAnuncioFiltro;
+  }
+
+  aoPesquisarAnuncios(event: any) {
+    this.pesquisaAnuncios = event.detail.value || '';
+    this.pesquisaSubject.next();
+  }
+
+  filtrarPorTipo(tipo: 'VENDA' | 'REQUERIMENTO' | null) {
+    if (this.tipoAnuncioFiltro === tipo) {
+      return;
+    }
+
+    this.tipoAnuncioFiltro = tipo;
+    this.carregarAnuncios();
+  }
+
+  private get filtrosAnuncios() {
+    return {
+      busca: this.pesquisaAnuncios.trim(),
+      tipo: this.tipoAnuncioFiltro ?? undefined
+    };
+  }
+
+  carregarAnunciosPopulares() {
+    this.anuncioComunidadeService.listarPopularesDaComunidade(this.comunidade.cdComunidade).subscribe({
+      next: (anuncios) => {
+        this.anunciosPopulares = anuncios;
+      },
+      error: () => {
+        this.anunciosPopulares = [];
+      }
+    });
   }
 
   carregarAnuncios() {
@@ -487,12 +544,17 @@ export class ComunidadePerfilPage implements OnDestroy {
       return;
     }
 
+    this.listagemSub?.unsubscribe();
+    this.carregandoMaisAnuncios = false;
     this.carregandoAnuncios = true;
     this.paginaAnuncios = 0;
 
-    this.anuncioComunidadeService
+    this.listagemSub = this.anuncioComunidadeService
       .listarAnunciosDaComunidade(
-        this.comunidade.cdComunidade
+        this.comunidade.cdComunidade,
+        0,
+        20,
+        this.filtrosAnuncios
       )
       .subscribe({
         next: (pagina) => {
@@ -518,8 +580,8 @@ export class ComunidadePerfilPage implements OnDestroy {
 
     this.carregandoMaisAnuncios = true;
 
-    this.anuncioComunidadeService
-      .listarAnunciosDaComunidade(this.comunidade.cdComunidade, this.paginaAnuncios + 1)
+    this.listagemSub = this.anuncioComunidadeService
+      .listarAnunciosDaComunidade(this.comunidade.cdComunidade, this.paginaAnuncios + 1, 20, this.filtrosAnuncios)
       .subscribe({
         next: (pagina) => {
           this.paginaAnuncios = pagina.number;

@@ -129,19 +129,9 @@
 
     <ng-container *ngIf="abaSelecionada === 'anuncios'">
 
-      <div class="loading-state" *ngIf="carregandoAnuncios">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Carregando...</p>
-      </div>
-
-      <div class="empty-state" *ngIf="!carregandoAnuncios && anuncios.length === 0">
-        <ion-icon name="pricetag-outline"></ion-icon>
-        <h2>Nenhum anúncio encontrado</h2>
-        <p>Ainda não há anúncios publicados nesta comunidade.</p>
-      </div>
-
-      <div class="lista" *ngIf="!carregandoAnuncios && anuncios.length > 0">
-        <a *ngFor="let anuncio of anuncios" class="item-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
+      <!-- Card usado tanto em "Mais procurados" quanto na lista completa -->
+      <ng-template #cardAnuncio let-anuncio>
+        <a class="item-card" [routerLink]="['/anuncio-tela', anuncio.cdAnuncio]">
 
           <div class="item-card__media">
             <img *ngIf="anuncio.ftAnuncio" [src]="anuncio.ftAnuncio" [alt]="anuncio.nmAnuncio">
@@ -167,10 +157,68 @@
             </p>
 
             <p class="item-card__desc">{{ anuncio.descricao }}</p>
+
+            <div class="item-card__meta" *ngIf="anuncio.totalInteressados">
+              <span>
+                <ion-icon name="heart-outline"></ion-icon>
+                {{ anuncio.totalInteressados }}
+                {{ anuncio.totalInteressados === 1 ? 'pessoa interessada' : 'pessoas interessadas' }}
+              </span>
+            </div>
           </div>
 
         </a>
+      </ng-template>
+
+      <div class="busca-anuncios">
+        <ion-searchbar placeholder="Pesquisar anúncios" [value]="pesquisaAnuncios"
+          (ionInput)="aoPesquisarAnuncios($event)"></ion-searchbar>
+
+        <div class="filtros">
+          <button type="button" class="filtro" [class.ativo]="tipoAnuncioFiltro === null" (click)="filtrarPorTipo(null)">
+            Todos
+          </button>
+          <button type="button" class="filtro" [class.ativo]="tipoAnuncioFiltro === 'VENDA'"
+            (click)="filtrarPorTipo('VENDA')">
+            Venda
+          </button>
+          <button type="button" class="filtro" [class.ativo]="tipoAnuncioFiltro === 'REQUERIMENTO'"
+            (click)="filtrarPorTipo('REQUERIMENTO')">
+            Compra
+          </button>
+        </div>
       </div>
+
+      <section class="anuncios-populares" *ngIf="!filtrandoAnuncios && anunciosPopulares.length > 0">
+        <p class="section-title">Mais procurados</p>
+
+        <div class="lista">
+          <ng-container *ngFor="let anuncio of anunciosPopulares">
+            <ng-container *ngTemplateOutlet="cardAnuncio; context: { $implicit: anuncio }"></ng-container>
+          </ng-container>
+        </div>
+      </section>
+
+      <div class="loading-state" *ngIf="carregandoAnuncios">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Carregando...</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!carregandoAnuncios && anuncios.length === 0">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        <h2>Nenhum anúncio encontrado</h2>
+        <p>{{ filtrandoAnuncios ? 'Tente outro termo de pesquisa ou outro filtro.' : 'Ainda não há anúncios publicados nesta comunidade.' }}</p>
+      </div>
+
+      <ng-container *ngIf="!carregandoAnuncios && anuncios.length > 0">
+        <p class="section-title" *ngIf="!filtrandoAnuncios && anunciosPopulares.length > 0">Todos os anúncios</p>
+
+        <div class="lista">
+          <ng-container *ngFor="let anuncio of anuncios">
+            <ng-container *ngTemplateOutlet="cardAnuncio; context: { $implicit: anuncio }"></ng-container>
+          </ng-container>
+        </div>
+      </ng-container>
 
       <div class="carregar-mais" *ngIf="!carregandoAnuncios && !ultimaPaginaAnuncios">
         <ion-button fill="outline" [disabled]="carregandoMaisAnuncios" (click)="carregarMaisAnuncios()">

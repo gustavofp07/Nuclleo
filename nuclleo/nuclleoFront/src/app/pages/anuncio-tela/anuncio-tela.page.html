@@ -137,6 +137,22 @@
 
       <div class="acoes-anuncio">
 
+        <p class="aviso" *ngIf="usuarioEhDono && anuncio.status === 'INATIVO'">
+          Este anúncio está desativado: só você consegue vê-lo.
+        </p>
+
+        <ion-button expand="block" fill="outline" color="medium" *ngIf="usuarioEhDono && anuncio.status === 'ATIVO'"
+          [disabled]="alterandoStatus" (click)="desativarAnuncio()">
+          <ion-icon name="pause-circle-outline" slot="start"></ion-icon>
+          Desativar anúncio
+        </ion-button>
+
+        <ion-button expand="block" *ngIf="usuarioEhDono && anuncio.status === 'INATIVO'" [disabled]="alterandoStatus"
+          (click)="reativarAnuncio()">
+          <ion-icon name="play-circle-outline" slot="start"></ion-icon>
+          Reativar anúncio
+        </ion-button>
+
         <div class="btn-group btn-group--row" *ngIf="usuarioEhDono; else botoesVisitante">
           <ion-button expand="block" fill="outline" color="medium"
             [routerLink]="['/criar-anuncio', anuncio.tipoAnuncio, anuncio.cdAnuncio]">

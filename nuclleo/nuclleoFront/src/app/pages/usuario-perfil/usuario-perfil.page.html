@@ -191,6 +191,9 @@
               <span class="badge badge--danger" *ngIf="ehAdminLogado && $any(anuncio).status === 'SUSPENSO'">
                 Suspenso
               </span>
+              <span class="badge badge--muted" *ngIf="ehAdminLogado && $any(anuncio).status === 'INATIVO'">
+                Desativado
+              </span>
             </div>
 
             <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">

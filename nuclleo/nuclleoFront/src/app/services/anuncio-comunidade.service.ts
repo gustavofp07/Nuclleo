@@ -34,16 +34,35 @@ export class AnuncioComunidadeService {
     return this.http.post<AnuncioComunidadeModel[]>(`${this.API_URL}/relacoes`, relacoes, this.getHeaders());
   }
 
-  // Paginado: os mais novos primeiro
+  // Paginado: os mais novos primeiro. Sem filtros, traz todos os anúncios da comunidade
   listarAnunciosDaComunidade(
     cdComunidade: number,
     page = 0,
-    size = 20
+    size = 20,
+    filtros: { busca?: string; tipo?: string } = {}
   ): Observable<PaginaModel<AnuncioModel>> {
+    const params: Record<string, string | number> = { cdComunidade, page, size };
+
+    if (filtros.busca) {
+      params['busca'] = filtros.busca;
+    }
+
+    if (filtros.tipo) {
+      params['tipo'] = filtros.tipo;
+    }
+
     return this.http.get<any>(
       `${this.API_URL}/comunidade/anuncios`,
-      { ...this.getHeaders(), params: { cdComunidade, page, size } }
+      { ...this.getHeaders(), params }
     ).pipe(paraPagina<AnuncioModel>());
+  }
+
+  // Os anúncios com mais pessoas interessadas, do mais procurado para o menos
+  listarPopularesDaComunidade(cdComunidade: number, limite = 5): Observable<AnuncioModel[]> {
+    return this.http.get<AnuncioModel[]>(
+      `${this.API_URL}/comunidade/anuncios/populares`,
+      { ...this.getHeaders(), params: { cdComunidade, limite } }
+    );
   }
 
   excluirRelacoesPorAnuncio(cdAnuncio: number) {

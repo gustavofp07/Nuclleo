@@ -1,6 +1,8 @@
 package br.cefetmg.nuclleo.services;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.Status;
+import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.AnuncioRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnuncioService {
     @Autowired
     private AnuncioRepository anuncioRepository;
+
+    @Autowired
+    private AnuncioComunidadeRepository anuncioComunidadeRepository;
 
     @Autowired
     private ModeracaoService moderacaoService;
@@ -51,7 +57,8 @@ public class AnuncioService {
 
     /**
      * O dono vê todos os seus anúncios, menos os excluídos (inclusive os suspensos,
-     * para o front mostrar o aviso). As outras pessoas veem só os ativos.
+     * para o front mostrar o aviso). As outras pessoas veem só os ativos que estão
+     * publicados em alguma comunidade.
      */
     @Transactional(readOnly = true)
     public List<Anuncio> listarAnunciosPorUsuario(Long cdUsuario, String emailSolicitante) {
@@ -61,8 +68,11 @@ public class AnuncioService {
             return anuncios;
         }
 
+        Set<Long> publicados = new HashSet<>(anuncioComunidadeRepository.findCdAnunciosPublicadosDoUsuario(cdUsuario));
+
         return anuncios.stream()
                 .filter(a -> a.getStatus() == Status.ATIVO && a.getUsuarioCria().getStatus() == Status.ATIVO)
+                .filter(a -> publicados.contains(a.getCdAnuncio()))
                 .toList();
     }
 
@@ -76,6 +86,18 @@ public class AnuncioService {
     @Transactional
     public Anuncio excluir(Long cdAnuncio, String emailSolicitante) {
         return moderacaoService.excluirAnuncioPeloDono(cdAnuncio, emailSolicitante);
+    }
+
+    /** O dono tira o anúncio do ar sem excluí-lo; as conversas em andamento continuam. */
+    @Transactional
+    public Anuncio desativar(Long cdAnuncio, String emailSolicitante) {
+        return moderacaoService.desativarAnuncioPeloDono(cdAnuncio, emailSolicitante);
+    }
+
+    /** O dono coloca de volta no ar um anúncio que ele mesmo desativou. */
+    @Transactional
+    public Anuncio reativar(Long cdAnuncio, String emailSolicitante) {
+        return moderacaoService.reativarAnuncioPeloDono(cdAnuncio, emailSolicitante);
     }
 
     // ===== Regras de visibilidade (usadas também pelos services de venda e requerimento) =====

@@ -49,6 +49,7 @@
               [title]="anuncio.suspensoAte ? 'Suspenso até ' + (anuncio.suspensoAte | date: 'dd/MM/yyyy HH:mm') : 'Suspenso'">
               Suspenso
             </span>
+            <span class="badge badge--muted" *ngIf="anuncio.status === 'INATIVO'">Desativado</span>
           </div>
 
           <p class="preco" *ngIf="anuncio.tipoAnuncio === 'VENDA'">

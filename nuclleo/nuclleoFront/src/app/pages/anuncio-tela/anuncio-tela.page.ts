@@ -23,7 +23,7 @@ import { addIcons } from 'ionicons';
 import {
   createOutline, trashOutline, chatbubbleOutline, personOutline, locationOutline, heartOutline,
   heartDislikeOutline, imageOutline, calendarOutline, peopleOutline, checkmarkCircle, logInOutline, refreshOutline,
-  flagOutline
+  flagOutline, pauseCircleOutline, playCircleOutline
 } from 'ionicons/icons';
 
 import { AnuncioModel } from 'src/app/model/anuncio.model';
@@ -70,6 +70,7 @@ export class AnuncioTelaPage {
   carregandoInteresse: boolean = false;
 
   carregandoAnuncio: boolean = true;
+  alterandoStatus: boolean = false;
 
   comunidadesAnuncio: ComunidadeModel[] = [];
   carregandoComunidades: boolean = false;
@@ -248,6 +249,38 @@ export class AnuncioTelaPage {
       },
       error: () => {
         this.carregandoAnuncio = false;
+      }
+    });
+  }
+
+  desativarAnuncio() {
+    this.alterandoStatus = true;
+
+    this.anuncioService.desativarAnuncio(this.anuncio.cdAnuncio).subscribe({
+      next: () => {
+        this.anuncio.status = 'INATIVO';
+        this.alterandoStatus = false;
+        this.exibirMensagem('Anúncio desativado.');
+      },
+      error: (erro) => {
+        this.alterandoStatus = false;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao desativar anúncio.');
+      }
+    });
+  }
+
+  reativarAnuncio() {
+    this.alterandoStatus = true;
+
+    this.anuncioService.reativarAnuncio(this.anuncio.cdAnuncio).subscribe({
+      next: () => {
+        this.anuncio.status = 'ATIVO';
+        this.alterandoStatus = false;
+        this.exibirMensagem('Anúncio reativado.');
+      },
+      error: (erro) => {
+        this.alterandoStatus = false;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao reativar anúncio.');
       }
     });
   }

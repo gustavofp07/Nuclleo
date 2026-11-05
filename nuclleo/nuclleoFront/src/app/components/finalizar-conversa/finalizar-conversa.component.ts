@@ -18,6 +18,8 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, star, starOutline } from 'ionicons/icons';
 
+import { AnuncioModel } from 'src/app/model/anuncio.model';
+import { AnuncioService } from 'src/app/services/anuncio.service';
 import { InteresseService } from 'src/app/services/interesse.service';
 import { TokenService } from 'src/app/services/token.service';
 
@@ -25,6 +27,7 @@ import { TokenService } from 'src/app/services/token.service';
  * Tela de finalizar/avaliar conversa (usada no chat e na página de conversas).
  *
  * modo = 'finalizar' -> anunciante: informa se houve transação (e o valor) e avalia o interessado.
+ *                       Se houve transação, depois pergunta se ele quer desativar o anúncio.
  * modo = 'avaliar'   -> interessado: a conversa já foi finalizada, ele só avalia o anunciante.
  *
  * Uso: <app-finalizar-conversa [aberto]="..." [modo]="..." [cdInteresse]="..." [nomeOutroUsuario]="..."
@@ -80,6 +83,7 @@ export class FinalizarConversaComponent implements OnChanges {
 
   constructor(
     private interesseService: InteresseService,
+    private anuncioService: AnuncioService,
     private tokenService: TokenService,
     private alertController: AlertController,
     private toastController: ToastController
@@ -204,12 +208,49 @@ export class FinalizarConversaComponent implements OnChanges {
         this.enviandoFinalizacao = false;
         this.finalizou = true;
         this.exibirMensagem('Conversa finalizada com sucesso.');
+
+        // Guardado antes de avisar o pai: ao fechar a tela, ele pode limpar o cdInteresse
+        const cdInteresse = this.cdInteresse;
         this.concluida.emit();
+
+        if (ocorreuTransacao) {
+          this.perguntarDesativarAnuncio(cdInteresse);
+        }
       },
       error: (err) => {
         this.enviandoFinalizacao = false;
         this.exibirMensagem(err?.error?.message || 'Erro ao finalizar a conversa.');
       }
+    });
+  }
+
+  // Só pergunta se o anúncio ainda está no ar: ele pode já ter sido desativado em outra transação
+  private perguntarDesativarAnuncio(cdInteresse: number) {
+    this.interesseService.buscarPorId(cdInteresse).subscribe({
+      next: async ({ anuncio }) => {
+        if (anuncio.status !== 'ATIVO') return;
+
+        const alert = await this.alertController.create({
+          header: 'Desativar anúncio?',
+          message: `A transação foi registrada. Deseja desativar "${anuncio.nmAnuncio}"? `
+            + 'Ele sai das comunidades e do seu perfil, e você pode reativá-lo quando quiser.',
+          backdropDismiss: false,
+          buttons: [
+            { text: 'Manter ativo', role: 'cancel' },
+            { text: 'Desativar', handler: () => this.desativarAnuncio(anuncio) }
+          ]
+        });
+
+        await alert.present();
+      },
+      error: () => { }
+    });
+  }
+
+  private desativarAnuncio(anuncio: AnuncioModel) {
+    this.anuncioService.desativarAnuncio(anuncio.cdAnuncio).subscribe({
+      next: () => this.exibirMensagem('Anúncio desativado.'),
+      error: (err) => this.exibirMensagem(err?.error?.message || 'Erro ao desativar o anúncio.')
     });
   }
 

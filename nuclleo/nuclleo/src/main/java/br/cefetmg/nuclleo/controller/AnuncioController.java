@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
  
@@ -71,6 +72,18 @@ public class AnuncioController {
     public ResponseEntity<List<Anuncio>> getAnunciosByUsuario(@PathVariable Long cdUsuario, Authentication authentication) {
         List<Anuncio> anuncios = anuncioService.listarAnunciosPorUsuario(cdUsuario, authentication.getName());
         return ResponseEntity.ok(anuncios);
+    }
+
+    @PutMapping("/{cdAnuncio}/desativar")
+    @Operation(summary = "Desativar anúncio (somente o dono; pode ser reativado depois)")
+    public ResponseEntity<Anuncio> desativar(@PathVariable Long cdAnuncio, Authentication authentication) {
+        return ResponseEntity.ok(anuncioService.desativar(cdAnuncio, authentication.getName()));
+    }
+
+    @PutMapping("/{cdAnuncio}/reativar")
+    @Operation(summary = "Reativar anúncio desativado (somente o dono)")
+    public ResponseEntity<Anuncio> reativar(@PathVariable Long cdAnuncio, Authentication authentication) {
+        return ResponseEntity.ok(anuncioService.reativar(cdAnuncio, authentication.getName()));
     }
 
     @DeleteMapping("/{cdAnuncio}")

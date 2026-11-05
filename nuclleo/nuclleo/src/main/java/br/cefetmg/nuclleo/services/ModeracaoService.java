@@ -324,6 +324,48 @@ public class ModeracaoService {
         return anuncio;
     }
 
+    /**
+     * O dono desativando o próprio anúncio. Diferente da exclusão, não apaga interesses
+     * nem conversas: quem está negociando (ou falta avaliar) continua podendo concluir.
+     */
+    @Transactional
+    public Anuncio desativarAnuncioPeloDono(Long cdAnuncio, String emailSolicitante) {
+        Anuncio anuncio = buscarAnuncioDoDono(cdAnuncio, emailSolicitante);
+
+        if (anuncio.getStatus() != Status.ATIVO) {
+            throw new BusinessException("Somente anúncios ativos podem ser desativados.");
+        }
+
+        anuncio.setStatus(Status.INATIVO);
+        return anuncioRepository.save(anuncio);
+    }
+
+    /** Só volta o que o próprio dono desativou: anúncio suspenso continua com a moderação. */
+    @Transactional
+    public Anuncio reativarAnuncioPeloDono(Long cdAnuncio, String emailSolicitante) {
+        Anuncio anuncio = buscarAnuncioDoDono(cdAnuncio, emailSolicitante);
+
+        if (anuncio.getStatus() != Status.INATIVO) {
+            throw new BusinessException("Somente anúncios desativados podem ser reativados.");
+        }
+
+        anuncio.setStatus(Status.ATIVO);
+        return anuncioRepository.save(anuncio);
+    }
+
+    private Anuncio buscarAnuncioDoDono(Long cdAnuncio, String emailSolicitante) {
+        Anuncio anuncio = buscarAnuncio(cdAnuncio);
+
+        if (anuncio.getStatus() == Status.EXCLUIDO) {
+            throw new ResourceNotFoundException("Anúncio não encontrado.");
+        }
+
+        if (!anuncio.getUsuarioCria().getEmail().equalsIgnoreCase(emailSolicitante)) {
+            throw new ForbiddenException("Você só pode alterar os seus próprios anúncios.");
+        }
+        return anuncio;
+    }
+
     /** Exclusão lógica: EXCLUIDO + apaga interesses, conversas e vínculos com comunidades. */
     private void excluirAnuncioInterno(Anuncio anuncio) {
         limparInteressesDoAnuncio(anuncio);
