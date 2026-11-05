@@ -28,8 +28,9 @@
       <p>Você ainda não tem transações registradas.</p>
     </div>
 
-    <div class="lista" *ngIf="!carregando && transacoes.length > 0">
-      <div *ngFor="let transacao of transacoes" class="card transacao">
+    <!-- Card usado tanto nas pendentes quanto no histórico -->
+    <ng-template #cardTransacao let-transacao>
+      <div class="card transacao">
 
         <div class="transacao__topo">
           <span class="badge" [class.badge--accent]="souComprador(transacao)">
@@ -51,8 +52,44 @@
           </span>
         </div>
 
+        <ng-container *ngIf="transacao.status === 'PENDENTE'">
+          <div class="btn-group btn-group--row transacao__acoes" *ngIf="devoResponder(transacao); else aguardando">
+            <ion-button expand="block" [disabled]="respondendo !== null" (click)="confirmar(transacao)">
+              Confirmar
+            </ion-button>
+            <ion-button expand="block" fill="outline" color="danger" [disabled]="respondendo !== null"
+              (click)="confirmarRecusa(transacao)">
+              Recusar
+            </ion-button>
+          </div>
+
+          <ng-template #aguardando>
+            <p class="aviso transacao__acoes">Aguardando {{ nomeOutroUsuario(transacao) }} confirmar.</p>
+          </ng-template>
+        </ng-container>
+
       </div>
-    </div>
+    </ng-template>
+
+    <section class="transacoes-grupo" *ngIf="!carregando && pendentes.length > 0">
+      <p class="section-title">Aguardando confirmação</p>
+
+      <div class="lista">
+        <ng-container *ngFor="let transacao of pendentes">
+          <ng-container *ngTemplateOutlet="cardTransacao; context: { $implicit: transacao }"></ng-container>
+        </ng-container>
+      </div>
+    </section>
+
+    <section class="transacoes-grupo" *ngIf="!carregando && historico.length > 0">
+      <p class="section-title" *ngIf="pendentes.length > 0">Histórico</p>
+
+      <div class="lista">
+        <ng-container *ngFor="let transacao of historico">
+          <ng-container *ngTemplateOutlet="cardTransacao; context: { $implicit: transacao }"></ng-container>
+        </ng-container>
+      </div>
+    </section>
 
   </div>
 

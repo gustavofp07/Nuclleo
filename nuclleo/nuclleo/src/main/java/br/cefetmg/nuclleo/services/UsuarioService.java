@@ -211,32 +211,6 @@ public class UsuarioService {
         return (usuario.getCpf() != null && !usuario.getCpf().isBlank());
     }
 
-    // Administrador
-    @Transactional
-    public Usuario inserirAdmin(UsuarioRequestDTO dto, MultipartFile foto) {
-        Usuario usuario = new Usuario();
-        usuario.setNmUsuario(dto.getNmUsuario());
-        usuario.setEmail(dto.getEmail());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-        usuario.setStatus(Status.ATIVO);
-        usuario.setDtEntrada(new java.sql.Date(System.currentTimeMillis()));
-        usuario.setPerfil(Perfil.ADMINISTRADOR);
-
-        if (foto != null && !foto.isEmpty()) {
-            try {
-                ArquivoResponseDTO arquivo = arquivoIntegracaoService.enviarArquivo(foto);
-                if (arquivo == null || arquivo.getUrl() == null || arquivo.getUrl().isBlank()) {
-                    throw new BusinessException("O serviço de arquivos não retornou a URL da foto.");
-                }
-                usuario.setFtUsuario(arquivo.getUrl());
-            } catch (RestClientException e) {
-                throw new BusinessException("Não foi possível enviar a foto.");
-            }
-        }
-
-        return usuarioRepository.save(usuario);
-    }
-
     @Transactional(readOnly = true)
     public Page<Usuario> listarTodos(Pageable pagina) {
         return usuarioRepository.findAll(pagina);

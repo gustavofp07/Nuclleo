@@ -344,12 +344,14 @@ export class CriarAnuncioPage implements OnInit {
 
   cadastrarRelacoesEdicao() {
 
-    const relacoes = this.comunidadesSelecionadas.map(
-      comunidade => ({
+    // O back só aceita comunidades de que o usuário participa: se ele saiu de
+    // alguma, o anúncio deixa de ser publicado nela
+    const relacoes = this.comunidadesSelecionadas
+      .filter(comunidade => this.comunidades.some(c => c.cdComunidade === comunidade.cdComunidade))
+      .map(comunidade => ({
         anuncio: this.anuncio,
         comunidade: comunidade
-      })
-    );
+      }));
 
     this.anuncioComunidadeService.cadastrarRelacoes(relacoes).subscribe({
       next: () => {

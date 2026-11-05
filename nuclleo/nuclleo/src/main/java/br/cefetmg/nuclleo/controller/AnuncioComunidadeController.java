@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,15 +35,17 @@ public class AnuncioComunidadeController {
 
     @PostMapping("")
     @Operation(summary = "Inserir uma nova relação entre anúncio e comunidade")
-    public ResponseEntity<AnuncioComunidade> inserir(@Valid @RequestBody AnuncioComunidade anuncioComunidade) {
-        anuncioComunidadeService.inserir(anuncioComunidade);
-        return ResponseEntity.ok(anuncioComunidade);
+    public ResponseEntity<AnuncioComunidade> inserir(@Valid @RequestBody AnuncioComunidade anuncioComunidade,
+            Authentication authentication) {
+        return ResponseEntity.ok(anuncioComunidadeService.inserir(anuncioComunidade, authentication.getName()));
     }
 
     @PostMapping("/relacoes")
     @Operation(summary = "Inserir relações em lote entre anúncio e comunidade")
-    public ResponseEntity<List<AnuncioComunidade>> inserirRelacoes(@RequestBody List<AnuncioComunidade> relacoes) {
-        List<AnuncioComunidade> relacoesInseridas = anuncioComunidadeService.inserirRelacoes(relacoes);
+    public ResponseEntity<List<AnuncioComunidade>> inserirRelacoes(@RequestBody List<AnuncioComunidade> relacoes,
+            Authentication authentication) {
+        List<AnuncioComunidade> relacoesInseridas = anuncioComunidadeService.inserirRelacoes(relacoes,
+                authentication.getName());
         return ResponseEntity.ok(relacoesInseridas);
     }
 
@@ -88,16 +91,20 @@ public class AnuncioComunidadeController {
 
     @DeleteMapping("/comunidade")
     @Operation(summary = "Excluir relações por comunidade")
-    public ResponseEntity<List<AnuncioComunidade>> excluirPorComunidade(@RequestParam Long cdComunidade) {
-        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorComunidade(cdComunidade);
+    public ResponseEntity<List<AnuncioComunidade>> excluirPorComunidade(@RequestParam Long cdComunidade,
+            Authentication authentication) {
+        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorComunidade(cdComunidade,
+                authentication.getName());
         return ResponseEntity.ok(relacoesExcluidas);
     }
 
     // URL: DELETE api/v1/AnuncioComunidade/anuncio?cdAnuncio=1
     @DeleteMapping("/anuncio")
     @Operation(summary = "Excluir relações por anúncio")
-    public ResponseEntity<List<AnuncioComunidade>> excluirPorAnuncio(@RequestParam Long cdAnuncio) {
-        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorAnuncio(cdAnuncio);
+    public ResponseEntity<List<AnuncioComunidade>> excluirPorAnuncio(@RequestParam Long cdAnuncio,
+            Authentication authentication) {
+        List<AnuncioComunidade> relacoesExcluidas = anuncioComunidadeService.excluirPorAnuncio(cdAnuncio,
+                authentication.getName());
         return ResponseEntity.ok(relacoesExcluidas);
     }
 
@@ -107,8 +114,9 @@ public class AnuncioComunidadeController {
     @DeleteMapping("/relacao")
     @Operation(summary = "Excluir relação específica entre anúncio e comunidade")
     public ResponseEntity<AnuncioComunidade> excluirRelacaoEspecifica(@RequestParam Long cdAnuncio,
-            @RequestParam Long cdComunidade) {
-        AnuncioComunidade relacaoExcluida = anuncioComunidadeService.excluirRelacaoEspecifica(cdAnuncio, cdComunidade);
+            @RequestParam Long cdComunidade, Authentication authentication) {
+        AnuncioComunidade relacaoExcluida = anuncioComunidadeService.excluirRelacaoEspecifica(cdAnuncio, cdComunidade,
+                authentication.getName());
         return ResponseEntity.ok(relacaoExcluida);
     }
 }

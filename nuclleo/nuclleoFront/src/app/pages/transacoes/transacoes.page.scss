@@ -22,3 +22,11 @@
   color: var(--nc-text);
   word-break: break-word;
 }
+
+.transacao__acoes {
+  margin-top: 14px;
+}
+
+.transacoes-grupo + .transacoes-grupo {
+  margin-top: 24px;
+}

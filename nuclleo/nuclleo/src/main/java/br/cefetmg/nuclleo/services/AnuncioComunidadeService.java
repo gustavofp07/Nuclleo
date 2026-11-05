@@ -13,11 +13,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.nuclleo.dto.TotalInteressadosDTO;
+import br.cefetmg.nuclleo.exception.BadRequestException;
+import br.cefetmg.nuclleo.exception.ForbiddenException;
+import br.cefetmg.nuclleo.exception.ResourceNotFoundException;
 import br.cefetmg.nuclleo.model.Anuncio;
 import br.cefetmg.nuclleo.model.AnuncioComunidade;
+import br.cefetmg.nuclleo.model.Comunidade;
+import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.AnuncioComunidadeRepository;
 import br.cefetmg.nuclleo.repository.AnuncioRepository;
+import br.cefetmg.nuclleo.repository.ComunidadeRepository;
 import br.cefetmg.nuclleo.repository.InteresseRepository;
+import br.cefetmg.nuclleo.repository.UsuarioComunidadeRepository;
+import br.cefetmg.nuclleo.repository.UsuarioRepository;
 
 @Service
 public class AnuncioComunidadeService {
@@ -30,14 +38,70 @@ public class AnuncioComunidadeService {
     @Autowired
     private InteresseRepository interesseRepository;
 
-    @Transactional
-    public AnuncioComunidade inserir(AnuncioComunidade anuncioComunidade) {
-        return repository.save(anuncioComunidade);
-    }
+    @Autowired
+    private ComunidadeRepository comunidadeRepository;
+
+    @Autowired
+    private UsuarioComunidadeRepository usuarioComunidadeRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Transactional
-    public List<AnuncioComunidade> inserirRelacoes(List<AnuncioComunidade> relacoes) {
-        return repository.saveAll(relacoes);
+    public AnuncioComunidade inserir(AnuncioComunidade anuncioComunidade, String emailSolicitante) {
+        return inserirRelacoes(List.of(anuncioComunidade), emailSolicitante).get(0);
+    }
+
+    /** RN03: só o dono publica o anúncio, e só nas comunidades de que ele participa. */
+    @Transactional
+    public List<AnuncioComunidade> inserirRelacoes(List<AnuncioComunidade> relacoes, String emailSolicitante) {
+        Usuario solicitante = usuarioRepository.findByEmail(emailSolicitante)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+
+        return repository.saveAll(relacoes.stream().map(relacao -> montarRelacao(relacao, solicitante)).toList());
+    }
+
+    // Do corpo só valem os códigos: anúncio e comunidade são sempre os que estão no banco
+    private AnuncioComunidade montarRelacao(AnuncioComunidade pedido, Usuario solicitante) {
+        if (pedido.getAnuncio() == null || pedido.getAnuncio().getCdAnuncio() == null
+                || pedido.getComunidade() == null || pedido.getComunidade().getCdComunidade() == null) {
+            throw new BadRequestException("O anúncio e a comunidade são obrigatórios.");
+        }
+
+        Anuncio anuncio = buscarAnuncio(pedido.getAnuncio().getCdAnuncio());
+        Comunidade comunidade = buscarComunidade(pedido.getComunidade().getCdComunidade());
+
+        if (!AnuncioService.ehDono(anuncio, solicitante.getEmail())) {
+            throw new ForbiddenException("Você só pode publicar os seus próprios anúncios.");
+        }
+
+        boolean participa = ehDonoDaComunidade(comunidade, solicitante.getEmail())
+                || usuarioComunidadeRepository.existsByUsuarioCdUsuarioAndComunidadeCdComunidade(
+                        solicitante.getCdUsuario(), comunidade.getCdComunidade());
+        if (!participa) {
+            throw new ForbiddenException("Você só pode publicar anúncios nas comunidades de que participa.");
+        }
+
+        AnuncioComunidade relacao = new AnuncioComunidade();
+        relacao.setAnuncio(anuncio);
+        relacao.setComunidade(comunidade);
+        return relacao;
+    }
+
+    private Anuncio buscarAnuncio(Long cdAnuncio) {
+        return anuncioRepository.findById(cdAnuncio)
+                .orElseThrow(() -> new ResourceNotFoundException("Anúncio não encontrado."));
+    }
+
+    private Comunidade buscarComunidade(Long cdComunidade) {
+        return comunidadeRepository.findById(cdComunidade)
+                .orElseThrow(() -> new ResourceNotFoundException("Comunidade não encontrada."));
+    }
+
+    private static boolean ehDonoDaComunidade(Comunidade comunidade, String email) {
+        return email != null
+                && comunidade.getUsuarioCria() != null
+                && email.equalsIgnoreCase(comunidade.getUsuarioCria().getEmail());
     }
 
     @Transactional(readOnly = true)
@@ -108,17 +172,28 @@ public class AnuncioComunidadeService {
     }
 
     @Transactional
-    public List<AnuncioComunidade> excluirPorComunidade(Long cdComunidade) {
+    public List<AnuncioComunidade> excluirPorComunidade(Long cdComunidade, String emailSolicitante) {
+        if (!ehDonoDaComunidade(buscarComunidade(cdComunidade), emailSolicitante)) {
+            throw new ForbiddenException("Apenas o administrador da comunidade pode remover os anúncios dela.");
+        }
         return repository.deleteByComunidadeCdComunidade(cdComunidade);
     }
 
     @Transactional
-    public List<AnuncioComunidade> excluirPorAnuncio(Long cdAnuncio) {
+    public List<AnuncioComunidade> excluirPorAnuncio(Long cdAnuncio, String emailSolicitante) {
+        if (!AnuncioService.ehDono(buscarAnuncio(cdAnuncio), emailSolicitante)) {
+            throw new ForbiddenException("Você só pode alterar os seus próprios anúncios.");
+        }
         return repository.deleteByAnuncioCdAnuncio(cdAnuncio);
     }
 
+    // Tirar um anúncio de uma comunidade: o dono do anúncio ou o dono da comunidade
     @Transactional
-    public AnuncioComunidade excluirRelacaoEspecifica(Long cdAnuncio, Long cdComunidade) {
+    public AnuncioComunidade excluirRelacaoEspecifica(Long cdAnuncio, Long cdComunidade, String emailSolicitante) {
+        if (!AnuncioService.ehDono(buscarAnuncio(cdAnuncio), emailSolicitante)
+                && !ehDonoDaComunidade(buscarComunidade(cdComunidade), emailSolicitante)) {
+            throw new ForbiddenException("Você não pode remover este anúncio da comunidade.");
+        }
         return repository.deleteByAnuncioCdAnuncioAndComunidadeCdComunidade(cdAnuncio, cdComunidade);
     }
 }

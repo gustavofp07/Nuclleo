@@ -12,6 +12,8 @@ import {
   IonContent,
   IonIcon,
   IonSpinner,
+  IonButton,
+  AlertController,
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -28,12 +30,13 @@ import { TokenService } from 'src/app/services/token.service';
   templateUrl: './transacoes.page.html',
   styleUrls: ['./transacoes.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonIcon, IonSpinner]
+  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonContent, IonIcon, IonSpinner, IonButton]
 })
 export class TransacoesPage {
   token: TokenModel;
   transacoes: TransacaoModel[] = [];
   carregando: boolean = false;
+  respondendo: number | null = null;
 
   private nomesUsuarios = new Map<number, string>();
 
@@ -41,6 +44,7 @@ export class TransacoesPage {
     private transacaoService: TransacaoService,
     private usuarioService: UsuarioService,
     private router: Router,
+    private alertController: AlertController,
     private toastController: ToastController,
     private tokenService: TokenService
   ) {
@@ -71,6 +75,64 @@ export class TransacoesPage {
       error: () => {
         this.carregando = false;
         this.exibirMensagem('Erro ao carregar transações.');
+      }
+    });
+  }
+
+  get pendentes(): TransacaoModel[] {
+    return this.transacoes.filter(t => t.status === 'PENDENTE');
+  }
+
+  get historico(): TransacaoModel[] {
+    return this.transacoes.filter(t => t.status === 'CONFIRMADA');
+  }
+
+  // Quem registra é o anunciante; quem valida é o outro participante
+  devoResponder(transacao: TransacaoModel): boolean {
+    return transacao.usuario.cdUsuario === this.token.cdUsuario;
+  }
+
+  confirmar(transacao: TransacaoModel) {
+    this.respondendo = transacao.id;
+
+    this.transacaoService.confirmar(transacao.id).subscribe({
+      next: () => {
+        transacao.status = 'CONFIRMADA';
+        this.respondendo = null;
+        this.exibirMensagem('Transação confirmada.');
+      },
+      error: (erro) => {
+        this.respondendo = null;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao confirmar a transação.');
+      }
+    });
+  }
+
+  async confirmarRecusa(transacao: TransacaoModel) {
+    const alert = await this.alertController.create({
+      header: 'Recusar transação',
+      message: `Essa transação não aconteceu? ${this.nomeOutroUsuario(transacao)} será avisado e ela não entra no histórico.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Recusar', role: 'destructive', handler: () => this.recusar(transacao) }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private recusar(transacao: TransacaoModel) {
+    this.respondendo = transacao.id;
+
+    this.transacaoService.recusar(transacao.id).subscribe({
+      next: () => {
+        this.transacoes = this.transacoes.filter(t => t.id !== transacao.id);
+        this.respondendo = null;
+        this.exibirMensagem('Transação recusada.');
+      },
+      error: (erro) => {
+        this.respondendo = null;
+        this.exibirMensagem(erro?.error?.message || 'Erro ao recusar a transação.');
       }
     });
   }

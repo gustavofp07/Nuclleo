@@ -143,7 +143,8 @@ public class InteresseService {
         messagingTemplate.convertAndSend("/topic/notificacoes/" + interessado.getCdUsuario(),
                 new NotificacaoDTO("CONVERSA_FINALIZADA",
                         anunciante.getNmUsuario() + " finalizou a conversa sobre \""
-                                + interesse.getAnuncio().getNmAnuncio() + "\". Avalie para concluir.",
+                                + interesse.getAnuncio().getNmAnuncio() + "\". Avalie para concluir."
+                                + (dto.isOcorreuTransacao() ? " Confirme também a transação em Suas transações." : ""),
                         interesse.getId()));
 
         excluirSeAmbosAvaliaram(interesse);

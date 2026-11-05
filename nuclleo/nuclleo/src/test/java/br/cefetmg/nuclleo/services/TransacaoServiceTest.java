@@ -1,8 +1,12 @@
 package br.cefetmg.nuclleo.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,10 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import br.cefetmg.nuclleo.Fixtures;
+import br.cefetmg.nuclleo.exception.BusinessException;
 import br.cefetmg.nuclleo.exception.ForbiddenException;
 import br.cefetmg.nuclleo.model.Anuncio;
+import br.cefetmg.nuclleo.model.StatusTransacao;
 import br.cefetmg.nuclleo.model.Transacao;
 import br.cefetmg.nuclleo.model.Usuario;
 import br.cefetmg.nuclleo.repository.TransacaoRepository;
@@ -36,6 +43,9 @@ class TransacaoServiceTest {
 
     @Mock
     private AnuncioService anuncioService;
+
+    @Mock
+    private SimpMessagingTemplate messagingTemplate;
 
     @InjectMocks
     private TransacaoService transacaoService;
@@ -93,6 +103,66 @@ class TransacaoServiceTest {
                 .thenReturn(List.of(transacao));
 
         assertSame(transacao, transacaoService.listarPorUsuarioEnvolvido(2L, comprador.getEmail()).get(0));
+    }
+
+    @Test
+    void transacaoNasceSemConfirmacao() {
+        assertEquals(StatusTransacao.PENDENTE, new Transacao().getStatus());
+    }
+
+    @Test
+    void interessadoConfirmaEOAnuncianteEAvisado() {
+        when(transacaoRepository.findById(100L)).thenReturn(Optional.of(transacao));
+        when(transacaoRepository.save(transacao)).thenReturn(transacao);
+        logado(comprador);
+
+        transacaoService.confirmar(100L, comprador.getEmail());
+
+        assertEquals(StatusTransacao.CONFIRMADA, transacao.getStatus());
+        verify(messagingTemplate).convertAndSend(eq("/topic/notificacoes/1"), any(Object.class));
+    }
+
+    @Test
+    void transacaoRecusadaSaiDoHistoricoDosDois() {
+        when(transacaoRepository.findById(100L)).thenReturn(Optional.of(transacao));
+        when(transacaoRepository.save(transacao)).thenReturn(transacao);
+        logado(comprador);
+        logado(vendedor);
+
+        transacaoService.recusar(100L, comprador.getEmail());
+
+        when(transacaoRepository.findByUsuarioCdUsuarioOrAnuncioUsuarioCriaCdUsuarioOrderByDataDesc(anyLong(), anyLong()))
+                .thenReturn(List.of(transacao));
+        assertEquals(StatusTransacao.RECUSADA, transacao.getStatus());
+        assertEquals(List.of(), transacaoService.listarPorUsuarioEnvolvido(2L, comprador.getEmail()));
+        assertEquals(List.of(), transacaoService.listarPorUsuarioEnvolvido(1L, vendedor.getEmail()));
+    }
+
+    @Test
+    void oAnuncianteNaoValidaAPropriaTransacao() {
+        when(transacaoRepository.findById(100L)).thenReturn(Optional.of(transacao));
+        logado(vendedor);
+
+        assertThrows(ForbiddenException.class, () -> transacaoService.confirmar(100L, vendedor.getEmail()));
+        assertEquals(StatusTransacao.PENDENTE, transacao.getStatus());
+    }
+
+    @Test
+    void quemNaoParticipouNaoValida() {
+        when(transacaoRepository.findById(100L)).thenReturn(Optional.of(transacao));
+        logado(estranho);
+
+        assertThrows(ForbiddenException.class, () -> transacaoService.recusar(100L, estranho.getEmail()));
+    }
+
+    @Test
+    void transacaoSoERespondidaUmaVez() {
+        transacao.setStatus(StatusTransacao.RECUSADA);
+        when(transacaoRepository.findById(100L)).thenReturn(Optional.of(transacao));
+        logado(comprador);
+
+        assertThrows(BusinessException.class, () -> transacaoService.confirmar(100L, comprador.getEmail()));
+        verify(messagingTemplate, never()).convertAndSend(anyString(), any(Object.class));
     }
 
     @Test

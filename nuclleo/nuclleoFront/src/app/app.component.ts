@@ -127,6 +127,15 @@ export class AppComponent implements OnInit {
           }
           break;
 
+        // O outro participante respondeu à transação registrada pelo anunciante
+        case 'TRANSACAO_CONFIRMADA':
+          this.mostrarToast(evento.mensagem, 'checkmark-circle-outline', 'success', 4000);
+          break;
+
+        case 'TRANSACAO_RECUSADA':
+          this.mostrarToast(evento.mensagem, 'close-circle-outline', 'medium', 5000);
+          break;
+
         // Moderação: a conta foi suspensa e o token deixou de valer
         case 'CONTA_SUSPENSA':
           this.encerrarSessaoSuspensa(evento.mensagem);

@@ -21,4 +21,12 @@ export class TransacaoService {
   listarPorUsuario(cdUsuario: number): Observable<TransacaoModel[]> {
     return this.http.get<TransacaoModel[]>(`${this.URL}/usuario/${cdUsuario}`, this.getHeaders());
   }
+
+  confirmar(id: number): Observable<TransacaoModel> {
+    return this.http.put<TransacaoModel>(`${this.URL}/${id}/confirmar`, null, this.getHeaders());
+  }
+
+  recusar(id: number): Observable<TransacaoModel> {
+    return this.http.put<TransacaoModel>(`${this.URL}/${id}/recusar`, null, this.getHeaders());
+  }
 }
